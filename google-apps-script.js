@@ -24,7 +24,8 @@ function doPost(e) {
   var welcomeSubject = "Welcome to UBLDA!";
   var welcomeBody = "Welcome to UBLDA, " + data.firstName + "!";
   welcomeBody += "\n\nYou are officially on the list. We will keep you in the loop on upcoming events, workshops, and ways to get involved.";
-  welcomeBody += "\n\nFollow us on Instagram: https://www.instagram.com/ublda_umich/";
+  welcomeBody += "\n\nFollow us on Instagram: https://www.instagram.com/michiganublda/";
+  welcomeBody += "\nFollow us on LinkedIn: https://www.linkedin.com/company/ublda/";
   welcomeBody += "\nCheck out events: https://ublda.org/events";
   welcomeBody += "\n\nQuestions? Reach out:";
   welcomeBody += "\nsbodine@umich.edu";
