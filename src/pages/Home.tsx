@@ -281,6 +281,14 @@ export default function Home() {
                     Ross B0560
                   </span>
                   <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="event-card__gcal"
+                  >
+                    RSVP
+                  </a>
+                  <a
                     href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Fireside+Chat+with+Andrew+Parker%2C+CEO+%26+Co-Founder+of+Nestidd&dates=20260311T190000/20260311T200000&details=Andrew+Parker+%28Ross+alum%29+built+Nestidd+into+an+800%2B+property+housing+platform+for+people+with+intellectual+and+developmental+disabilities.+Hear+how+he+did+it+and+why+mission-driven+business+wins.+Raising+Cane%27s+will+be+catered.&location=Ross+B0560%2C+Ross+School+of+Business"
                     target="_blank"
                     rel="noopener noreferrer"

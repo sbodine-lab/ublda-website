@@ -13,6 +13,7 @@ interface Event {
   location: string
   tags?: string[]
   past?: boolean
+  rsvpUrl?: string
 }
 
 function buildGCalUrl(event: Event): string {
@@ -67,6 +68,7 @@ const events: Event[] = [
     description:
       'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. Hear how he did it and why mission-driven business wins. Raising Cane\'s provided.',
     location: 'Ross B0560, Ross School of Business',
+    rsvpUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header',
   },
   {
     date: 'February 13, 2026',
@@ -192,6 +194,16 @@ function EventCard({ event }: { event: Event }) {
             {event.location}
           </span>
           <div className="ev-card__actions">
+            {!event.past && event.rsvpUrl && (
+              <a
+                href={event.rsvpUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ev-card__gcal"
+              >
+                RSVP
+              </a>
+            )}
             {!event.past && (
               <a
                 href={buildGCalUrl(event)}

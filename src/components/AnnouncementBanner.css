@@ -1,0 +1,107 @@
+/* ─── Announcement Banner ─── */
+.announcement {
+  background: var(--color-navy);
+  color: var(--color-white);
+  padding: var(--space-2) 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+}
+
+.announcement__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.announcement__text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.announcement__countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--color-teal);
+  letter-spacing: var(--tracking-wide);
+}
+
+.announcement__countdown-unit {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.announcement__countdown-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.announcement__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.announcement__rsvp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  background: var(--color-teal);
+  color: var(--color-navy-deep);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.announcement__rsvp:hover {
+  filter: brightness(1.1);
+}
+
+.announcement__dismiss {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: var(--space-1) var(--space-2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.announcement__dismiss:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+  .announcement {
+    padding: var(--space-2) 0;
+  }
+
+  .announcement__inner {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .announcement__text {
+    flex-direction: column;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+  }
+
+  .announcement__actions {
+    gap: var(--space-2);
+  }
+}

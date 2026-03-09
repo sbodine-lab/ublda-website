@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
+import AnnouncementBanner from './components/AnnouncementBanner'
 import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
@@ -28,6 +29,7 @@ export default function App() {
           Skip to main content
         </a>
       )}
+      {!isStandalone && <AnnouncementBanner />}
       {!isStandalone && <Nav />}
       <ScrollToTop />
       <Routes>
