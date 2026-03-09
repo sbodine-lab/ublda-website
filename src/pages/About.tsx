@@ -42,16 +42,82 @@ export default function About() {
               world that doesn't leave anyone out.
             </p>
           </Reveal>
-          <Reveal delay={0.3}>
-            <p className="about__intro">
-              UBLDA was built by Sam Bodine, Alexa Chiang, and Cooper Perry when they
-              first got to campus. They brought on Lindsey Ye, Landon Miller, and Alex
-              Forstner to form the inaugural leadership team and together launched the
-              organization to the public in Winter 2026. We're actively growing,
-              expanding our programming, and taking on new leadership every semester.
-              This is just the start.
-            </p>
+        </div>
+      </section>
+
+      <section className="section about__timeline">
+        <div className="container">
+          <Reveal>
+            <h2 className="about__timeline-headline">Our story so far.</h2>
           </Reveal>
+          <div className="about__timeline-track">
+            <Reveal>
+              <div className="timeline-item">
+                <div className="timeline-item__marker" />
+                <div className="timeline-item__content">
+                  <span className="timeline-item__date">Sep – Nov 2025</span>
+                  <h3 className="timeline-item__title">The idea takes shape</h3>
+                  <p className="timeline-item__desc">
+                    Sam Bodine, Alexa Chiang, and Cooper Perry got to campus and started
+                    building UBLDA from scratch. Planning, outreach, and laying the groundwork
+                    for a new kind of org at Ross.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="timeline-item">
+                <div className="timeline-item__marker" />
+                <div className="timeline-item__content">
+                  <span className="timeline-item__date">Dec 2025</span>
+                  <h3 className="timeline-item__title">Leadership team assembled</h3>
+                  <p className="timeline-item__desc">
+                    Recruited Lindsey Ye, Landon Miller, and Alex Forstner as VPs. Together,
+                    the six of us became the inaugural e-board.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <div className="timeline-item">
+                <div className="timeline-item__marker" />
+                <div className="timeline-item__content">
+                  <span className="timeline-item__date">Jan 2026</span>
+                  <h3 className="timeline-item__title">BBA Meet the Clubs</h3>
+                  <p className="timeline-item__desc">
+                    Officially introduced UBLDA to the Ross community. Started signing up
+                    members and building momentum.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <div className="timeline-item">
+                <div className="timeline-item__marker timeline-item__marker--active" />
+                <div className="timeline-item__content">
+                  <span className="timeline-item__date">Mar 2026</span>
+                  <h3 className="timeline-item__title">First ever UBLDA event</h3>
+                  <p className="timeline-item__desc">
+                    Fireside Chat with Andrew Parker, CEO &amp; Co-Founder of Nestidd.
+                    Our first solo event as an organization.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.4}>
+              <div className="timeline-item">
+                <div className="timeline-item__marker timeline-item__marker--future" />
+                <div className="timeline-item__content">
+                  <span className="timeline-item__date">Fall 2026 &amp; beyond</span>
+                  <h3 className="timeline-item__title">More to come</h3>
+                  <p className="timeline-item__desc">
+                    Accessibility consulting, a mentorship program, expanded speaker series,
+                    and new leadership opportunities. We're just getting started.
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+          </div>
         </div>
       </section>
 

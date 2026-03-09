@@ -280,7 +280,6 @@ export default function Home() {
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>
                     Ross B0560
                   </span>
-                  <span className="event-card__tag">Catered</span>
                   <a
                     href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Fireside+Chat+with+Andrew+Parker%2C+CEO+%26+Co-Founder+of+Nestidd&dates=20260311T190000/20260311T200000&details=Andrew+Parker+%28Ross+alum%29+built+Nestidd+into+an+800%2B+property+housing+platform+for+people+with+intellectual+and+developmental+disabilities.+Hear+how+he+did+it+and+why+mission-driven+business+wins.+Raising+Cane%27s+will+be+catered.&location=Ross+B0560%2C+Ross+School+of+Business"
                     target="_blank"

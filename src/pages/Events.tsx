@@ -67,18 +67,16 @@ const events: Event[] = [
     description:
       'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. Hear how he did it and why mission-driven business wins. Raising Cane\'s provided.',
     location: 'Ross B0560, Ross School of Business',
-    tags: ['Speaker', 'Catered'],
   },
   {
     date: 'February 13, 2026',
     month: 'Feb',
     day: '13',
     title: '2nd Annual RossAbilities Conference',
-    host: 'Business Leaders for Diverse Abilities (BLDA)',
+    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
     description:
       'A full day of speakers, panels, and real conversations on disability inclusion and what accessible business actually looks like.',
     location: 'Tauber Colloquium, Ross School of Business',
-    tags: ['Conference'],
     past: true,
   },
   {
@@ -87,11 +85,10 @@ const events: Event[] = [
     day: '17',
     time: '12:00 PM - 2:00 PM',
     title: 'Adaptive Basketball Event',
-    host: 'Business Leaders for Diverse Abilities (BLDA)',
+    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
     description:
       'Wheelchair basketball against the medical school. No experience needed. We ran chair skills and drills before tip-off.',
     location: 'Sports Coliseum, 701 Tappan Street, Ann Arbor, MI 48109',
-    tags: ['Social', 'Sports'],
     past: true,
   },
 ]
@@ -195,13 +192,6 @@ function EventCard({ event }: { event: Event }) {
             {event.location}
           </span>
           <div className="ev-card__actions">
-            {event.tags && (
-              <div className="ev-card__tags">
-                {event.tags.map((tag) => (
-                  <span key={tag} className="ev-card__tag">{tag}</span>
-                ))}
-              </div>
-            )}
             {!event.past && (
               <a
                 href={buildGCalUrl(event)}
