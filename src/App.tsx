@@ -7,6 +7,7 @@ import About from './pages/About'
 import Events from './pages/Events'
 import Team from './pages/Team'
 import Join from './pages/Join'
+import Links from './pages/Links'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -17,12 +18,17 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const { pathname } = useLocation()
+  const isStandalone = pathname === '/links'
+
   return (
     <>
-      <a href="#main-content" className="skip-nav">
-        Skip to main content
-      </a>
-      <Nav />
+      {!isStandalone && (
+        <a href="#main-content" className="skip-nav">
+          Skip to main content
+        </a>
+      )}
+      {!isStandalone && <Nav />}
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -30,8 +36,9 @@ export default function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
+        <Route path="/links" element={<Links />} />
       </Routes>
-      <Footer />
+      {!isStandalone && <Footer />}
     </>
   )
 }
