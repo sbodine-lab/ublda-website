@@ -45,10 +45,11 @@ export default function About() {
           <Reveal delay={0.3}>
             <p className="about__intro">
               UBLDA was built by Sam Bodine, Alexa Chiang, and Cooper Perry when they
-              first got to campus. They brought on the rest of the leadership team and
-              together launched the organization to the public in Winter 2026. We're
-              actively growing, expanding our programming, and taking on new leadership
-              every semester. This is just the start.
+              first got to campus. They brought on Lindsey Ye, Landon Miller, and Alex
+              Forstner to form the inaugural leadership team and together launched the
+              organization to the public in Winter 2026. We're actively growing,
+              expanding our programming, and taking on new leadership every semester.
+              This is just the start.
             </p>
           </Reveal>
         </div>
