@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 200" fill="none">
+  <!-- Teal triangle center -->
+  <path d="M90 18L140 185H40Z" fill="#6EC6B8"/>
+  <!-- Left figure (navy) - body -->
+  <path d="M75 50C40 60 22 110 45 185H90C82 130 85 100 90 72C82 58 75 50 75 50Z" fill="#1A4D6E"/>
+  <!-- Left figure head -->
+  <circle cx="78" cy="34" r="18" fill="#1A4D6E"/>
+  <!-- Right figure (gold) - body -->
+  <path d="M108 56C140 66 155 115 135 185H90C98 130 96 105 90 78C98 62 108 56 108 56Z" fill="#D4A34B"/>
+  <!-- Right figure head -->
+  <circle cx="118" cy="40" r="15" fill="#D4A34B"/>
+  <!-- Center overlap blend -->
+  <path d="M90 72C85 100 82 130 90 185C98 130 96 105 90 78Z" fill="#7A8E3E" opacity="0.55"/>
+</svg>
