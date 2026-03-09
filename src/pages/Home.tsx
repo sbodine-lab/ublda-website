@@ -181,9 +181,9 @@ export default function Home() {
               <Reveal delay={0.2}>
                 <p className="partnership__desc">
                   We're the undergraduate chapter of Business Leaders for Diverse Abilities (BLDA),
-                  Ross's MBA disability advocacy organization. That means our members get
-                  direct access to mentorship, networking, and career opportunities
-                  through the MBA community that you simply won't find anywhere else on campus.
+                  Ross's MBA disability advocacy organization. Through this partnership,
+                  our members gain access to a broader network, mentorship, and guidance
+                  opportunities across the Ross community that you won't find anywhere else on campus.
                 </p>
               </Reveal>
             </div>
