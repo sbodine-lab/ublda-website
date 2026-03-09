@@ -85,33 +85,9 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile: compact two-row layout */
+/* Mobile: hide banner entirely so it doesn't obstruct content */
 @media (max-width: 768px) {
   .announcement {
-    padding: var(--space-1) 0;
-  }
-
-  .announcement__inner {
-    gap: var(--space-2);
-  }
-
-  .announcement__text {
-    font-size: var(--text-xs);
-    gap: var(--space-2);
-  }
-
-  /* Hide countdown on small screens to keep it compact */
-  .announcement__countdown {
     display: none;
-  }
-
-  .announcement__actions {
-    gap: var(--space-2);
-    flex-shrink: 0;
-  }
-
-  .announcement__dismiss {
-    font-size: 0.6875rem;
-    padding: var(--space-1) 0;
   }
 }
