@@ -51,15 +51,15 @@ const upcoming = [
 ]
 
 const exec = [
-  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Runs the show and keeps UBLDA pointed in the right direction, from speaker events to campus-wide partnerships.', linkedin: '#' },
-  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Bridges disability advocacy and the broader Ross community. Makes sure no one gets left out of the conversation.', linkedin: '#' },
-  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: '#' },
+  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Runs the show and keeps UBLDA pointed in the right direction, from speaker events to campus-wide partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
+  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Bridges disability advocacy and the broader Ross community. Makes sure no one gets left out of the conversation.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
+  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
 ]
 
 const vps = [
-  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: '#' },
-  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: '#' },
-  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: '#' },
+  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
+  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
+  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
 ]
 
 const LinkedInIcon = () => (
