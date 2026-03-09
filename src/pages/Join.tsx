@@ -57,10 +57,15 @@ export default function Join() {
     email: '',
   })
 
-  const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm({ ...form, [field]: e.target.value })
+  const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    let val = e.target.value
+    if (field === 'email') {
+      val = val.replace(/@umich\.edu$/i, '').replace(/@.*$/, '')
+    }
+    setForm({ ...form, [field]: val })
+  }
 
-  const fullEmail = form.email.includes('@') ? form.email : `${form.email}@umich.edu`
+  const fullEmail = `${form.email.replace(/@umich\.edu$/i, '').replace(/@.*$/, '')}@umich.edu`
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
