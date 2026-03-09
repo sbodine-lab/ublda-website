@@ -542,14 +542,13 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-navy);
-  background: rgba(23, 224, 219, 0.1);
-  border: 1px solid rgba(23, 224, 219, 0.25);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  letter-spacing: var(--tracking-wide);
+  font-weight: 500;
+  color: var(--color-gray-600);
   white-space: nowrap;
+}
+
+.event-card__gcal:hover {
+  color: var(--color-teal);
 }
 
 .events__more {
