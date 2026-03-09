@@ -74,13 +74,13 @@
 .value-card__title {
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
   color: var(--color-navy);
   margin-bottom: var(--space-3);
 }
 
 .value-card__desc {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   color: var(--color-gray-600);
   line-height: var(--leading-normal);
 }

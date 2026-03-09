@@ -90,13 +90,13 @@
 .team-card__name {
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   color: var(--color-navy);
   margin-bottom: var(--space-1);
 }
 
 .team-card__role {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--color-gray-600);
   margin-bottom: var(--space-3);
 }

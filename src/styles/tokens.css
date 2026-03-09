@@ -22,8 +22,8 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
 
-  --text-xs:   0.8125rem;
-  --text-sm:   0.875rem;
+  --text-xs:   0.875rem;
+  --text-sm:   0.9375rem;
   --text-base: 1rem;
   --text-lg:   1.125rem;
   --text-xl:   1.25rem;
