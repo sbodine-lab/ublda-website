@@ -192,13 +192,13 @@ export default function Join() {
                 <div className="join-form__row">
                   <div className="join-form__field">
                     <label className="join-form__label" htmlFor="major">
-                      Major
+                      College
                     </label>
                     <input
                       id="major"
                       type="text"
                       className="join-form__input"
-                      placeholder="e.g. Business, Psychology"
+                      placeholder="e.g. Ross, LSA, Engineering"
                       value={form.major}
                       onChange={update('major')}
                       required

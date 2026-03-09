@@ -11,36 +11,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Email service not configured' })
+  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
+  if (!scriptUrl) {
+    return res.status(500).json({ error: 'Form backend not configured' })
   }
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'UBLDA Website <onboarding@resend.dev>',
-      to: 'sbodine@umich.edu',
-      subject: `UBLDA Membership: ${firstName} ${lastName}`,
-      html: `
-        <h2>New UBLDA Membership Sign-Up</h2>
-        <table style="border-collapse:collapse;font-family:sans-serif;">
-          <tr><td style="padding:8px 16px;font-weight:bold;">Name</td><td style="padding:8px 16px;">${firstName} ${lastName}</td></tr>
-          <tr><td style="padding:8px 16px;font-weight:bold;">Email</td><td style="padding:8px 16px;"><a href="mailto:${email}">${email}</a></td></tr>
-          <tr><td style="padding:8px 16px;font-weight:bold;">Major</td><td style="padding:8px 16px;">${major || 'N/A'}</td></tr>
-          <tr><td style="padding:8px 16px;font-weight:bold;">Year</td><td style="padding:8px 16px;">${year || 'N/A'}</td></tr>
-        </table>
-      `,
-    }),
-  })
+  // Extract uniqname (strip @umich.edu if present)
+  const uniqname = email.replace(/@umich\.edu$/i, '')
 
-  if (!response.ok) {
-    return res.status(500).json({ error: 'Failed to send email' })
+  try {
+    const response = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, uniqname, year, college: major }),
+    })
+
+    if (!response.ok) {
+      return res.status(500).json({ error: 'Failed to submit' })
+    }
+
+    return res.status(200).json({ success: true })
+  } catch {
+    return res.status(500).json({ error: 'Failed to submit' })
   }
-
-  return res.status(200).json({ success: true })
 }
