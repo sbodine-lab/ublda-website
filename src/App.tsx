@@ -9,6 +9,7 @@ import Events from './pages/Events'
 import Team from './pages/Team'
 import Join from './pages/Join'
 import Links from './pages/Links'
+import Brand from './pages/Brand'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/join" element={<Join />} />
         <Route path="/links" element={<Links />} />
+        <Route path="/brand" element={<Brand />} />
       </Routes>
       {!isStandalone && <Footer />}
     </>

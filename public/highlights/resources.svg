@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <circle cx="540" cy="540" r="540" fill="#0F2B3C"/>
+  <rect x="390" y="280" width="220" height="300" rx="16" fill="none" stroke="#2BBAB0" stroke-width="18"/>
+  <rect x="470" y="340" width="220" height="300" rx="16" fill="none" stroke="rgba(43,186,176,0.45)" stroke-width="14"/>
+  <line x1="430" y1="400" x2="570" y2="400" stroke="#2BBAB0" stroke-width="12" stroke-linecap="round"/>
+  <line x1="430" y1="450" x2="550" y2="450" stroke="#2BBAB0" stroke-width="12" stroke-linecap="round"/>
+  <line x1="430" y1="500" x2="530" y2="500" stroke="#2BBAB0" stroke-width="12" stroke-linecap="round"/>
+  <text x="540" y="800" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="56" font-weight="600" letter-spacing="0.1em" fill="rgba(255,255,255,0.7)">RESOURCES</text>
+</svg>
