@@ -10,13 +10,10 @@ interface Member {
   linkedin: string
 }
 
-const exec: Member[] = [
+const board: Member[] = [
   { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Runs the show and keeps UBLDA pointed in the right direction, from speaker events to campus-wide partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
   { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Bridges disability advocacy and the broader Ross community. Makes sure no one gets left out of the conversation.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
   { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
-]
-
-const vps: Member[] = [
   { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
   { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
   { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
@@ -54,21 +51,10 @@ export default function Team() {
       <section className="section team-section">
         <div className="container">
           <Reveal>
-            <div className="team-section__divider">Executive Leadership</div>
+            <div className="team-section__divider">Executive Board</div>
           </Reveal>
           <RevealStagger className="team-grid">
-            {exec.map((m) => (
-              <RevealChild key={m.name}>
-                <TeamCard member={m} />
-              </RevealChild>
-            ))}
-          </RevealStagger>
-
-          <Reveal>
-            <div className="team-section__divider">Vice Presidents</div>
-          </Reveal>
-          <RevealStagger className="team-grid">
-            {vps.map((m) => (
+            {board.map((m) => (
               <RevealChild key={m.name}>
                 <TeamCard member={m} />
               </RevealChild>
