@@ -43,10 +43,12 @@ export default function AnnouncementBanner() {
     }
 
     const update = () => {
-      if (bannerRef.current) {
-        const h = bannerRef.current.offsetHeight
-        document.documentElement.style.setProperty('--announcement-h', `${h}px`)
-      }
+      requestAnimationFrame(() => {
+        if (bannerRef.current) {
+          const h = bannerRef.current.offsetHeight
+          document.documentElement.style.setProperty('--announcement-h', `${h}px`)
+        }
+      })
     }
 
     update()
