@@ -507,7 +507,7 @@
 }
 
 .event-card__desc {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   color: var(--color-gray-600);
   line-height: var(--leading-normal);
   margin-bottom: var(--space-6);
@@ -523,16 +523,16 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   color: var(--color-gray-600);
 }
 
 .event-card__tag {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-gold);
   background: var(--color-gold-soft);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   letter-spacing: var(--tracking-wide);
 }
@@ -541,12 +541,12 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-navy);
   background: rgba(23, 224, 219, 0.1);
   border: 1px solid rgba(23, 224, 219, 0.25);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   letter-spacing: var(--tracking-wide);
   white-space: nowrap;
