@@ -60,6 +60,8 @@ export default function Join() {
   const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [field]: e.target.value })
 
+  const fullEmail = form.email.includes('@') ? form.email : `${form.email}@umich.edu`
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
@@ -70,7 +72,7 @@ export default function Join() {
         body: JSON.stringify({
           firstName: form.firstName,
           lastName: form.lastName,
-          email: form.email,
+          email: fullEmail,
           major: form.major,
           year: form.year,
         }),
@@ -171,17 +173,20 @@ export default function Join() {
 
                 <div className="join-form__field">
                   <label className="join-form__label" htmlFor="email">
-                    UMich email (@umich.edu)
+                    UMich uniqname
                   </label>
-                  <input
-                    id="email"
-                    type="email"
-                    className="join-form__input"
-                    placeholder="uniqname@umich.edu"
-                    value={form.email}
-                    onChange={update('email')}
-                    required
-                  />
+                  <div className="join-form__email-wrapper">
+                    <input
+                      id="email"
+                      type="text"
+                      className="join-form__input join-form__input--email"
+                      placeholder="uniqname"
+                      value={form.email}
+                      onChange={update('email')}
+                      required
+                    />
+                    <span className="join-form__email-suffix">@umich.edu</span>
+                  </div>
                 </div>
 
                 <div className="join-form__row">
