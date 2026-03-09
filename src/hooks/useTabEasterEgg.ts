@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 const ORIGINAL_TITLE = 'UBLDA — Undergraduate Business Leaders for Diverse Abilities'
-const AWAY_TITLE = 'Come back soon! \u2764\uFE0F'
+const AWAY_TITLE = 'Come back soon!'
 const WELCOME_TITLE = 'Welcome back! \uD83D\uDC4B'
 
 export function useTabEasterEgg() {
