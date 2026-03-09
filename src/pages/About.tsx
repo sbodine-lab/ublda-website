@@ -42,6 +42,14 @@ export default function About() {
               world that doesn't leave anyone out.
             </p>
           </Reveal>
+          <Reveal delay={0.3}>
+            <p className="about__intro">
+              Founded in Winter 2026 by Sam Bodine, Alexa Chiang, and Cooper Perry,
+              UBLDA is a new and fast-growing club. We're actively expanding our
+              leadership team, building out new programming, and taking on more every
+              semester. This is just the beginning.
+            </p>
+          </Reveal>
         </div>
       </section>
 

@@ -26,7 +26,7 @@ const faqs = [
   {
     question: "What's the time commitment?",
     answer:
-      'Totally flexible. Come to as many or as few events as you want. There are no attendance requirements.',
+      'Totally flexible. Come to as many or as few events as you want. That said, we do track active attendance for future leadership openings and selective program opportunities launching in Fall 2026.',
   },
   {
     question: 'Is there a membership fee?',
@@ -35,7 +35,7 @@ const faqs = [
   {
     question: "I'm not in Ross. Can I still join?",
     answer:
-      "Yes. We're Ross-based but open to all University of Michigan students.",
+      "Yes. We're officially affiliated with the Ross School of Business, but we're open to all University of Michigan students regardless of college.",
   },
   {
     question: 'What happens after I sign up?',
