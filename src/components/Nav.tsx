@@ -40,6 +40,16 @@ export default function Nav() {
     setMobileOpen(false)
   }, [location])
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.classList.add('nav-open')
+    } else {
+      document.body.classList.remove('nav-open')
+    }
+    return () => document.body.classList.remove('nav-open')
+  }, [mobileOpen])
+
   return (
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
       <div className="nav__inner container">

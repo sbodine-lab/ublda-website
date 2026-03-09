@@ -165,8 +165,20 @@
     height: 52px;
   }
 
+  .team-card__name {
+    font-size: var(--text-base);
+  }
+
+  .team-card__role {
+    font-size: var(--text-sm);
+  }
+
+  .team-contact__title {
+    font-size: var(--text-3xl);
+  }
+
   .team-contact__desc {
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
   }
 }
 

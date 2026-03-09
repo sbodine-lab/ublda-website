@@ -754,6 +754,27 @@
     max-width: 100%;
   }
 
+  .hero__actions {
+    gap: var(--space-3);
+  }
+
+  .btn {
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-6);
+  }
+
+  .btn-flip__front,
+  .btn-flip__back {
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-6);
+  }
+
+  .btn--lg {
+    width: 100%;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+  }
+
   .mission {
     padding: var(--space-20) 0;
   }
@@ -772,6 +793,18 @@
     gap: var(--space-3);
   }
 
+  .pillar-card {
+    padding: var(--space-6);
+  }
+
+  .pillar-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .pillar-card__desc {
+    font-size: var(--text-base);
+  }
+
   .partnership {
     padding: var(--space-20) 0;
   }
@@ -779,6 +812,15 @@
   .partnership__layout {
     grid-template-columns: 1fr;
     gap: var(--space-10);
+  }
+
+  .partnership__desc {
+    font-size: var(--text-base);
+  }
+
+  .benefit-tag {
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-4);
   }
 
   .community {
@@ -812,6 +854,18 @@
     gap: var(--space-3);
   }
 
+  .upcoming-card {
+    padding: var(--space-6);
+  }
+
+  .upcoming-card__title {
+    font-size: var(--text-2xl);
+  }
+
+  .upcoming-card__desc {
+    font-size: var(--text-base);
+  }
+
   .featured-event {
     padding: var(--space-20) 0;
   }
@@ -823,12 +877,21 @@
   }
 
   .event-card__date {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+  }
+
+  .event-card__day {
+    font-size: var(--text-2xl);
   }
 
   .event-card__title {
     font-size: var(--text-xl);
+  }
+
+  .event-card__desc {
+    font-size: var(--text-base);
   }
 
   .event-card__meta {
@@ -855,12 +918,16 @@
   }
 
   .person-card__avatar {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     font-size: var(--text-xs);
   }
 
   .person-card__name {
+    font-size: var(--text-sm);
+  }
+
+  .person-card__role {
     font-size: var(--text-sm);
   }
 
@@ -876,21 +943,31 @@
     display: none;
   }
 
-  .btn--lg {
-    width: 100%;
-    justify-content: center;
+  .cta__sub {
+    font-size: var(--text-base);
   }
 }
 
 /* Small mobile */
-@media (max-width: 400px) {
+@media (max-width: 480px) {
   .hero__actions {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .hero__actions .btn,
+  .hero__actions .btn-flip {
+    width: 100%;
+  }
+
   .hero__actions .btn {
     justify-content: center;
+  }
+
+  .hero__actions .btn-flip__front,
+  .hero__actions .btn-flip__back {
+    justify-content: center;
+    width: 100%;
   }
 
   .cta__actions {
@@ -901,5 +978,16 @@
   .cta__actions .btn {
     justify-content: center;
     width: 100%;
+  }
+
+  .leadership__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .person-card__avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 0.75rem;
+    margin-bottom: var(--space-3);
   }
 }

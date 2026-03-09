@@ -308,13 +308,39 @@
     font-size: var(--text-base);
   }
 
+  .join-form__subtitle {
+    font-size: var(--text-base);
+  }
+
   .join-form__row {
     grid-template-columns: 1fr;
+  }
+
+  .join-form__email-wrapper {
+    width: 100%;
+  }
+
+  .join-form__input--email {
+    width: auto;
+    flex: 1;
+    min-width: 0;
   }
 
   .join-form__submit {
     align-self: stretch;
     justify-content: center;
+  }
+
+  .join-form__success {
+    padding: var(--space-10) var(--space-6);
+  }
+
+  .join-form__success-title {
+    font-size: var(--text-2xl);
+  }
+
+  .join-form__success-desc {
+    font-size: var(--text-base);
   }
 
   .join-reasons__title {
@@ -330,12 +356,28 @@
     padding: var(--space-6);
   }
 
+  .reason-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .reason-card__desc {
+    font-size: var(--text-base);
+  }
+
   .join-faq__title {
     margin-bottom: var(--space-8);
   }
 
   .join-faq__item {
     padding: var(--space-5) var(--space-6);
+  }
+
+  .join-faq__question {
+    font-size: var(--text-base);
+  }
+
+  .join-contact__title {
+    font-size: var(--text-3xl);
   }
 
   .join-contact__desc {

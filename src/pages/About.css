@@ -232,7 +232,28 @@
     padding: var(--space-6);
   }
 
+  .value-card__title {
+    font-size: var(--text-lg);
+  }
+
+  .value-card__desc {
+    font-size: var(--text-base);
+  }
+
+  .about__cta-headline {
+    margin-bottom: var(--space-3);
+  }
+
   .about__cta-sub {
     font-size: var(--text-base);
+  }
+
+  .about__cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .about__cta-actions .btn {
+    justify-content: center;
   }
 }
