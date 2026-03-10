@@ -38,11 +38,11 @@ const benefits = [
 const upcoming = [
   {
     title: 'Accessibility Consulting',
-    desc: 'An invite-only program pairing select members with real businesses and campus orgs to audit, advise, and improve their accessibility practices.',
+    desc: 'A selective program pairing select members with real businesses and campus orgs to audit, advise, and improve their accessibility practices.',
   },
   {
-    title: 'Mentorship',
-    desc: 'We\'re launching a one-on-one mentorship program to connect members with experienced leaders for career guidance, resume reviews, and honest advice you can actually use.',
+    title: 'Mentorship & Education',
+    desc: 'One-on-one mentorship with experienced leaders paired with an education track led by Alex Forstner covering finance, consulting, and more.',
   },
   {
     title: 'Expanded Speaker Series',
