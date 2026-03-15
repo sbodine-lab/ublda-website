@@ -68,7 +68,7 @@ const events: Event[] = [
     description:
       'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. Hear how he did it and why mission-driven business wins. Raising Cane\'s provided.',
     location: 'Ross B0560, Ross School of Business',
-    rsvpUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header',
+    past: true,
   },
   {
     date: 'February 13, 2026',
@@ -108,7 +108,7 @@ export default function Events() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="events-page__headline">
-              What we've got <em>coming up.</em>
+              What we've <em>been up to.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
