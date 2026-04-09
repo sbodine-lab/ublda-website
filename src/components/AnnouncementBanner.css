@@ -70,6 +70,26 @@
   filter: brightness(1.1);
 }
 
+.announcement__gcal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.announcement__gcal:hover {
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 .announcement__dismiss {
   font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.5);
