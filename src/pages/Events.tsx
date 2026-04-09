@@ -60,6 +60,17 @@ function buildGCalUrl(event: Event): string {
 
 const events: Event[] = [
   {
+    date: 'April 16, 2026',
+    month: 'Apr',
+    day: '16',
+    time: '6:00 PM - 7:00 PM',
+    title: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores',
+    description:
+      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with intellectual and developmental disabilities. He grew employees with IDD from 10 to 350+ under his leadership. Joining us live from Colorado while we gather in person at Ross. Dinner catered — come hungry.',
+    location: 'Ross R1240, Ross School of Business',
+    rsvpUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform',
+  },
+  {
     date: 'March 11, 2026',
     month: 'Mar',
     day: '11',

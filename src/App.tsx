@@ -4,6 +4,7 @@ import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import AnnouncementBanner from './components/AnnouncementBanner'
+import EventPopup from './components/EventPopup'
 import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/brand" element={<Brand />} />
       </Routes>
       {!isStandalone && <Footer />}
+      {!isStandalone && <EventPopup />}
     </>
   )
 }

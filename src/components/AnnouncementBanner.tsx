@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import './AnnouncementBanner.css'
 
-const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header'
-const EVENT_DATE = new Date('2026-03-11T19:00:00-05:00') // March 11, 2026 7 PM ET
-const STORAGE_KEY = 'ublda-fireside-rsvp-dismissed'
+const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform'
+const EVENT_DATE = new Date('2026-04-16T18:00:00-04:00') // April 16, 2026 6 PM ET
+const STORAGE_KEY = 'ublda-lloyd-lewis-rsvp-dismissed'
 
 function getTimeLeft() {
   const now = new Date()
@@ -74,7 +74,7 @@ export default function AnnouncementBanner() {
     <div className="announcement" ref={bannerRef} role="banner">
       <div className="announcement__inner container">
         <div className="announcement__text">
-          <span>Fireside Chat with Andrew Parker — Mar 11, 7 PM</span>
+          <span>Fireside Chat with Lloyd Lewis, CEO of Arc Thrift — Apr 16, 6 PM</span>
           <span className="announcement__countdown">
             <span className="announcement__countdown-unit">
               <span className="announcement__countdown-num">{timeLeft.days}</span>d
