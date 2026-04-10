@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './Links.css'
 
-const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header'
+const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform'
 
 interface Event {
   date: string
@@ -58,14 +58,14 @@ function buildGCalUrl(event: Event): string {
 
 const upcomingEvents: Event[] = [
   {
-    date: 'March 11, 2026',
-    month: 'Mar',
-    day: '11',
-    time: '7:00 PM - 8:00 PM',
-    title: 'Fireside Chat with Andrew Parker, CEO & Co-Founder of Nestidd',
+    date: 'April 16, 2026',
+    month: 'Apr',
+    day: '16',
+    time: '6:00 PM - 7:00 PM',
+    title: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores',
     description:
-      'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities.',
-    location: 'Ross B0560, Ross School of Business',
+      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with IDD. Dinner catered.',
+    location: 'Ross R1240, Ross School of Business',
     rsvpUrl: RSVP_URL,
   },
 ]
@@ -134,7 +134,7 @@ export default function Links() {
         <div className="links__buttons">
           <a href={RSVP_URL} target="_blank" rel="noopener noreferrer" className="links__btn links__btn--primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
-            RSVP — Fireside Chat (Mar 11)
+            RSVP — Fireside Chat (Apr 16)
           </a>
           <a href="https://ublda.org" className="links__btn links__btn--secondary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
