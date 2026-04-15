@@ -262,26 +262,29 @@ export default function Home() {
           <Reveal>
             <div className="event-card">
               <div className="event-card__date">
-                <span className="event-card__month">Mar</span>
-                <span className="event-card__day">11</span>
+                <span className="event-card__month">Apr</span>
+                <span className="event-card__day">16</span>
               </div>
               <div className="event-card__content">
-                <p className="event-card__time">Wednesday, March 11 &middot; 7:00 &ndash; 8:00 PM</p>
+                <p className="event-card__time">Thursday, April 16 &middot; 6:00 &ndash; 7:00 PM</p>
                 <h3 className="event-card__title">
-                  Fireside Chat with Andrew Parker, CEO & Co-Founder of Nestidd
+                  Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores
                 </h3>
                 <p className="event-card__desc">
-                  Andrew Parker (Ross alum) built Nestidd into an 800+ property
-                  housing platform for people with intellectual and developmental
-                  disabilities. Hear how he did it and why mission-driven business wins.
+                  Lloyd runs a 1,600-person, 24-store operation with $2.3B in total
+                  economic impact on Colorado and has funded $250M+ to nonprofits
+                  supporting people with intellectual and developmental disabilities.
+                  He grew employees with IDD from 10 to 350+ under his leadership.
+                  Joining us live from Colorado while we gather in person at Ross.
+                  Dinner catered — come hungry.
                 </p>
                 <div className="event-card__meta">
                   <span className="event-card__location">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>
-                    Ross B0560
+                    Ross R1240
                   </span>
                   <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSe1Dw6kREajSYHL2S1BRbHQsloGn4VQVjWORwC2HrciCviu1Q/viewform?usp=header"
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="event-card__gcal"
@@ -289,7 +292,7 @@ export default function Home() {
                     RSVP
                   </a>
                   <a
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Fireside+Chat+with+Andrew+Parker%2C+CEO+%26+Co-Founder+of+Nestidd&dates=20260311T190000/20260311T200000&details=Andrew+Parker+%28Ross+alum%29+built+Nestidd+into+an+800%2B+property+housing+platform+for+people+with+intellectual+and+developmental+disabilities.+Hear+how+he+did+it+and+why+mission-driven+business+wins.+Raising+Cane%27s+will+be+catered.&location=Ross+B0560%2C+Ross+School+of+Business"
+                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Fireside+Chat+with+Lloyd+Lewis%2C+CEO+of+Arc+Thrift+Stores&dates=20260416T180000/20260416T190000&details=Lloyd+runs+a+1%2C600-person%2C+24-store+operation+with+%242.3B+in+total+economic+impact+on+Colorado+and+has+funded+%24250M%2B+to+nonprofits+supporting+people+with+intellectual+and+developmental+disabilities.+Dinner+catered.&location=Ross+R1240%2C+Ross+School+of+Business"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="event-card__gcal"
