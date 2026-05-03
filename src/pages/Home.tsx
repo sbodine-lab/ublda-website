@@ -7,19 +7,19 @@ const pillars = [
   {
     title: 'Advocacy & Community',
     description:
-      'Students with disabilities and allies, together. We show up for each other, learn from each other, and push for a business world that includes all of us.',
+      'Students with disabilities, allies, and anyone who thinks inclusion belongs in business. We show up for each other and push for a business world that includes all of us.',
     icon: '01',
   },
   {
-    title: 'Accessibility Consulting',
+    title: 'Career Preparation',
     description:
-      'We work directly with faculty, student orgs, and local businesses to audit and improve their accessibility practices. Real clients, real impact.',
+      'Programs built around disability-focused business: accessibility consulting, stock pitches, and entrepreneurship tracks that give members real work to point to.',
     icon: '02',
   },
   {
-    title: 'Professional Development',
+    title: 'Networking',
     description:
-      'Speaker series, hands-on workshops, and skill-building that prepare members to make workplaces more inclusive from day one.',
+      'We connect members with employers, professionals, and students across Ross and the industry, so you\'re not building a career in this space on your own.',
     icon: '03',
   },
 ]
@@ -38,15 +38,15 @@ const benefits = [
 const upcoming = [
   {
     title: 'Accessibility Consulting',
-    desc: 'A selective program pairing select members with real businesses and campus orgs to audit, advise, and improve their accessibility practices.',
+    desc: 'A selective program pairing members with real businesses and campus orgs to audit and improve their accessibility practices.',
   },
   {
     title: 'Mentorship & Education',
-    desc: 'One-on-one mentorship with experienced leaders paired with an education track led by Alex Forstner covering finance, consulting, and more.',
+    desc: 'One-on-one mentorship with senior business leaders plus an education track from Alex Forstner covering finance, consulting, and product.',
   },
   {
     title: 'Expanded Speaker Series',
-    desc: 'Monthly fireside chats with disability advocates, startup founders, and industry executives who\'ve actually built inclusive organizations.',
+    desc: 'Monthly fireside chats with disability advocates, startup founders, and industry executives who\'ve built inclusive organizations firsthand.',
   },
 ]
 
@@ -102,9 +102,9 @@ export default function Home() {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
               }}
             >
-              Disability inclusion belongs in business. We're a student org
-              at Michigan Ross building real community and advancing
-              disability inclusion, on campus and beyond.
+              Disability inclusion belongs in business. We're a Michigan Ross student
+              org for students passionate about the mission, whether you're headed
+              into consulting, finance, product, or any career where real impact matters.
             </motion.p>
 
             <motion.div
@@ -181,9 +181,8 @@ export default function Home() {
               <Reveal delay={0.2}>
                 <p className="partnership__desc">
                   We're the undergraduate chapter of Business Leaders for Diverse Abilities (BLDA),
-                  Ross's MBA disability advocacy organization. Through this partnership,
-                  our members gain access to a broader network, mentorship, and guidance
-                  opportunities across the Ross community that you won't find anywhere else on campus.
+                  Ross's MBA disability advocacy organization. Members tap into BLDA's MBA network,
+                  mentorship, and guidance that most Ross undergrads never touch.
                 </p>
               </Reveal>
             </div>
@@ -256,65 +255,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Featured Event ─── */}
-      <section className="section featured-event">
-        <div className="container">
-          <Reveal>
-            <div className="event-card">
-              <div className="event-card__date">
-                <span className="event-card__month">Apr</span>
-                <span className="event-card__day">16</span>
-              </div>
-              <div className="event-card__content">
-                <p className="event-card__time">Thursday, April 16 &middot; 6:00 &ndash; 7:00 PM</p>
-                <h3 className="event-card__title">
-                  Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores
-                </h3>
-                <p className="event-card__desc">
-                  Lloyd runs a 1,600-person, 24-store operation with $2.3B in total
-                  economic impact on Colorado and has funded $250M+ to nonprofits
-                  supporting people with intellectual and developmental disabilities.
-                  He grew employees with IDD from 10 to 350+ under his leadership.
-                  Joining us live from Colorado while we gather in person at Ross.
-                  Dinner catered — come hungry.
-                </p>
-                <div className="event-card__meta">
-                  <span className="event-card__location">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>
-                    Ross R1240
-                  </span>
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="event-card__gcal"
-                  >
-                    RSVP
-                  </a>
-                  <a
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Fireside+Chat+with+Lloyd+Lewis%2C+CEO+of+Arc+Thrift+Stores&dates=20260416T180000/20260416T190000&details=Lloyd+runs+a+1%2C600-person%2C+24-store+operation+with+%242.3B+in+total+economic+impact+on+Colorado+and+has+funded+%24250M%2B+to+nonprofits+supporting+people+with+intellectual+and+developmental+disabilities.+Dinner+catered.&location=Ross+R1240%2C+Ross+School+of+Business"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="event-card__gcal"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                    Add to Google Calendar
-                  </a>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <div className="events__more">
-              <Link to="/events" className="link-arrow">
-                View all events
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ─── Leadership ─── */}
       <section className="section leadership">
         <div className="container">
@@ -368,9 +308,9 @@ export default function Home() {
             </Reveal>
             <Reveal delay={0.15}>
               <p className="cta__sub">
-                Students with disabilities, allies, future business leaders who
-                believe inclusion is non-negotiable. It takes 30 seconds to sign
-                up. Join 30+ Ross students already building this.
+                Students with disabilities, allies, and future business leaders who
+                want impact built into their careers. 30 seconds to sign up.
+                Join 30+ Ross students already here.
               </p>
             </Reveal>
             <Reveal delay={0.25}>

@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useMemberAuth } from '../hooks/useMemberAuth'
 import './Nav.css'
 
-const links = [
+const publicLinks = [
   { label: 'About', path: '/about' },
   { label: 'Events', path: '/events' },
   { label: 'Team', path: '/team' },
+]
+
+const memberLinks = [
+  ...publicLinks,
+  { label: 'Dashboard', path: '/dashboard' },
 ]
 
 function NavLetters({ text }: { text: string }) {
@@ -29,16 +35,15 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
+  const { status, signOut } = useMemberAuth()
+  const signedIn = status === 'signed-in'
+  const links = signedIn ? memberLinks : publicLinks
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [location])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -66,15 +71,22 @@ export default function Nav() {
               key={link.path}
               to={link.path}
               className={`nav__link ${location.pathname === link.path ? 'nav__link--active' : ''}`}
+              onClick={() => setMobileOpen(false)}
             >
               <NavLetters text={link.label} />
             </Link>
           ))}
         </nav>
 
-        <Link to="/join" className="nav__cta">
-          Join Us
-        </Link>
+        {signedIn ? (
+          <button type="button" className="nav__cta nav__cta--button" onClick={signOut}>
+            Sign Out
+          </button>
+        ) : (
+          <Link to="/signin" className="nav__cta">
+            Sign In
+          </Link>
+        )}
 
         <button
           className={`nav__burger ${mobileOpen ? 'nav__burger--open' : ''}`}
@@ -101,13 +113,27 @@ export default function Nav() {
                 key={link.path}
                 to={link.path}
                 className="nav__mobile-link"
+                onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <Link to="/join" className="nav__mobile-cta">
-              Join Us
-            </Link>
+            {signedIn ? (
+              <button
+                type="button"
+                className="nav__mobile-cta nav__mobile-cta--button"
+                onClick={() => {
+                  signOut()
+                  setMobileOpen(false)
+                }}
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link to="/signin" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
+                Sign In
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

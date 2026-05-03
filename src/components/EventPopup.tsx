@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './EventPopup.css'
 
 const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform'
@@ -10,6 +10,12 @@ const SHOW_DELAY_MS = 1600
 export default function EventPopup() {
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
+
+  const close = useCallback(() => {
+    setVisible(false)
+    try { localStorage.setItem(POPUP_KEY, 'true') } catch { /* */ }
+    window.setTimeout(() => setMounted(false), 380)
+  }, [])
 
   useEffect(() => {
     if (Date.now() >= EVENT_DATE.getTime()) return
@@ -40,13 +46,7 @@ export default function EventPopup() {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [mounted])
-
-  const close = () => {
-    setVisible(false)
-    try { localStorage.setItem(POPUP_KEY, 'true') } catch { /* */ }
-    window.setTimeout(() => setMounted(false), 380)
-  }
+  }, [mounted, close])
 
   if (!mounted) return null
 

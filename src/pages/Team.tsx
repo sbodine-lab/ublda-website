@@ -66,23 +66,10 @@ export default function Team() {
       <section className="section team-contact">
         <div className="container container--narrow" style={{ textAlign: 'center' }}>
           <Reveal>
-            <h2 className="team-contact__title">Work with us.</h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p className="team-contact__desc">
-              Whether you want to join the team, partner on a project, or just ask a question, we're always open. Reach out to any of our exec team:{' '}
-              <a href="mailto:sbodine@umich.edu" className="team-contact__email">sbodine@umich.edu</a>,{' '}
-              <a href="mailto:atchiang@umich.edu" className="team-contact__email">atchiang@umich.edu</a>,{' '}
-              <a href="mailto:cooperry@umich.edu" className="team-contact__email">cooperry@umich.edu</a>
-            </p>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <div className="team-contact__actions">
-              <Link to="/join" className="btn btn--primary btn--lg">
-                Become a member
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </Link>
-            </div>
+            <Link to="/join" className="btn btn--primary btn--lg">
+              Become a member
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
           </Reveal>
         </div>
       </section>

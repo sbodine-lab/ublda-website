@@ -101,6 +101,10 @@
   letter-spacing: var(--tracking-wide);
 }
 
+.nav__cta--button {
+  font-family: var(--font-body);
+}
+
 .nav__cta:hover {
   background: var(--color-navy-light);
 }
@@ -162,6 +166,10 @@
   padding: var(--space-3) var(--space-8);
   border-radius: var(--radius-full);
   margin-top: var(--space-4);
+}
+
+.nav__mobile-cta--button {
+  width: fit-content;
 }
 
 @media (max-width: 768px) {

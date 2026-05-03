@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import './Links.css'
 
-const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform'
-
 interface Event {
   date: string
   month: string
@@ -11,52 +9,9 @@ interface Event {
   title: string
   description: string
   location: string
-  rsvpUrl?: string
 }
 
-function buildGCalUrl(event: Event): string {
-  const months: Record<string, string> = {
-    January: '01', February: '02', March: '03', April: '04',
-    May: '05', June: '06', July: '07', August: '08',
-    September: '09', October: '10', November: '11', December: '12',
-  }
-
-  const parts = event.date.split(/[\s,]+/)
-  const m = months[parts[0]] || '01'
-  const d = parts[1].padStart(2, '0')
-  const y = parts[2]
-
-  let dates: string
-  if (event.time) {
-    const [startStr, endStr] = event.time.split(' - ')
-    const toMil = (t: string) => {
-      const match = t.match(/(\d+):(\d+)\s*(AM|PM)/i)
-      if (!match) return '000000'
-      let h = parseInt(match[1])
-      const min = match[2]
-      const ampm = match[3].toUpperCase()
-      if (ampm === 'PM' && h !== 12) h += 12
-      if (ampm === 'AM' && h === 12) h = 0
-      return `${String(h).padStart(2, '0')}${min}00`
-    }
-    dates = `${y}${m}${d}T${toMil(startStr)}/${y}${m}${d}T${toMil(endStr)}`
-  } else {
-    const nextDay = String(parseInt(d) + 1).padStart(2, '0')
-    dates = `${y}${m}${d}/${y}${m}${nextDay}`
-  }
-
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: event.title,
-    dates,
-    details: event.description,
-    location: event.location,
-  })
-
-  return `https://calendar.google.com/calendar/render?${params.toString()}`
-}
-
-const upcomingEvents: Event[] = [
+const pastEvents: Event[] = [
   {
     date: 'April 16, 2026',
     month: 'Apr',
@@ -66,7 +21,6 @@ const upcomingEvents: Event[] = [
     description:
       'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with IDD. Dinner catered.',
     location: 'Ross R1240, Ross School of Business',
-    rsvpUrl: RSVP_URL,
   },
 ]
 
@@ -132,11 +86,7 @@ export default function Links() {
 
         {/* Link buttons */}
         <div className="links__buttons">
-          <a href={RSVP_URL} target="_blank" rel="noopener noreferrer" className="links__btn links__btn--primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
-            RSVP — Fireside Chat (Apr 16)
-          </a>
-          <a href="https://ublda.org" className="links__btn links__btn--secondary">
+          <a href="https://ublda.org" className="links__btn links__btn--primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             Our Website
           </a>
@@ -154,11 +104,11 @@ export default function Links() {
           </a>
         </div>
 
-        {/* Upcoming events */}
-        <p className="links__section-label">Upcoming Events</p>
+        {/* Past events */}
+        <p className="links__section-label">Past Events</p>
         <div className="links__events">
-          {upcomingEvents.length > 0 ? (
-            upcomingEvents.map((event) => (
+          {pastEvents.length > 0 ? (
+            pastEvents.map((event) => (
               <div key={event.title} className="links__event">
                 <div className="links__event-date">
                   <span className="links__event-month">{event.month}</span>
@@ -169,28 +119,12 @@ export default function Links() {
                   <p className="links__event-meta">
                     {event.time && `${event.time} · `}{event.location}
                   </p>
-                  <div className="links__event-actions">
-                    {event.rsvpUrl && (
-                      <a href={event.rsvpUrl} target="_blank" rel="noopener noreferrer" className="links__event-rsvp">
-                        RSVP
-                      </a>
-                    )}
-                    <a
-                      href={buildGCalUrl(event)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="links__event-gcal"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                      Add to calendar
-                    </a>
-                  </div>
                 </div>
               </div>
             ))
           ) : (
             <div className="links__no-events">
-              No upcoming events — check back soon!
+              No past events yet.
             </div>
           )}
         </div>
