@@ -438,6 +438,14 @@
   line-height: var(--leading-normal);
 }
 
+.upcoming__teaser {
+  margin-top: var(--space-8);
+  font-size: var(--text-base);
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  max-width: 560px;
+}
+
 /* ═══════════════════════════════════════
    FEATURED EVENT
    ═══════════════════════════════════════ */
