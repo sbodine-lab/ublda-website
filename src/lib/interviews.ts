@@ -146,7 +146,7 @@ export const BOARD_POSITION_OPTIONS = [
 export const INTERVIEWER_OPTIONS = [
   'Sam Bodine',
   'Alexa Chiang',
-  'Cooper Ryan',
+  'Cooper Perry',
   'E-board member',
 ] as const
 

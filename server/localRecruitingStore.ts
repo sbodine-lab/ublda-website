@@ -7,7 +7,7 @@ import type { ApplicationSubmission } from '../src/lib/application.ts'
 import type { InterviewAssignmentSubmission } from '../src/lib/interviewAssignment.ts'
 import type { InterviewerAvailabilitySubmission } from '../src/lib/interviewerAvailability.ts'
 import { ADMIN_ACCOUNTS, adminAccountForEmail, roleForEmail } from '../src/lib/dashboardAccess.ts'
-import type { DashboardData } from '../src/lib/dashboardData.ts'
+import type { DashboardCalendarEvent, DashboardData } from '../src/lib/dashboardData.ts'
 import type { Candidate, InterviewerAvailability, MemberSignup } from '../src/lib/memberData.ts'
 
 type StoredAccount = ApplicantAccount & {
@@ -40,6 +40,7 @@ type LocalRecruitingData = {
   sessions: Record<string, StoredSession>
   candidates: Record<string, Candidate>
   interviewerAvailability: Record<string, StoredInterviewerAvailability>
+  calendarEvents: Record<string, DashboardCalendarEvent>
 }
 
 export type LocalAccountResponse = {
@@ -58,6 +59,7 @@ const emptyData = (): LocalRecruitingData => ({
   sessions: {},
   candidates: {},
   interviewerAvailability: {},
+  calendarEvents: {},
 })
 
 const defaultDataPath = () => (
@@ -141,6 +143,7 @@ const buildDashboardData = (
     dashboardData.interviewerAvailability = Object.values(data.interviewerAvailability)
     dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts)
     dashboardData.adminAccounts = ADMIN_ACCOUNTS
+    dashboardData.calendarEvents = Object.values(data.calendarEvents)
   } else {
     dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts).filter((member) => member.email === accountEmail)
   }
@@ -199,6 +202,7 @@ export class LocalRecruitingStore {
     const now = new Date().toISOString()
     const email = 'sbodine@umich.edu'
     const existing = data.accounts[email]
+    data.calendarEvents ||= {}
 
     data.accounts[email] = {
       firstName: existing?.firstName || 'Sam',
@@ -368,6 +372,21 @@ export class LocalRecruitingStore {
 
     await this.writeData(data)
     return { updatedCandidate: Boolean(candidate) }
+  }
+
+  async saveCalendarEvent(event: DashboardCalendarEvent) {
+    const data = await this.readData()
+    data.calendarEvents[event.id] = event
+    await this.writeData(data)
+    return event
+  }
+
+  async deleteCalendarEvent(id: string) {
+    const data = await this.readData()
+    const existed = Boolean(data.calendarEvents[id])
+    delete data.calendarEvents[id]
+    await this.writeData(data)
+    return { deleted: existed }
   }
 
   async dashboardData(sessionToken: string): Promise<{ account: ApplicantAccount; role: string; dashboardData: DashboardData } | null> {

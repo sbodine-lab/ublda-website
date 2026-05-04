@@ -172,7 +172,7 @@ export const buildMemberProfile = (
         ? 'E-board operations'
         : isLeadershipApplicant ? 'Interviewing' : 'Not assigned',
     officerFocus: role === 'super-admin'
-      ? 'System, recruiting, members, sponsors, publishing'
+      ? 'System, recruiting, members, announcements, resources'
       : role === 'exec'
         ? adminScopes.join(', ') || 'E-board operations'
         : 'Recruiting preview',
@@ -224,10 +224,10 @@ export const leadershipActions: DashboardAction[] = [
     tone: 'ready',
   },
   {
-    title: 'Move sponsor intros to next step',
-    description: 'Two warm leads need a follow-up owner and meeting date.',
-    status: '2 warm',
-    href: '#sponsors',
+    title: 'Review announcements and opportunities',
+    description: 'Keep member updates, opportunities, and resources ready for publishing.',
+    status: '2 drafts',
+    href: '#announcements',
     tone: 'neutral',
   },
 ]

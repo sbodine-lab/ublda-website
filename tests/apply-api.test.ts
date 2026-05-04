@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/apply.ts'
 import { INTERVIEW_SLOTS } from '../src/lib/application.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 const createResponse = () => {
   let statusCode = 0
@@ -24,15 +28,20 @@ const createResponse = () => {
   }
 }
 
-test('forwards validated leadership interest submissions to the configured script', async () => {
+test('persists validated leadership interest submissions to the recruiting backend', async () => {
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalWriteMode = process.env.UBLDA_RECRUITING_WRITE_MODE
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
   const originalFetch = globalThis.fetch
-  let forwardedBody: Record<string, unknown> | null = null
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-apply-api-'))
 
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-  globalThis.fetch = async (_url, init) => {
-    forwardedBody = JSON.parse(String(init?.body || '{}'))
-    return new Response(JSON.stringify({ success: true }), { status: 200 })
+  delete process.env.GOOGLE_SCRIPT_URL
+  delete process.env.UBLDA_RECRUITING_WRITE_MODE
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
+  globalThis.fetch = async () => {
+    throw new Error('legacy script should not be called')
   }
 
   try {
@@ -68,33 +77,38 @@ test('forwards validated leadership interest submissions to the configured scrip
     assert.deepEqual(result().payload, {
       success: true,
       status: 'Interview eligible',
+      source: 'vercel',
       calendarEventCreated: false,
     })
-    assert.equal(forwardedBody?.formType, 'leadershipInterest')
-    assert.equal(forwardedBody?.email, 'alexchen@umich.edu')
-    assert.equal(forwardedBody?.dedupeKey, 'alexchen@umich.edu')
-    assert.equal(forwardedBody?.status, 'Interview eligible')
-    assert.deepEqual(forwardedBody?.rolePreferences, ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'])
-    assert.equal((forwardedBody?.availability as unknown[]).length, 2)
-    assert.deepEqual(forwardedBody?.interviewSlot, {
-      value: INTERVIEW_SLOTS[0].value,
-      label: 'Thu, May 7, 8:00 AM-8:30 AM ET',
-      dayLabel: 'Thursday, May 7',
-      timeLabel: '8:00 AM-8:30 AM ET',
-      bufferLabel: 'buffer until 8:50 AM ET',
-      start: '2026-05-07T08:00:00-04:00',
-      end: '2026-05-07T08:30:00-04:00',
-      bufferEnd: '2026-05-07T08:50:00-04:00',
-      startMinutes: 480,
-    })
-    assert.equal((forwardedBody?.resumeFile as Record<string, unknown>)?.name, 'alex-chen-resume.pdf')
-    assert.match(String(forwardedBody?.submissionId), /^app_/)
+
+    const storeData = await createLocalRecruitingStore().leadershipDashboardData()
+    assert.equal(storeData.candidates?.length, 1)
+    assert.equal(storeData.candidates?.[0].email, 'alexchen@umich.edu')
+    assert.deepEqual(storeData.candidates?.[0].rolePreferences, ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'])
+    assert.equal(storeData.candidates?.[0].availability.length, 2)
+    assert.equal(storeData.candidates?.[0].resumeUrl, 'local-preview://alex-chen-resume.pdf')
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL
     } else {
       process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
     }
+    if (originalWriteMode === undefined) {
+      delete process.env.UBLDA_RECRUITING_WRITE_MODE
+    } else {
+      process.env.UBLDA_RECRUITING_WRITE_MODE = originalWriteMode
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
     globalThis.fetch = originalFetch
+    await rm(dir, { recursive: true, force: true })
   }
 })

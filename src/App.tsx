@@ -26,7 +26,7 @@ function ScrollToTop() {
 
 export default function App() {
   const { pathname } = useLocation()
-  const isStandalone = pathname === '/links'
+  const isStandalone = pathname === '/links' || pathname === '/dashboard' || pathname === '/members'
   useTabEasterEgg()
 
   return (

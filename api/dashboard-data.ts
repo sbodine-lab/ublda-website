@@ -56,7 +56,7 @@ const localSuperAdminPayload = () => ({
     email: 'sbodine@umich.edu',
     role: 'super-admin',
     adminTitle: 'Super Admin',
-    adminScopes: ['recruiting', 'members', 'events', 'sponsors', 'publishing', 'system'],
+    adminScopes: ['recruiting', 'members', 'announcements', 'resources', 'system'],
   },
   role: 'super-admin',
   dashboardData: {
@@ -136,8 +136,9 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
   const storeCandidates = Array.isArray(storeDashboardData.candidates) ? storeDashboardData.candidates : []
   const storeInterviewers = Array.isArray(storeDashboardData.interviewerAvailability) ? storeDashboardData.interviewerAvailability : []
   const storeMembers = Array.isArray(storeDashboardData.memberSignups) ? storeDashboardData.memberSignups : []
+  const storeCalendarEvents = Array.isArray(storeDashboardData.calendarEvents) ? storeDashboardData.calendarEvents : []
   const meaningfulStoreMembers = storeMembers.filter((member) => member.email !== 'sbodine@umich.edu')
-  const hasStoreRecruitingData = storeCandidates.length > 0 || storeInterviewers.length > 0 || meaningfulStoreMembers.length > 0
+  const hasStoreRecruitingData = storeCandidates.length > 0 || storeInterviewers.length > 0 || meaningfulStoreMembers.length > 0 || storeCalendarEvents.length > 0
   const sheetCandidates = Array.isArray(dashboardData.candidates) ? dashboardData.candidates as Record<string, unknown>[] : []
   const sheetInterviewers = Array.isArray(dashboardData.interviewerAvailability) ? dashboardData.interviewerAvailability as Record<string, unknown>[] : []
   const sheetMembers = Array.isArray(dashboardData.memberSignups) ? dashboardData.memberSignups as Record<string, unknown>[] : []
@@ -151,6 +152,7 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
       : dashboardData.interviewerAvailability,
     memberSignups: meaningfulStoreMembers.length ? mergeById(storeMembers as unknown as Record<string, unknown>[], sheetMembers) : dashboardData.memberSignups,
     adminAccounts: dashboardData.adminAccounts || storeDashboardData.adminAccounts,
+    calendarEvents: storeCalendarEvents.length ? storeCalendarEvents : dashboardData.calendarEvents,
     backendStatus: hasStoreRecruitingData ? {
       source: storeDashboardData.backendStatus?.source || 'vercel',
       message: hasSheetDashboard

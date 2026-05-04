@@ -1,5 +1,5 @@
 export type DashboardRole = 'member' | 'exec' | 'super-admin'
-export type AdminScope = 'recruiting' | 'members' | 'events' | 'sponsors' | 'publishing' | 'system'
+export type AdminScope = 'recruiting' | 'members' | 'announcements' | 'resources' | 'system'
 
 export type AdminAccount = {
   email: string
@@ -17,21 +17,21 @@ export const ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Sam Bodine',
     title: 'Super Admin',
     role: 'super-admin',
-    scopes: ['recruiting', 'members', 'events', 'sponsors', 'publishing', 'system'],
+    scopes: ['recruiting', 'members', 'announcements', 'resources', 'system'],
   },
   {
     email: 'atchiang@umich.edu',
     name: 'Alexa Chiang',
     title: 'Exec Admin',
     role: 'exec',
-    scopes: ['recruiting', 'events', 'members', 'publishing'],
+    scopes: ['recruiting', 'members', 'announcements', 'resources'],
   },
   {
     email: 'cooperry@umich.edu',
-    name: 'Cooper Ryan',
+    name: 'Cooper Perry',
     title: 'Exec Admin',
     role: 'exec',
-    scopes: ['recruiting', 'members', 'sponsors'],
+    scopes: ['recruiting', 'members'],
   },
 ]
 

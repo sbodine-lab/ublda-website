@@ -51,7 +51,7 @@ test('persists validated interviewer availability to the recruiting backend with
       headers: { 'user-agent': 'api-handler-test' },
       body: {
         firstName: 'Cooper',
-        lastName: 'Ryan',
+        lastName: 'Perry',
         uniqname: 'cooperry',
         availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value],
         maxInterviews: '2',
@@ -66,7 +66,7 @@ test('persists validated interviewer availability to the recruiting backend with
 
     const dashboard = await createLocalRecruitingStore(dataPath).leadershipDashboardData()
     assert.equal(dashboard.interviewerAvailability?.length, 1)
-    assert.equal(dashboard.interviewerAvailability?.[0].name, 'Cooper Ryan')
+    assert.equal(dashboard.interviewerAvailability?.[0].name, 'Cooper Perry')
     assert.equal(dashboard.interviewerAvailability?.[0].availability.length, 2)
   } finally {
     if (originalScriptUrl === undefined) {

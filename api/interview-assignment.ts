@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { randomUUID } from 'node:crypto'
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 type InterviewSlot = {
   value: string
@@ -51,6 +52,42 @@ const setApiSecurityHeaders = (res: VercelResponse) => {
   res.setHeader?.('Cache-Control', 'no-store, max-age=0')
   res.setHeader?.('Pragma', 'no-cache')
   res.setHeader?.('X-Content-Type-Options', 'nosniff')
+}
+
+const superAdminSessionSecret = () => (
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  || process.env.SAM_BODINE_PASSWORD
+  || ''
+)
+
+const localAdminFallbackEnabled = () => process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK === 'true'
+
+const signSessionPayload = (payload: string) => {
+  const secret = superAdminSessionSecret()
+  if (!secret) return ''
+  return createHmac('sha256', secret).update(payload).digest('base64url')
+}
+
+const safeEquals = (left: string, right: string) => {
+  const leftBuffer = Buffer.from(left)
+  const rightBuffer = Buffer.from(right)
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+const verifyLocalSuperAdminSession = (sessionToken: string) => {
+  if (!localAdminFallbackEnabled() || !superAdminSessionSecret()) return false
+
+  const [prefix, payload, signature] = sessionToken.split('.')
+  if (prefix !== 'ublda_admin' || !payload || !signature) return false
+  const expectedSignature = signSessionPayload(payload)
+  if (!expectedSignature || !safeEquals(signature, expectedSignature)) return false
+
+  try {
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
+    return decoded.email === 'sbodine@umich.edu' && typeof decoded.exp === 'number' && decoded.exp > Date.now()
+  } catch {
+    return false
+  }
 }
 
 const formatTime = (hour24: number, minute: number) => {
@@ -169,11 +206,42 @@ const validateInterviewAssignmentPayload = (payload: unknown): ValidationResult 
 
 const buildInterviewAssignmentSubmission = (data: InterviewAssignmentData, userAgent = '') => ({
   ...data,
-  formType: 'interviewAssignment',
+  formType: 'interviewAssignment' as const,
   submittedAt: new Date().toISOString(),
   submissionId: `assignment_${randomUUID()}`,
   userAgent,
 })
+
+const shouldMirrorToLegacyScript = () => process.env.UBLDA_RECRUITING_WRITE_MODE === 'legacy-script'
+
+const mirrorToLegacyScript = async (submission: ReturnType<typeof buildInterviewAssignmentSubmission>) => {
+  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
+  if (!scriptUrl) return { row: null, calendarEventCreated: false }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 8000)
+
+  try {
+    const response = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submission),
+      signal: controller.signal,
+    })
+    const payload = await response.json().catch(() => null)
+
+    if (!response.ok || payload?.success === false) {
+      throw new Error(payload?.error || 'Failed to mirror assignment')
+    }
+
+    return {
+      row: payload?.row || null,
+      calendarEventCreated: Boolean(payload?.calendarEventCreated),
+    }
+  } finally {
+    clearTimeout(timeout)
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
@@ -190,38 +258,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   }
 
-  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
-  if (!scriptUrl) {
-    return res.status(500).json({ error: 'Form backend not configured' })
-  }
-
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 8000)
-
   try {
     const submission = buildInterviewAssignmentSubmission(result.data, req.headers['user-agent'] || '')
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submission),
-      signal: controller.signal,
-    })
-    const payload = await response.json().catch(() => null)
+    const store = createLocalRecruitingStore()
+    const localSession = verifyLocalSuperAdminSession(result.data.sessionToken)
+      ? { role: 'super-admin' }
+      : await store.dashboardData(result.data.sessionToken)
 
-    if (!response.ok || payload?.success === false) {
-      return res.status(response.ok ? 400 : 500).json({
-        error: payload?.error || 'Failed to save assignment',
-      })
+    if (!localSession || !['super-admin', 'exec'].includes(localSession.role)) {
+      return res.status(401).json({ error: 'A valid admin session is required.' })
     }
+
+    const saved = await store.saveInterviewAssignment(submission)
+    const legacyResult = shouldMirrorToLegacyScript()
+      ? await mirrorToLegacyScript(submission)
+      : { row: null, calendarEventCreated: false }
 
     return res.status(200).json({
       success: true,
-      row: payload?.row || null,
-      calendarEventCreated: Boolean(payload?.calendarEventCreated),
+      source: 'vercel',
+      updatedCandidate: saved.updatedCandidate,
+      row: legacyResult.row,
+      calendarEventCreated: legacyResult.calendarEventCreated,
     })
   } catch {
     return res.status(500).json({ error: 'Failed to save assignment' })
-  } finally {
-    clearTimeout(timeout)
   }
 }

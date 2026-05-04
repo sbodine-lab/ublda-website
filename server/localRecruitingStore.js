@@ -12,21 +12,21 @@ var ADMIN_ACCOUNTS = [
     name: "Sam Bodine",
     title: "Super Admin",
     role: "super-admin",
-    scopes: ["recruiting", "members", "events", "sponsors", "publishing", "system"]
+    scopes: ["recruiting", "members", "announcements", "resources", "system"]
   },
   {
     email: "atchiang@umich.edu",
     name: "Alexa Chiang",
     title: "Exec Admin",
     role: "exec",
-    scopes: ["recruiting", "events", "members", "publishing"]
+    scopes: ["recruiting", "members", "announcements", "resources"]
   },
   {
     email: "cooperry@umich.edu",
-    name: "Cooper Ryan",
+    name: "Cooper Perry",
     title: "Exec Admin",
     role: "exec",
-    scopes: ["recruiting", "members", "sponsors"]
+    scopes: ["recruiting", "members"]
   }
 ];
 var adminAccountForEmail = (email) => ADMIN_ACCOUNTS.find((account) => account.email === email.toLowerCase());
@@ -41,7 +41,8 @@ var emptyData = () => ({
   accounts: {},
   sessions: {},
   candidates: {},
-  interviewerAvailability: {}
+  interviewerAvailability: {},
+  calendarEvents: {}
 });
 var defaultDataPath = () => process.env.UBLDA_LOCAL_DATA_FILE || path.join(process.cwd(), ".ublda-local-data", "recruiting.json");
 var shouldUseBlobStorage = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
@@ -101,6 +102,7 @@ var buildDashboardData = (data, role, accountEmail) => {
     dashboardData.interviewerAvailability = Object.values(data.interviewerAvailability);
     dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts);
     dashboardData.adminAccounts = ADMIN_ACCOUNTS;
+    dashboardData.calendarEvents = Object.values(data.calendarEvents);
   } else {
     dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts).filter((member) => member.email === accountEmail);
   }
@@ -152,6 +154,7 @@ var LocalRecruitingStore = class {
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const email = "sbodine@umich.edu";
     const existing = data.accounts[email];
+    data.calendarEvents ||= {};
     data.accounts[email] = {
       firstName: existing?.firstName || "Sam",
       lastName: existing?.lastName || "Bodine",
@@ -298,6 +301,19 @@ var LocalRecruitingStore = class {
     }
     await this.writeData(data);
     return { updatedCandidate: Boolean(candidate) };
+  }
+  async saveCalendarEvent(event) {
+    const data = await this.readData();
+    data.calendarEvents[event.id] = event;
+    await this.writeData(data);
+    return event;
+  }
+  async deleteCalendarEvent(id) {
+    const data = await this.readData();
+    const existed = Boolean(data.calendarEvents[id]);
+    delete data.calendarEvents[id];
+    await this.writeData(data);
+    return { deleted: existed };
   }
   async dashboardData(sessionToken) {
     const session = await this.restoreSession(sessionToken);

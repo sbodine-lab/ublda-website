@@ -163,11 +163,7 @@ export default function SignIn() {
           <Reveal>
             <div className="signin-page__copy">
               <p className="section__label">Member Homebase</p>
-              <h1>Sign in once. Keep your UBLDA life in one place.</h1>
-              <p>
-                Use a UMich Google account for the fastest path into the dashboard,
-                interview signup, opportunities board, calendar, news, and member directory.
-              </p>
+              <h1>Sign in to your UBLDA dashboard.</h1>
               <div className="signin-page__proof" aria-label="Dashboard features">
                 <span>Member status</span>
                 <span>Leadership interviews</span>

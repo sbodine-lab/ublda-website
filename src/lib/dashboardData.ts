@@ -7,11 +7,25 @@ export type DashboardBackendStatus = {
   updatedAt: string
 }
 
+export type DashboardCalendarEvent = {
+  id: string
+  title: string
+  date: string
+  startMinutes: number
+  durationMinutes: number
+  owner: string
+  location: string
+  notes: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type DashboardData = {
   candidates?: Candidate[]
   interviewerAvailability?: InterviewerAvailability[]
   memberSignups?: MemberSignup[]
   adminAccounts?: AdminAccount[]
+  calendarEvents?: DashboardCalendarEvent[]
   metrics?: LeadershipMetric[]
   backendStatus?: DashboardBackendStatus
 }

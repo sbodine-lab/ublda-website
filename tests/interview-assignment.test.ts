@@ -70,7 +70,7 @@ test('requires sane interviewer assignments for matched slots', () => {
   const tooManyInterviewers = validateInterviewAssignmentPayload({
     email: 'candidate@umich.edu',
     assignedSlot: INTERVIEW_SLOTS[0].value,
-    interviewers: ['Sam Bodine', 'Alexa Chiang', 'Cooper Ryan'],
+    interviewers: ['Sam Bodine', 'Alexa Chiang', 'Cooper Perry'],
     interviewStatus: 'Matched',
     sessionToken: 'session-token-session-token-session',
   })

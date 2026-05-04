@@ -36,7 +36,7 @@ test('matches a candidate to up to two interviewers on a shared interview slot',
     [
       interviewer({ name: 'Sam Bodine' }),
       interviewer({ name: 'Alexa Chiang' }),
-      interviewer({ name: 'Cooper Ryan', availability: [INTERVIEW_SLOTS[1].value] }),
+      interviewer({ name: 'Cooper Perry', availability: [INTERVIEW_SLOTS[1].value] }),
     ],
     [],
   )

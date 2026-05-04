@@ -323,7 +323,7 @@ const superAdminAccountResponse = {
   email: 'sbodine@umich.edu',
   role: 'super-admin',
   adminTitle: 'Super Admin',
-  adminScopes: ['recruiting', 'members', 'events', 'sponsors', 'publishing', 'system'],
+  adminScopes: ['recruiting', 'members', 'announcements', 'resources', 'system'],
 }
 
 const localSuperAdminResponse = () => ({

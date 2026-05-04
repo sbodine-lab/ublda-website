@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { randomUUID } from 'node:crypto'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 type InterviewSlot = {
   value: string
@@ -298,12 +299,40 @@ const validateApplicationPayload = (payload: unknown): ValidationResult => {
 
 const buildApplicationSubmission = (data: ApplicationData, userAgent = '') => ({
   ...data,
-  formType: 'leadershipInterest',
+  formType: 'leadershipInterest' as const,
   dedupeKey: data.email,
   submittedAt: new Date().toISOString(),
   submissionId: `app_${randomUUID()}`,
   userAgent,
 })
+
+const shouldMirrorToLegacyScript = () => process.env.UBLDA_RECRUITING_WRITE_MODE === 'legacy-script'
+
+const mirrorToLegacyScript = async (submission: ReturnType<typeof buildApplicationSubmission>, userAgent: string) => {
+  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
+  if (!scriptUrl) return { calendarEventCreated: false }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 8000)
+
+  try {
+    const response = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...submission, userAgent }),
+      signal: controller.signal,
+    })
+    const payload = await response.json().catch(() => null)
+
+    if (!response.ok || payload?.success === false) {
+      throw new Error(payload?.error || 'Failed to mirror candidate submission')
+    }
+
+    return { calendarEventCreated: Boolean(payload?.calendarEventCreated) }
+  } finally {
+    clearTimeout(timeout)
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
@@ -326,38 +355,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   }
 
-  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
-  if (!scriptUrl) {
-    return res.status(500).json({ error: 'Form backend not configured' })
-  }
-
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 8000)
-
   try {
     const submission = buildApplicationSubmission(result.data, req.headers['user-agent'] || '')
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submission),
-      signal: controller.signal,
-    })
-    const payload = await response.json().catch(() => null)
-
-    if (!response.ok || payload?.success === false) {
-      return res.status(response.ok ? 400 : 500).json({
-        error: payload?.error || 'Failed to submit',
-      })
-    }
+    await createLocalRecruitingStore().saveApplication(submission)
+    const legacyResult = shouldMirrorToLegacyScript()
+      ? await mirrorToLegacyScript(submission, req.headers['user-agent'] || '')
+      : { calendarEventCreated: false }
 
     return res.status(200).json({
       success: true,
       status: submission.status,
-      calendarEventCreated: Boolean(payload?.calendarEventCreated),
+      source: 'vercel',
+      calendarEventCreated: legacyResult.calendarEventCreated,
     })
   } catch {
     return res.status(500).json({ error: 'Failed to submit' })
-  } finally {
-    clearTimeout(timeout)
   }
 }
