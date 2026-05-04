@@ -562,14 +562,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
 
-    if (result.data.action === 'create') {
-      return res.status(200).json({
-        success: true,
-        accountCreated: Boolean(payload?.accountCreated ?? true),
-        magicLinkSent: Boolean(payload?.magicLinkSent ?? true),
-      })
-    }
-
     return res.status(200).json({
       success: true,
       account: payload?.account || (fallbackToLocalAdmin ? superAdminAccountResponse : 'account' in result.data ? result.data.account : null),
