@@ -1,4 +1,5 @@
 import { normalizeUniqname } from './application.ts'
+import type { AdminScope, DashboardRole } from './dashboardAccess.ts'
 
 export const APPLICANT_SESSION_STORAGE_KEY = 'ubldaApplicantSessionToken'
 export const AUTH_SESSION_CHANGED_EVENT = 'ublda-auth-session-changed'
@@ -11,6 +12,9 @@ export type ApplicantAccount = {
   lastName: string
   uniqname: string
   email: string
+  role?: DashboardRole
+  adminTitle?: string
+  adminScopes?: AdminScope[]
 }
 
 export type GoogleProfile = {

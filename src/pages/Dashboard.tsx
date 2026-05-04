@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { useMemberAuth } from '../hooks/useMemberAuth'
+import { ADMIN_ACCOUNTS } from '../lib/dashboardAccess'
+import { readDashboardData } from '../lib/dashboardData'
+import type { DashboardData } from '../lib/dashboardData'
 import {
   calendarItems,
   candidates,
@@ -16,7 +19,7 @@ import {
   sponsors,
   interviewerAvailability,
 } from '../lib/memberData'
-import type { Candidate, DashboardAction, MemberProfile, WorkspaceMode } from '../lib/memberData'
+import type { Candidate, DashboardAction, DashboardTab, MemberProfile, WorkspaceMode } from '../lib/memberData'
 import {
   getInterviewSlotByValue,
   overlappingSlotValues,
@@ -38,8 +41,9 @@ const publicPreviewItems = [
   },
 ]
 
-const memberTabs = ['Overview', 'Opportunities', 'Calendar', 'Directory', 'News', 'Resources', 'Profile']
-const leadershipTabs = ['Overview', 'Recruiting', 'Members', 'Sponsors', 'Publishing', 'Resources', 'Profile']
+const memberTabs: DashboardTab[] = ['Overview', 'Opportunities', 'Calendar', 'Directory', 'News', 'Resources', 'Profile']
+const execTabs: DashboardTab[] = ['Overview', 'Recruiting', 'Members', 'Sponsors', 'Publishing', 'Resources', 'Profile']
+const superAdminTabs: DashboardTab[] = ['Overview', 'Recruiting', 'Members', 'Sponsors', 'Publishing', 'Admin', 'Resources', 'Profile']
 
 const statusClass = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
@@ -48,11 +52,19 @@ const slotLabel = (value: string) => {
   return slot ? `${slot.label} · ${slot.bufferLabel}` : value || 'Unassigned'
 }
 
+const initialDashboardTab = (): DashboardTab => {
+  const tab = new URLSearchParams(window.location.search).get('tab') as DashboardTab | null
+  return tab || (window.location.search.includes('preview=leadership') ? 'Recruiting' : 'Overview')
+}
+
 const localPreviewMember: MemberProfile = {
   firstName: 'Preview',
   lastName: 'Member',
   uniqname: 'preview.member',
   email: 'preview.member@umich.edu',
+  role: 'member',
+  adminTitle: 'Member',
+  adminScopes: [],
   memberStatus: 'Local dashboard preview',
   attendance: {
     attended: 1,
@@ -93,18 +105,67 @@ function ActionCard({ action }: { action: DashboardAction }) {
 }
 
 export default function Dashboard() {
-  const { status, member, signOut } = useMemberAuth()
-  const effectiveMember = member || (import.meta.env.DEV && window.location.search.includes('preview=leadership') ? localPreviewMember : null)
-  const [workspace, setWorkspace] = useState<WorkspaceMode>(() => (window.location.search.includes('preview=leadership') ? 'leadership' : 'member'))
-  const [activeTab, setActiveTab] = useState(() => (window.location.search.includes('preview=leadership') ? 'Recruiting' : 'Overview'))
+  const { status, member, sessionToken, signOut } = useMemberAuth()
+  const previewingLeadership = import.meta.env.DEV && window.location.search.includes('preview=leadership')
+  const effectiveMember = useMemo(() => member || (previewingLeadership ? {
+    ...localPreviewMember,
+    firstName: 'Sam',
+    lastName: 'Bodine',
+    uniqname: 'sbodine',
+    email: 'sbodine@umich.edu',
+    role: 'super-admin' as const,
+    adminTitle: 'Super Admin',
+    adminScopes: ['recruiting' as const, 'members' as const, 'events' as const, 'sponsors' as const, 'publishing' as const, 'system' as const],
+    memberStatus: 'Super admin preview',
+  } : null), [member, previewingLeadership])
+  const workspace: WorkspaceMode = effectiveMember?.role === 'member' ? 'member' : 'leadership'
+  const tabs = effectiveMember?.role === 'super-admin' ? superAdminTabs : effectiveMember?.role === 'exec' ? execTabs : memberTabs
+  const [activeTab, setActiveTab] = useState<DashboardTab>(initialDashboardTab)
+  const [dashboardData, setDashboardData] = useState<DashboardData>({})
+  const [dashboardDataState, setDashboardDataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [dashboardError, setDashboardError] = useState('')
   const [candidateRows, setCandidateRows] = useState<Candidate[]>(candidates)
   const [assignmentSaveState, setAssignmentSaveState] = useState<Record<string, string>>({})
-  const [assignmentAdminToken, setAssignmentAdminToken] = useState('')
   const attendancePercent = effectiveMember ? Math.round((effectiveMember.attendance.attended / effectiveMember.attendance.total) * 100) : 0
-  const tabs = workspace === 'leadership' ? leadershipTabs : memberTabs
   const actions = workspace === 'leadership' ? leadershipActions : memberActions
-  const totalInterviewerSlots = new Set(interviewerAvailability.flatMap((interviewer) => interviewer.availability)).size
+  const liveInterviewerAvailability = dashboardData.interviewerAvailability?.length ? dashboardData.interviewerAvailability : interviewerAvailability
+  const totalInterviewerSlots = new Set(liveInterviewerAvailability.flatMap((interviewer) => interviewer.availability)).size
   const matchedCandidates = candidateRows.filter((candidate) => candidate.assignedSlot).length
+
+  useEffect(() => {
+    if (!tabs.includes(activeTab)) {
+      setActiveTab('Overview')
+    }
+  }, [activeTab, tabs])
+
+  useEffect(() => {
+    if (!effectiveMember || workspace !== 'leadership' || !sessionToken || previewingLeadership) {
+      return
+    }
+
+    let cancelled = false
+    setDashboardDataState('loading')
+    setDashboardError('')
+
+    readDashboardData(sessionToken)
+      .then((nextData) => {
+        if (cancelled) return
+        setDashboardData(nextData)
+        if (nextData.candidates?.length) {
+          setCandidateRows(nextData.candidates)
+        }
+        setDashboardDataState('ready')
+      })
+      .catch((error) => {
+        if (cancelled) return
+        setDashboardError(error instanceof Error ? error.message : 'Could not load live dashboard data.')
+        setDashboardDataState('error')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [effectiveMember, previewingLeadership, sessionToken, workspace])
 
   const updateCandidate = (id: string, updates: Partial<Candidate>) => {
     setCandidateRows((current) => current.map((candidate) => (
@@ -116,18 +177,25 @@ export default function Dashboard() {
     setAssignmentSaveState((current) => ({ ...current, [candidate.id]: 'Saving...' }))
 
     try {
+      if (previewingLeadership) {
+        setAssignmentSaveState((current) => ({ ...current, [candidate.id]: 'Preview only. Sign in as Sam to save to the sheet.' }))
+        return
+      }
+
+      if (!sessionToken) {
+        throw new Error('Sign in with an admin account before saving.')
+      }
+
       const response = await fetch('/api/interview-assignment', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-ublda-admin-token': assignmentAdminToken,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: candidate.email,
           assignedSlot: candidate.assignedSlot,
           interviewers: candidate.interviewers,
           interviewStatus: candidate.status,
           feedback: candidate.feedback,
+          sessionToken,
         }),
       })
       const result = await response.json().catch(() => null)
@@ -143,17 +211,20 @@ export default function Dashboard() {
     }
   }
 
-  const updateWorkspace = (nextWorkspace: WorkspaceMode) => {
-    setWorkspace(nextWorkspace)
-    setActiveTab('Overview')
-  }
-
   const workspaceSummary = useMemo(() => {
-    if (workspace === 'leadership') {
+    if (effectiveMember?.role === 'super-admin') {
       return {
-        label: 'Leadership workspace',
-        title: 'Recruiting and club operations, in one cockpit.',
-        text: 'Track candidates, interviews, Ross ratio, sponsors, member health, and publishing queues without burying leaders in spreadsheets.',
+        label: 'Super admin',
+        title: 'Sam, this is your UBLDA control room.',
+        text: 'Own account access, recruiting, e-board availability, interview assignments, member health, sponsors, publishing, and backend data health from one dashboard.',
+      }
+    }
+
+    if (effectiveMember?.role === 'exec') {
+      return {
+        label: 'Exec dashboard',
+        title: 'Your e-board operations dashboard.',
+        text: 'Work the recruiting, member, sponsor, and publishing queues you own without exposing super-admin account controls.',
       }
     }
 
@@ -162,7 +233,7 @@ export default function Dashboard() {
         title: `Welcome back, ${effectiveMember?.firstName || 'member'}.`,
       text: 'Find your next action, upcoming events, opportunities, news, directory access, and profile settings from one homebase.',
     }
-  }, [effectiveMember?.firstName, workspace])
+  }, [effectiveMember?.firstName, effectiveMember?.role])
 
   if (status === 'loading') {
     return (
@@ -481,12 +552,23 @@ export default function Dashboard() {
           </article>
         </div>
 
+        {workspace === 'leadership' && (
+          <div className={`dashboard-sync dashboard-sync--${dashboardDataState}`}>
+            <strong>{dashboardData.backendStatus?.source === 'sheets' ? 'Live sheet data' : 'Preview data'}</strong>
+            <span>
+              {dashboardDataState === 'loading'
+                ? 'Loading live recruiting data...'
+                : dashboardError || dashboardData.backendStatus?.message || 'Using the built-in sample slate until the account backend returns sheet data.'}
+            </span>
+          </div>
+        )}
+
         <div className="candidate-workbench">
           {candidateRows.map((candidate) => {
             const candidateSlots = candidate.availability
               .map((value) => getInterviewSlotByValue(value))
               .filter((slot): slot is NonNullable<typeof slot> => Boolean(slot))
-            const assignedInterviewers = interviewerAvailability.filter((interviewer) => candidate.interviewers.includes(interviewer.name))
+            const assignedInterviewers = liveInterviewerAvailability.filter((interviewer) => candidate.interviewers.includes(interviewer.name))
             const overlapValues = assignedInterviewers.flatMap((interviewer) => {
               const interviewerSlots = interviewer.availability
                 .map((value) => getInterviewSlotByValue(value))
@@ -539,7 +621,7 @@ export default function Dashboard() {
                       onChange={(event) => updateCandidate(candidate.id, { interviewers: event.target.value ? [event.target.value] : [] })}
                     >
                       <option value="">Assign lead interviewer</option>
-                      {interviewerAvailability.map((interviewer) => (
+                      {liveInterviewerAvailability.map((interviewer) => (
                         <option key={interviewer.name} value={interviewer.name}>{interviewer.name}</option>
                       ))}
                     </select>
@@ -593,7 +675,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="interviewer-coverage-list">
-          {interviewerAvailability.map((interviewer) => (
+          {liveInterviewerAvailability.map((interviewer) => (
             <article key={interviewer.name}>
               <div>
                 <strong>{interviewer.name}</strong>
@@ -603,15 +685,6 @@ export default function Dashboard() {
             </article>
           ))}
         </div>
-        <label className="interview-admin-token">
-          <span>Assignment save token</span>
-          <input
-            type="password"
-            value={assignmentAdminToken}
-            onChange={(event) => setAssignmentAdminToken(event.target.value)}
-            placeholder="Required to save sheet updates"
-          />
-        </label>
         <div className="portal-control-stack">
           <Link to="/interviewer-availability">Collect e-board availability</Link>
           <Link to="/apply">Candidate form</Link>
@@ -621,6 +694,80 @@ export default function Dashboard() {
       </section>
     </div>
   )
+
+  const renderAdmin = () => {
+    const adminAccounts = dashboardData.adminAccounts?.length ? dashboardData.adminAccounts : ADMIN_ACCOUNTS
+
+    return (
+      <div className="portal-grid portal-grid--ops">
+        <section className="portal-panel portal-panel--span-2">
+          <div className="portal-panel__header">
+            <div>
+              <h2>Account control</h2>
+              <p>Super-admin access is server-side. Sam can see every operational surface; exec admins get scoped dashboards.</p>
+            </div>
+            <Link to="/signin">Account sign in</Link>
+          </div>
+
+          <div className="admin-account-list">
+            {adminAccounts.map((admin) => (
+              <article key={admin.email}>
+                <div>
+                  <strong>{admin.name}</strong>
+                  <span>{admin.email}</span>
+                </div>
+                <mark className={`portal-status portal-status--${admin.role}`}>{admin.title}</mark>
+                <p>{admin.scopes.join(', ')}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="portal-panel">
+          <div className="portal-panel__header">
+            <div>
+              <h2>Backend network</h2>
+              <p>The dashboard uses the same account session as member sign-in.</p>
+            </div>
+          </div>
+          <div className="portal-stat-list">
+            <div>
+              <span>Accounts</span>
+              <strong>Applicant Accounts</strong>
+            </div>
+            <div>
+              <span>Candidates</span>
+              <strong>Leadership Interest</strong>
+            </div>
+            <div>
+              <span>E-board responses</span>
+              <strong>Interviewer Availability</strong>
+            </div>
+            <div>
+              <span>Resumes</span>
+              <strong>UBLDA Leadership Resumes</strong>
+            </div>
+          </div>
+        </section>
+
+        <section className="portal-panel">
+          <div className="portal-panel__header">
+            <div>
+              <h2>Admin capabilities</h2>
+              <p>Short-term Sheets backend, structured for a future database.</p>
+            </div>
+          </div>
+          <div className="admin-capability-list">
+            <span>Role-aware dashboard tabs</span>
+            <span>Session-based assignment saves</span>
+            <span>Candidate and interviewer sheet readback</span>
+            <span>Super-admin-only account roster</span>
+            <span>Member dashboard fallback</span>
+          </div>
+        </section>
+      </div>
+    )
+  }
 
   const renderMembers = () => (
     <div className="portal-grid portal-grid--ops" id="members">
@@ -778,6 +925,7 @@ export default function Dashboard() {
     if (activeTab === 'Members') return renderMembers()
     if (activeTab === 'Sponsors') return renderSponsors()
     if (activeTab === 'Publishing') return renderPublishing()
+    if (activeTab === 'Admin') return renderAdmin()
     return renderProfile()
   }
 
@@ -794,24 +942,10 @@ export default function Dashboard() {
                   <p>{workspaceSummary.text}</p>
                 </div>
                 <div className="portal-header__actions">
-                  <div className="workspace-switcher" aria-label="Workspace preview">
+                  <div className="portal-role-card" aria-label="Account access">
                     <span>{workspaceSummary.label}</span>
-                    <div>
-                      <button
-                        type="button"
-                        className={workspace === 'member' ? 'workspace-switcher__button workspace-switcher__button--active' : 'workspace-switcher__button'}
-                        onClick={() => updateWorkspace('member')}
-                      >
-                        Member
-                      </button>
-                      <button
-                        type="button"
-                        className={workspace === 'leadership' ? 'workspace-switcher__button workspace-switcher__button--active' : 'workspace-switcher__button'}
-                        onClick={() => updateWorkspace('leadership')}
-                      >
-                        Leadership
-                      </button>
-                    </div>
+                    <strong>{effectiveMember.adminTitle}</strong>
+                    <small>{effectiveMember.role === 'member' ? 'Member access' : effectiveMember.adminScopes.join(', ')}</small>
                   </div>
                   <button type="button" className="portal-header__signout" onClick={signOut}>
                     Sign out
@@ -838,8 +972,8 @@ export default function Dashboard() {
                     ))}
                   </nav>
                   <div className="portal-sidebar__note">
-                    <span>Prototype note</span>
-                    <p>Leadership preview is a UI model. Real e-board access should be assigned server-side.</p>
+                    <span>Access</span>
+                    <p>{effectiveMember.role === 'member' ? 'Member dashboard. Admin tools stay hidden unless your account is assigned e-board access.' : 'Admin tools are tied to your signed-in UMich account session.'}</p>
                   </div>
                 </aside>
 

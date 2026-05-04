@@ -1,7 +1,22 @@
 import type { ApplicantAccount, ApplicantApplicationSummary } from './applicantAccount'
-import { INTERVIEW_SLOTS } from './interviews'
+import type { AdminScope, DashboardRole } from './dashboardAccess.ts'
+import { adminAccountForEmail, roleForEmail, scopesForEmail } from './dashboardAccess.ts'
+import { INTERVIEW_SLOTS } from './interviews.ts'
 
 export type WorkspaceMode = 'member' | 'leadership'
+export type DashboardTab =
+  | 'Overview'
+  | 'Opportunities'
+  | 'Calendar'
+  | 'Directory'
+  | 'News'
+  | 'Resources'
+  | 'Profile'
+  | 'Recruiting'
+  | 'Members'
+  | 'Sponsors'
+  | 'Publishing'
+  | 'Admin'
 
 export type MemberProfile = ApplicantAccount & {
   memberStatus: string
@@ -12,6 +27,9 @@ export type MemberProfile = ApplicantAccount & {
   }
   leadershipPosition: string
   officerFocus: string
+  role: DashboardRole
+  adminTitle: string
+  adminScopes: AdminScope[]
   year: string
   college: string
   track: string
@@ -119,17 +137,35 @@ export const buildMemberProfile = (
   application?: ApplicantApplicationSummary | null,
 ): MemberProfile => {
   const isLeadershipApplicant = application?.status === 'Interview eligible' || application?.status === 'Needs review'
+  const fallbackAdmin = adminAccountForEmail(account.email)
+  const role = account.role || roleForEmail(account.email)
+  const adminScopes = account.adminScopes?.length ? account.adminScopes : scopesForEmail(account.email)
 
   return {
     ...account,
-    memberStatus: application ? 'Leadership candidate' : 'Member account active',
+    role,
+    adminTitle: account.adminTitle || fallbackAdmin?.title || (role === 'member' ? 'Member' : 'Exec Admin'),
+    adminScopes,
+    memberStatus: role === 'super-admin'
+      ? 'Super admin'
+      : role === 'exec'
+        ? 'Exec dashboard active'
+        : application ? 'Leadership candidate' : 'Member account active',
     attendance: {
       attended: application ? 1 : 0,
       total: 4,
       streak: application ? 1 : 0,
     },
-    leadershipPosition: isLeadershipApplicant ? 'Interviewing' : 'Not assigned',
-    officerFocus: 'Recruiting preview',
+    leadershipPosition: role === 'super-admin'
+      ? 'Full operating control'
+      : role === 'exec'
+        ? 'E-board operations'
+        : isLeadershipApplicant ? 'Interviewing' : 'Not assigned',
+    officerFocus: role === 'super-admin'
+      ? 'System, recruiting, members, sponsors, publishing'
+      : role === 'exec'
+        ? adminScopes.join(', ') || 'E-board operations'
+        : 'Recruiting preview',
     year: 'Update in profile',
     college: 'University of Michigan',
     track: application ? 'Leadership interest' : 'Member resources',
