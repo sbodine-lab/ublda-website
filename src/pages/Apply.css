@@ -686,6 +686,231 @@
   margin: 0 auto var(--space-8);
 }
 
+.apply-page--interviewer .interviewer-shell {
+  padding: calc(var(--space-32) + var(--space-6)) 0 var(--space-24);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.interviewer-shell__grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(var(--space-10), 5vw, var(--space-20));
+}
+
+.interviewer-intro {
+  position: sticky;
+  top: calc(var(--space-24) + var(--space-5));
+  display: grid;
+  gap: var(--space-8);
+}
+
+.interviewer-intro .section__label {
+  margin-bottom: 0;
+}
+
+.apply-page--interviewer .apply-page__headline {
+  margin: 0;
+  font-size: clamp(var(--text-5xl), 7vw, var(--text-7xl));
+  line-height: 0.98;
+  letter-spacing: 0;
+  max-width: 620px;
+}
+
+.apply-page--interviewer .apply-page__headline em {
+  color: var(--color-teal);
+  font-style: italic;
+}
+
+.apply-page--interviewer .apply-page__intro {
+  max-width: 520px;
+  margin: 0;
+  color: var(--color-gray-600);
+  font-size: clamp(var(--text-lg), 2vw, var(--text-xl));
+}
+
+.interviewer-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.interviewer-facts span {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  color: var(--color-navy);
+  background: rgba(255, 255, 255, 0.32);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-align: center;
+}
+
+.interviewer-form-column {
+  min-width: 0;
+}
+
+.apply-page--interviewer .apply-form {
+  gap: var(--space-6);
+}
+
+.apply-page--interviewer .apply-form__header {
+  margin-bottom: var(--space-1);
+}
+
+.apply-page--interviewer .apply-form__header .section__label {
+  margin-bottom: var(--space-5);
+}
+
+.apply-page--interviewer .apply-form__title {
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  margin-bottom: var(--space-3);
+}
+
+.apply-page--interviewer .apply-form__subtitle {
+  max-width: none;
+  color: var(--color-gray-600);
+}
+
+.apply-page--interviewer .apply-form__group {
+  padding: var(--space-8);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.32);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.apply-page--interviewer .apply-form__group legend {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-6);
+}
+
+.apply-page--interviewer .apply-form input,
+.apply-page--interviewer .apply-form select,
+.apply-page--interviewer .apply-form textarea,
+.apply-page--interviewer .apply-form__email-wrapper {
+  min-height: 52px;
+  border-color: var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.apply-page--interviewer .apply-form textarea {
+  min-height: 118px;
+}
+
+.apply-page--interviewer .availability-picker {
+  gap: var(--space-5);
+}
+
+.apply-page--interviewer .availability-summary {
+  width: 100%;
+  min-height: 70px;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.apply-page--interviewer .availability-summary span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.apply-page--interviewer .availability-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.apply-page--interviewer .availability-quick-actions button,
+.apply-page--interviewer .availability-part__header button,
+.apply-page--interviewer .availability-day__header button {
+  min-height: 44px;
+  border-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  background: transparent;
+}
+
+.apply-page--interviewer .availability-days {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.apply-page--interviewer .availability-day {
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5);
+  border-color: var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-cream);
+}
+
+.apply-page--interviewer .availability-day__header {
+  border-bottom-color: var(--color-gray-200);
+}
+
+.apply-page--interviewer .availability-day__header h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 400;
+}
+
+.apply-page--interviewer .availability-day__details summary {
+  color: var(--color-navy);
+  font-weight: 800;
+}
+
+.apply-page--interviewer .availability-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+.apply-page--interviewer .availability-slot {
+  min-height: 78px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.apply-page--interviewer .availability-slot span {
+  min-width: 0;
+}
+
+.apply-page--interviewer .availability-slot:has(input:checked) {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+}
+
+.apply-page--interviewer .apply-form__footer-actions {
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.apply-page--interviewer .apply-form__submit {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 64px;
+  font-size: var(--text-lg);
+}
+
+.apply-page--interviewer .apply-form__secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  color: var(--color-gray-600);
+  background: transparent;
+  font-size: var(--text-base);
+}
+
 @media (max-width: 768px) {
   .apply-page__hero {
     padding: var(--space-24) 0 var(--space-10);
@@ -783,5 +1008,40 @@
   .apply-form__submit {
     align-self: stretch;
     justify-content: center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .interviewer-shell__grid,
+  .apply-page--interviewer .availability-days {
+    grid-template-columns: 1fr;
+  }
+
+  .interviewer-intro {
+    position: static;
+  }
+
+  .apply-page--interviewer .availability-quick-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .apply-page--interviewer .interviewer-shell {
+    padding: var(--space-24) 0 var(--space-16);
+  }
+
+  .apply-page--interviewer .apply-page__headline {
+    font-size: clamp(var(--text-4xl), 14vw, var(--text-6xl));
+  }
+
+  .interviewer-facts,
+  .apply-page--interviewer .availability-quick-actions,
+  .apply-page--interviewer .availability-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-page--interviewer .apply-form__group {
+    padding: var(--space-6);
   }
 }

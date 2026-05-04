@@ -30,6 +30,13 @@ const initialForm: AvailabilityForm = {
   website: '',
 }
 
+const scheduleFacts = [
+  '20 min interview',
+  '10 min buffer',
+  'Google Meet',
+  'Match Wednesday',
+]
+
 export default function InterviewerAvailability() {
   const [form, setForm] = useState(initialForm)
   const [submitting, setSubmitting] = useState(false)
@@ -80,25 +87,28 @@ export default function InterviewerAvailability() {
   }
 
   return (
-    <main id="main-content" className="apply-page">
-      <section className="apply-page__hero">
-        <div className="container container--narrow">
+    <main id="main-content" className="apply-page apply-page--interviewer">
+      <section className="interviewer-shell">
+        <div className="container interviewer-shell__grid">
           <Reveal>
-            <p className="section__label">E-Board Availability</p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h1 className="apply-page__headline">Help cover the interview window.</h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="apply-page__intro">
-              Select the {INTERVIEW_DAY_RANGE_LABEL} slots you can cover.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+            <aside className="interviewer-intro">
+              <p className="section__label">E-Board Availability</p>
+              <h1 className="apply-page__headline">
+                E-board <em>availability</em>
+              </h1>
+              <p className="apply-page__intro">
+                Select the slots you can cover. {INTERVIEW_DAY_RANGE_LABEL}.
+              </p>
 
-      <section className="section apply-form-section">
-        <div className="container container--narrow">
+              <div className="interviewer-facts" aria-label="Interview schedule details">
+                {scheduleFacts.map((fact) => (
+                  <span key={fact}>{fact}</span>
+                ))}
+              </div>
+            </aside>
+          </Reveal>
+
+          <div className="interviewer-form-column">
           {submitted ? (
             <Reveal>
               <div className="apply-form__success" role="alert" aria-live="polite">
@@ -196,6 +206,7 @@ export default function InterviewerAvailability() {
               </form>
             </Reveal>
           )}
+          </div>
         </div>
       </section>
     </main>
