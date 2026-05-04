@@ -157,7 +157,6 @@ export default function InterviewerAvailability() {
                   legend="Availability"
                   selectedValues={form.availability}
                   onChange={updateAvailability}
-                  helper="Shortcuts or exact times."
                 />
 
                 <div className="apply-form__trap" aria-hidden="true">
