@@ -51,7 +51,7 @@ const statusClass = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g
 
 const slotLabel = (value: string) => {
   const slot = getInterviewSlotByValue(value)
-  return slot ? `${slot.label} · ${slot.bufferLabel}` : value || 'Unassigned'
+  return slot ? slot.label : value || 'Unassigned'
 }
 
 const initialDashboardTab = (): DashboardTab => {

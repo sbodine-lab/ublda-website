@@ -63,7 +63,7 @@ export default function AvailabilityPicker({
 
       <div className="availability-summary">
         <strong>{selectedValues.length}</strong>
-        <span>buffered slot{selectedValues.length === 1 ? '' : 's'} selected</span>
+        <span>slot{selectedValues.length === 1 ? '' : 's'} selected</span>
       </div>
 
       <div className="availability-quick-actions" aria-label="Availability shortcuts">
@@ -92,7 +92,7 @@ export default function AvailabilityPicker({
               <div className="availability-day__header">
                 <div>
                   <h3>{group.label}</h3>
-                  <p>{selectedCount} of {values.length} buffered slots selected</p>
+                  <p>{selectedCount} of {values.length} slots selected</p>
                 </div>
                 <button type="button" onClick={() => toggleValues(values)}>
                   {selectedCount === values.length ? 'Clear day' : 'Select day'}
@@ -129,7 +129,6 @@ export default function AvailabilityPicker({
                               />
                               <span>
                                 <strong>{slot.timeLabel.replace(' ET', '')}</strong>
-                                <small>{slot.bufferLabel}</small>
                               </span>
                             </label>
                           ))}

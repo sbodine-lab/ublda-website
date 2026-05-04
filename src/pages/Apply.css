@@ -518,9 +518,10 @@
 }
 
 .availability-slot {
-  min-height: 70px;
-  align-items: flex-start;
+  min-height: 60px;
+  align-items: center;
   cursor: pointer;
+  padding: var(--space-3);
   transition: background var(--duration-fast) var(--ease-out),
               border-color var(--duration-fast) var(--ease-out),
               box-shadow var(--duration-fast) var(--ease-out);
@@ -535,12 +536,15 @@
 .availability-slot span {
   display: grid;
   gap: 2px;
+  min-width: 0;
 }
 
 .availability-slot strong {
   color: var(--color-navy);
   font-size: var(--text-sm);
   font-weight: 900;
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
 }
 
 .availability-slot small {
@@ -804,7 +808,7 @@
 }
 
 .apply-page--interviewer .availability-slot {
-  min-height: 78px;
+  min-height: 58px;
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.56);
 }
@@ -887,20 +891,49 @@
 
   .apply-form__row,
   .apply-form__checkbox-grid,
-  .apply-form__rank-grid,
-  .availability-grid {
+  .apply-form__rank-grid {
     grid-template-columns: 1fr;
   }
 
+  .availability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
   .availability-day {
-    padding: var(--space-4);
+    gap: var(--space-3);
+    padding: var(--space-3);
   }
 
   .availability-day__header,
-  .availability-part__header,
   .apply-form__footer-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .availability-day__header {
+    gap: var(--space-3);
+  }
+
+  .availability-day__header button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .availability-day__details[open] summary {
+    margin-bottom: var(--space-3);
+  }
+
+  .availability-parts {
+    gap: var(--space-3);
+  }
+
+  .availability-part {
+    gap: var(--space-2);
+  }
+
+  .availability-part__header {
+    align-items: center;
   }
 
   .availability-part__header div {
@@ -910,13 +943,36 @@
   }
 
   .availability-summary,
-  .availability-quick-actions button,
-  .availability-part__header button {
+  .availability-quick-actions button {
     width: 100%;
+  }
+
+  .availability-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .availability-part__header button {
+    flex: 0 0 auto;
+    min-width: 86px;
   }
 
   .availability-summary {
     justify-content: center;
+  }
+
+  .availability-slot {
+    min-height: 54px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .availability-slot input {
+    width: 16px;
+    height: 16px;
+  }
+
+  .availability-slot strong {
+    font-size: var(--text-xs);
   }
 
   .apply-account__tabs {
@@ -955,11 +1011,23 @@
 
 @media (max-width: 768px) {
   .apply-page--interviewer .availability-quick-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .apply-page--interviewer .apply-form__group {
     padding: var(--space-6);
+  }
+
+  .apply-page--interviewer .availability-day {
+    padding: var(--space-3);
+  }
+
+  .apply-page--interviewer .availability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .apply-page--interviewer .availability-slot {
+    min-height: 54px;
   }
 }
 
@@ -1010,14 +1078,131 @@
 
 @media (max-width: 768px) {
   .apply-page--simple-form .interviewer-simple {
-    padding: var(--space-24) 0 var(--space-16);
+    padding: calc(var(--space-24) + var(--space-4)) 0 var(--space-14);
+  }
+
+  .apply-page--simple-form .apply-form {
+    gap: var(--space-5);
+  }
+
+  .apply-page--simple-form .apply-form__title {
+    font-size: var(--text-4xl);
+    line-height: 1.05;
+  }
+
+  .apply-page--simple-form .interviewer-simple__header {
+    padding-top: var(--space-16);
+  }
+
+  .apply-page--simple-form .apply-form__subtitle {
+    font-size: var(--text-base);
   }
 
   .apply-page--simple-form .apply-form__group {
-    padding: var(--space-6);
+    gap: var(--space-4);
+    padding: var(--space-5);
   }
 
   .apply-page--simple-form .availability-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .apply-page--simple-form .availability-summary {
+    min-height: 58px;
+  }
+
+  .apply-page--simple-form .availability-summary strong {
+    font-size: var(--text-2xl);
+  }
+}
+
+@media (max-width: 430px) {
+  .apply-page__hero {
+    padding: var(--space-20) 0 var(--space-8);
+  }
+
+  .apply-form-section {
+    padding-top: var(--space-10);
+  }
+
+  .apply-form,
+  .apply-page--simple-form .apply-form {
+    gap: var(--space-4);
+  }
+
+  .apply-form__group,
+  .apply-page--simple-form .apply-form__group,
+  .apply-page--interviewer .apply-form__group {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+  }
+
+  .apply-form__group legend,
+  .apply-page--interviewer .apply-form__group legend {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .apply-form input,
+  .apply-form select,
+  .apply-form textarea {
+    min-height: 48px;
+    font-size: 16px;
+    padding: var(--space-3);
+  }
+
+  .apply-form textarea {
+    min-height: 96px;
+  }
+
+  .apply-form input[type="file"]::file-selector-button {
+    width: 100%;
+    margin: 0 0 var(--space-2);
+  }
+
+  .availability-quick-actions,
+  .apply-page--interviewer .availability-quick-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .availability-quick-actions {
+    display: grid;
+  }
+
+  .availability-quick-actions button,
+  .availability-part__header button,
+  .availability-day__header button {
+    min-height: 42px;
+    padding: 0 var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .availability-grid,
+  .apply-page--interviewer .availability-grid,
+  .apply-page--simple-form .availability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .availability-slot {
+    gap: var(--space-2);
+    min-height: 50px;
+    padding: var(--space-2);
+  }
+
+  .availability-slot strong {
+    font-size: 0.75rem;
+    line-height: 1.15;
+  }
+
+  .apply-form__footer-actions,
+  .apply-page--interviewer .apply-form__footer-actions {
+    gap: var(--space-3);
+  }
+
+  .apply-page--interviewer .apply-form__submit,
+  .apply-page--interviewer .apply-form__secondary-link {
+    min-height: 54px;
+    padding: 0 var(--space-4);
+    font-size: var(--text-base);
   }
 }
