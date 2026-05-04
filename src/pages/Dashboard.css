@@ -376,6 +376,27 @@
   font-weight: 900;
 }
 
+.portal-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.portal-panel__actions button,
+.portal-panel__actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(216, 214, 208, 0.86);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--color-navy);
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 900;
+}
+
 .portal-actions {
   display: grid;
   gap: 0;
@@ -895,6 +916,10 @@
   color: #9f1d1d;
 }
 
+.dashboard-sync--ready span {
+  color: var(--color-navy);
+}
+
 .candidate-workbench {
   display: grid;
   gap: var(--space-6);
@@ -951,7 +976,7 @@
 
 .candidate-card__controls {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(150px, 0.85fr) minmax(150px, 0.85fr) minmax(130px, 0.7fr);
   gap: var(--space-3);
 }
 
@@ -987,6 +1012,49 @@
   border-top: 1px solid rgba(216, 214, 208, 0.72);
 }
 
+.candidate-card__bias {
+  border-top: 1px solid rgba(216, 214, 208, 0.72);
+  border-bottom: 1px solid rgba(216, 214, 208, 0.72);
+  padding: var(--space-3) 0;
+}
+
+.candidate-card__bias summary {
+  color: var(--color-navy);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 900;
+}
+
+.candidate-card__bias p {
+  margin: var(--space-2) 0;
+}
+
+.candidate-card__bias div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.candidate-card__bias label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 34px;
+  border: 1px solid rgba(216, 214, 208, 0.86);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--color-navy);
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 850;
+}
+
+.candidate-card__bias input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-teal);
+}
+
 .candidate-card__save-row {
   display: flex;
   flex-wrap: wrap;
@@ -1002,6 +1070,12 @@
   padding: 0 var(--space-4);
   font-size: var(--text-sm);
   font-weight: 900;
+}
+
+.candidate-card__save-row .candidate-card__match-button {
+  border: 1px solid rgba(216, 214, 208, 0.86);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--color-navy);
 }
 
 .candidate-card__save-row span {

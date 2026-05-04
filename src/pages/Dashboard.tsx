@@ -24,6 +24,11 @@ import {
   getInterviewSlotByValue,
   overlappingSlotValues,
 } from '../lib/interviews'
+import {
+  matchInterviewCandidate,
+  matchOpenInterviewSlate,
+} from '../lib/interviewMatching'
+import type { InterviewerAvoidance } from '../lib/interviewMatching'
 import './Dashboard.css'
 
 const publicPreviewItems = [
@@ -125,6 +130,8 @@ export default function Dashboard() {
   const [dashboardDataState, setDashboardDataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [dashboardError, setDashboardError] = useState('')
   const [candidateRows, setCandidateRows] = useState<Candidate[]>(candidates)
+  const [interviewerAvoidance, setInterviewerAvoidance] = useState<InterviewerAvoidance>({})
+  const [matchingNotice, setMatchingNotice] = useState('')
   const [assignmentSaveState, setAssignmentSaveState] = useState<Record<string, string>>({})
   const attendancePercent = effectiveMember ? Math.round((effectiveMember.attendance.attended / effectiveMember.attendance.total) * 100) : 0
   const actions = workspace === 'leadership' ? leadershipActions : memberActions
@@ -171,6 +178,63 @@ export default function Dashboard() {
     setCandidateRows((current) => current.map((candidate) => (
       candidate.id === id ? { ...candidate, ...updates } : candidate
     )))
+  }
+
+  const updateCandidateInterviewers = (id: string, index: number, value: string) => {
+    setCandidateRows((current) => current.map((candidate) => {
+      if (candidate.id !== id) return candidate
+
+      const nextInterviewers = [...candidate.interviewers]
+      nextInterviewers[index] = value
+      const uniqueInterviewers = Array.from(new Set(nextInterviewers.filter(Boolean))).slice(0, 2)
+
+      return { ...candidate, interviewers: uniqueInterviewers }
+    }))
+  }
+
+  const toggleAvoidedInterviewer = (candidateId: string, interviewerName: string) => {
+    setInterviewerAvoidance((current) => {
+      const avoided = new Set(current[candidateId] || [])
+      if (avoided.has(interviewerName)) {
+        avoided.delete(interviewerName)
+      } else {
+        avoided.add(interviewerName)
+      }
+
+      return {
+        ...current,
+        [candidateId]: Array.from(avoided),
+      }
+    })
+  }
+
+  const applyCandidateMatch = (candidate: Candidate) => {
+    const match = matchInterviewCandidate(
+      candidate,
+      liveInterviewerAvailability,
+      candidateRows,
+      interviewerAvoidance[candidate.id] || [],
+    )
+
+    if (!match) {
+      setAssignmentSaveState((current) => ({ ...current, [candidate.id]: 'No conflict-safe overlap found.' }))
+      return
+    }
+
+    updateCandidate(candidate.id, {
+      assignedSlot: match.assignedSlot,
+      interviewers: match.interviewers,
+      status: 'Matched',
+    })
+    setAssignmentSaveState((current) => ({ ...current, [candidate.id]: `Auto-matched ${match.interviewers.length} interviewer${match.interviewers.length === 1 ? '' : 's'}.` }))
+  }
+
+  const applySlateMatch = () => {
+    const result = matchOpenInterviewSlate(candidateRows, liveInterviewerAvailability, interviewerAvoidance)
+    setCandidateRows(result.candidates)
+    setMatchingNotice(result.matchedCount
+      ? `Auto-matched ${result.matchedCount} candidate${result.matchedCount === 1 ? '' : 's'} using overlap, capacity, and conflict flags.`
+      : 'No open candidates had a conflict-safe overlap.')
   }
 
   const saveAssignment = async (candidate: Candidate) => {
@@ -531,7 +595,10 @@ export default function Dashboard() {
             <h2>E-board interview command center</h2>
             <p>Candidate resumes, ranked roles, availability overlap, assignments, interview status, and feedback.</p>
           </div>
-          <Link to="/interviewer-availability">E-board availability form</Link>
+          <div className="portal-panel__actions">
+            <button type="button" onClick={applySlateMatch}>Auto-match open candidates</button>
+            <Link to="/interviewer-availability">E-board availability form</Link>
+          </div>
         </div>
 
         <div className="interview-admin-summary" aria-label="Interview scheduling summary">
@@ -563,6 +630,13 @@ export default function Dashboard() {
           </div>
         )}
 
+        {matchingNotice && (
+          <div className="dashboard-sync dashboard-sync--ready">
+            <strong>Matcher</strong>
+            <span>{matchingNotice}</span>
+          </div>
+        )}
+
         <div className="candidate-workbench">
           {candidateRows.map((candidate) => {
             const candidateSlots = candidate.availability
@@ -577,6 +651,9 @@ export default function Dashboard() {
             })
             const realisticSlotValues = Array.from(new Set(overlapValues))
             const fallbackValues = realisticSlotValues.length > 0 ? realisticSlotValues : candidate.availability
+            const avoidedInterviewers = new Set(interviewerAvoidance[candidate.id] || [])
+            const leadInterviewer = candidate.interviewers[0] || ''
+            const secondInterviewer = candidate.interviewers[1] || ''
 
             return (
               <article className="candidate-card" key={candidate.id}>
@@ -615,15 +692,30 @@ export default function Dashboard() {
                   </label>
 
                   <label>
-                    <span>Interviewers</span>
+                    <span>Lead interviewer</span>
                     <select
-                      value={candidate.interviewers[0] || ''}
-                      onChange={(event) => updateCandidate(candidate.id, { interviewers: event.target.value ? [event.target.value] : [] })}
+                      value={leadInterviewer}
+                      onChange={(event) => updateCandidateInterviewers(candidate.id, 0, event.target.value)}
                     >
                       <option value="">Assign lead interviewer</option>
                       {liveInterviewerAvailability.map((interviewer) => (
                         <option key={interviewer.name} value={interviewer.name}>{interviewer.name}</option>
                       ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Second interviewer</span>
+                    <select
+                      value={secondInterviewer}
+                      onChange={(event) => updateCandidateInterviewers(candidate.id, 1, event.target.value)}
+                    >
+                      <option value="">Optional second interviewer</option>
+                      {liveInterviewerAvailability
+                        .filter((interviewer) => interviewer.name !== leadInterviewer)
+                        .map((interviewer) => (
+                          <option key={interviewer.name} value={interviewer.name}>{interviewer.name}</option>
+                        ))}
                     </select>
                   </label>
 
@@ -646,6 +738,23 @@ export default function Dashboard() {
                   <small>{realisticSlotValues.length} overlap buffered slot{realisticSlotValues.length === 1 ? '' : 's'} with assigned interviewer availability</small>
                 </div>
 
+                <details className="candidate-card__bias">
+                  <summary>Conflict / bias check</summary>
+                  <p>Mark anyone who is friends with this candidate or should not interview them.</p>
+                  <div>
+                    {liveInterviewerAvailability.map((interviewer) => (
+                      <label key={interviewer.name}>
+                        <input
+                          type="checkbox"
+                          checked={avoidedInterviewers.has(interviewer.name)}
+                          onChange={() => toggleAvoidedInterviewer(candidate.id, interviewer.name)}
+                        />
+                        <span>Avoid {interviewer.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </details>
+
                 <label className="candidate-card__feedback">
                   <span>Notes / feedback</span>
                   <textarea
@@ -656,6 +765,9 @@ export default function Dashboard() {
                 </label>
 
                 <div className="candidate-card__save-row">
+                  <button type="button" className="candidate-card__match-button" onClick={() => applyCandidateMatch(candidate)}>
+                    Auto-match
+                  </button>
                   <button type="button" onClick={() => void saveAssignment(candidate)}>
                     Save assignment
                   </button>

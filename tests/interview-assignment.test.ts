@@ -40,6 +40,7 @@ test('builds an interview assignment submission for Apps Script', () => {
     uniqname: 'candidate',
     assignedSlot: INTERVIEW_SLOTS[0].value,
     interviewStatus: 'Matched',
+    interviewers: ['Sam Bodine'],
     sessionToken: 'session-token-session-token-session',
   })
 
@@ -51,4 +52,33 @@ test('builds an interview assignment submission for Apps Script', () => {
   assert.equal(submission.email, 'candidate@umich.edu')
   assert.equal(submission.userAgent, 'node-test-agent')
   assert.match(submission.submissionId, /^assignment_/)
+})
+
+test('requires sane interviewer assignments for matched slots', () => {
+  const missingSlot = validateInterviewAssignmentPayload({
+    email: 'candidate@umich.edu',
+    interviewers: ['Sam Bodine'],
+    interviewStatus: 'Matched',
+    sessionToken: 'session-token-session-token-session',
+  })
+  const missingInterviewer = validateInterviewAssignmentPayload({
+    email: 'candidate@umich.edu',
+    assignedSlot: INTERVIEW_SLOTS[0].value,
+    interviewStatus: 'Matched',
+    sessionToken: 'session-token-session-token-session',
+  })
+  const tooManyInterviewers = validateInterviewAssignmentPayload({
+    email: 'candidate@umich.edu',
+    assignedSlot: INTERVIEW_SLOTS[0].value,
+    interviewers: ['Sam Bodine', 'Alexa Chiang', 'Cooper Ryan'],
+    interviewStatus: 'Matched',
+    sessionToken: 'session-token-session-token-session',
+  })
+
+  assert.equal(missingSlot.success, false)
+  assert.match(missingSlot.errors.join(' '), /assigned slot/i)
+  assert.equal(missingInterviewer.success, false)
+  assert.match(missingInterviewer.errors.join(' '), /at least one interviewer/i)
+  assert.equal(tooManyInterviewers.success, false)
+  assert.match(tooManyInterviewers.errors.join(' '), /no more than two/i)
 })

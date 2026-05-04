@@ -9,6 +9,7 @@ import { normalizeUniqname } from './application.ts'
 const UMICH_EMAIL_DOMAIN = '@umich.edu'
 const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
 const statusValues = new Set<string>(INTERVIEW_STATUS_OPTIONS)
+const scheduledStatusValues = new Set<string>(['Matched', 'Invited', 'Interviewed', 'Offer'])
 
 export type InterviewAssignmentData = {
   uniqname: string
@@ -55,16 +56,21 @@ export const validateInterviewAssignmentPayload = (payload: unknown): Validation
   const email = `${uniqname}${UMICH_EMAIL_DOMAIN}`
   const assignedSlotValue = getString(body, 'assignedSlot')
   const assignedSlot = assignedSlotValue ? getInterviewSlotByValue(assignedSlotValue) || null : null
-  const interviewers = normalizeStringArray(body.interviewers || body.interviewer)
+  const submittedInterviewers = normalizeStringArray(body.interviewers || body.interviewer)
+  const interviewers = Array.from(new Set(submittedInterviewers))
   const interviewStatus = (getString(body, 'interviewStatus') || getString(body, 'status') || 'Needs match') as InterviewStatus
   const feedback = getString(body, 'feedback')
   const sessionToken = getString(body, 'sessionToken')
 
+  if (sessionToken.length < 24) errors.push('A valid admin session is required.')
   if (!uniqname || !uniqnamePattern.test(uniqname)) errors.push('A valid candidate uniqname is required.')
   if (assignedSlotValue && !assignedSlot) errors.push('Assigned slot is invalid.')
   if (!statusValues.has(interviewStatus)) errors.push('Interview status is invalid.')
+  if (submittedInterviewers.length !== interviewers.length) errors.push('Interviewers must be unique.')
+  if (interviewers.length > 2) errors.push('Assign no more than two interviewers.')
+  if (scheduledStatusValues.has(interviewStatus) && !assignedSlot) errors.push('Select an assigned slot before using this interview status.')
+  if ((assignedSlot || scheduledStatusValues.has(interviewStatus)) && interviewers.length === 0) errors.push('Assign at least one interviewer with the interview slot.')
   if (feedback.length > 2000) errors.push('Feedback must be 2,000 characters or fewer.')
-  if (sessionToken.length < 24) errors.push('A valid admin session is required.')
 
   if (errors.length > 0) {
     return { success: false, data: null, errors }
