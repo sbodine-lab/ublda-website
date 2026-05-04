@@ -148,7 +148,7 @@ export const memberActions: DashboardAction[] = [
   },
   {
     title: 'Choose a leadership interview slot',
-    description: 'Drop your resume and select every interview block you can make.',
+    description: 'Drop your resume and select every buffered interview slot you can make.',
     status: 'Open now',
     href: '/portal',
     tone: 'ready',
@@ -196,7 +196,7 @@ export const leadershipMetrics: LeadershipMetric[] = [
   {
     label: 'Interview coverage',
     value: '4 days',
-    detail: '20-minute Google Meet blocks, May 7-10',
+    detail: '20-minute Google Meet interviews with 10-minute buffers, May 7-10',
     tone: 'watch',
   },
   {
@@ -361,7 +361,7 @@ export const candidates: Candidate[] = [
     email: 'tbrooks@umich.edu',
     rolePreferences: ['VP of Accessibility Projects', 'VP of Marketing & Community', 'Open to any role'],
     status: 'Hold',
-    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[132].value, INTERVIEW_SLOTS[133].value],
+    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[104].value, INTERVIEW_SLOTS[105].value],
     resumeUrl: 'https://drive.google.com/',
     assignedSlot: '',
     interviewers: ['Cooper Ryan'],
@@ -398,7 +398,7 @@ export const interviewerAvailability: InterviewerAvailability[] = [
   {
     name: 'Cooper Ryan',
     role: 'E-board',
-    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[90].value, INTERVIEW_SLOTS[91].value, INTERVIEW_SLOTS[132].value, INTERVIEW_SLOTS[133].value],
+    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[90].value, INTERVIEW_SLOTS[91].value, INTERVIEW_SLOTS[104].value, INTERVIEW_SLOTS[105].value],
     maxInterviews: '3',
   },
 ]

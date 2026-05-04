@@ -29,7 +29,7 @@ test('accepts a complete Ross interview signup with a resume drop', () => {
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
     rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
-    availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value, INTERVIEW_SLOTS[42].value],
+    availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value, INTERVIEW_SLOTS[28].value],
     resumeFile,
   })
 
@@ -61,7 +61,7 @@ test('keeps non-Ross students in the future role pool instead of rejecting them'
   assert.equal(result.data?.status, 'Future role pool')
 })
 
-test('requires at least one available interview block because matching happens later', () => {
+test('requires at least one available interview slot because matching happens later', () => {
   const result = validateApplicationPayload({
     firstName: 'Sam',
     lastName: 'Bodine',
@@ -75,7 +75,7 @@ test('requires at least one available interview block because matching happens l
   })
 
   assert.equal(result.success, false)
-  assert.match(result.errors[0], /interview block/i)
+  assert.match(result.errors[0], /interview slot/i)
 })
 
 test('requires three ranked board position interests', () => {
@@ -164,7 +164,7 @@ test('builds a submission with a stable dedupe key and generated submission id',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
     rolePreferences: ['Open to any role', 'VP of Member Experience', 'VP of Marketing & Community'],
-    availability: [INTERVIEW_SLOTS[42].value, INTERVIEW_SLOTS[43].value],
+    availability: [INTERVIEW_SLOTS[28].value, INTERVIEW_SLOTS[29].value],
     resumeFile,
   })
 
@@ -176,6 +176,7 @@ test('builds a submission with a stable dedupe key and generated submission id',
   assert.equal(submission.userAgent, 'node-test-agent')
   assert.equal(submission.availability.length, 2)
   assert.equal(submission.interviewSlot.label, 'Fri, May 8, 8:00 AM-8:20 AM ET')
+  assert.equal(submission.interviewSlot.bufferLabel, 'buffer until 8:30 AM ET')
   assert.equal(submission.resumeFile.name, 'sam-bodine-resume.pdf')
   assert.match(submission.submissionId, /^app_/)
 })

@@ -6,12 +6,12 @@ import {
   validateInterviewerAvailabilityPayload,
 } from '../src/lib/interviewerAvailability.ts'
 
-test('accepts e-board interviewer availability across many interview blocks', () => {
+test('accepts e-board interviewer availability across many interview slots', () => {
   const result = validateInterviewerAvailabilityPayload({
     firstName: 'Alexa',
     lastName: 'Chiang',
     uniqname: 'atchiang',
-    availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value, INTERVIEW_SLOTS[42].value],
+    availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value, INTERVIEW_SLOTS[28].value],
     maxInterviews: '3',
     notes: 'Prefer to pair with one other interviewer.',
   })
@@ -22,7 +22,7 @@ test('accepts e-board interviewer availability across many interview blocks', ()
   assert.match(result.data?.availabilitySummary || '', /Thursday, May 7/)
 })
 
-test('requires at least one e-board availability block', () => {
+test('requires at least one e-board availability slot', () => {
   const result = validateInterviewerAvailabilityPayload({
     firstName: 'Alexa',
     lastName: 'Chiang',
@@ -31,7 +31,7 @@ test('requires at least one e-board availability block', () => {
   })
 
   assert.equal(result.success, false)
-  assert.match(result.errors[0], /interview block/i)
+  assert.match(result.errors[0], /interview slot/i)
 })
 
 test('builds an interviewer availability submission for Apps Script', () => {

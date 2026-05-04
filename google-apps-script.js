@@ -879,7 +879,7 @@ function summarizeSlots_(slots) {
   });
 
   return Object.keys(counts).map(function(label) {
-    return label + ": " + counts[label] + " block" + (counts[label] === 1 ? "" : "s");
+    return label + ": " + counts[label] + " slot" + (counts[label] === 1 ? "" : "s");
   }).join("; ");
 }
 

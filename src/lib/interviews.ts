@@ -24,14 +24,19 @@ export const INTERVIEW_WINDOW_DAYS = [
 export const INTERVIEW_START_HOUR_ET = 8
 export const INTERVIEW_END_HOUR_ET = 22
 export const INTERVIEW_BLOCK_MINUTES = 20
+export const INTERVIEW_BUFFER_MINUTES = 10
+export const INTERVIEW_SLOT_INTERVAL_MINUTES = INTERVIEW_BLOCK_MINUTES + INTERVIEW_BUFFER_MINUTES
 
 export type InterviewSlot = {
   value: string
   label: string
   dayLabel: string
   timeLabel: string
+  bufferLabel: string
   start: string
   end: string
+  bufferEnd: string
+  startMinutes: number
 }
 
 const formatHour = (hour24: number) => {
@@ -57,36 +62,77 @@ export const INTERVIEW_SLOTS: InterviewSlot[] = INTERVIEW_WINDOW_DAYS.flatMap((d
   const endMinutes = INTERVIEW_END_HOUR_ET * 60
   const slots: InterviewSlot[] = []
 
-  for (let minute = startMinutes; minute < endMinutes; minute += INTERVIEW_BLOCK_MINUTES) {
+  for (let minute = startMinutes; minute < endMinutes; minute += INTERVIEW_SLOT_INTERVAL_MINUTES) {
     const end = minute + INTERVIEW_BLOCK_MINUTES
+    const bufferEnd = end + INTERVIEW_BUFFER_MINUTES
     const startHour = Math.floor(minute / 60)
     const startMinute = minute % 60
     const endHour = Math.floor(end / 60)
     const endMinute = end % 60
+    const bufferEndHour = Math.floor(bufferEnd / 60)
+    const bufferEndMinute = bufferEnd % 60
     const timeLabel = `${formatTime(startHour, startMinute)}-${formatTime(endHour, endMinute)} ET`
+    const bufferLabel = `buffer until ${formatTime(bufferEndHour, bufferEndMinute)} ET`
     const start = isoWithEasternOffset(day.date, minute)
     const endValue = isoWithEasternOffset(day.date, end)
+    const bufferEndValue = isoWithEasternOffset(day.date, bufferEnd)
 
     slots.push({
       value: `${start}/${endValue}`,
       label: `${day.shortLabel}, ${timeLabel}`,
       dayLabel: day.label,
       timeLabel,
+      bufferLabel,
       start,
       end: endValue,
+      bufferEnd: bufferEndValue,
+      startMinutes: minute,
     })
   }
 
   return slots
 })
 
+export const INTERVIEW_DAY_PARTS = [
+  {
+    key: 'morning',
+    label: 'Morning',
+    rangeLabel: '8 AM-noon',
+    startMinutes: 8 * 60,
+    endMinutes: 12 * 60,
+  },
+  {
+    key: 'afternoon',
+    label: 'Afternoon',
+    rangeLabel: 'noon-5 PM',
+    startMinutes: 12 * 60,
+    endMinutes: 17 * 60,
+  },
+  {
+    key: 'evening',
+    label: 'Evening',
+    rangeLabel: '5-10 PM',
+    startMinutes: 17 * 60,
+    endMinutes: 22 * 60,
+  },
+] as const
+
 export const INTERVIEW_SLOT_GROUPS = INTERVIEW_WINDOW_DAYS.map((day) => ({
   ...day,
   slots: INTERVIEW_SLOTS.filter((slot) => slot.dayLabel === day.label),
+  parts: INTERVIEW_DAY_PARTS.map((part) => ({
+    ...part,
+    slots: INTERVIEW_SLOTS.filter((slot) => (
+      slot.dayLabel === day.label &&
+      slot.startMinutes >= part.startMinutes &&
+      slot.startMinutes < part.endMinutes
+    )),
+  })),
 }))
 
 export const INTERVIEW_WINDOW_LABEL = 'Thursday, May 7 through Sunday, May 10'
 export const INTERVIEW_DAY_RANGE_LABEL = `${INTERVIEW_WINDOW_LABEL}, ${formatHour(INTERVIEW_START_HOUR_ET)}-${formatHour(INTERVIEW_END_HOUR_ET)} ET`
+export const INTERVIEW_BLOCK_WITH_BUFFER_LABEL = `${INTERVIEW_BLOCK_MINUTES}-minute interview + ${INTERVIEW_BUFFER_MINUTES}-minute buffer`
 
 export const BOARD_POSITION_OPTIONS = [
   'VP of Member Experience',
@@ -141,6 +187,11 @@ export const getSlotsFromValues = (values: string[]) => {
   }, [])
 }
 
+export const sortSlotValues = (values: Iterable<string>) => {
+  const selected = new Set(values)
+  return INTERVIEW_SLOTS.filter((slot) => selected.has(slot.value)).map((slot) => slot.value)
+}
+
 export const normalizeStringArray = (value: unknown) => {
   if (!Array.isArray(value)) {
     return typeof value === 'string' && value ? [value] : []
@@ -165,7 +216,7 @@ export const availabilitySummary = (slots: InterviewSlot[]) => {
   slots.forEach((slot) => counts.set(slot.dayLabel, (counts.get(slot.dayLabel) || 0) + 1))
 
   return Array.from(counts.entries())
-    .map(([day, count]) => `${day}: ${count} block${count === 1 ? '' : 's'}`)
+    .map(([day, count]) => `${day}: ${count} slot${count === 1 ? '' : 's'}`)
     .join('; ')
 }
 
