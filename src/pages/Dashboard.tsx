@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useMemberAuth } from '../hooks/useMemberAuth'
 import { ADMIN_ACCOUNTS } from '../lib/dashboardAccess'
 import type { AdminAccount, AdminScope, DashboardRole } from '../lib/dashboardAccess'
@@ -124,11 +124,15 @@ const timeOnly = (value: string) => {
   return slot ? slot.timeLabel.replace(' ET', '') : 'Open'
 }
 
-const initialTab = (): AdminDashboardTab => {
-  const queryTab = new URLSearchParams(window.location.search).get('tab')
+const tabFromLocation = (search: string, hash: string): AdminDashboardTab | null => {
+  const queryTab = new URLSearchParams(search).get('tab')
   const normalized = queryTab ? queryTab.replace(/-/g, ' ') : ''
   const match = adminTabs.find((tab) => tab.toLowerCase().replace(/-/g, ' ') === normalized.toLowerCase())
-  return match || (window.location.hash === '#recruiting' ? 'Recruiting' : 'Overview')
+  return match || (hash === '#recruiting' ? 'Recruiting' : null)
+}
+
+const initialTab = (): AdminDashboardTab => {
+  return tabFromLocation(window.location.search, window.location.hash) || 'Overview'
 }
 
 const formatScope = (scope: AdminScope) => {
@@ -307,6 +311,7 @@ function StatusPill({ value }: { value: string }) {
 
 export default function Dashboard() {
   const { status, member, sessionToken, signOut } = useMemberAuth()
+  const location = useLocation()
   const previewingLeadership = import.meta.env.DEV && window.location.search.includes('preview=leadership')
   const effectiveMember = useMemo(() => member || (previewingLeadership ? localPreviewMember : null), [member, previewingLeadership])
   const isLeadership = effectiveMember?.role === 'super-admin' || effectiveMember?.role === 'exec'
@@ -374,12 +379,18 @@ export default function Dashboard() {
   const liveAnnouncements = announcementRows.filter((row) => row.status === 'Ready').length
   const draftAnnouncements = announcementRows.filter((row) => row.status !== 'Ready').length
   const displayName = `${effectiveMember?.firstName || ''} ${effectiveMember?.lastName || ''}`.trim()
+  const requestedTab = useMemo(() => tabFromLocation(location.search, location.hash), [location.hash, location.search])
 
   useEffect(() => {
+    if (requestedTab && tabs.includes(requestedTab)) {
+      setActiveTab(requestedTab)
+      return
+    }
+
     if (!tabs.includes(activeTab)) {
       setActiveTab('Overview')
     }
-  }, [activeTab, tabs])
+  }, [activeTab, requestedTab, tabs])
 
   useEffect(() => {
     if (!effectiveMember || !isLeadership || !sessionToken || previewingLeadership) {
