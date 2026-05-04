@@ -186,7 +186,7 @@ const buildInterviewerAvailabilitySubmission = (
   userAgent = '',
 ) => ({
   ...data,
-  formType: 'interviewerAvailability',
+  formType: 'interviewerAvailability' as const,
   dedupeKey: data.email,
   submittedAt: new Date().toISOString(),
   submissionId: createSubmissionId(),
