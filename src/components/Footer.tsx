@@ -12,7 +12,7 @@ export default function Footer() {
               UBLDA
             </span>
             <p className="footer__tagline">
-              Disability inclusion in business. Built by students at Michigan Ross.
+              Where disability and business meet. Built by students at Michigan Ross.
             </p>
             <Link to="/join" className="footer__cta">
               Become a member
