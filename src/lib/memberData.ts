@@ -194,7 +194,7 @@ export const memberActions: DashboardAction[] = [
   },
   {
     title: 'Choose a leadership interview slot',
-    description: 'Drop your resume and select every buffered interview slot you can make.',
+    description: 'Drop your resume and select every interview slot you can make.',
     status: 'Open now',
     href: '/portal',
     tone: 'ready',
@@ -242,7 +242,7 @@ export const leadershipMetrics: LeadershipMetric[] = [
   {
     label: 'Interview coverage',
     value: '4 days',
-    detail: '20-minute Google Meet interviews with 10-minute buffers, May 7-10',
+    detail: '30-minute Google Meet holds with 20-minute buffers, May 7-10',
     tone: 'watch',
   },
   {

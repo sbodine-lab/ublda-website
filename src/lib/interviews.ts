@@ -23,8 +23,8 @@ export const INTERVIEW_WINDOW_DAYS = [
 
 export const INTERVIEW_START_HOUR_ET = 8
 export const INTERVIEW_END_HOUR_ET = 22
-export const INTERVIEW_BLOCK_MINUTES = 20
-export const INTERVIEW_BUFFER_MINUTES = 10
+export const INTERVIEW_BLOCK_MINUTES = 30
+export const INTERVIEW_BUFFER_MINUTES = 20
 export const INTERVIEW_SLOT_INTERVAL_MINUTES = INTERVIEW_BLOCK_MINUTES + INTERVIEW_BUFFER_MINUTES
 
 export type InterviewSlot = {
@@ -62,7 +62,7 @@ export const INTERVIEW_SLOTS: InterviewSlot[] = INTERVIEW_WINDOW_DAYS.flatMap((d
   const endMinutes = INTERVIEW_END_HOUR_ET * 60
   const slots: InterviewSlot[] = []
 
-  for (let minute = startMinutes; minute < endMinutes; minute += INTERVIEW_SLOT_INTERVAL_MINUTES) {
+  for (let minute = startMinutes; minute + INTERVIEW_BLOCK_MINUTES <= endMinutes; minute += INTERVIEW_SLOT_INTERVAL_MINUTES) {
     const end = minute + INTERVIEW_BLOCK_MINUTES
     const bufferEnd = end + INTERVIEW_BUFFER_MINUTES
     const startHour = Math.floor(minute / 60)

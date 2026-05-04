@@ -30,7 +30,7 @@ const interviewer = (overrides: Partial<InterviewerAvailability>): InterviewerAv
   ...overrides,
 })
 
-test('matches a candidate to up to two interviewers on a shared buffered slot', () => {
+test('matches a candidate to up to two interviewers on a shared interview slot', () => {
   const match = matchInterviewCandidate(
     candidate({}),
     [

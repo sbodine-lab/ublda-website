@@ -39,7 +39,7 @@ test('accepts a complete Ross interview signup with a resume drop', () => {
   assert.equal(result.data?.preferredRole, 'VP of Events & Programming')
   assert.equal(result.data?.rolePreferences.length, 3)
   assert.equal(result.data?.availability.length, 3)
-  assert.equal(result.data?.interviewSlot.label, 'Thu, May 7, 8:00 AM-8:20 AM ET')
+  assert.equal(result.data?.interviewSlot.label, 'Thu, May 7, 8:00 AM-8:30 AM ET')
   assert.equal(result.data?.resumeFile.name, 'sam-bodine-resume.pdf')
 })
 
@@ -164,7 +164,7 @@ test('builds a submission with a stable dedupe key and generated submission id',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
     rolePreferences: ['Open to any role', 'VP of Member Experience', 'VP of Marketing & Community'],
-    availability: [INTERVIEW_SLOTS[28].value, INTERVIEW_SLOTS[29].value],
+    availability: [INTERVIEW_SLOTS[17].value, INTERVIEW_SLOTS[18].value],
     resumeFile,
   })
 
@@ -175,8 +175,8 @@ test('builds a submission with a stable dedupe key and generated submission id',
   assert.equal(submission.dedupeKey, 'sbodine@umich.edu')
   assert.equal(submission.userAgent, 'node-test-agent')
   assert.equal(submission.availability.length, 2)
-  assert.equal(submission.interviewSlot.label, 'Fri, May 8, 8:00 AM-8:20 AM ET')
-  assert.equal(submission.interviewSlot.bufferLabel, 'buffer until 8:30 AM ET')
+  assert.equal(submission.interviewSlot.label, 'Fri, May 8, 8:00 AM-8:30 AM ET')
+  assert.equal(submission.interviewSlot.bufferLabel, 'buffer until 8:50 AM ET')
   assert.equal(submission.resumeFile.name, 'sam-bodine-resume.pdf')
   assert.match(submission.submissionId, /^app_/)
 })

@@ -18,7 +18,7 @@ test('validates an interview assignment update', () => {
 
   assert.equal(result.success, true)
   assert.equal(result.data?.email, 'candidate@umich.edu')
-  assert.equal(result.data?.assignedSlot?.label, 'Thu, May 7, 8:00 AM-8:20 AM ET')
+  assert.equal(result.data?.assignedSlot?.label, 'Thu, May 7, 8:00 AM-8:30 AM ET')
   assert.deepEqual(result.data?.interviewers, ['Sam Bodine', 'Alexa Chiang'])
 })
 

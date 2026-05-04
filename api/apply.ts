@@ -84,6 +84,11 @@ const rossStatusValues = new Set<string>(rossStatusOptions)
 const interestTypeValues = new Set<string>(interestTypeOptions)
 const commitmentValues = new Set<string>(commitmentOptions)
 const resumeMimeTypeValues = new Set<string>(resumeMimeTypes)
+const interviewBlockMinutes = 30
+const interviewBufferMinutes = 20
+const interviewSlotIntervalMinutes = interviewBlockMinutes + interviewBufferMinutes
+const interviewStartMinutes = 8 * 60
+const interviewEndMinutes = 22 * 60
 
 const setApiSecurityHeaders = (res: VercelResponse) => {
   res.setHeader?.('Cache-Control', 'no-store, max-age=0')
@@ -106,9 +111,9 @@ const isoWithEasternOffset = (date: string, totalMinutes: number) => {
 const interviewSlots = interviewWindowDays.flatMap((day) => {
   const slots: InterviewSlot[] = []
 
-  for (let minute = 8 * 60; minute < 22 * 60; minute += 30) {
-    const end = minute + 20
-    const bufferEnd = end + 10
+  for (let minute = interviewStartMinutes; minute + interviewBlockMinutes <= interviewEndMinutes; minute += interviewSlotIntervalMinutes) {
+    const end = minute + interviewBlockMinutes
+    const bufferEnd = end + interviewBufferMinutes
     const startHour = Math.floor(minute / 60)
     const startMinute = minute % 60
     const endHour = Math.floor(end / 60)

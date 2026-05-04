@@ -29,6 +29,11 @@ const interviewWindowDays = [
   { date: '2026-05-09', shortLabel: 'Sat, May 9', label: 'Saturday, May 9' },
   { date: '2026-05-10', shortLabel: 'Sun, May 10', label: 'Sunday, May 10' },
 ] as const
+const interviewBlockMinutes = 30
+const interviewBufferMinutes = 20
+const interviewSlotIntervalMinutes = interviewBlockMinutes + interviewBufferMinutes
+const interviewStartMinutes = 8 * 60
+const interviewEndMinutes = 22 * 60
 
 const formatTime = (hour24: number, minute: number) => {
   const hour12 = hour24 % 12 || 12
@@ -45,9 +50,9 @@ const isoWithEasternOffset = (date: string, totalMinutes: number) => {
 const interviewSlots = interviewWindowDays.flatMap((day) => {
   const slots: InterviewSlot[] = []
 
-  for (let minute = 8 * 60; minute < 22 * 60; minute += 30) {
-    const end = minute + 20
-    const bufferEnd = end + 10
+  for (let minute = interviewStartMinutes; minute + interviewBlockMinutes <= interviewEndMinutes; minute += interviewSlotIntervalMinutes) {
+    const end = minute + interviewBlockMinutes
+    const bufferEnd = end + interviewBufferMinutes
     const startHour = Math.floor(minute / 60)
     const startMinute = minute % 60
     const endHour = Math.floor(end / 60)

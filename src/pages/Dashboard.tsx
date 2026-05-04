@@ -146,7 +146,7 @@ export default function Dashboard() {
     {
       label: 'E-board responses',
       value: String(liveInterviewerAvailability.length),
-      detail: `${totalInterviewerSlots} unique buffered slots submitted`,
+      detail: `${totalInterviewerSlots} unique interview slots submitted`,
       tone: liveInterviewerAvailability.length ? 'healthy' as const : 'watch' as const,
     },
     {
@@ -632,12 +632,12 @@ export default function Dashboard() {
           <article>
             <span>E-board coverage</span>
             <strong>{totalInterviewerSlots}</strong>
-            <p>unique buffered slots submitted</p>
+            <p>unique interview slots submitted</p>
           </article>
           <article>
             <span>Window</span>
             <strong>May 7-10</strong>
-            <p>20-minute interviews + 10-minute buffers</p>
+            <p>30-minute holds + 20-minute buffers</p>
           </article>
         </div>
 
@@ -764,7 +764,7 @@ export default function Dashboard() {
                 <div className="candidate-card__availability">
                   <span>Candidate availability</span>
                   <p>{candidate.availability.slice(0, 4).map(slotLabel).join(' · ')}{candidate.availability.length > 4 ? ` · +${candidate.availability.length - 4} more` : ''}</p>
-                  <small>{realisticSlotValues.length} overlap buffered slot{realisticSlotValues.length === 1 ? '' : 's'} with assigned interviewer availability</small>
+                  <small>{realisticSlotValues.length} overlap slot{realisticSlotValues.length === 1 ? '' : 's'} with assigned interviewer availability</small>
                 </div>
 
                 <details className="candidate-card__bias">
@@ -829,7 +829,7 @@ export default function Dashboard() {
                   <strong>{interviewer.name}</strong>
                   <span>{interviewer.role} · max {interviewer.maxInterviews}</span>
                 </div>
-                <p>{interviewer.availability.length} buffered slots submitted</p>
+                <p>{interviewer.availability.length} interview slots submitted</p>
                 <small>{interviewer.availability.slice(0, 6).map(slotLabel).join(' · ')}{interviewer.availability.length > 6 ? ` · +${interviewer.availability.length - 6} more` : ''}</small>
               </article>
             ))}
