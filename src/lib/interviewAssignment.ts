@@ -17,6 +17,7 @@ export type InterviewAssignmentData = {
   interviewers: string[]
   interviewStatus: InterviewStatus
   feedback: string
+  sessionToken: string
 }
 
 export type InterviewAssignmentSubmission = InterviewAssignmentData & {
@@ -57,11 +58,13 @@ export const validateInterviewAssignmentPayload = (payload: unknown): Validation
   const interviewers = normalizeStringArray(body.interviewers || body.interviewer)
   const interviewStatus = (getString(body, 'interviewStatus') || getString(body, 'status') || 'Needs match') as InterviewStatus
   const feedback = getString(body, 'feedback')
+  const sessionToken = getString(body, 'sessionToken')
 
   if (!uniqname || !uniqnamePattern.test(uniqname)) errors.push('A valid candidate uniqname is required.')
   if (assignedSlotValue && !assignedSlot) errors.push('Assigned slot is invalid.')
   if (!statusValues.has(interviewStatus)) errors.push('Interview status is invalid.')
   if (feedback.length > 2000) errors.push('Feedback must be 2,000 characters or fewer.')
+  if (sessionToken.length < 24) errors.push('A valid admin session is required.')
 
   if (errors.length > 0) {
     return { success: false, data: null, errors }
@@ -76,6 +79,7 @@ export const validateInterviewAssignmentPayload = (payload: unknown): Validation
       interviewers,
       interviewStatus,
       feedback,
+      sessionToken,
     },
     errors: [],
   }

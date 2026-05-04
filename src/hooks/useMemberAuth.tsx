@@ -59,7 +59,16 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const restoreStoredSession = useCallback(async () => {
-    const storedToken = window.localStorage.getItem(APPLICANT_SESSION_STORAGE_KEY) || ''
+    const url = new URL(window.location.href)
+    const urlToken = url.searchParams.get('session') || ''
+    let storedToken = window.localStorage.getItem(APPLICANT_SESSION_STORAGE_KEY) || ''
+
+    if (urlToken.length >= 24) {
+      storedToken = urlToken
+      window.localStorage.setItem(APPLICANT_SESSION_STORAGE_KEY, urlToken)
+      url.searchParams.delete('session')
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+    }
 
     if (!storedToken) {
       setStatus('signed-out')
@@ -68,10 +77,10 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
     if (import.meta.env.DEV && storedToken === 'local-preview-session-token') {
       applySession({
-        firstName: 'Preview',
-        lastName: 'Member',
-        uniqname: 'preview.member',
-        email: 'preview.member@umich.edu',
+        firstName: 'Sam',
+        lastName: 'Bodine',
+        uniqname: 'sbodine',
+        email: 'sbodine@umich.edu',
       }, null, storedToken)
       return
     }

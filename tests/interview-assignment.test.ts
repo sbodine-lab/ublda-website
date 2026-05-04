@@ -13,6 +13,7 @@ test('validates an interview assignment update', () => {
     interviewers: ['Sam Bodine', 'Alexa Chiang'],
     interviewStatus: 'Invited',
     feedback: 'Invite sent. Needs scorecard after interview.',
+    sessionToken: 'session-token-session-token-session',
   })
 
   assert.equal(result.success, true)
@@ -26,6 +27,7 @@ test('rejects invalid assignment status and slot values', () => {
     email: 'candidate@umich.edu',
     assignedSlot: 'not-a-slot',
     interviewStatus: 'Maybe',
+    sessionToken: 'session-token-session-token-session',
   })
 
   assert.equal(result.success, false)
@@ -38,6 +40,7 @@ test('builds an interview assignment submission for Apps Script', () => {
     uniqname: 'candidate',
     assignedSlot: INTERVIEW_SLOTS[0].value,
     interviewStatus: 'Matched',
+    sessionToken: 'session-token-session-token-session',
   })
 
   assert.equal(result.success, true)

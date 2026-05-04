@@ -17,16 +17,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   }
 
-  const adminToken = process.env.INTERVIEW_ADMIN_TOKEN
-  if (!adminToken) {
-    return res.status(500).json({ error: 'Interview assignment backend not configured' })
-  }
-
-  const providedToken = req.headers['x-ublda-admin-token']
-  if (providedToken !== adminToken) {
-    return res.status(401).json({ error: 'Interview assignment admin token is required' })
-  }
-
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (!scriptUrl) {
     return res.status(500).json({ error: 'Form backend not configured' })

@@ -6,6 +6,30 @@ var GENERAL_MEMBERS_SHEET_NAME = "General Members";
 var RESUME_FOLDER_PROPERTY = "UBLDA_RESUME_FOLDER_ID";
 var SESSION_TTL_DAYS = 30;
 
+var ADMIN_ACCOUNTS = [
+  {
+    email: "sbodine@umich.edu",
+    name: "Sam Bodine",
+    title: "Super Admin",
+    role: "super-admin",
+    scopes: ["recruiting", "members", "events", "sponsors", "publishing", "system"]
+  },
+  {
+    email: "atchiang@umich.edu",
+    name: "Alexa Chiang",
+    title: "Exec Admin",
+    role: "exec",
+    scopes: ["recruiting", "events", "members", "publishing"]
+  },
+  {
+    email: "cooperry@umich.edu",
+    name: "Cooper Ryan",
+    title: "Exec Admin",
+    role: "exec",
+    scopes: ["recruiting", "members", "sponsors"]
+  }
+];
+
 var APPLICATION_HEADERS = [
   "Submitted At",
   "Updated At",
@@ -346,6 +370,11 @@ function handleInterviewAssignment(data) {
   lock.waitLock(10000);
 
   try {
+    var adminSession = authorizeDashboardSession_(data.sessionToken, ["super-admin", "exec"]);
+    if (!adminSession.authorized) {
+      return jsonResponse_({ success: false, error: adminSession.error || "Admin access is required." });
+    }
+
     var sheet = ensureSheet_(APPLICATION_SHEET_NAME, APPLICATION_HEADERS);
     var email = canonicalEmail_(data.email || data.uniqname);
     var rowNumber = findRowByEmail_(sheet, email);
@@ -354,7 +383,8 @@ function handleInterviewAssignment(data) {
       return jsonResponse_({ success: false, error: "Candidate application was not found." });
     }
 
-    var assignedSlot = data.assignedSlot && data.assignedSlot.label ? data.assignedSlot.label : safeString_(data.assignedSlot);
+    var assignedSlot = assignmentSlotValue_(data.assignedSlot);
+    var assignedSlotLabel = assignmentSlotLabel_(data.assignedSlot) || assignedSlot;
     var interviewers = safeJoin_(data.interviewers);
     var interviewStatus = safeString_(data.interviewStatus || data.status || "Needs match");
     var feedback = safeString_(data.feedback);
@@ -366,7 +396,7 @@ function handleInterviewAssignment(data) {
       feedback
     ]]);
 
-    sendInterviewAssignmentNotification_(data, email, rowNumber, assignedSlot, interviewers, interviewStatus);
+    sendInterviewAssignmentNotification_(data, email, rowNumber, assignedSlotLabel, interviewers, interviewStatus, adminSession.account);
 
     return jsonResponse_({
       success: true,
@@ -378,9 +408,10 @@ function handleInterviewAssignment(data) {
   }
 }
 
-function sendInterviewAssignmentNotification_(data, email, rowNumber, assignedSlot, interviewers, interviewStatus) {
+function sendInterviewAssignmentNotification_(data, email, rowNumber, assignedSlot, interviewers, interviewStatus, adminAccount) {
   var notifySubject = "UBLDA interview assignment updated: " + email;
   var notifyBody = "Candidate: " + email;
+  notifyBody += "\nUpdated by: " + safeString_(adminAccount && adminAccount.email);
   notifyBody += "\nAssigned slot: " + (assignedSlot || "Unassigned");
   notifyBody += "\nInterviewers: " + (interviewers || "Unassigned");
   notifyBody += "\nStatus: " + interviewStatus;
@@ -400,6 +431,10 @@ function handleApplicantAccount(data) {
 
     if (action === "session") {
       return handleApplicantSession_(sheet, data);
+    }
+
+    if (action === "dashboardData") {
+      return handleDashboardData_(sheet, data);
     }
 
     var account = data.account || data;
@@ -468,11 +503,62 @@ function handleApplicantAccount(data) {
 }
 
 function handleApplicantSession_(sheet, data) {
-  var tokenHash = hashToken_(safeString_(data.sessionToken));
+  var session = sessionForToken_(sheet, data.sessionToken);
+
+  if (!session.found) {
+    return jsonResponse_({ success: false, error: session.error || "Applicant session not found." });
+  }
+
+  var values = session.values;
+  var application = applicationSummaryForEmail_(safeString_(values[2]));
+  sheet.getRange(session.rowNumber, 9).setValue(new Date());
+
+  if (application) {
+    sheet.getRange(session.rowNumber, 10, 1, 3).setValues([[application.status, application.row, application.submissionCount]]);
+  }
+
+  return jsonResponse_({
+    success: true,
+    account: accountResponse_(values),
+    application: application ? application.response : null
+  });
+}
+
+function handleDashboardData_(sheet, data) {
+  var session = authorizeDashboardSession_(data.sessionToken, ["super-admin", "exec", "member"]);
+  if (!session.authorized) {
+    return jsonResponse_({ success: false, error: session.error || "A valid member session is required." });
+  }
+
+  var role = session.account.role;
+  var payload = {
+    backendStatus: {
+      source: "sheets",
+      message: "Loaded from Google Sheets through the signed-in account backend.",
+      updatedAt: new Date().toISOString()
+    }
+  };
+
+  if (role === "super-admin" || role === "exec") {
+    payload.candidates = dashboardCandidates_();
+    payload.interviewerAvailability = dashboardInterviewerAvailability_();
+    payload.adminAccounts = ADMIN_ACCOUNTS;
+  }
+
+  return jsonResponse_({
+    success: true,
+    account: session.account,
+    role: role,
+    dashboardData: payload
+  });
+}
+
+function sessionForToken_(sheet, sessionToken) {
+  var tokenHash = hashToken_(safeString_(sessionToken));
   var lastRow = sheet.getLastRow();
 
-  if (lastRow < 2) {
-    return jsonResponse_({ success: false, error: "Applicant session not found." });
+  if (!tokenHash || lastRow < 2) {
+    return { found: false, error: "Applicant session not found." };
   }
 
   var matches = sheet
@@ -483,7 +569,7 @@ function handleApplicantSession_(sheet, data) {
     .findNext();
 
   if (!matches) {
-    return jsonResponse_({ success: false, error: "Applicant session not found." });
+    return { found: false, error: "Applicant session not found." };
   }
 
   var rowNumber = matches.getRow();
@@ -491,21 +577,40 @@ function handleApplicantSession_(sheet, data) {
   var expiresAt = parseDate_(values[7]);
 
   if (!expiresAt || expiresAt.getTime() < Date.now()) {
-    return jsonResponse_({ success: false, error: "Applicant session expired." });
+    return { found: false, error: "Applicant session expired." };
   }
 
-  var application = applicationSummaryForEmail_(safeString_(values[2]));
-  sheet.getRange(rowNumber, 9).setValue(new Date());
+  return {
+    found: true,
+    rowNumber: rowNumber,
+    values: values,
+    account: accountResponse_(values)
+  };
+}
 
-  if (application) {
-    sheet.getRange(rowNumber, 10, 1, 3).setValues([[application.status, application.row, application.submissionCount]]);
+function authorizeDashboardSession_(sessionToken, allowedRoles) {
+  var sheet = ensureSheet_(APPLICANT_ACCOUNTS_SHEET_NAME, APPLICANT_ACCOUNT_HEADERS);
+  var session = sessionForToken_(sheet, sessionToken);
+
+  if (!session.found) {
+    return { authorized: false, error: session.error || "Applicant session not found." };
   }
 
-  return jsonResponse_({
-    success: true,
-    account: accountResponse_(values),
-    application: application ? application.response : null
-  });
+  var role = session.account.role || "member";
+  var allowed = !allowedRoles || allowedRoles.indexOf(role) !== -1;
+
+  if (!allowed) {
+    return { authorized: false, error: "Admin access is required." };
+  }
+
+  sheet.getRange(session.rowNumber, 9).setValue(new Date());
+
+  return {
+    authorized: true,
+    account: session.account,
+    rowNumber: session.rowNumber,
+    values: session.values
+  };
 }
 
 function syncApplicantAccountFromSubmission_(data, email, uniqname, applicationRow, status, submissionCount) {
@@ -618,6 +723,97 @@ function maybeUpsertInterviewEvent_(data, email, existingEventId, resumeFile) {
     guests: email,
     sendInvites: true
   }).getId();
+}
+
+function dashboardCandidates_() {
+  var sheet = ensureSheet_(APPLICATION_SHEET_NAME, APPLICATION_HEADERS);
+  var lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    return [];
+  }
+
+  var rows = sheet.getRange(2, 1, lastRow - 1, APPLICATION_HEADERS.length).getValues();
+
+  return rows.map(function(row, index) {
+    var email = safeString_(row[6]);
+    var interviewStatus = safeString_(row[25]) || statusForDashboard_(safeString_(row[3]));
+
+    return {
+      id: normalizeUniqname_(email) || "candidate-" + (index + 2),
+      name: [safeString_(row[4]), safeString_(row[5])].filter(Boolean).join(" ") || email,
+      program: [safeString_(row[10]), safeString_(row[9])].filter(Boolean).join(" · "),
+      email: email,
+      rolePreferences: splitList_(row[13]),
+      status: interviewStatus,
+      availability: splitList_(row[22]),
+      resumeUrl: safeString_(row[16]),
+      assignedSlot: slotValueFromAssignment_(row[23]),
+      interviewers: splitList_(row[24]),
+      feedback: safeString_(row[26])
+    };
+  });
+}
+
+function dashboardInterviewerAvailability_() {
+  var sheet = ensureSheet_(INTERVIEWER_AVAILABILITY_SHEET_NAME, INTERVIEWER_AVAILABILITY_HEADERS);
+  var lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    return [];
+  }
+
+  var rows = sheet.getRange(2, 1, lastRow - 1, INTERVIEWER_AVAILABILITY_HEADERS.length).getValues();
+
+  return rows.map(function(row) {
+    var name = [safeString_(row[3]), safeString_(row[4])].filter(Boolean).join(" ") || safeString_(row[5]);
+    var admin = adminAccountForEmail_(row[5]);
+
+    return {
+      name: name,
+      role: admin ? admin.title : "E-board",
+      availability: splitList_(row[8]),
+      maxInterviews: safeString_(row[9]) || "As needed"
+    };
+  });
+}
+
+function splitList_(value) {
+  return safeString_(value).split(/\s*;\s*/).map(function(item) {
+    return safeString_(item);
+  }).filter(Boolean);
+}
+
+function statusForDashboard_(value) {
+  if (value === "Interview eligible" || value === "Needs review") return "Needs match";
+  if (value === "Future role pool") return "Hold";
+  return value || "Needs match";
+}
+
+function slotValueFromAssignment_(value) {
+  var text = safeString_(value);
+  if (!text) return "";
+  if (text.indexOf(" | ") !== -1) return safeString_(text.split(" | ")[0]);
+  if (text.indexOf("2026-") === 0) return text;
+  return text;
+}
+
+function assignmentSlotValue_(slot) {
+  if (slot && typeof slot === "object") {
+    var value = safeString_(slot.value || slot.start);
+    var label = safeString_(slot.label);
+    return label && value ? value + " | " + label : value || label;
+  }
+
+  return safeString_(slot);
+}
+
+function assignmentSlotLabel_(slot) {
+  if (slot && typeof slot === "object") {
+    return safeString_(slot.label || slot.value || slot.start);
+  }
+
+  return safeString_(slot);
 }
 
 function hasSlotConflict_(calendar, start, end, allowedEventId) {
@@ -813,11 +1009,17 @@ function sessionExpiresAt_() {
 }
 
 function accountResponse_(values) {
+  var email = safeString_(values[2]);
+  var admin = adminAccountForEmail_(email);
+
   return {
-    email: safeString_(values[2]),
+    email: email,
     uniqname: safeString_(values[3]),
     firstName: safeString_(values[4]),
-    lastName: safeString_(values[5])
+    lastName: safeString_(values[5]),
+    role: admin ? admin.role : "member",
+    adminTitle: admin ? admin.title : "Member",
+    adminScopes: admin ? admin.scopes : []
   };
 }
 
@@ -841,6 +1043,18 @@ function canonicalEmail_(value) {
 
 function normalizeUniqname_(value) {
   return safeString_(value).toLowerCase().replace(/@.*$/, "");
+}
+
+function adminAccountForEmail_(email) {
+  var normalized = safeString_(email).toLowerCase();
+
+  for (var i = 0; i < ADMIN_ACCOUNTS.length; i += 1) {
+    if (ADMIN_ACCOUNTS[i].email === normalized) {
+      return ADMIN_ACCOUNTS[i];
+    }
+  }
+
+  return null;
 }
 
 function safeJoin_(value) {

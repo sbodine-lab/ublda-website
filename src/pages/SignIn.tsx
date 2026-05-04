@@ -96,10 +96,10 @@ export default function SignIn() {
 
     try {
       await signInWithGoogle('local-preview-google-credential-token', {
-        email: 'preview.member@umich.edu',
-        firstName: 'Preview',
-        lastName: 'Member',
-        name: 'Preview Member',
+        email: 'sbodine@umich.edu',
+        firstName: 'Sam',
+        lastName: 'Bodine',
+        name: 'Sam Bodine',
       })
       navigate('/dashboard')
     } catch (caughtError) {
