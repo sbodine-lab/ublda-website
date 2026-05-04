@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { timingSafeEqual } from 'node:crypto'
 import type { ApplicantAccount } from '../src/lib/applicantAccount.ts'
 import { validateApplicantAccountPayload } from '../src/lib/applicantAccount.ts'
 
@@ -24,6 +25,38 @@ type GoogleTokenInfo = {
   family_name?: string
   name?: string
   picture?: string
+}
+
+const superAdminPassword = () => (
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  || process.env.SAM_BODINE_PASSWORD
+  || ''
+)
+
+const constantTimeEquals = (submitted: string, expected: string) => {
+  const submittedBuffer = Buffer.from(submitted)
+  const expectedBuffer = Buffer.from(expected)
+
+  return submittedBuffer.length === expectedBuffer.length && timingSafeEqual(submittedBuffer, expectedBuffer)
+}
+
+const superAdminPasswordAccount = (uniqname: string, password: string): ApplicantAccount | null => {
+  const normalizedUniqname = uniqname.toLowerCase().replace(/@.*$/, '')
+  if (normalizedUniqname !== 'sbodine') {
+    return null
+  }
+
+  const expectedPassword = superAdminPassword()
+  if (!expectedPassword || !constantTimeEquals(password, expectedPassword)) {
+    throw new Error('Invalid uniqname or password.')
+  }
+
+  return {
+    firstName: 'Sam',
+    lastName: 'Bodine',
+    uniqname: 'sbodine',
+    email: 'sbodine@umich.edu',
+  }
 }
 
 const verifyGoogleCredential = async (credential: string): Promise<ApplicantAccount> => {
@@ -89,6 +122,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Google sign-in failed.'
+      return res.status(401).json({ error: message })
+    }
+  }
+
+  if (result.data.action === 'signIn') {
+    try {
+      const adminAccount = superAdminPasswordAccount(result.data.uniqname, result.data.password)
+      scriptPayload = adminAccount
+        ? {
+            formType: 'applicantAccount',
+            action: 'googleSignIn',
+            account: adminAccount,
+            origin: baseUrlForRequest(req),
+          }
+        : {
+            formType: 'applicantAccount',
+            action: 'signIn',
+            uniqname: result.data.uniqname,
+            email: result.data.email,
+            password: result.data.password,
+            origin: baseUrlForRequest(req),
+          }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Invalid uniqname or password.'
       return res.status(401).json({ error: message })
     }
   }

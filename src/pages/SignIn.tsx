@@ -23,13 +23,15 @@ const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefin
 
 export default function SignIn() {
   const navigate = useNavigate()
-  const { status, signInWithGoogle, createAccount, requestSignInLink } = useMemberAuth()
+  const { status, signInWithGoogle, signInWithPassword, createAccount } = useMemberAuth()
   const googleButtonRef = useRef<HTMLDivElement | null>(null)
-  const [manualMode, setManualMode] = useState<'create' | 'link'>('create')
+  const [manualMode, setManualMode] = useState<'signin' | 'create'>('signin')
   const [manualForm, setManualForm] = useState({
     firstName: '',
     lastName: '',
     uniqname: '',
+    password: '',
+    confirmPassword: '',
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -117,14 +119,24 @@ export default function SignIn() {
     setNotice('')
 
     try {
+      if (manualMode === 'signin') {
+        await signInWithPassword({
+          uniqname: manualForm.uniqname,
+          password: manualForm.password,
+        })
+        navigate('/dashboard')
+        return
+      }
+
+      if (manualForm.password !== manualForm.confirmPassword) {
+        throw new Error('Passwords do not match.')
+      }
+
       if (manualMode === 'create') {
         await createAccount(manualForm)
         navigate('/dashboard')
         return
       }
-
-      await requestSignInLink(manualForm.uniqname)
-      setNotice('Check your UMich inbox for a secure sign-in link.')
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : ''
       setError(message || 'Could not continue.')
@@ -157,28 +169,21 @@ export default function SignIn() {
             <div className="signin-card">
               <div>
                 <h2>Continue to UBLDA</h2>
-                <p>Low-friction access for members, applicants, and future resources.</p>
-              </div>
-
-              {googleClientId ? (
-                <div className="signin-card__google" ref={googleButtonRef} aria-label="Continue with Google" />
-              ) : (
-                <button
-                  type="button"
-                  className="signin-card__google-preview"
-                  onClick={handlePreviewGoogle}
-                  disabled={submitting}
-                >
-                  <span aria-hidden="true">G</span>
-                  Continue with Google
-                </button>
-              )}
-
-              <div className="signin-card__divider">
-                <span>or use uniqname</span>
+                <p>Sign in with your uniqname and password, or create an account in under a minute.</p>
               </div>
 
               <div className="signin-card__tabs" role="tablist" aria-label="Sign-in method">
+                <button
+                  type="button"
+                  className={manualMode === 'signin' ? 'signin-card__tab signin-card__tab--active' : 'signin-card__tab'}
+                  onClick={() => {
+                    setManualMode('signin')
+                    setError('')
+                    setNotice('')
+                  }}
+                >
+                  Sign in
+                </button>
                 <button
                   type="button"
                   className={manualMode === 'create' ? 'signin-card__tab signin-card__tab--active' : 'signin-card__tab'}
@@ -188,18 +193,7 @@ export default function SignIn() {
                     setNotice('')
                   }}
                 >
-                  First time
-                </button>
-                <button
-                  type="button"
-                  className={manualMode === 'link' ? 'signin-card__tab signin-card__tab--active' : 'signin-card__tab'}
-                  onClick={() => {
-                    setManualMode('link')
-                    setError('')
-                    setNotice('')
-                  }}
-                >
-                  Email link
+                  Create account
                 </button>
               </div>
 
@@ -245,13 +239,55 @@ export default function SignIn() {
                   </div>
                 </label>
 
+                <label>
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    value={manualForm.password}
+                    onChange={(event) => setManualForm((current) => ({ ...current, password: event.target.value }))}
+                    autoComplete={manualMode === 'signin' ? 'current-password' : 'new-password'}
+                    required
+                  />
+                </label>
+
+                {manualMode === 'create' && (
+                  <label>
+                    <span>Confirm password</span>
+                    <input
+                      type="password"
+                      value={manualForm.confirmPassword}
+                      onChange={(event) => setManualForm((current) => ({ ...current, confirmPassword: event.target.value }))}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </label>
+                )}
+
                 {error && <p className="signin-card__error" role="alert">{error}</p>}
                 {notice && <p className="signin-card__notice" role="status">{notice}</p>}
 
                 <button type="submit" className="btn btn--primary btn--lg signin-card__submit" disabled={submitting}>
-                  {submitting ? 'Working...' : manualMode === 'create' ? 'Create member account' : 'Send secure link'}
+                  {submitting ? 'Working...' : manualMode === 'signin' ? 'Sign in' : 'Create member account'}
                 </button>
               </form>
+
+              <div className="signin-card__divider">
+                <span>or</span>
+              </div>
+
+              {googleClientId ? (
+                <div className="signin-card__google" ref={googleButtonRef} aria-label="Continue with Google" />
+              ) : (
+                <button
+                  type="button"
+                  className="signin-card__google-preview"
+                  onClick={handlePreviewGoogle}
+                  disabled={submitting}
+                >
+                  <span aria-hidden="true">G</span>
+                  Continue with Google
+                </button>
+              )}
 
               <Link to="/portal" className="signin-card__portal-link">
                 Going straight to leadership interviews?

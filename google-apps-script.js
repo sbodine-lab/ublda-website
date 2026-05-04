@@ -88,7 +88,10 @@ var APPLICANT_ACCOUNT_HEADERS = [
   "Last Sign In At",
   "Application Status",
   "Last Application Row",
-  "Submission Count"
+  "Submission Count",
+  "Password Salt",
+  "Password Hash",
+  "Password Updated At"
 ];
 
 var GENERAL_MEMBER_HEADERS = [
@@ -455,6 +458,37 @@ function handleApplicantAccount(data) {
       return jsonResponse_({ success: true, magicLinkSent: true });
     }
 
+    if (action === "signIn") {
+      if (!existingRow) {
+        return jsonResponse_({ success: false, error: "Invalid uniqname or password." });
+      }
+
+      var signInValues = sheet.getRange(existingRow, 1, 1, APPLICANT_ACCOUNT_HEADERS.length).getValues()[0];
+      if (!passwordMatches_(data.password, signInValues[12], signInValues[13])) {
+        return jsonResponse_({ success: false, error: "Invalid uniqname or password." });
+      }
+
+      var signInToken = createSessionToken_();
+      var signInTokenHash = hashToken_(signInToken);
+      var signInExpiresAt = sessionExpiresAt_();
+      var signInApplication = applicationSummaryForEmail_(email);
+      sheet.getRange(existingRow, 7, 1, 6).setValues([[
+        signInTokenHash,
+        signInExpiresAt,
+        new Date(),
+        signInApplication ? signInApplication.status : "",
+        signInApplication ? signInApplication.row : "",
+        signInApplication ? signInApplication.submissionCount : ""
+      ]]);
+
+      return jsonResponse_({
+        success: true,
+        sessionToken: signInToken,
+        account: accountResponse_(signInValues),
+        application: signInApplication ? signInApplication.response : null
+      });
+    }
+
     if (action !== "create" && action !== "googleSignIn") {
       return jsonResponse_({ success: false, error: "Applicant account action is invalid." });
     }
@@ -466,6 +500,16 @@ function handleApplicantAccount(data) {
     var application = applicationSummaryForEmail_(email);
     var existingValues = existingRow ? sheet.getRange(existingRow, 1, 1, APPLICANT_ACCOUNT_HEADERS.length).getValues()[0] : [];
     var createdAt = existingValues[0] || now;
+    var passwordSalt = existingValues[12] || "";
+    var passwordHash = existingValues[13] || "";
+    var passwordUpdatedAt = existingValues[14] || "";
+
+    if (action === "create" && safeString_(data.password)) {
+      passwordSalt = createPasswordSalt_();
+      passwordHash = hashPassword_(data.password, passwordSalt);
+      passwordUpdatedAt = now;
+    }
+
     var row = [
       createdAt,
       now,
@@ -478,7 +522,10 @@ function handleApplicantAccount(data) {
       now,
       application ? application.status : "",
       application ? application.row : "",
-      application ? application.submissionCount : ""
+      application ? application.submissionCount : "",
+      passwordSalt,
+      passwordHash,
+      passwordUpdatedAt
     ];
 
     if (existingRow) {
@@ -1000,6 +1047,25 @@ function hashToken_(token) {
   }
 
   return output;
+}
+
+function createPasswordSalt_() {
+  return Utilities.getUuid() + "-" + Utilities.getUuid();
+}
+
+function hashPassword_(password, salt) {
+  return hashToken_(safeString_(salt) + ":" + safeString_(password));
+}
+
+function passwordMatches_(password, salt, passwordHash) {
+  var storedSalt = safeString_(salt);
+  var storedHash = safeString_(passwordHash);
+
+  if (!storedSalt || !storedHash || !safeString_(password)) {
+    return false;
+  }
+
+  return hashPassword_(password, storedSalt) === storedHash;
 }
 
 function sessionExpiresAt_() {
