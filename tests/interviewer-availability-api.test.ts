@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/interviewer-availability.ts'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 import { INTERVIEW_SLOTS } from '../src/lib/interviews.ts'
 
 const createResponse = () => {

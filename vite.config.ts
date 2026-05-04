@@ -5,7 +5,7 @@ import { validateApplicantAccountPayload } from './src/lib/applicantAccount.ts'
 import { buildApplicationSubmission, validateApplicationPayload } from './src/lib/application.ts'
 import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
 import { buildInterviewerAvailabilitySubmission, validateInterviewerAvailabilityPayload } from './src/lib/interviewerAvailability.ts'
-import { createLocalRecruitingStore } from './server/localRecruitingStore.ts'
+import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
 
 const store = createLocalRecruitingStore()
 

@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 import {
   buildInterviewerAvailabilitySubmission,
   validateInterviewerAvailabilityPayload,

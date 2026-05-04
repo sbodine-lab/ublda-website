@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 const superAdminSessionSecret = () => (
   process.env.UBLDA_SUPER_ADMIN_PASSWORD

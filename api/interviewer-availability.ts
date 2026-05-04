@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 type InterviewSlot = {
   value: string
