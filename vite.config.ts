@@ -9,6 +9,7 @@ type DevAccount = {
   lastName: string
   uniqname: string
   email: string
+  password?: string
   sessionToken: string
   application: {
     status: string
@@ -140,9 +141,32 @@ const devApiPlugin = () => ({
         return
       }
 
+      if (result.data.action === 'signIn') {
+        const account = devAccounts.get(result.data.email)
+
+        if (!account || account.password !== result.data.password) {
+          sendJson(res, 401, { success: false, error: 'Invalid uniqname or password.' })
+          return
+        }
+
+        sendJson(res, 200, {
+          success: true,
+          sessionToken: account.sessionToken,
+          account: {
+            firstName: account.firstName,
+            lastName: account.lastName,
+            uniqname: account.uniqname,
+            email: account.email,
+          },
+          application: account.application,
+        })
+        return
+      }
+
       const sessionToken = createDevSessionToken()
       const account: DevAccount = {
         ...result.data.account,
+        password: result.data.password,
         sessionToken,
         application: devAccounts.get(result.data.account.email)?.application || null,
       }

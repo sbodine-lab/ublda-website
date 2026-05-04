@@ -14,7 +14,8 @@ type AuthContextValue = {
   member: MemberProfile | null
   sessionToken: string
   signInWithGoogle: (credential: string, profile?: GoogleProfile) => Promise<void>
-  createAccount: (payload: { firstName: string; lastName: string; uniqname: string }) => Promise<void>
+  signInWithPassword: (payload: { uniqname: string; password: string }) => Promise<void>
+  createAccount: (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => Promise<void>
   requestSignInLink: (uniqname: string) => Promise<void>
   signOut: () => void
 }
@@ -153,7 +154,17 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     applySession(result.account, result.application, result.sessionToken)
   }, [applySession, postAccountAction])
 
-  const createAccount = useCallback(async (payload: { firstName: string; lastName: string; uniqname: string }) => {
+  const signInWithPassword = useCallback(async (payload: { uniqname: string; password: string }) => {
+    const result = await postAccountAction({ action: 'signIn', ...payload })
+
+    if (!result.account || !result.sessionToken) {
+      throw new Error('Sign-in did not return a member session.')
+    }
+
+    applySession(result.account, result.application, result.sessionToken)
+  }, [applySession, postAccountAction])
+
+  const createAccount = useCallback(async (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => {
     const result = await postAccountAction({ action: 'create', ...payload })
 
     if (!result.account || !result.sessionToken) {
@@ -176,10 +187,11 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     member,
     sessionToken,
     signInWithGoogle,
+    signInWithPassword,
     createAccount,
     requestSignInLink,
     signOut,
-  }), [account, application, createAccount, member, requestSignInLink, sessionToken, signInWithGoogle, signOut, status])
+  }), [account, application, createAccount, member, requestSignInLink, sessionToken, signInWithGoogle, signInWithPassword, signOut, status])
 
   return (
     <AuthContext.Provider value={value}>

@@ -8,11 +8,24 @@ test('validates applicant account creation with a UMich identity', () => {
     firstName: 'Sam',
     lastName: 'Bodine',
     uniqname: 'SBoDine@umich.edu',
+    password: 'secure-password',
   })
 
   assert.equal(result.success, true)
   assert.equal(result.data?.action, 'create')
   assert.equal(result.data?.action === 'create' ? result.data.account.email : '', 'sbodine@umich.edu')
+})
+
+test('validates uniqname and password sign-in requests', () => {
+  const result = validateApplicantAccountPayload({
+    action: 'signIn',
+    uniqname: 'SBoDine@umich.edu',
+    password: 'secure-password',
+  })
+
+  assert.equal(result.success, true)
+  assert.equal(result.data?.action, 'signIn')
+  assert.equal(result.data?.action === 'signIn' ? result.data.email : '', 'sbodine@umich.edu')
 })
 
 test('validates passwordless sign-in link requests', () => {
@@ -24,6 +37,17 @@ test('validates passwordless sign-in link requests', () => {
   assert.equal(result.success, true)
   assert.equal(result.data?.action, 'requestMagicLink')
   assert.equal(result.data?.action === 'requestMagicLink' ? result.data.email : '', 'alexchen@umich.edu')
+})
+
+test('requires a usable password for account access', () => {
+  const result = validateApplicantAccountPayload({
+    action: 'signIn',
+    uniqname: 'sbodine',
+    password: 'short',
+  })
+
+  assert.equal(result.success, false)
+  assert.match(result.errors.join(' '), /password/i)
 })
 
 test('validates Google sign-in credentials with UMich profiles', () => {

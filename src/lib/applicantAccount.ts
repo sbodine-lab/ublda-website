@@ -37,6 +37,13 @@ export type ApplicantAccountRequest =
   | {
       action: 'create'
       account: ApplicantAccount
+      password: string
+    }
+  | {
+      action: 'signIn'
+      uniqname: string
+      email: string
+      password: string
     }
   | {
       action: 'requestMagicLink'
@@ -60,6 +67,16 @@ type ValidationResult =
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
   return typeof value === 'string' ? value.trim() : ''
+}
+
+const validatePassword = (password: string, errors: string[]) => {
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters.')
+  }
+
+  if (password.length > 128) {
+    errors.push('Password must be 128 characters or fewer.')
+  }
 }
 
 export const validateApplicantAccountPayload = (payload: unknown): ValidationResult => {
@@ -135,6 +152,16 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
       : { success: true, data: { action, uniqname, email }, errors: [] }
   }
 
+  const password = getString(body, 'password')
+
+  if (action === 'signIn') {
+    validatePassword(password, errors)
+
+    return errors.length
+      ? { success: false, data: null, errors }
+      : { success: true, data: { action, uniqname, email, password }, errors: [] }
+  }
+
   if (action !== 'create') {
     errors.push('Applicant account action is invalid.')
   }
@@ -144,6 +171,7 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
 
   if (!firstName) errors.push('First name is required.')
   if (!lastName) errors.push('Last name is required.')
+  validatePassword(password, errors)
 
   return errors.length
     ? { success: false, data: null, errors }
@@ -157,6 +185,7 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
             uniqname,
             email,
           },
+          password,
         },
         errors: [],
       }

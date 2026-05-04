@@ -58,6 +58,7 @@ test('creates an applicant account through the configured script backend', async
         firstName: 'Alex',
         lastName: 'Chen',
         uniqname: 'AlexChen',
+        password: 'secure-password',
       },
     }, res)
 
@@ -66,12 +67,71 @@ test('creates an applicant account through the configured script backend', async
     assert.equal(forwardedBody?.formType, 'applicantAccount')
     assert.equal(forwardedBody?.action, 'create')
     assert.equal((forwardedBody?.account as Record<string, unknown>).email, 'alexchen@umich.edu')
+    assert.equal(forwardedBody?.password, 'secure-password')
     assert.equal(forwardedBody?.origin, 'https://ublda.org')
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL
     } else {
       process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('signs Sam in with the configured super-admin password before creating a backend session', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  const originalFetch = globalThis.fetch
+  let forwardedBody: Record<string, unknown> | null = null
+
+  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
+  globalThis.fetch = async (_url, init) => {
+    forwardedBody = JSON.parse(String(init?.body || '{}'))
+    return new Response(JSON.stringify({
+      success: true,
+      sessionToken: 'token-token-token-token-token-token',
+      account: {
+        firstName: 'Sam',
+        lastName: 'Bodine',
+        uniqname: 'sbodine',
+        email: 'sbodine@umich.edu',
+      },
+      application: null,
+    }), { status: 200 })
+  }
+
+  try {
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {
+        origin: 'https://ublda.org',
+        host: 'ublda.org',
+      },
+      body: {
+        action: 'signIn',
+        uniqname: 'sbodine',
+        password: 'secure-password',
+      },
+    }, res)
+
+    assert.equal(result().statusCode, 200)
+    assert.equal((result().payload as Record<string, unknown>).success, true)
+    assert.equal(forwardedBody?.action, 'googleSignIn')
+    assert.equal((forwardedBody?.account as Record<string, unknown>).email, 'sbodine@umich.edu')
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalPassword === undefined) {
+      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
+    } else {
+      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
     }
     globalThis.fetch = originalFetch
   }
