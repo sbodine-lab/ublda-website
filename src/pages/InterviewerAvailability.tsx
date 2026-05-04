@@ -103,7 +103,6 @@ export default function InterviewerAvailability() {
             <Reveal>
               <form className="apply-form" onSubmit={handleSubmit}>
                 <div className="apply-form__header interviewer-simple__header">
-                  <p className="section__label">E-Board Availability</p>
                   <h2 className="apply-form__title">Your availability.</h2>
                   <p className="apply-form__subtitle">
                     May 7-10, 8 AM-10 PM ET. Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
