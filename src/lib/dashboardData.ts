@@ -17,6 +17,25 @@ export type DashboardData = {
 }
 
 export const emptyDashboardData: DashboardData = {}
+export const DASHBOARD_DATA_CHANGED_EVENT = 'ublda-dashboard-data-changed'
+export const DASHBOARD_DATA_CHANGED_STORAGE_KEY = 'ubldaDashboardDataChangedAt'
+
+type BrowserEventTarget = {
+  localStorage?: {
+    setItem: (key: string, value: string) => void
+  }
+  dispatchEvent?: (event: { type: string }) => boolean
+  CustomEvent?: new (type: string, init?: { detail?: unknown }) => { type: string }
+}
+
+export const notifyDashboardDataChanged = () => {
+  const browser = globalThis as typeof globalThis & BrowserEventTarget
+  if (!browser.localStorage || !browser.dispatchEvent || !browser.CustomEvent) return
+
+  const stamp = String(Date.now())
+  browser.localStorage.setItem(DASHBOARD_DATA_CHANGED_STORAGE_KEY, stamp)
+  browser.dispatchEvent(new browser.CustomEvent(DASHBOARD_DATA_CHANGED_EVENT, { detail: { stamp } }))
+}
 
 export const readDashboardData = async (sessionToken: string): Promise<DashboardData> => {
   if (!sessionToken) {

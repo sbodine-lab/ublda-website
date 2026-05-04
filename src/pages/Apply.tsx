@@ -19,6 +19,7 @@ import {
   INTERVIEW_BLOCK_WITH_BUFFER_LABEL,
   INTERVIEW_DAY_RANGE_LABEL,
 } from '../lib/interviews'
+import { notifyDashboardDataChanged } from '../lib/dashboardData'
 import AvailabilityPicker from '../components/AvailabilityPicker'
 import Reveal from '../components/Reveal'
 import './Apply.css'
@@ -214,6 +215,7 @@ export default function Apply() {
 
       setSubmittedStatus(result?.status || '')
       setSubmitted(true)
+      notifyDashboardDataChanged()
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : ''
       setError(message || 'Something went wrong. Please try again or email sbodine@umich.edu.')

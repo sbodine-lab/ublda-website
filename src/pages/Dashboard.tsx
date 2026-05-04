@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { useMemberAuth } from '../hooks/useMemberAuth'
 import { ADMIN_ACCOUNTS } from '../lib/dashboardAccess'
-import { readDashboardData } from '../lib/dashboardData'
+import {
+  DASHBOARD_DATA_CHANGED_EVENT,
+  DASHBOARD_DATA_CHANGED_STORAGE_KEY,
+  readDashboardData,
+} from '../lib/dashboardData'
 import type { DashboardData } from '../lib/dashboardData'
 import {
   calendarItems,
@@ -126,6 +130,7 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData>({})
   const [dashboardDataState, setDashboardDataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [dashboardError, setDashboardError] = useState('')
+  const [dashboardReloadKey, setDashboardReloadKey] = useState(0)
   const [candidateRows, setCandidateRows] = useState<Candidate[]>([])
   const [interviewerAvoidance, setInterviewerAvoidance] = useState<InterviewerAvoidance>({})
   const [matchingNotice, setMatchingNotice] = useState('')
@@ -194,7 +199,32 @@ export default function Dashboard() {
     return () => {
       cancelled = true
     }
-  }, [effectiveMember, previewingLeadership, sessionToken, workspace])
+  }, [dashboardReloadKey, effectiveMember, previewingLeadership, sessionToken, workspace])
+
+  useEffect(() => {
+    if (!effectiveMember || workspace !== 'leadership' || previewingLeadership) {
+      return
+    }
+
+    const refreshDashboard = () => setDashboardReloadKey((current) => current + 1)
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === DASHBOARD_DATA_CHANGED_STORAGE_KEY) {
+        refreshDashboard()
+      }
+    }
+
+    window.addEventListener(DASHBOARD_DATA_CHANGED_EVENT, refreshDashboard)
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener('focus', refreshDashboard)
+
+    return () => {
+      window.removeEventListener(DASHBOARD_DATA_CHANGED_EVENT, refreshDashboard)
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('focus', refreshDashboard)
+    }
+  }, [effectiveMember, previewingLeadership, workspace])
+
+  const refreshDashboardData = () => setDashboardReloadKey((current) => current + 1)
 
   const updateCandidate = (id: string, updates: Partial<Candidate>) => {
     setCandidateRows((current) => current.map((candidate) => (
@@ -618,6 +648,7 @@ export default function Dashboard() {
             <p>Candidate resumes, ranked roles, availability overlap, assignments, interview status, and feedback.</p>
           </div>
           <div className="portal-panel__actions">
+            <button type="button" onClick={refreshDashboardData}>Refresh data</button>
             <button type="button" onClick={applySlateMatch}>Auto-match open candidates</button>
             <Link to="/interviewer-availability">E-board availability form</Link>
           </div>
