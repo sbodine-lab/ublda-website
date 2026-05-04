@@ -148,6 +148,16 @@ const interviewerUniqname = (interviewer: { name: string } & Record<string, unkn
   typeof interviewer.uniqname === 'string' ? interviewer.uniqname : interviewer.name.toLowerCase().replace(/[^a-z0-9]+/g, '')
 )
 
+const initialsForName = (name: string) => (
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+)
+
 const managedMembersFromData = (
   signups: MemberSignup[],
   admins: AdminAccount[],
@@ -350,6 +360,22 @@ export default function Dashboard() {
   const liveInterviewerAvailability = useMemo(() => dashboardData.interviewerAvailability || [], [dashboardData.interviewerAvailability])
   const liveMemberSignups = useMemo(() => dashboardData.memberSignups || [], [dashboardData.memberSignups])
   const liveAdminAccounts = useMemo(() => dashboardData.adminAccounts?.length ? dashboardData.adminAccounts : ADMIN_ACCOUNTS, [dashboardData.adminAccounts])
+  const interviewerAvailabilityBySlot = useMemo(() => {
+    const bySlot = new Map<string, typeof liveInterviewerAvailability>()
+
+    liveInterviewerAvailability.forEach((interviewer) => {
+      const uniqueSlots = new Set(interviewer.availability)
+      uniqueSlots.forEach((slotValue) => {
+        if (!getInterviewSlotByValue(slotValue)) return
+        const current = bySlot.get(slotValue) || []
+        if (!current.some((row) => row.name === interviewer.name)) {
+          bySlot.set(slotValue, [...current, interviewer])
+        }
+      })
+    })
+
+    return bySlot
+  }, [liveInterviewerAvailability])
   const matchedCandidates = candidateRows.filter((candidate) => candidate.assignedSlot).length
   const unscheduledCandidates = candidateRows.filter((candidate) => !candidate.assignedSlot)
   const totalInterviewerSlots = new Set(liveInterviewerAvailability.flatMap((interviewer) => interviewer.availability)).size
@@ -727,13 +753,24 @@ export default function Dashboard() {
     return loads
   }, [candidateRows])
 
-  const slotsByDay = INTERVIEW_WINDOW_DAYS.map((day) => ({
-    ...day,
-    scheduled: sortSlotValues(candidateRows.map((candidate) => candidate.assignedSlot).filter(Boolean)).filter((slotValue) => slotValue.includes(day.date)),
-    manualEvents: manualCalendarEvents
-      .filter((event) => event.date === day.date)
-      .sort((a, b) => a.startMinutes - b.startMinutes),
-  }))
+  const slotsByDay = useMemo(() => INTERVIEW_WINDOW_DAYS.map((day) => {
+    const coverage = INTERVIEW_SLOTS
+      .filter((slot) => slot.start.includes(day.date))
+      .map((slot) => ({
+        slot,
+        interviewers: interviewerAvailabilityBySlot.get(slot.value) || [],
+      }))
+
+    return {
+      ...day,
+      scheduled: sortSlotValues(candidateRows.map((candidate) => candidate.assignedSlot).filter(Boolean)).filter((slotValue) => slotValue.includes(day.date)),
+      manualEvents: manualCalendarEvents
+        .filter((event) => event.date === day.date)
+        .sort((a, b) => a.startMinutes - b.startMinutes),
+      coverage,
+      coveredCount: coverage.filter((row) => row.interviewers.length > 0).length,
+    }
+  }), [candidateRows, interviewerAvailabilityBySlot, manualCalendarEvents])
 
   if (status === 'loading') {
     return (
@@ -1154,8 +1191,36 @@ export default function Dashboard() {
           <div className="admin-calendar">
             {slotsByDay.map((day) => (
               <section className="admin-calendar__day" key={day.date}>
-                <header><strong>{day.shortLabel}</strong><span>{day.scheduled.length + day.manualEvents.length} scheduled</span></header>
-                <div>
+                <header><strong>{day.shortLabel}</strong><span>{day.scheduled.length + day.manualEvents.length} scheduled · {day.coveredCount}/{day.coverage.length} covered</span></header>
+                <div className="admin-calendar__body">
+                  <section className="admin-calendar-coverage" aria-label={`E-board availability for ${day.shortLabel}`}>
+                    <div className="admin-calendar-coverage__header">
+                      <strong>E-board availability</strong>
+                      <span>{day.coveredCount}/{day.coverage.length} slots</span>
+                    </div>
+                    <div className="admin-calendar-coverage__slots">
+                      {day.coverage.map(({ slot, interviewers }) => {
+                        const visibleInterviewers = interviewers.slice(0, 3)
+                        const hiddenCount = Math.max(interviewers.length - visibleInterviewers.length, 0)
+                        const coverageClass = interviewers.length >= 2 ? 'admin-coverage-slot--strong' : interviewers.length === 1 ? 'admin-coverage-slot--covered' : 'admin-coverage-slot--empty'
+
+                        return (
+                          <article className={`admin-coverage-slot ${coverageClass}`} key={slot.value}>
+                            <time>{slot.timeLabel.replace(' ET', '')}</time>
+                            <div>
+                              <strong>{interviewers.length || '0'}</strong>
+                              {interviewers.length > 0 && (
+                                <span aria-label={interviewers.map((interviewer) => interviewer.name).join(', ')}>
+                                  {visibleInterviewers.map((interviewer) => <mark key={interviewer.name} title={interviewer.name}>{initialsForName(interviewer.name)}</mark>)}
+                                  {hiddenCount > 0 && <mark title={`${hiddenCount} more interviewer${hiddenCount === 1 ? '' : 's'}`}>+{hiddenCount}</mark>}
+                                </span>
+                              )}
+                            </div>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  </section>
                   {day.scheduled.length === 0 && day.manualEvents.length === 0 && <p className="admin-empty-copy">No interviews scheduled.</p>}
                   {day.manualEvents.map((event) => (
                     <article className="admin-interview-card admin-interview-card--manual" key={event.id}>
