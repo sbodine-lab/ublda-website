@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
+import { mkdtemp } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/dashboard-data.ts'
 
@@ -95,10 +98,13 @@ test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () 
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
   const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
   const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
 
   delete process.env.GOOGLE_SCRIPT_URL
   process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
   process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
 
   try {
     const { res, result } = createResponse()
@@ -131,6 +137,104 @@ test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () 
     } else {
       process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
     }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+  }
+})
+
+test('uses a live sheet dashboard for an enabled Vercel fallback Sam session when the script backend exists', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalFetch = globalThis.fetch
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
+  const forwardedBodies: Record<string, unknown>[] = []
+
+  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
+  process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
+  globalThis.fetch = async (_url, init) => {
+    const body = JSON.parse(String(init?.body || '{}'))
+    forwardedBodies.push(body)
+
+    if (body.action === 'googleSignIn') {
+      return new Response(JSON.stringify({
+        success: true,
+        sessionToken: 'sheet-session-token-sheet-session-token',
+        account: {
+          firstName: 'Sam',
+          lastName: 'Bodine',
+          uniqname: 'sbodine',
+          email: 'sbodine@umich.edu',
+        },
+      }), { status: 200 })
+    }
+
+    return new Response(JSON.stringify({
+      success: true,
+      role: 'super-admin',
+      dashboardData: {
+        interviewerAvailability: [
+          {
+            name: 'Sam Bodine',
+            role: 'Super Admin',
+            availability: ['2026-05-07T08:00:00-04:00/2026-05-07T08:30:00-04:00'],
+            maxInterviews: '2',
+          },
+        ],
+        backendStatus: {
+          source: 'sheets',
+          message: 'Loaded from Google Sheets',
+          updatedAt: '2026-05-04T00:00:00.000Z',
+        },
+      },
+    }), { status: 200 })
+  }
+
+  try {
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { sessionToken: createLocalAdminToken('secure-password') },
+    }, res)
+
+    assert.equal(result().statusCode, 200)
+    const payload = result().payload as Record<string, unknown>
+    const dashboardData = payload.dashboardData as Record<string, unknown>
+    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'sheets')
+    assert.equal((dashboardData.interviewerAvailability as unknown[]).length, 1)
+    assert.equal(forwardedBodies[0].action, 'googleSignIn')
+    assert.equal(forwardedBodies[1].action, 'dashboardData')
+    assert.equal(forwardedBodies[1].sessionToken, 'sheet-session-token-sheet-session-token')
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalPassword === undefined) {
+      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
+    } else {
+      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
+    }
+    if (originalFallback === undefined) {
+      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+    } else {
+      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    globalThis.fetch = originalFetch
   }
 })
 

@@ -127,7 +127,7 @@ function doPost(e) {
       return handleInterviewAssignment(data);
     }
 
-    if (formType === "generalMember" || isGeneralMemberPayload_(data)) {
+    if (formType === "generalMember") {
       return handleGeneralMember(data);
     }
 
@@ -144,15 +144,6 @@ function isInterviewerAvailabilityPayload_(data) {
     Array.isArray(data.interviewAvailability) ||
     safeString_(data.maxInterviews)
   );
-}
-
-function isGeneralMemberPayload_(data) {
-  return !safeString_(data.formType) &&
-    safeString_(data.firstName) &&
-    safeString_(data.lastName) &&
-    (safeString_(data.uniqname) || safeString_(data.email)) &&
-    !Array.isArray(data.availability) &&
-    !Array.isArray(data.interviewAvailability);
 }
 
 function setupLeadershipInterestSheet() {

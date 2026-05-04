@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.ts'
 
 const superAdminSessionSecret = () => (
   process.env.UBLDA_SUPER_ADMIN_PASSWORD
@@ -70,11 +71,125 @@ const localSuperAdminPayload = () => ({
   },
 })
 
+const superAdminAccount = {
+  firstName: 'Sam',
+  lastName: 'Bodine',
+  uniqname: 'sbodine',
+  email: 'sbodine@umich.edu',
+}
+
 const getSessionToken = (body: unknown) => {
   if (!body || typeof body !== 'object') return ''
   const token = (body as Record<string, unknown>).sessionToken
   return typeof token === 'string' ? token.trim() : ''
 }
+
+const fetchScriptJson = async (
+  scriptUrl: string,
+  body: Record<string, unknown>,
+  signal: AbortSignal,
+) => {
+  const response = await fetch(scriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok || payload?.success === false) {
+    throw new Error(payload?.error || 'Could not load dashboard data')
+  }
+
+  return payload
+}
+
+const fetchSheetDashboard = async (
+  scriptUrl: string,
+  sessionToken: string,
+  signal: AbortSignal,
+) => fetchScriptJson(scriptUrl, {
+  formType: 'applicantAccount',
+  action: 'dashboardData',
+  sessionToken,
+}, signal)
+
+const fetchSheetDashboardForLocalSuperAdmin = async (
+  scriptUrl: string,
+  signal: AbortSignal,
+) => {
+  const signInPayload = await fetchScriptJson(scriptUrl, {
+    formType: 'applicantAccount',
+    action: 'googleSignIn',
+    account: superAdminAccount,
+    origin: 'https://ublda.org',
+  }, signal)
+  const sheetSessionToken = typeof signInPayload?.sessionToken === 'string' ? signInPayload.sessionToken : ''
+
+  if (sheetSessionToken.length < 24) {
+    throw new Error('Could not create a live dashboard session.')
+  }
+
+  return fetchSheetDashboard(scriptUrl, sheetSessionToken, signal)
+}
+
+const dashboardResponse = (payload: Record<string, unknown>) => ({
+  success: true,
+  account: payload?.account || null,
+  role: payload?.role || 'member',
+  dashboardData: payload?.dashboardData || {},
+})
+
+const mergeById = <T extends Record<string, unknown>>(primary: T[], secondary: T[]) => {
+  const seen = new Set<string>()
+  const merged: T[] = []
+
+  primary.concat(secondary).forEach((item, index) => {
+    const id = String(item.id || item.email || item.name || index)
+    if (seen.has(id)) return
+    seen.add(id)
+    merged.push(item)
+  })
+
+  return merged
+}
+
+const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
+  const storeDashboardData = await createLocalRecruitingStore().leadershipDashboardData()
+  const dashboardData = (payload.dashboardData && typeof payload.dashboardData === 'object'
+    ? payload.dashboardData
+    : {}) as Record<string, unknown>
+  const storeCandidates = Array.isArray(storeDashboardData.candidates) ? storeDashboardData.candidates : []
+  const storeInterviewers = Array.isArray(storeDashboardData.interviewerAvailability) ? storeDashboardData.interviewerAvailability : []
+  const storeMembers = Array.isArray(storeDashboardData.memberSignups) ? storeDashboardData.memberSignups : []
+  const meaningfulStoreMembers = storeMembers.filter((member) => member.email !== 'sbodine@umich.edu')
+  const hasStoreRecruitingData = storeCandidates.length > 0 || storeInterviewers.length > 0 || meaningfulStoreMembers.length > 0
+  const sheetCandidates = Array.isArray(dashboardData.candidates) ? dashboardData.candidates as Record<string, unknown>[] : []
+  const sheetInterviewers = Array.isArray(dashboardData.interviewerAvailability) ? dashboardData.interviewerAvailability as Record<string, unknown>[] : []
+  const sheetMembers = Array.isArray(dashboardData.memberSignups) ? dashboardData.memberSignups as Record<string, unknown>[] : []
+  const nextDashboardData = {
+    ...dashboardData,
+    candidates: storeCandidates.length ? mergeById(storeCandidates as unknown as Record<string, unknown>[], sheetCandidates) : dashboardData.candidates,
+    interviewerAvailability: storeInterviewers.length
+      ? mergeById(storeInterviewers as unknown as Record<string, unknown>[], sheetInterviewers)
+      : dashboardData.interviewerAvailability,
+    memberSignups: meaningfulStoreMembers.length ? mergeById(storeMembers as unknown as Record<string, unknown>[], sheetMembers) : dashboardData.memberSignups,
+    adminAccounts: dashboardData.adminAccounts || storeDashboardData.adminAccounts,
+    backendStatus: hasStoreRecruitingData ? {
+      source: storeDashboardData.backendStatus?.source || 'vercel',
+      message: dashboardData.backendStatus
+        ? 'Loaded account data from Google Sheets and recruiting responses from the private Vercel backend.'
+        : storeDashboardData.backendStatus?.message || 'Loaded recruiting data from the private Vercel backend.',
+      updatedAt: new Date().toISOString(),
+    } : dashboardData.backendStatus || storeDashboardData.backendStatus,
+  }
+
+  return {
+    ...payload,
+    dashboardData: nextDashboardData,
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
 
@@ -87,12 +202,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: 'A valid member session is required.' })
   }
 
-  if (verifyLocalSuperAdminSession(sessionToken)) {
-    return res.status(200).json(localSuperAdminPayload())
-  }
-
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (!scriptUrl) {
+    if (verifyLocalSuperAdminSession(sessionToken)) {
+      return res.status(200).json(await withRecruitingStoreData(localSuperAdminPayload()))
+    }
+
     return res.status(500).json({ error: 'Dashboard backend not configured' })
   }
 
@@ -100,32 +215,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const timeout = setTimeout(() => controller.abort(), 8000)
 
   try {
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        formType: 'applicantAccount',
-        action: 'dashboardData',
-        sessionToken,
-      }),
-      signal: controller.signal,
-    })
-    const payload = await response.json().catch(() => null)
+    const payload = verifyLocalSuperAdminSession(sessionToken)
+      ? await fetchSheetDashboardForLocalSuperAdmin(scriptUrl, controller.signal)
+      : await fetchSheetDashboard(scriptUrl, sessionToken, controller.signal)
+    const mergedPayload = await withRecruitingStoreData(payload)
 
-    if (!response.ok || payload?.success === false) {
-      return res.status(response.ok ? 401 : 500).json({
-        error: payload?.error || 'Could not load dashboard data',
+    return res.status(200).json(dashboardResponse(mergedPayload))
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Could not load dashboard data.'
+
+    if (verifyLocalSuperAdminSession(sessionToken)) {
+      const localPayload = await withRecruitingStoreData(localSuperAdminPayload())
+      return res.status(200).json({
+        ...localPayload,
+        warning: message || 'Could not load live sheet data.',
       })
     }
 
-    return res.status(200).json({
-      success: true,
-      account: payload?.account || null,
-      role: payload?.role || 'member',
-      dashboardData: payload?.dashboardData || {},
-    })
-  } catch {
-    return res.status(500).json({ error: 'Could not load dashboard data' })
+    const authFailure = /session|required|auth|authorized|permission/i.test(message)
+    return res.status(authFailure ? 401 : 500).json({ error: message || 'Could not load dashboard data' })
   } finally {
     clearTimeout(timeout)
   }

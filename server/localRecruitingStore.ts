@@ -1,6 +1,7 @@
 import { randomBytes, pbkdf2Sync, timingSafeEqual } from 'node:crypto'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { get, put } from '@vercel/blob'
 import type { ApplicantAccount, ApplicantApplicationSummary } from '../src/lib/applicantAccount.ts'
 import type { ApplicationSubmission } from '../src/lib/application.ts'
 import type { InterviewAssignmentSubmission } from '../src/lib/interviewAssignment.ts'
@@ -48,6 +49,7 @@ export type LocalAccountResponse = {
 }
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30
+const BLOB_STATE_PATH = 'recruiting/state.json'
 export const LOCAL_PREVIEW_SESSION_TOKEN = 'local-preview-session-token'
 
 const emptyData = (): LocalRecruitingData => ({
@@ -62,6 +64,8 @@ const defaultDataPath = () => (
   process.env.UBLDA_LOCAL_DATA_FILE ||
   path.join(process.cwd(), '.ublda-local-data', 'recruiting.json')
 )
+
+const shouldUseBlobStorage = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 
 const sessionExpiresAt = () => new Date(Date.now() + SESSION_TTL_MS).toISOString()
 
@@ -115,6 +119,35 @@ const statusForDashboard = (status: string): Candidate['status'] => {
   return 'Needs match'
 }
 
+const dashboardStatus = (): DashboardData['backendStatus'] => ({
+  source: shouldUseBlobStorage() ? 'vercel' : 'preview',
+  message: shouldUseBlobStorage()
+    ? 'Loaded recruiting data from the private Vercel Blob backend.'
+    : 'Loaded from durable local preview storage. Data lives in .ublda-local-data and survives dev-server restarts.',
+  updatedAt: new Date().toISOString(),
+})
+
+const buildDashboardData = (
+  data: LocalRecruitingData,
+  role: string,
+  accountEmail: string,
+): DashboardData => {
+  const dashboardData: DashboardData = {
+    backendStatus: dashboardStatus(),
+  }
+
+  if (role === 'super-admin' || role === 'exec') {
+    dashboardData.candidates = Object.values(data.candidates)
+    dashboardData.interviewerAvailability = Object.values(data.interviewerAvailability)
+    dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts)
+    dashboardData.adminAccounts = ADMIN_ACCOUNTS
+  } else {
+    dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts).filter((member) => member.email === accountEmail)
+  }
+
+  return dashboardData
+}
+
 export class LocalRecruitingStore {
   private readonly dataPath: string
 
@@ -123,6 +156,20 @@ export class LocalRecruitingStore {
   }
 
   private async readData() {
+    if (shouldUseBlobStorage()) {
+      try {
+        const blob = await get(BLOB_STATE_PATH, { access: 'private', useCache: false })
+        if (!blob || blob.statusCode !== 200) {
+          return this.withPreviewAdmin(emptyData())
+        }
+
+        const raw = await new Response(blob.stream).text()
+        return this.withPreviewAdmin(JSON.parse(raw) as LocalRecruitingData)
+      } catch {
+        return this.withPreviewAdmin(emptyData())
+      }
+    }
+
     try {
       const raw = await readFile(this.dataPath, 'utf8')
       return this.withPreviewAdmin(JSON.parse(raw) as LocalRecruitingData)
@@ -132,6 +179,16 @@ export class LocalRecruitingStore {
   }
 
   private async writeData(data: LocalRecruitingData) {
+    if (shouldUseBlobStorage()) {
+      await put(BLOB_STATE_PATH, `${JSON.stringify(data, null, 2)}\n`, {
+        access: 'private',
+        allowOverwrite: true,
+        addRandomSuffix: false,
+        contentType: 'application/json',
+      })
+      return
+    }
+
     await mkdir(path.dirname(this.dataPath), { recursive: true })
     const tempPath = `${this.dataPath}.${process.pid}.tmp`
     await writeFile(tempPath, `${JSON.stringify(data, null, 2)}\n`)
@@ -319,28 +376,17 @@ export class LocalRecruitingStore {
 
     const data = await this.readData()
     const role = roleForEmail(session.account.email)
-    const dashboardData: DashboardData = {
-      backendStatus: {
-        source: 'preview',
-        message: 'Loaded from durable local preview storage. Data lives in .ublda-local-data and survives dev-server restarts.',
-        updatedAt: new Date().toISOString(),
-      },
-    }
-
-    if (role === 'super-admin' || role === 'exec') {
-      dashboardData.candidates = Object.values(data.candidates)
-      dashboardData.interviewerAvailability = Object.values(data.interviewerAvailability)
-      dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts)
-      dashboardData.adminAccounts = ADMIN_ACCOUNTS
-    } else {
-      dashboardData.memberSignups = memberSignupsFromAccounts(data.accounts).filter((member) => member.email === session.account.email)
-    }
 
     return {
       account: session.account,
       role,
-      dashboardData,
+      dashboardData: buildDashboardData(data, role, session.account.email),
     }
+  }
+
+  async leadershipDashboardData(): Promise<DashboardData> {
+    const data = await this.readData()
+    return buildDashboardData(data, 'super-admin', 'sbodine@umich.edu')
   }
 }
 
