@@ -81,7 +81,6 @@ test('rejects assignment updates without an admin session', async () => {
       headers: { 'user-agent': 'api-handler-test' },
       body: {
         email: 'candidate@umich.edu',
-        assignedSlot: INTERVIEW_SLOTS[0].value,
         interviewStatus: 'Matched',
       },
     }, res)
