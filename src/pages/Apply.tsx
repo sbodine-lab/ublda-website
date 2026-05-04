@@ -64,14 +64,14 @@ const initialForm: ApplicationForm = {
 
 const successMessage = (status: ApplicationStatus | '') => {
   if (status === 'Future role pool') {
-    return 'Your resume and availability are saved for future project, committee, and leadership roles. Current e-board interviews are Ross-focused, but UBLDA still needs strong non-Ross collaborators as opportunities open.'
+    return 'Your resume and availability are saved for future UBLDA roles.'
   }
 
   if (status === 'Needs review') {
-    return 'Your resume, role interests, and availability are saved while we confirm eligibility and match realistic interview slots.'
+    return 'Your resume, role interests, and availability are saved.'
   }
 
-  return 'Your resume, role rankings, and availability are in. We will match candidates to realistic Google Meet slots after e-board availability is collected.'
+  return 'Your resume, role rankings, and availability are in.'
 }
 
 const resumeAccept = RESUME_MIME_TYPES.join(',')
@@ -231,15 +231,13 @@ export default function Apply() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="apply-page__headline">
-              Resume, role ranking, and interview availability.
+              Resume, roles, availability.
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="apply-page__intro">
-              UBLDA is recruiting three new e-board members on a compressed timeline.
-              This replaces the written application: upload your resume, rank the
-              board roles you are most interested in, and select every Google Meet
-              interview slot you can make from {INTERVIEW_DAY_RANGE_LABEL}.
+              Upload your resume, rank board roles, and select every Google Meet
+              slot you can make from {INTERVIEW_DAY_RANGE_LABEL}.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -279,17 +277,16 @@ export default function Apply() {
               <form className="apply-form" onSubmit={handleSubmit}>
                 <div className="apply-form__header">
                   <p className="section__label">Candidate Form</p>
-                  <h2 className="apply-form__title">One clean form. No login.</h2>
+                  <h2 className="apply-form__title">No login required.</h2>
                   <p className="apply-form__subtitle">
-                    Select all availability that works. We will assign one slot after matching against e-board interviewer availability.
+                    We will assign one matched interview slot.
                   </p>
                 </div>
 
                 <div className="apply-form__notice">
                   <strong>Timeline</strong>
                   <span>
-                    Monday: candidate form opens. Tuesday: rubric and structure. Wednesday: matching. Thursday-Sunday:
-                    virtual interviews. Monday, May 11: decisions target.
+                    Monday: form opens. Wednesday: matching. Thursday-Sunday: interviews. Monday, May 11: decisions.
                   </span>
                 </div>
 
@@ -449,7 +446,7 @@ export default function Apply() {
                 <AvailabilityPicker
                   selectedValues={form.availability}
                   onChange={updateAvailability}
-                  helper={`Select every slot you can make. Each option reserves a ${INTERVIEW_BLOCK_WITH_BUFFER_LABEL}, and the morning / afternoon / evening shortcuts keep this quick.`}
+                  helper={`Select every slot you can make. ${INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.`}
                 />
 
                 <div className="apply-form__trap" aria-hidden="true">
