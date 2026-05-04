@@ -13,6 +13,7 @@ import Links from './pages/Links'
 import Brand from './pages/Brand'
 import Apply from './pages/Apply'
 import InterviewerAvailability from './pages/InterviewerAvailability'
+import InterviewBooking from './pages/InterviewBooking'
 import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
 
@@ -46,6 +47,8 @@ export default function App() {
         <Route path="/join" element={<Join />} />
         <Route path="/apply" element={<Apply />} />
         <Route path="/portal" element={<Apply />} />
+        <Route path="/interview-signup" element={<InterviewBooking />} />
+        <Route path="/interview-booking" element={<InterviewBooking />} />
         <Route path="/interviewer-availability" element={<InterviewerAvailability />} />
         <Route path="/eboard-availability" element={<InterviewerAvailability />} />
         <Route path="/signin" element={<SignIn />} />

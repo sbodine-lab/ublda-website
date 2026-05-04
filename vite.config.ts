@@ -4,6 +4,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { validateApplicantAccountPayload } from './src/lib/applicantAccount.ts'
 import { buildApplicationSubmission, validateApplicationPayload } from './src/lib/application.ts'
 import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
+import { buildInterviewBookingSubmission, validateInterviewBookingPayload } from './src/lib/interviewBooking.ts'
 import { buildInterviewerAvailabilitySubmission, validateInterviewerAvailabilityPayload } from './src/lib/interviewerAvailability.ts'
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
 
@@ -29,6 +30,13 @@ const sendJson = (res: ServerResponse, statusCode: number, payload: unknown) => 
   res.setHeader('Content-Type', 'application/json')
   res.setHeader('Cache-Control', 'no-store, max-age=0')
   res.end(JSON.stringify(payload))
+}
+
+const bookingStatusCode = (error: unknown) => {
+  const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : ''
+  if (code === 'SLOT_TAKEN' || code === 'ALREADY_BOOKED' || code === 'NO_INTERVIEWER_COVERAGE') return 409
+  if (code === 'INVALID_SLOT') return 400
+  return 500
 }
 
 const devApiPlugin = () => ({
@@ -184,6 +192,55 @@ const devApiPlugin = () => ({
       })
     })
 
+    server.middlewares.use('/api/interview-booking', async (req, res) => {
+      if (req.method === 'GET') {
+        const slots = await store.publicInterviewSlots()
+        sendJson(res, 200, {
+          success: true,
+          timeZone: 'Eastern Time (ET, Ann Arbor)',
+          slots,
+          localPreview: true,
+        })
+        return
+      }
+
+      if (req.method !== 'POST') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const body = await readJsonBody(req)
+
+      if (typeof body.website === 'string' && body.website.trim()) {
+        sendJson(res, 200, { success: true })
+        return
+      }
+
+      const result = validateInterviewBookingPayload(body)
+
+      if (!result.success) {
+        sendJson(res, 400, { error: result.errors[0], errors: result.errors })
+        return
+      }
+
+      try {
+        const submission = buildInterviewBookingSubmission(result.data, req.headers['user-agent'] || '')
+        const booking = await store.bookInterviewSlot(submission)
+
+        sendJson(res, 200, {
+          success: true,
+          candidate: booking.candidate,
+          slot: booking.slot,
+          interviewers: booking.interviewers,
+          email: { sent: false, reason: 'Confirmation email provider is not configured yet.' },
+          localPreview: true,
+        })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Could not book that interview slot.'
+        sendJson(res, bookingStatusCode(error), { success: false, error: message })
+      }
+    })
+
     server.middlewares.use('/api/dashboard-data', async (req, res) => {
       if (req.method !== 'POST') {
         sendJson(res, 405, { error: 'Method not allowed' })
@@ -192,6 +249,15 @@ const devApiPlugin = () => ({
 
       const body = await readJsonBody(req)
       const sessionToken = typeof body.sessionToken === 'string' ? body.sessionToken.trim() : ''
+      if (sessionToken === 'local-preview-session-token') {
+        sendJson(res, 200, {
+          success: true,
+          dashboardData: await store.leadershipDashboardData(),
+          localPreview: true,
+        })
+        return
+      }
+
       const dashboard = await store.dashboardData(sessionToken)
 
       if (!dashboard) {

@@ -64,13 +64,22 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(() => {
+    const tokenToRevoke = sessionToken || window.localStorage.getItem(APPLICANT_SESSION_STORAGE_KEY) || ''
+    if (tokenToRevoke.length >= 24 && tokenToRevoke !== 'local-preview-session-token') {
+      void fetch('/api/applicant-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout', sessionToken: tokenToRevoke }),
+      }).catch(() => undefined)
+    }
+
     window.localStorage.removeItem(APPLICANT_SESSION_STORAGE_KEY)
     setAccount(null)
     setApplication(null)
     setSessionToken('')
     setStatus('signed-out')
     notifySessionChanged()
-  }, [])
+  }, [sessionToken])
 
   const restoreStoredSession = useCallback(async () => {
     const url = new URL(window.location.href)

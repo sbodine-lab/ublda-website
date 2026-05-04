@@ -129,6 +129,11 @@ const mergeById = <T extends Record<string, unknown>>(primary: T[], secondary: T
 }
 
 const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
+  const role = typeof payload.role === 'string' ? payload.role : 'member'
+  if (role !== 'super-admin' && role !== 'exec') {
+    return payload
+  }
+
   const storeDashboardData = await createLocalRecruitingStore().leadershipDashboardData()
   const dashboardData = (payload.dashboardData && typeof payload.dashboardData === 'object'
     ? payload.dashboardData
@@ -183,6 +188,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (verifyLocalSuperAdminSession(sessionToken)) {
     return res.status(200).json(await withRecruitingStoreData(localSuperAdminPayload()))
+  }
+
+  const storeSession = await createLocalRecruitingStore().dashboardData(sessionToken)
+  if (storeSession) {
+    return res.status(200).json(dashboardResponse(await withRecruitingStoreData(storeSession as unknown as Record<string, unknown>)))
   }
 
   if (!scriptUrl) {

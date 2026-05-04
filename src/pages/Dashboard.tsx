@@ -393,7 +393,7 @@ export default function Dashboard() {
   }, [activeTab, requestedTab, tabs])
 
   useEffect(() => {
-    if (!effectiveMember || !isLeadership || !sessionToken || previewingLeadership) {
+    if (!effectiveMember || !isLeadership || (!sessionToken && !previewingLeadership)) {
       return
     }
 
@@ -401,7 +401,7 @@ export default function Dashboard() {
     setDashboardState('loading')
     setDashboardError('')
 
-    readDashboardData(sessionToken)
+    readDashboardData(sessionToken || 'local-preview-session-token')
       .then((nextData) => {
         if (cancelled) return
         setDashboardData(nextData)
@@ -1152,6 +1152,7 @@ export default function Dashboard() {
         <div className="admin-page-heading__actions">
           <button type="button" onClick={applySlateMatch}>Auto-match</button>
           <button type="button" onClick={() => setShowManualEventForm((current) => !current)}>Add event</button>
+          <Link to="/interview-signup">Interview signup</Link>
           <Link to="/apply">Candidate form</Link>
           <Link to="/interviewer-availability">E-board form</Link>
         </div>
@@ -1188,7 +1189,7 @@ export default function Dashboard() {
 
       <div className="admin-dashboard__two admin-dashboard__two--calendar">
         <section className="admin-panel admin-calendar-panel">
-          <div className="admin-panel__title"><h2>Interview calendar</h2><span>{INTERVIEW_BLOCK_MINUTES} min + {INTERVIEW_BUFFER_MINUTES} min buffer spacing</span></div>
+          <div className="admin-panel__title"><h2>Interview calendar</h2><span>{INTERVIEW_BLOCK_MINUTES} min + {INTERVIEW_BUFFER_MINUTES} min buffer spacing · all times ET</span></div>
           <div className="admin-calendar">
             {slotsByDay.map((day) => (
               <section className="admin-calendar__day" key={day.date}>
@@ -1206,7 +1207,10 @@ export default function Dashboard() {
 
                         return (
                           <article className={`admin-coverage-slot ${coverageClass}`} key={slot.value} title={interviewerNames || 'No e-board availability submitted for this slot'}>
-                            <time>{slot.timeLabel.replace(' ET', '')}</time>
+                            <div>
+                              <time>{slot.timeLabel.replace(' ET', '')}</time>
+                              <small>{interviewerNames || 'No e-board availability'}</small>
+                            </div>
                             <strong aria-label={interviewerNames || 'No e-board availability'}>{interviewers.length}</strong>
                           </article>
                         )

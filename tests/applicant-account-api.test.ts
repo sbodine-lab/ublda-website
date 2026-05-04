@@ -243,6 +243,112 @@ test('restores an explicitly enabled Vercel fallback super-admin session', async
   }
 })
 
+test('rejects the hardcoded local preview session token on the API', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-account-api-'))
+
+  delete process.env.GOOGLE_SCRIPT_URL
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'accounts.json')
+
+  try {
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: {
+        action: 'session',
+        sessionToken: 'local-preview-session-token',
+      },
+    }, res)
+
+    assert.equal(result().statusCode, 401)
+    assert.deepEqual(result().payload, { error: 'Session expired. Please sign in again.' })
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('logout revokes a captured local account session token', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-account-api-'))
+
+  delete process.env.GOOGLE_SCRIPT_URL
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'accounts.json')
+
+  try {
+    const created = createResponse()
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: {
+        action: 'create',
+        firstName: 'Logout',
+        lastName: 'Probe',
+        email: 'logout.probe@example.com',
+        password: 'logout-password',
+      },
+    }, created.res)
+    const sessionToken = String((created.result().payload as Record<string, unknown>).sessionToken)
+
+    const logout = createResponse()
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { action: 'logout', sessionToken },
+    }, logout.res)
+    assert.equal(logout.result().statusCode, 200)
+
+    const restored = createResponse()
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { action: 'session', sessionToken },
+    }, restored.res)
+
+    assert.equal(restored.result().statusCode, 401)
+    assert.deepEqual(restored.result().payload, { error: 'Session expired. Please sign in again.' })
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
 test('rate limits repeated password sign-in failures for the same uniqname and IP', async () => {
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
   const originalFetch = globalThis.fetch

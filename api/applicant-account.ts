@@ -39,6 +39,10 @@ type ApplicantAccountRequest =
       sessionToken: string
     }
   | {
+      action: 'logout'
+      sessionToken: string
+    }
+  | {
       action: 'googleSignIn'
       credential: string
       profile?: GoogleProfile
@@ -108,7 +112,7 @@ const validateApplicantAccountPayload = (payload: unknown): ValidationResult => 
   const action = getString(body, 'action')
   const errors: string[] = []
 
-  if (action === 'session') {
+  if (action === 'session' || action === 'logout') {
     const sessionToken = getString(body, 'sessionToken')
     if (sessionToken.length < 24) errors.push('A valid applicant session is required.')
 
@@ -443,6 +447,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
+  if (result.data.action === 'logout') {
+    await createLocalRecruitingStore().deleteSession(result.data.sessionToken)
+    return res.status(200).json({ success: true })
+  }
+
   if (result.data.action === 'googleSignIn') {
     try {
       const account = await verifyGoogleCredential(result.data.credential)
@@ -512,6 +521,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
     if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
     return res.status(200).json(localSuperAdminResponse())
+  }
+
+  if (result.data.action === 'session' && !scriptUrl) {
+    return res.status(401).json({ error: 'Session expired. Please sign in again.' })
   }
 
   if (!scriptUrl) {

@@ -58,12 +58,9 @@ const interviewWindowDays = [
 ] as const
 
 const boardPositionOptions = [
-  'VP of Member Experience',
-  'VP of Events & Programming',
-  'VP of Partnerships & Sponsorships',
-  'VP of Marketing & Community',
-  'VP of Accessibility Projects',
-  'Open to any role',
+  'Events and Programming',
+  'Marketing and Social Media',
+  'Outreach and Partnerships',
 ] as const
 
 const rossStatusOptions = ['ross-bba', 'business-minor', 'non-ross', 'unsure'] as const
@@ -146,7 +143,7 @@ const slotByValue = new Map(interviewSlots.map((slot) => [slot.value, slot]))
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
+  return typeof value === 'string' ? value.replace(/[<>]/g, '').trim() : ''
 }
 
 const normalizeUniqname = (value: unknown) => (
@@ -251,7 +248,7 @@ const validateApplicationPayload = (payload: unknown): ValidationResult => {
   if (!college) errors.push('College or program is required.')
   if (!rossStatusValues.has(rossStatus)) errors.push('Ross/BBA status is required.')
   if (!interestTypeValues.has(interestType)) errors.push('Interest type is required.')
-  if (rolePreferences.length < 3) errors.push('Rank your top three board position interests.')
+  if (rolePreferences.length < 3) errors.push('Rank all three function preferences.')
   if (availability.length === 0) errors.push('Select every interview slot you are available for.')
   if (!resumeFile) {
     errors.push('Resume upload is required.')

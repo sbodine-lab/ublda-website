@@ -1,13 +1,16 @@
-import { randomBytes, pbkdf2Sync, timingSafeEqual } from 'node:crypto'
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
+import { createHash, randomBytes, pbkdf2Sync, timingSafeEqual } from 'node:crypto'
+import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { get, put } from '@vercel/blob'
+import { BlobPreconditionFailedError, del, get, put } from '@vercel/blob'
+import bcrypt from 'bcryptjs'
 import type { ApplicantAccount, ApplicantApplicationSummary } from '../src/lib/applicantAccount.ts'
 import type { ApplicationSubmission } from '../src/lib/application.ts'
 import type { InterviewAssignmentSubmission } from '../src/lib/interviewAssignment.ts'
 import type { InterviewerAvailabilitySubmission } from '../src/lib/interviewerAvailability.ts'
-import { ADMIN_ACCOUNTS, adminAccountForEmail, roleForEmail } from '../src/lib/dashboardAccess.ts'
+import type { InterviewBookingSubmission, PublicInterviewSlot } from '../src/lib/interviewBooking.ts'
+import { ADMIN_ACCOUNTS, adminAccountForEmail } from '../src/lib/dashboardAccess.ts'
 import type { DashboardCalendarEvent, DashboardData } from '../src/lib/dashboardData.ts'
+import { INTERVIEW_SLOTS, getInterviewSlotByValue } from '../src/lib/interviews.ts'
 import type { Candidate, InterviewerAvailability, MemberSignup } from '../src/lib/memberData.ts'
 
 type StoredAccount = ApplicantAccount & {
@@ -34,6 +37,11 @@ type StoredSession = {
   expiresAt: string
 }
 
+type StoredRateLimit = {
+  count: number
+  resetAt: number
+}
+
 type LocalRecruitingData = {
   version: 1
   accounts: Record<string, StoredAccount>
@@ -41,6 +49,12 @@ type LocalRecruitingData = {
   candidates: Record<string, Candidate>
   interviewerAvailability: Record<string, StoredInterviewerAvailability>
   calendarEvents: Record<string, DashboardCalendarEvent>
+  rateLimits: Record<string, StoredRateLimit>
+}
+
+type BlobReadResult = {
+  data: LocalRecruitingData
+  etag: string | null
 }
 
 export type LocalAccountResponse = {
@@ -50,8 +64,13 @@ export type LocalAccountResponse = {
 }
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30
+const BCRYPT_COST = 12
+const PASSWORD_HASH_ALGORITHM = 'bcrypt'
 const BLOB_STATE_PATH = 'recruiting/state.json'
+const BLOB_SLOT_LOCK_PREFIX = 'recruiting/slot-locks'
 export const LOCAL_PREVIEW_SESSION_TOKEN = 'local-preview-session-token'
+const mutationQueues = new Map<string, Promise<unknown>>()
+const BLOB_WRITE_MAX_ATTEMPTS = 5
 
 const emptyData = (): LocalRecruitingData => ({
   version: 1,
@@ -60,6 +79,7 @@ const emptyData = (): LocalRecruitingData => ({
   candidates: {},
   interviewerAvailability: {},
   calendarEvents: {},
+  rateLimits: {},
 })
 
 const defaultDataPath = () => (
@@ -71,9 +91,14 @@ const shouldUseBlobStorage = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 
 const sessionExpiresAt = () => new Date(Date.now() + SESSION_TTL_MS).toISOString()
 
-const hashPassword = (password: string, salt = randomBytes(16).toString('base64url')) => ({
+const legacyHashPassword = (password: string, salt = randomBytes(16).toString('base64url')) => ({
   salt,
   hash: pbkdf2Sync(password, salt, 120_000, 32, 'sha256').toString('base64url'),
+})
+
+const hashPassword = (password: string) => ({
+  salt: PASSWORD_HASH_ALGORITHM,
+  hash: bcrypt.hashSync(password, BCRYPT_COST),
 })
 
 const constantTimeEquals = (left: string, right: string) => {
@@ -84,21 +109,24 @@ const constantTimeEquals = (left: string, right: string) => {
 
 const verifyPassword = (password: string, salt: string, expectedHash: string) => {
   if (!salt || !expectedHash) return false
-  return constantTimeEquals(hashPassword(password, salt).hash, expectedHash)
+  if (salt === PASSWORD_HASH_ALGORITHM || expectedHash.startsWith('$2')) {
+    return bcrypt.compareSync(password, expectedHash)
+  }
+
+  return constantTimeEquals(legacyHashPassword(password, salt).hash, expectedHash)
 }
 
 const createSessionToken = () => `local_${Date.now()}_${randomBytes(18).toString('base64url')}`
 
 const decorateAccount = (account: ApplicantAccount): ApplicantAccount => {
-  const admin = adminAccountForEmail(account.email)
   return {
     firstName: account.firstName,
     lastName: account.lastName,
     uniqname: account.uniqname,
     email: account.email,
-    role: admin?.role || 'member',
-    adminTitle: admin?.title || 'Member',
-    adminScopes: admin?.scopes || [],
+    role: account.role || 'member',
+    adminTitle: account.adminTitle || 'Member',
+    adminScopes: account.adminScopes || [],
   }
 }
 
@@ -129,6 +157,42 @@ const dashboardStatus = (): DashboardData['backendStatus'] => ({
   updatedAt: new Date().toISOString(),
 })
 
+const candidateIdFromEmail = (email: string) => email.replace(/@.*$/, '').replace(/[^a-z0-9._-]+/g, '-').slice(0, 48) || email
+
+const bookingError = (code: string, message: string) => Object.assign(new Error(message), { code })
+
+const isBlobWriteConflict = (error: unknown) => (
+  error instanceof BlobPreconditionFailedError ||
+  (error instanceof Error && /precondition|already exists|overwrite/i.test(error.message))
+)
+
+const slotLockId = (slotValue: string) => createHash('sha256').update(slotValue).digest('base64url')
+
+const bookingSlotRows = (data: LocalRecruitingData): PublicInterviewSlot[] => (
+  INTERVIEW_SLOTS.map((slot) => {
+    const interviewers = Object.values(data.interviewerAvailability)
+      .filter((interviewer) => interviewer.availability.includes(slot.value))
+      .map((interviewer) => interviewer.name)
+      .sort((left, right) => left.localeCompare(right))
+    const bookedCandidate = Object.values(data.candidates).find((candidate) => candidate.assignedSlot === slot.value)
+
+    return {
+      value: slot.value,
+      label: slot.label,
+      dayLabel: slot.dayLabel,
+      shortDayLabel: slot.dayLabel.replace(/^.*?, /, ''),
+      timeLabel: slot.timeLabel,
+      start: slot.start,
+      end: slot.end,
+      startMinutes: slot.startMinutes,
+      interviewerCount: interviewers.length,
+      interviewers,
+      isBooked: Boolean(bookedCandidate),
+      isAvailable: interviewers.length > 0 && !bookedCandidate,
+    }
+  })
+)
+
 const buildDashboardData = (
   data: LocalRecruitingData,
   role: string,
@@ -158,19 +222,26 @@ export class LocalRecruitingStore {
     this.dataPath = dataPath
   }
 
+  private async readBlobData(): Promise<BlobReadResult> {
+    try {
+      const blob = await get(BLOB_STATE_PATH, { access: 'private', useCache: false })
+      if (!blob || blob.statusCode !== 200) {
+        return { data: this.withPreviewAdmin(emptyData()), etag: null }
+      }
+
+      const raw = await new Response(blob.stream).text()
+      return {
+        data: this.withPreviewAdmin(JSON.parse(raw) as LocalRecruitingData),
+        etag: blob.blob.etag,
+      }
+    } catch {
+      return { data: this.withPreviewAdmin(emptyData()), etag: null }
+    }
+  }
+
   private async readData() {
     if (shouldUseBlobStorage()) {
-      try {
-        const blob = await get(BLOB_STATE_PATH, { access: 'private', useCache: false })
-        if (!blob || blob.statusCode !== 200) {
-          return this.withPreviewAdmin(emptyData())
-        }
-
-        const raw = await new Response(blob.stream).text()
-        return this.withPreviewAdmin(JSON.parse(raw) as LocalRecruitingData)
-      } catch {
-        return this.withPreviewAdmin(emptyData())
-      }
+      return (await this.readBlobData()).data
     }
 
     try {
@@ -179,6 +250,16 @@ export class LocalRecruitingStore {
     } catch {
       return this.withPreviewAdmin(emptyData())
     }
+  }
+
+  private async writeBlobData(data: LocalRecruitingData, etag: string | null) {
+    await put(BLOB_STATE_PATH, `${JSON.stringify(data, null, 2)}\n`, {
+      access: 'private',
+      allowOverwrite: Boolean(etag),
+      addRandomSuffix: false,
+      contentType: 'application/json',
+      ...(etag ? { ifMatch: etag } : {}),
+    })
   }
 
   private async writeData(data: LocalRecruitingData) {
@@ -193,9 +274,101 @@ export class LocalRecruitingStore {
     }
 
     await mkdir(path.dirname(this.dataPath), { recursive: true })
-    const tempPath = `${this.dataPath}.${process.pid}.tmp`
+    const tempPath = `${this.dataPath}.${process.pid}.${randomBytes(6).toString('base64url')}.tmp`
     await writeFile(tempPath, `${JSON.stringify(data, null, 2)}\n`)
     await rename(tempPath, this.dataPath)
+  }
+
+  private localSlotLockPath(slotValue: string) {
+    return path.join(path.dirname(this.dataPath), 'slot-locks', `${slotLockId(slotValue)}.json`)
+  }
+
+  private blobSlotLockPath(slotValue: string) {
+    return `${BLOB_SLOT_LOCK_PREFIX}/${slotLockId(slotValue)}.json`
+  }
+
+  private async releaseBookingLock(slotValue: string) {
+    if (shouldUseBlobStorage()) {
+      await del(this.blobSlotLockPath(slotValue)).catch(() => undefined)
+      return
+    }
+
+    await unlink(this.localSlotLockPath(slotValue)).catch(() => undefined)
+  }
+
+  private async acquireBookingLock(submission: InterviewBookingSubmission) {
+    const payload = `${JSON.stringify({
+      slotValue: submission.slotValue,
+      email: submission.email,
+      submissionId: submission.submissionId,
+      createdAt: new Date().toISOString(),
+    }, null, 2)}\n`
+
+    try {
+      if (shouldUseBlobStorage()) {
+        await put(this.blobSlotLockPath(submission.slotValue), payload, {
+          access: 'private',
+          addRandomSuffix: false,
+          allowOverwrite: false,
+          contentType: 'application/json',
+        })
+      } else {
+        const lockPath = this.localSlotLockPath(submission.slotValue)
+        await mkdir(path.dirname(lockPath), { recursive: true })
+        const file = await open(lockPath, 'wx')
+        try {
+          await file.writeFile(payload)
+        } finally {
+          await file.close()
+        }
+      }
+    } catch (error) {
+      if (
+        isBlobWriteConflict(error) ||
+        (error && typeof error === 'object' && 'code' in error && (error as { code?: unknown }).code === 'EEXIST')
+      ) {
+        throw bookingError('SLOT_TAKEN', 'That slot was just booked. Please choose another time.')
+      }
+
+      throw error
+    }
+
+    return () => this.releaseBookingLock(submission.slotValue)
+  }
+
+  private async updateData<T>(mutator: (data: LocalRecruitingData) => T | Promise<T>): Promise<T> {
+    if (shouldUseBlobStorage()) {
+      for (let attempt = 0; attempt < BLOB_WRITE_MAX_ATTEMPTS; attempt += 1) {
+        const { data, etag } = await this.readBlobData()
+        const result = await mutator(data)
+
+        try {
+          await this.writeBlobData(data, etag)
+          return result
+        } catch (error) {
+          if (!isBlobWriteConflict(error) || attempt === BLOB_WRITE_MAX_ATTEMPTS - 1) {
+            throw error
+          }
+        }
+      }
+
+      throw bookingError('WRITE_CONFLICT', 'Could not save that change. Please try again.')
+    }
+
+    const key = shouldUseBlobStorage() ? `blob:${BLOB_STATE_PATH}` : `file:${this.dataPath}`
+    const previous = mutationQueues.get(key) || Promise.resolve()
+
+    const next = previous
+      .catch(() => undefined)
+      .then(async () => {
+        const data = await this.readData()
+        const result = await mutator(data)
+        await this.writeData(data)
+        return result
+      })
+
+    mutationQueues.set(key, next.catch(() => undefined))
+    return next
   }
 
   private withPreviewAdmin(data: LocalRecruitingData) {
@@ -203,6 +376,7 @@ export class LocalRecruitingStore {
     const email = 'sbodine@umich.edu'
     const existing = data.accounts[email]
     data.calendarEvents ||= {}
+    data.rateLimits ||= {}
 
     data.accounts[email] = {
       firstName: existing?.firstName || 'Sam',
@@ -217,10 +391,7 @@ export class LocalRecruitingStore {
       passwordHash: existing?.passwordHash || '',
       application: existing?.application || null,
     }
-    data.sessions[LOCAL_PREVIEW_SESSION_TOKEN] = {
-      email,
-      expiresAt: sessionExpiresAt(),
-    }
+    delete data.sessions[LOCAL_PREVIEW_SESSION_TOKEN]
 
     return data
   }
@@ -284,6 +455,10 @@ export class LocalRecruitingStore {
   }
 
   async restoreSession(sessionToken: string): Promise<LocalAccountResponse | null> {
+    if (sessionToken === LOCAL_PREVIEW_SESSION_TOKEN) {
+      return null
+    }
+
     const data = await this.readData()
     const session = data.sessions[sessionToken]
 
@@ -301,6 +476,24 @@ export class LocalRecruitingStore {
       sessionToken,
       application: account.application,
     }
+  }
+
+  async deleteSession(sessionToken: string) {
+    return this.updateData((data) => {
+      const session = data.sessions[sessionToken]
+      delete data.sessions[sessionToken]
+
+      if (session) {
+        const account = data.accounts[session.email]
+        if (account?.sessionToken === sessionToken) {
+          account.sessionToken = ''
+          account.sessionExpiresAt = new Date(0).toISOString()
+          account.updatedAt = new Date().toISOString()
+        }
+      }
+
+      return { deleted: Boolean(session) }
+    })
   }
 
   async saveApplication(submission: ApplicationSubmission) {
@@ -374,6 +567,113 @@ export class LocalRecruitingStore {
     return { updatedCandidate: Boolean(candidate) }
   }
 
+  async publicInterviewSlots() {
+    const data = await this.readData()
+    return bookingSlotRows(data)
+  }
+
+  async consumeRateLimit(key: string, maxAttempts: number, windowMs: number) {
+    return this.updateData((data) => {
+      data.rateLimits ||= {}
+
+      const now = Date.now()
+      const existing = data.rateLimits[key]
+      if (!existing || existing.resetAt <= now) {
+        data.rateLimits[key] = { count: 1, resetAt: now + windowMs }
+        return { limited: false, retryAfterSeconds: 0 }
+      }
+
+      existing.count += 1
+
+      return {
+        limited: existing.count > maxAttempts,
+        retryAfterSeconds: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
+      }
+    })
+  }
+
+  async bookInterviewSlot(submission: InterviewBookingSubmission) {
+    const preflightData = await this.readData()
+    const slot = getInterviewSlotByValue(submission.slotValue)
+    if (!slot) {
+      throw bookingError('INVALID_SLOT', 'Choose a valid interview slot.')
+    }
+
+    const preflightInterviewers = Object.values(preflightData.interviewerAvailability)
+      .filter((interviewer) => interviewer.availability.includes(submission.slotValue))
+
+    if (preflightInterviewers.length === 0) {
+      throw bookingError('NO_INTERVIEWER_COVERAGE', 'That slot no longer has e-board interviewer coverage.')
+    }
+
+    const preflightBookedCandidate = Object.values(preflightData.candidates).find((candidate) => candidate.assignedSlot === submission.slotValue)
+    if (preflightBookedCandidate && preflightBookedCandidate.email !== submission.email) {
+      throw bookingError('SLOT_TAKEN', 'That slot was just booked. Please choose another time.')
+    }
+
+    const preflightExistingCandidate = preflightData.candidates[submission.email]
+    if (preflightExistingCandidate?.assignedSlot && preflightExistingCandidate.assignedSlot !== submission.slotValue) {
+      throw bookingError('ALREADY_BOOKED', 'This email already has an interview slot. Email sbodine@umich.edu if you need to reschedule.')
+    }
+
+    const releaseLock = await this.acquireBookingLock(submission)
+
+    try {
+      return await this.updateData((data) => {
+        const availableInterviewers = Object.values(data.interviewerAvailability)
+          .filter((interviewer) => interviewer.availability.includes(submission.slotValue))
+          .sort((left, right) => left.name.localeCompare(right.name))
+
+        if (availableInterviewers.length === 0) {
+          throw bookingError('NO_INTERVIEWER_COVERAGE', 'That slot no longer has e-board interviewer coverage.')
+        }
+
+        const bookedCandidate = Object.values(data.candidates).find((candidate) => candidate.assignedSlot === submission.slotValue)
+        if (bookedCandidate && bookedCandidate.email !== submission.email) {
+          throw bookingError('SLOT_TAKEN', 'That slot was just booked. Please choose another time.')
+        }
+
+        const existingCandidate = data.candidates[submission.email]
+        if (existingCandidate?.assignedSlot && existingCandidate.assignedSlot !== submission.slotValue) {
+          throw bookingError('ALREADY_BOOKED', 'This email already has an interview slot. Email sbodine@umich.edu if you need to reschedule.')
+        }
+
+        const interviewers = availableInterviewers.slice(0, 2).map((interviewer) => interviewer.name)
+        const rolePreferences = submission.rolePreferences?.length
+          ? submission.rolePreferences
+          : existingCandidate?.rolePreferences?.length
+            ? existingCandidate.rolePreferences
+            : [submission.roleInterest || 'Open function preference'].filter(Boolean)
+        const feedbackNotes = [
+          existingCandidate?.feedback || '',
+          submission.conflicts ? `Booking notes: ${submission.conflicts}` : '',
+        ].filter(Boolean).join('\n')
+
+        data.candidates[submission.email] = {
+          id: existingCandidate?.id || candidateIdFromEmail(submission.email),
+          name: `${submission.firstName} ${submission.lastName}`.trim() || submission.email,
+          program: existingCandidate?.program || 'Interview slot signup',
+          email: submission.email,
+          rolePreferences,
+          status: 'Invited',
+          availability: existingCandidate?.availability?.length ? existingCandidate.availability : [submission.slotValue],
+          resumeUrl: existingCandidate?.resumeUrl || '',
+          assignedSlot: submission.slotValue,
+          interviewers,
+          feedback: feedbackNotes,
+        }
+
+        return {
+          candidate: data.candidates[submission.email],
+          slot,
+          interviewers,
+        }
+      })
+    } finally {
+      await releaseLock()
+    }
+  }
+
   async saveCalendarEvent(event: DashboardCalendarEvent) {
     const data = await this.readData()
     data.calendarEvents[event.id] = event
@@ -394,7 +694,7 @@ export class LocalRecruitingStore {
     if (!session) return null
 
     const data = await this.readData()
-    const role = roleForEmail(session.account.email)
+    const role = session.account.role || 'member'
 
     return {
       account: session.account,

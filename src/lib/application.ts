@@ -119,7 +119,7 @@ const resumeFileExtensionValues = new Set<string>(RESUME_FILE_EXTENSIONS)
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
+  return typeof value === 'string' ? value.replace(/[<>]/g, '').trim() : ''
 }
 
 export const countWords = (value: string) => value.trim().split(/\s+/).filter(Boolean).length
@@ -154,11 +154,11 @@ const statusForRossStatus = (rossStatus: RossStatus): ApplicationStatus => {
 }
 
 const createSubmissionId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `app_${crypto.randomUUID()}`
+  if (typeof crypto === 'undefined' || !('randomUUID' in crypto)) {
+    throw new Error('A secure random source is required to submit an application.')
   }
 
-  return `app_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  return `app_${crypto.randomUUID()}`
 }
 
 const getResumeFile = (payload: Record<string, unknown>): ResumeFilePayload | null => {
@@ -215,7 +215,7 @@ export const validateApplicationPayload = (payload: unknown): ValidationResult =
   if (!college) errors.push('College or program is required.')
   if (!rossStatusValues.has(rossStatus)) errors.push('Ross/BBA status is required.')
   if (!interestTypeValues.has(interestType)) errors.push('Interest type is required.')
-  if (rolePreferences.length < 3) errors.push('Rank your top three board position interests.')
+  if (rolePreferences.length < 3) errors.push('Rank all three function preferences.')
   if (availability.length === 0) errors.push('Select every interview slot you are available for.')
   if (!resumeFile) {
     errors.push('Resume upload is required.')

@@ -28,7 +28,7 @@ test('accepts a complete Ross interview signup with a resume drop', () => {
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value, INTERVIEW_SLOTS[28].value],
     resumeFile,
   })
@@ -36,7 +36,7 @@ test('accepts a complete Ross interview signup with a resume drop', () => {
   assert.equal(result.success, true)
   assert.equal(result.data?.email, 'sbodine@umich.edu')
   assert.equal(result.data?.status, 'Interview eligible')
-  assert.equal(result.data?.preferredRole, 'VP of Events & Programming')
+  assert.equal(result.data?.preferredRole, 'Events and Programming')
   assert.equal(result.data?.rolePreferences.length, 3)
   assert.equal(result.data?.availability.length, 3)
   assert.equal(result.data?.interviewSlot.label, 'Thu, May 7, 8:00 AM-8:30 AM ET')
@@ -52,13 +52,32 @@ test('keeps non-Ross students in the future role pool instead of rejecting them'
     expectedGraduation: 'May 2029',
     college: 'LSA',
     rossStatus: 'non-ross',
-    rolePreferences: ['Open to any role', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[10].value],
     resumeFile,
   })
 
   assert.equal(result.success, true)
   assert.equal(result.data?.status, 'Future role pool')
+})
+
+test('strips raw markup delimiters from stored application text fields', () => {
+  const result = validateApplicationPayload({
+    firstName: '<script>Sam</script>',
+    lastName: '<img src=x onerror=alert(1)>',
+    uniqname: 'markup-probe',
+    year: 'Junior',
+    expectedGraduation: 'May 2028',
+    college: '<b>Ross BBA</b>',
+    rossStatus: 'ross-bba',
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
+    availability: [INTERVIEW_SLOTS[0].value],
+    notes: '<script>alert(1)</script>',
+    resumeFile,
+  })
+
+  assert.equal(result.success, true)
+  assert.equal(/[<>]/.test(`${result.data?.firstName} ${result.data?.lastName} ${result.data?.college} ${result.data?.notes}`), false)
 })
 
 test('requires at least one available interview slot because matching happens later', () => {
@@ -70,7 +89,7 @@ test('requires at least one available interview slot because matching happens la
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     resumeFile,
   })
 
@@ -78,7 +97,7 @@ test('requires at least one available interview slot because matching happens la
   assert.match(result.errors[0], /interview slot/i)
 })
 
-test('requires three ranked board position interests', () => {
+test('requires all three ranked function preferences', () => {
   const result = validateApplicationPayload({
     firstName: 'Sam',
     lastName: 'Bodine',
@@ -87,13 +106,13 @@ test('requires three ranked board position interests', () => {
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming'],
+    rolePreferences: ['Events and Programming'],
     availability: [INTERVIEW_SLOTS[0].value],
     resumeFile,
   })
 
   assert.equal(result.success, false)
-  assert.match(result.errors[0], /top three/i)
+  assert.match(result.errors[0], /function/i)
 })
 
 test('requires a valid resume file upload', () => {
@@ -105,7 +124,7 @@ test('requires a valid resume file upload', () => {
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[0].value],
   })
 
@@ -120,7 +139,7 @@ test('requires a valid resume file upload', () => {
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[0].value],
     resumeFile: {
       name: 'resume.png',
@@ -141,7 +160,7 @@ test('requires a valid resume file upload', () => {
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[0].value],
     resumeFile: {
       name: 'resume.docx',
@@ -163,7 +182,7 @@ test('builds a submission with a stable dedupe key and generated submission id',
     expectedGraduation: 'May 2028',
     college: 'Ross BBA',
     rossStatus: 'ross-bba',
-    rolePreferences: ['Open to any role', 'VP of Member Experience', 'VP of Marketing & Community'],
+    rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
     availability: [INTERVIEW_SLOTS[17].value, INTERVIEW_SLOTS[18].value],
     resumeFile,
   })
