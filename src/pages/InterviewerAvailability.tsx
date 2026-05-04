@@ -91,9 +91,7 @@ export default function InterviewerAvailability() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="apply-page__intro">
-              Submit all times you can help interview between {INTERVIEW_DAY_RANGE_LABEL}.
-              Candidate matching will happen Wednesday, so Sunday night availability helps
-              keep the compressed timeline realistic.
+              Select the {INTERVIEW_DAY_RANGE_LABEL} slots you can cover.
             </p>
           </Reveal>
         </div>
@@ -111,7 +109,7 @@ export default function InterviewerAvailability() {
                 </div>
                 <h2 className="apply-form__success-title">Availability saved.</h2>
                 <p className="apply-form__success-desc">
-                  Thanks. Admins can now compare your free slots against candidate availability while assigning Google Meet interviews.
+                  Thanks. Your slots are saved for interview matching.
                 </p>
                 <Link to="/dashboard" className="btn btn--ghost">
                   Back to Dashboard
@@ -123,9 +121,9 @@ export default function InterviewerAvailability() {
               <form className="apply-form" onSubmit={handleSubmit}>
                 <div className="apply-form__header">
                   <p className="section__label">Interviewer Form</p>
-                  <h2 className="apply-form__title">Quick availability pass.</h2>
+                  <h2 className="apply-form__title">Your availability.</h2>
                   <p className="apply-form__subtitle">
-                    Select every slot you can help cover. Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
+                    Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
                   </p>
                 </div>
 
@@ -177,7 +175,7 @@ export default function InterviewerAvailability() {
                   legend="Availability"
                   selectedValues={form.availability}
                   onChange={updateAvailability}
-                  helper={`Use Select day or the morning / afternoon / evening shortcuts when your coverage is broad. Each selected slot reserves a ${INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.`}
+                  helper="Shortcuts or exact times."
                 />
 
                 <div className="apply-form__trap" aria-hidden="true">
