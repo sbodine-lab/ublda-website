@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response = await fetch(scriptUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ firstName, lastName, uniqname, year, college: major }),
+      body: JSON.stringify({ formType: 'generalMember', firstName, lastName, uniqname, year, college: major }),
     })
 
     if (!response.ok) {

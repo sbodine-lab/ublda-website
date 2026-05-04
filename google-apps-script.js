@@ -109,28 +109,50 @@ var GENERAL_MEMBER_HEADERS = [
 function doPost(e) {
   try {
     var data = JSON.parse((e.postData && e.postData.contents) || "{}");
+    var formType = safeString_(data.formType);
 
-    if (data.formType === "leadershipInterest" || data.formType === "eboardApplication") {
+    if (formType === "leadershipInterest" || formType === "eboardApplication") {
       return handleLeadershipInterest(data);
     }
 
-    if (data.formType === "applicantAccount") {
+    if (formType === "applicantAccount") {
       return handleApplicantAccount(data);
     }
 
-    if (data.formType === "interviewerAvailability") {
+    if (formType === "interviewerAvailability" || isInterviewerAvailabilityPayload_(data)) {
       return handleInterviewerAvailability(data);
     }
 
-    if (data.formType === "interviewAssignment") {
+    if (formType === "interviewAssignment") {
       return handleInterviewAssignment(data);
     }
 
-    return handleGeneralMember(data);
+    if (formType === "generalMember" || isGeneralMemberPayload_(data)) {
+      return handleGeneralMember(data);
+    }
+
+    return jsonResponse_({ success: false, error: "Unsupported form type." });
   } catch (error) {
     MailApp.sendEmail(OWNER_EMAIL, "UBLDA form error", String(error && error.stack ? error.stack : error));
     return jsonResponse_({ success: false, error: "Could not process submission" });
   }
+}
+
+function isInterviewerAvailabilityPayload_(data) {
+  return !safeString_(data.formType) && (
+    Array.isArray(data.availability) ||
+    Array.isArray(data.interviewAvailability) ||
+    safeString_(data.maxInterviews)
+  );
+}
+
+function isGeneralMemberPayload_(data) {
+  return !safeString_(data.formType) &&
+    safeString_(data.firstName) &&
+    safeString_(data.lastName) &&
+    (safeString_(data.uniqname) || safeString_(data.email)) &&
+    !Array.isArray(data.availability) &&
+    !Array.isArray(data.interviewAvailability);
 }
 
 function setupLeadershipInterestSheet() {
