@@ -85,27 +85,19 @@ test('creates an applicant account through the configured script backend', async
   }
 })
 
-test('signs Sam in with the configured super-admin password before creating a backend session', async () => {
+test('signs Sam in with the configured super-admin password without touching the legacy script when fallback is enabled', async () => {
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
   const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
   const originalFetch = globalThis.fetch
-  let forwardedBody: Record<string, unknown> | null = null
+  let fetchCalled = false
 
   process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
   process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
-  globalThis.fetch = async (_url, init) => {
-    forwardedBody = JSON.parse(String(init?.body || '{}'))
-    return new Response(JSON.stringify({
-      success: true,
-      sessionToken: 'token-token-token-token-token-token',
-      account: {
-        firstName: 'Sam',
-        lastName: 'Bodine',
-        uniqname: 'sbodine',
-        email: 'sbodine@umich.edu',
-      },
-      application: null,
-    }), { status: 200 })
+  process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
+  globalThis.fetch = async () => {
+    fetchCalled = true
+    return new Response(JSON.stringify({ success: false }), { status: 500 })
   }
 
   try {
@@ -125,9 +117,10 @@ test('signs Sam in with the configured super-admin password before creating a ba
     }, res)
 
     assert.equal(result().statusCode, 200)
-    assert.equal((result().payload as Record<string, unknown>).success, true)
-    assert.equal(forwardedBody?.action, 'googleSignIn')
-    assert.equal((forwardedBody?.account as Record<string, unknown>).email, 'sbodine@umich.edu')
+    const payload = result().payload as Record<string, unknown>
+    assert.equal(payload.success, true)
+    assert.equal((payload.account as Record<string, unknown>).email, 'sbodine@umich.edu')
+    assert.equal(fetchCalled, false)
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL
@@ -138,6 +131,11 @@ test('signs Sam in with the configured super-admin password before creating a ba
       delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
     } else {
       process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
+    }
+    if (originalFallback === undefined) {
+      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+    } else {
+      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
     }
     globalThis.fetch = originalFetch
   }

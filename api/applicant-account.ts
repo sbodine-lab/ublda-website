@@ -471,12 +471,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
-  if (!scriptUrl) {
-    if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
-      if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
-      return res.status(200).json(localSuperAdminResponse())
-    }
+  if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
+    if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
+    return res.status(200).json(localSuperAdminResponse())
+  }
 
+  if (!scriptUrl) {
     return res.status(500).json({ error: 'Form backend not configured' })
   }
 

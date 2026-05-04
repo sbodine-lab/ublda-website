@@ -145,55 +145,22 @@ test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () 
   }
 })
 
-test('uses a live sheet dashboard for an enabled Vercel fallback Sam session when the script backend exists', async () => {
+test('keeps an enabled Vercel fallback Sam dashboard off the legacy script backend', async () => {
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
   const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
   const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
   const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
   const originalFetch = globalThis.fetch
   const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
-  const forwardedBodies: Record<string, unknown>[] = []
+  let fetchCalled = false
 
   process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
   process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
   process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
   process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
-  globalThis.fetch = async (_url, init) => {
-    const body = JSON.parse(String(init?.body || '{}'))
-    forwardedBodies.push(body)
-
-    if (body.action === 'googleSignIn') {
-      return new Response(JSON.stringify({
-        success: true,
-        sessionToken: 'sheet-session-token-sheet-session-token',
-        account: {
-          firstName: 'Sam',
-          lastName: 'Bodine',
-          uniqname: 'sbodine',
-          email: 'sbodine@umich.edu',
-        },
-      }), { status: 200 })
-    }
-
-    return new Response(JSON.stringify({
-      success: true,
-      role: 'super-admin',
-      dashboardData: {
-        interviewerAvailability: [
-          {
-            name: 'Sam Bodine',
-            role: 'Super Admin',
-            availability: ['2026-05-07T08:00:00-04:00/2026-05-07T08:30:00-04:00'],
-            maxInterviews: '2',
-          },
-        ],
-        backendStatus: {
-          source: 'sheets',
-          message: 'Loaded from Google Sheets',
-          updatedAt: '2026-05-04T00:00:00.000Z',
-        },
-      },
-    }), { status: 200 })
+  globalThis.fetch = async () => {
+    fetchCalled = true
+    return new Response(JSON.stringify({ success: false }), { status: 500 })
   }
 
   try {
@@ -208,11 +175,8 @@ test('uses a live sheet dashboard for an enabled Vercel fallback Sam session whe
     assert.equal(result().statusCode, 200)
     const payload = result().payload as Record<string, unknown>
     const dashboardData = payload.dashboardData as Record<string, unknown>
-    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'sheets')
-    assert.equal((dashboardData.interviewerAvailability as unknown[]).length, 1)
-    assert.equal(forwardedBodies[0].action, 'googleSignIn')
-    assert.equal(forwardedBodies[1].action, 'dashboardData')
-    assert.equal(forwardedBodies[1].sessionToken, 'sheet-session-token-sheet-session-token')
+    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'vercel')
+    assert.equal(fetchCalled, false)
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL

@@ -71,13 +71,6 @@ const localSuperAdminPayload = () => ({
   },
 })
 
-const superAdminAccount = {
-  firstName: 'Sam',
-  lastName: 'Bodine',
-  uniqname: 'sbodine',
-  email: 'sbodine@umich.edu',
-}
-
 const getSessionToken = (body: unknown) => {
   if (!body || typeof body !== 'object') return ''
   const token = (body as Record<string, unknown>).sessionToken
@@ -113,25 +106,6 @@ const fetchSheetDashboard = async (
   action: 'dashboardData',
   sessionToken,
 }, signal)
-
-const fetchSheetDashboardForLocalSuperAdmin = async (
-  scriptUrl: string,
-  signal: AbortSignal,
-) => {
-  const signInPayload = await fetchScriptJson(scriptUrl, {
-    formType: 'applicantAccount',
-    action: 'googleSignIn',
-    account: superAdminAccount,
-    origin: 'https://ublda.org',
-  }, signal)
-  const sheetSessionToken = typeof signInPayload?.sessionToken === 'string' ? signInPayload.sessionToken : ''
-
-  if (sheetSessionToken.length < 24) {
-    throw new Error('Could not create a live dashboard session.')
-  }
-
-  return fetchSheetDashboard(scriptUrl, sheetSessionToken, signal)
-}
 
 const dashboardResponse = (payload: Record<string, unknown>) => ({
   success: true,
@@ -203,11 +177,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
-  if (!scriptUrl) {
-    if (verifyLocalSuperAdminSession(sessionToken)) {
-      return res.status(200).json(await withRecruitingStoreData(localSuperAdminPayload()))
-    }
+  if (verifyLocalSuperAdminSession(sessionToken)) {
+    return res.status(200).json(await withRecruitingStoreData(localSuperAdminPayload()))
+  }
 
+  if (!scriptUrl) {
     return res.status(500).json({ error: 'Dashboard backend not configured' })
   }
 
@@ -215,22 +189,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const timeout = setTimeout(() => controller.abort(), 8000)
 
   try {
-    const payload = verifyLocalSuperAdminSession(sessionToken)
-      ? await fetchSheetDashboardForLocalSuperAdmin(scriptUrl, controller.signal)
-      : await fetchSheetDashboard(scriptUrl, sessionToken, controller.signal)
+    const payload = await fetchSheetDashboard(scriptUrl, sessionToken, controller.signal)
     const mergedPayload = await withRecruitingStoreData(payload)
 
     return res.status(200).json(dashboardResponse(mergedPayload))
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Could not load dashboard data.'
-
-    if (verifyLocalSuperAdminSession(sessionToken)) {
-      const localPayload = await withRecruitingStoreData(localSuperAdminPayload())
-      return res.status(200).json({
-        ...localPayload,
-        warning: message || 'Could not load live sheet data.',
-      })
-    }
 
     const authFailure = /session|required|auth|authorized|permission/i.test(message)
     return res.status(authFailure ? 401 : 500).json({ error: message || 'Could not load dashboard data' })
