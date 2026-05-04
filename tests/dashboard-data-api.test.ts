@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createHmac } from 'node:crypto'
 import { test } from 'node:test'
 import handler from '../api/dashboard-data.ts'
 
@@ -21,6 +22,16 @@ const createResponse = () => {
       return { statusCode, payload }
     },
   }
+}
+
+const createLocalAdminToken = (secret: string) => {
+  const payload = Buffer.from(JSON.stringify({
+    email: 'sbodine@umich.edu',
+    exp: Date.now() + 1000 * 60 * 60,
+  })).toString('base64url')
+  const signature = createHmac('sha256', secret).update(payload).digest('base64url')
+
+  return `ublda_admin.${payload}.${signature}`
 }
 
 test('loads dashboard data through the configured account backend', async () => {
@@ -78,4 +89,96 @@ test('rejects dashboard data requests without a session', async () => {
   }, res)
 
   assert.equal(result().statusCode, 401)
+})
+
+test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+
+  delete process.env.GOOGLE_SCRIPT_URL
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
+  process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
+
+  try {
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { sessionToken: createLocalAdminToken('secure-password') },
+    }, res)
+
+    assert.equal(result().statusCode, 200)
+    const payload = result().payload as Record<string, unknown>
+    assert.equal(payload.success, true)
+    const dashboardData = payload.dashboardData as Record<string, unknown>
+    assert.deepEqual(dashboardData.candidates, [])
+    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'vercel')
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalPassword === undefined) {
+      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
+    } else {
+      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
+    }
+    if (originalFallback === undefined) {
+      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+    } else {
+      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
+    }
+  }
+})
+
+test('does not accept a Vercel fallback dashboard token when fallback is disabled', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+  const originalFetch = globalThis.fetch
+  let forwarded = false
+
+  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
+  delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+  globalThis.fetch = async () => {
+    forwarded = true
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'A valid member session is required.',
+    }), { status: 200 })
+  }
+
+  try {
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { sessionToken: createLocalAdminToken('secure-password') },
+    }, res)
+
+    assert.equal(result().statusCode, 401)
+    assert.equal(forwarded, true)
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalPassword === undefined) {
+      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
+    } else {
+      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
+    }
+    if (originalFallback === undefined) {
+      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
+    } else {
+      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
+    }
+    globalThis.fetch = originalFetch
+  }
 })

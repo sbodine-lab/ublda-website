@@ -5,6 +5,8 @@ var INTERVIEWER_AVAILABILITY_SHEET_NAME = "Interviewer Availability";
 var GENERAL_MEMBERS_SHEET_NAME = "General Members";
 var RESUME_FOLDER_PROPERTY = "UBLDA_RESUME_FOLDER_ID";
 var SESSION_TTL_DAYS = 30;
+var PASSWORD_HASH_VERSION = "v2";
+var PASSWORD_HASH_ITERATIONS = 2500;
 
 var ADMIN_ACCOUNTS = [
   {
@@ -91,7 +93,9 @@ var APPLICANT_ACCOUNT_HEADERS = [
   "Submission Count",
   "Password Salt",
   "Password Hash",
-  "Password Updated At"
+  "Password Updated At",
+  "Password Version",
+  "Email Verified At"
 ];
 
 var GENERAL_MEMBER_HEADERS = [
@@ -464,8 +468,21 @@ function handleApplicantAccount(data) {
       }
 
       var signInValues = sheet.getRange(existingRow, 1, 1, APPLICANT_ACCOUNT_HEADERS.length).getValues()[0];
-      if (!passwordMatches_(data.password, signInValues[12], signInValues[13])) {
+      var passwordCheck = verifyPassword_(data.password, signInValues[12], signInValues[13], signInValues[15]);
+      if (!passwordCheck.matches) {
         return jsonResponse_({ success: false, error: "Invalid uniqname or password." });
+      }
+
+      if (!signInValues[16]) {
+        var verifyToken = createSessionToken_();
+        var verifyTokenHash = hashToken_(verifyToken);
+        sheet.getRange(existingRow, 7, 1, 2).setValues([[verifyTokenHash, sessionExpiresAt_()]]);
+        sendApplicantPortalLink_(email, verifyToken, safeString_(data.origin));
+        return jsonResponse_({
+          success: false,
+          code: "EMAIL_VERIFICATION_REQUIRED",
+          error: "Check your UMich email to finish setting up your account before signing in."
+        });
       }
 
       var signInToken = createSessionToken_();
@@ -480,6 +497,11 @@ function handleApplicantAccount(data) {
         signInApplication ? signInApplication.row : "",
         signInApplication ? signInApplication.submissionCount : ""
       ]]);
+      if (passwordCheck.needsUpgrade) {
+        var upgradedSalt = createPasswordSalt_();
+        var upgradedHash = hashPassword_(data.password, upgradedSalt, PASSWORD_HASH_VERSION);
+        sheet.getRange(existingRow, 13, 1, 4).setValues([[upgradedSalt, upgradedHash, new Date(), PASSWORD_HASH_VERSION]]);
+      }
 
       return jsonResponse_({
         success: true,
@@ -493,6 +515,14 @@ function handleApplicantAccount(data) {
       return jsonResponse_({ success: false, error: "Applicant account action is invalid." });
     }
 
+    if (action === "create" && existingRow) {
+      return jsonResponse_({
+        success: false,
+        code: "ACCOUNT_EXISTS",
+        error: "An account already exists for that uniqname. Sign in or request a new email link."
+      });
+    }
+
     var now = new Date();
     var token = createSessionToken_();
     var tokenHash = hashToken_(token);
@@ -503,11 +533,18 @@ function handleApplicantAccount(data) {
     var passwordSalt = existingValues[12] || "";
     var passwordHash = existingValues[13] || "";
     var passwordUpdatedAt = existingValues[14] || "";
+    var passwordVersion = existingValues[15] || "";
+    var emailVerifiedAt = existingValues[16] || "";
 
     if (action === "create" && safeString_(data.password)) {
       passwordSalt = createPasswordSalt_();
-      passwordHash = hashPassword_(data.password, passwordSalt);
+      passwordHash = hashPassword_(data.password, passwordSalt, PASSWORD_HASH_VERSION);
       passwordUpdatedAt = now;
+      passwordVersion = PASSWORD_HASH_VERSION;
+    }
+
+    if (action === "googleSignIn" && !emailVerifiedAt) {
+      emailVerifiedAt = now;
     }
 
     var row = [
@@ -525,7 +562,9 @@ function handleApplicantAccount(data) {
       application ? application.submissionCount : "",
       passwordSalt,
       passwordHash,
-      passwordUpdatedAt
+      passwordUpdatedAt,
+      passwordVersion,
+      emailVerifiedAt
     ];
 
     if (existingRow) {
@@ -536,6 +575,11 @@ function handleApplicantAccount(data) {
 
     if (action === "create") {
       sendApplicantPortalLink_(email, token, safeString_(data.origin));
+      return jsonResponse_({
+        success: true,
+        magicLinkSent: true,
+        accountCreated: true
+      });
     }
 
     return jsonResponse_({
@@ -558,7 +602,13 @@ function handleApplicantSession_(sheet, data) {
 
   var values = session.values;
   var application = applicationSummaryForEmail_(safeString_(values[2]));
-  sheet.getRange(session.rowNumber, 9).setValue(new Date());
+  var now = new Date();
+  sheet.getRange(session.rowNumber, 9).setValue(now);
+
+  if (!values[16]) {
+    sheet.getRange(session.rowNumber, 17).setValue(now);
+    values[16] = now;
+  }
 
   if (application) {
     sheet.getRange(session.rowNumber, 10, 1, 3).setValues([[application.status, application.row, application.submissionCount]]);
@@ -1100,19 +1150,43 @@ function createPasswordSalt_() {
   return Utilities.getUuid() + "-" + Utilities.getUuid();
 }
 
-function hashPassword_(password, salt) {
+function legacyHashPassword_(password, salt) {
   return hashToken_(safeString_(salt) + ":" + safeString_(password));
 }
 
-function passwordMatches_(password, salt, passwordHash) {
-  var storedSalt = safeString_(salt);
-  var storedHash = safeString_(passwordHash);
-
-  if (!storedSalt || !storedHash || !safeString_(password)) {
-    return false;
+function hashPassword_(password, salt, version) {
+  if (version !== PASSWORD_HASH_VERSION) {
+    return legacyHashPassword_(password, salt);
   }
 
-  return hashPassword_(password, storedSalt) === storedHash;
+  var hash = legacyHashPassword_(password, salt);
+  for (var i = 1; i < PASSWORD_HASH_ITERATIONS; i += 1) {
+    hash = hashToken_(safeString_(salt) + ":" + hash + ":" + safeString_(password));
+  }
+
+  return PASSWORD_HASH_VERSION + "$" + PASSWORD_HASH_ITERATIONS + "$" + hash;
+}
+
+function verifyPassword_(password, salt, passwordHash, passwordVersion) {
+  var storedSalt = safeString_(salt);
+  var storedHash = safeString_(passwordHash);
+  var storedVersion = safeString_(passwordVersion);
+
+  if (!storedSalt || !storedHash || !safeString_(password)) {
+    return { matches: false, needsUpgrade: false };
+  }
+
+  if (storedVersion === PASSWORD_HASH_VERSION || storedHash.indexOf(PASSWORD_HASH_VERSION + "$") === 0) {
+    return {
+      matches: hashPassword_(password, storedSalt, PASSWORD_HASH_VERSION) === storedHash,
+      needsUpgrade: false
+    };
+  }
+
+  return {
+    matches: legacyHashPassword_(password, storedSalt) === storedHash,
+    needsUpgrade: true
+  };
 }
 
 function sessionExpiresAt_() {

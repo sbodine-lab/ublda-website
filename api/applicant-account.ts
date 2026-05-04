@@ -49,6 +49,22 @@ type ValidationResult =
 
 const UMICH_EMAIL_DOMAIN = '@umich.edu'
 const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
+const INVALID_AUTH_ERROR = 'Invalid uniqname or password.'
+const AUTH_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
+const AUTH_RATE_LIMIT_MAX_FAILURES = 8
+
+type AuthAttemptBucket = {
+  count: number
+  resetAt: number
+}
+
+const authAttemptBuckets = new Map<string, AuthAttemptBucket>()
+
+const setApiSecurityHeaders = (res: VercelResponse) => {
+  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
+  res.setHeader?.('Pragma', 'no-cache')
+  res.setHeader?.('X-Content-Type-Options', 'nosniff')
+}
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
@@ -203,11 +219,18 @@ const superAdminPassword = () => (
   || ''
 )
 
-const superAdminSessionSecret = () => superAdminPassword() || process.env.GOOGLE_SCRIPT_URL || 'ublda-local-session'
+const localAdminFallbackEnabled = () => process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK === 'true'
 
-const signSessionPayload = (payload: string) => (
-  createHmac('sha256', superAdminSessionSecret()).update(payload).digest('base64url')
-)
+const superAdminSessionSecret = () => superAdminPassword()
+
+const signSessionPayload = (payload: string) => {
+  const secret = superAdminSessionSecret()
+  if (!secret) {
+    throw new Error('Super-admin session secret is not configured.')
+  }
+
+  return createHmac('sha256', secret).update(payload).digest('base64url')
+}
 
 const createSuperAdminSessionToken = () => {
   const payload = Buffer.from(JSON.stringify({
@@ -224,6 +247,23 @@ const constantTimeEquals = (submitted: string, expected: string) => {
   return submittedBuffer.length === expectedBuffer.length && timingSafeEqual(submittedBuffer, expectedBuffer)
 }
 
+const verifyLocalSuperAdminSession = (sessionToken: string) => {
+  if (!localAdminFallbackEnabled() || !superAdminSessionSecret()) {
+    return false
+  }
+
+  const [prefix, payload, signature] = sessionToken.split('.')
+  if (prefix !== 'ublda_admin' || !payload || !signature) return false
+  if (!constantTimeEquals(signature, signSessionPayload(payload))) return false
+
+  try {
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
+    return decoded.email === 'sbodine@umich.edu' && typeof decoded.exp === 'number' && decoded.exp > Date.now()
+  } catch {
+    return false
+  }
+}
+
 const superAdminPasswordAccount = (uniqname: string, password: string): ApplicantAccount | null => {
   const normalizedUniqname = uniqname.toLowerCase().replace(/@.*$/, '')
   if (normalizedUniqname !== 'sbodine') {
@@ -232,7 +272,7 @@ const superAdminPasswordAccount = (uniqname: string, password: string): Applican
 
   const expectedPassword = superAdminPassword()
   if (!expectedPassword || !constantTimeEquals(password, expectedPassword)) {
-    throw new Error('Invalid uniqname or password.')
+    throw new Error(INVALID_AUTH_ERROR)
   }
 
   return {
@@ -291,10 +331,68 @@ const localSuperAdminResponse = () => ({
   account: superAdminAccountResponse,
   sessionToken: createSuperAdminSessionToken(),
   application: null,
-  localAdminSession: true,
 })
 
+const requestIp = (req: VercelRequest) => {
+  const forwardedFor = req.headers['x-forwarded-for']
+  if (Array.isArray(forwardedFor)) {
+    return forwardedFor[0] || 'unknown'
+  }
+
+  if (typeof forwardedFor === 'string') {
+    return forwardedFor.split(',')[0]?.trim() || 'unknown'
+  }
+
+  return req.socket?.remoteAddress || 'unknown'
+}
+
+const authAttemptKey = (req: VercelRequest, uniqname: string) => `${requestIp(req)}:${uniqname}`
+
+const pruneExpiredAuthBuckets = (now: number) => {
+  if (authAttemptBuckets.size < 128) return
+
+  authAttemptBuckets.forEach((bucket, key) => {
+    if (bucket.resetAt <= now) {
+      authAttemptBuckets.delete(key)
+    }
+  })
+}
+
+const isRateLimited = (key: string) => {
+  const now = Date.now()
+  pruneExpiredAuthBuckets(now)
+  const bucket = authAttemptBuckets.get(key)
+
+  if (!bucket || bucket.resetAt <= now) {
+    authAttemptBuckets.delete(key)
+    return false
+  }
+
+  return bucket.count >= AUTH_RATE_LIMIT_MAX_FAILURES
+}
+
+const recordAuthFailure = (key: string) => {
+  const now = Date.now()
+  const existing = authAttemptBuckets.get(key)
+
+  if (!existing || existing.resetAt <= now) {
+    authAttemptBuckets.set(key, { count: 1, resetAt: now + AUTH_RATE_LIMIT_WINDOW_MS })
+    return
+  }
+
+  authAttemptBuckets.set(key, {
+    count: existing.count + 1,
+    resetAt: existing.resetAt,
+  })
+}
+
+const clearAuthFailures = (key: string) => {
+  authAttemptBuckets.delete(key)
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setApiSecurityHeaders(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -313,6 +411,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     origin: baseUrlForRequest(req),
   }
   let fallbackToLocalAdmin = false
+  const signInRateLimitKey = result.data.action === 'signIn'
+    ? authAttemptKey(req, result.data.uniqname)
+    : ''
+
+  if (signInRateLimitKey && isRateLimited(signInRateLimitKey)) {
+    return res.status(429).json({
+      error: 'Too many sign-in attempts. Please wait a few minutes and try again.',
+    })
+  }
+
+  if (result.data.action === 'session' && verifyLocalSuperAdminSession(result.data.sessionToken)) {
+    return res.status(200).json({
+      success: true,
+      account: superAdminAccountResponse,
+      application: null,
+    })
+  }
 
   if (result.data.action === 'googleSignIn') {
     try {
@@ -349,14 +464,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             origin: baseUrlForRequest(req),
           }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Invalid uniqname or password.'
+      if (signInRateLimitKey) recordAuthFailure(signInRateLimitKey)
+      const message = error instanceof Error ? error.message : INVALID_AUTH_ERROR
       return res.status(401).json({ error: message })
     }
   }
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (!scriptUrl) {
-    if (fallbackToLocalAdmin) {
+    if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
+      if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
       return res.status(200).json(localSuperAdminResponse())
     }
 
@@ -376,12 +493,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = await response.json().catch(() => null)
 
     if (!response.ok || payload?.success === false) {
-      if (fallbackToLocalAdmin) {
+      if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
+        if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
         return res.status(200).json(localSuperAdminResponse())
+      }
+
+      if (result.data.action === 'requestMagicLink' && response.ok) {
+        return res.status(200).json({
+          success: true,
+          magicLinkSent: Boolean(payload?.magicLinkSent),
+        })
+      }
+
+      if (result.data.action === 'signIn') {
+        if (payload?.code === 'EMAIL_VERIFICATION_REQUIRED') {
+          return res.status(403).json({
+            error: payload?.error || 'Check your UMich email to finish setting up your account before signing in.',
+            code: 'EMAIL_VERIFICATION_REQUIRED',
+          })
+        }
+
+        if (signInRateLimitKey) recordAuthFailure(signInRateLimitKey)
+        return res.status(401).json({ error: INVALID_AUTH_ERROR })
       }
 
       return res.status(response.ok ? 400 : 500).json({
         error: payload?.error || 'Failed to update applicant account',
+      })
+    }
+
+    if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
+
+    if (result.data.action === 'create') {
+      return res.status(200).json({
+        success: true,
+        accountCreated: Boolean(payload?.accountCreated ?? true),
+        magicLinkSent: Boolean(payload?.magicLinkSent ?? true),
       })
     }
 
@@ -393,8 +540,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       magicLinkSent: Boolean(payload?.magicLinkSent),
     })
   } catch {
-    if (fallbackToLocalAdmin) {
+    if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
+      if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
       return res.status(200).json(localSuperAdminResponse())
+    }
+
+    if (result.data.action === 'signIn' && signInRateLimitKey) {
+      recordAuthFailure(signInRateLimitKey)
     }
 
     return res.status(500).json({ error: 'Failed to update applicant account' })

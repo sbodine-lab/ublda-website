@@ -4,13 +4,25 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 const superAdminSessionSecret = () => (
   process.env.UBLDA_SUPER_ADMIN_PASSWORD
   || process.env.SAM_BODINE_PASSWORD
-  || process.env.GOOGLE_SCRIPT_URL
-  || 'ublda-local-session'
+  || ''
 )
 
-const signSessionPayload = (payload: string) => (
-  createHmac('sha256', superAdminSessionSecret()).update(payload).digest('base64url')
-)
+const localAdminFallbackEnabled = () => process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK === 'true'
+
+const setApiSecurityHeaders = (res: VercelResponse) => {
+  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
+  res.setHeader?.('Pragma', 'no-cache')
+  res.setHeader?.('X-Content-Type-Options', 'nosniff')
+}
+
+const signSessionPayload = (payload: string) => {
+  const secret = superAdminSessionSecret()
+  if (!secret) {
+    return ''
+  }
+
+  return createHmac('sha256', secret).update(payload).digest('base64url')
+}
 
 const safeEquals = (left: string, right: string) => {
   const leftBuffer = Buffer.from(left)
@@ -19,9 +31,12 @@ const safeEquals = (left: string, right: string) => {
 }
 
 const verifyLocalSuperAdminSession = (sessionToken: string) => {
+  if (!localAdminFallbackEnabled() || !superAdminSessionSecret()) return false
+
   const [prefix, payload, signature] = sessionToken.split('.')
   if (prefix !== 'ublda_admin' || !payload || !signature) return false
-  if (!safeEquals(signature, signSessionPayload(payload))) return false
+  const expectedSignature = signSessionPayload(payload)
+  if (!expectedSignature || !safeEquals(signature, expectedSignature)) return false
 
   try {
     const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
@@ -48,7 +63,7 @@ const localSuperAdminPayload = () => ({
     interviewerAvailability: [],
     memberSignups: [],
     backendStatus: {
-      source: 'sheets',
+      source: 'vercel',
       message: 'Signed in through Vercel super-admin session. Publish the Apps Script backend for live sheet data.',
       updatedAt: new Date().toISOString(),
     },
@@ -61,6 +76,8 @@ const getSessionToken = (body: unknown) => {
   return typeof token === 'string' ? token.trim() : ''
 }
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setApiSecurityHeaders(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

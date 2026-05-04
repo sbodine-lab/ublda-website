@@ -2,7 +2,7 @@ import type { AdminAccount } from './dashboardAccess'
 import type { Candidate, InterviewerAvailability, LeadershipMetric, MemberSignup } from './memberData'
 
 export type DashboardBackendStatus = {
-  source: 'preview' | 'sheets'
+  source: 'preview' | 'sheets' | 'vercel'
   message: string
   updatedAt: string
 }

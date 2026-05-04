@@ -79,6 +79,12 @@ const slotByValue = new Map(interviewSlots.map((slot) => [slot.value, slot]))
 const interviewSlotValues = new Set(interviewSlots.map((slot) => slot.value))
 const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
 
+const setApiSecurityHeaders = (res: VercelResponse) => {
+  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
+  res.setHeader?.('Pragma', 'no-cache')
+  res.setHeader?.('X-Content-Type-Options', 'nosniff')
+}
+
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
   return typeof value === 'string' ? value.trim() : ''
@@ -148,6 +154,7 @@ const validateInterviewerAvailabilityPayload = (payload: unknown) => {
   if (!uniqname || !uniqnamePattern.test(uniqname)) errors.push('A valid UMich uniqname is required.')
   if (invalidSlot) errors.push('Availability includes an invalid interview slot.')
   if (availability.length === 0) errors.push('Select every interview slot you can help interview.')
+  if (maxInterviews.length > 80) errors.push('Max interviews must be 80 characters or fewer.')
   if (notes.length > 800) errors.push('Notes must be 800 characters or fewer.')
 
   return errors.length
@@ -181,6 +188,8 @@ const buildInterviewerAvailabilitySubmission = (
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setApiSecurityHeaders(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

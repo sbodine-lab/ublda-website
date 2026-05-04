@@ -15,7 +15,7 @@ type AuthContextValue = {
   sessionToken: string
   signInWithGoogle: (credential: string, profile?: GoogleProfile) => Promise<void>
   signInWithPassword: (payload: { uniqname: string; password: string }) => Promise<void>
-  createAccount: (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => Promise<void>
+  createAccount: (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => Promise<'signed-in' | 'verification-sent'>
   requestSignInLink: (uniqname: string) => Promise<void>
   signOut: () => void
 }
@@ -30,8 +30,14 @@ const toPortalAccount = (payload: Record<string, unknown> | null) => {
     ? payload.application as ApplicantApplicationSummary
     : null
   const sessionToken = typeof payload?.sessionToken === 'string' ? payload.sessionToken : ''
+  const accountCreated = Boolean(payload?.accountCreated)
+  const magicLinkSent = Boolean(payload?.magicLinkSent)
 
-  return { account, application, sessionToken }
+  return { account, application, sessionToken, accountCreated, magicLinkSent }
+}
+
+const notifySessionChanged = () => {
+  window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT))
 }
 
 export function MemberAuthProvider({ children }: { children: ReactNode }) {
@@ -40,7 +46,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [application, setApplication] = useState<ApplicantApplicationSummary | null>(null)
   const [sessionToken, setSessionToken] = useState('')
 
-  const applySession = useCallback((nextAccount: ApplicantAccount, nextApplication: ApplicantApplicationSummary | null, nextToken = '') => {
+  const applySession = useCallback((
+    nextAccount: ApplicantAccount,
+    nextApplication: ApplicantApplicationSummary | null,
+    nextToken = '',
+    shouldNotify = false,
+  ) => {
     setAccount(nextAccount)
     setApplication(nextApplication)
     setStatus('signed-in')
@@ -48,6 +59,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     if (nextToken) {
       setSessionToken(nextToken)
       window.localStorage.setItem(APPLICANT_SESSION_STORAGE_KEY, nextToken)
+      if (shouldNotify) notifySessionChanged()
     }
   }, [])
 
@@ -57,6 +69,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     setApplication(null)
     setSessionToken('')
     setStatus('signed-out')
+    notifySessionChanged()
   }, [])
 
   const restoreStoredSession = useCallback(async () => {
@@ -115,7 +128,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     }
 
     window.addEventListener(AUTH_SESSION_CHANGED_EVENT, handleSessionChange)
-    return () => window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, handleSessionChange)
+    window.addEventListener('storage', handleSessionChange)
+
+    return () => {
+      window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, handleSessionChange)
+      window.removeEventListener('storage', handleSessionChange)
+    }
   }, [restoreStoredSession])
 
   const postAccountAction = useCallback(async (payload: Record<string, unknown>) => {
@@ -141,7 +159,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         uniqname: profile.email.replace(/@.*$/, ''),
         email: profile.email.toLowerCase(),
       }
-      applySession(previewAccount, null, 'local-preview-session-token')
+      applySession(previewAccount, null, 'local-preview-session-token', true)
       return
     }
 
@@ -151,7 +169,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Google sign-in did not return a member session.')
     }
 
-    applySession(result.account, result.application, result.sessionToken)
+    applySession(result.account, result.application, result.sessionToken, true)
   }, [applySession, postAccountAction])
 
   const signInWithPassword = useCallback(async (payload: { uniqname: string; password: string }) => {
@@ -161,17 +179,22 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Sign-in did not return a member session.')
     }
 
-    applySession(result.account, result.application, result.sessionToken)
+    applySession(result.account, result.application, result.sessionToken, true)
   }, [applySession, postAccountAction])
 
   const createAccount = useCallback(async (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => {
     const result = await postAccountAction({ action: 'create', ...payload })
 
-    if (!result.account || !result.sessionToken) {
-      throw new Error('Account creation did not return a member session.')
+    if (result.account && result.sessionToken) {
+      applySession(result.account, result.application, result.sessionToken, true)
+      return 'signed-in'
     }
 
-    applySession(result.account, result.application, result.sessionToken)
+    if (result.accountCreated || result.magicLinkSent) {
+      return 'verification-sent'
+    }
+
+    throw new Error('Account creation did not return a verification link.')
   }, [applySession, postAccountAction])
 
   const requestSignInLink = useCallback(async (uniqname: string) => {

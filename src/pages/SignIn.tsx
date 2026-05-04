@@ -133,8 +133,19 @@ export default function SignIn() {
       }
 
       if (manualMode === 'create') {
-        await createAccount(manualForm)
-        navigate('/dashboard')
+        const result = await createAccount(manualForm)
+        if (result === 'signed-in') {
+          navigate('/dashboard')
+          return
+        }
+
+        setManualMode('signin')
+        setManualForm((current) => ({
+          ...current,
+          password: '',
+          confirmPassword: '',
+        }))
+        setNotice('Check your UMich email to finish signing in.')
         return
       }
     } catch (caughtError) {
@@ -207,6 +218,7 @@ export default function SignIn() {
                         value={manualForm.firstName}
                         onChange={(event) => setManualForm((current) => ({ ...current, firstName: event.target.value }))}
                         autoComplete="given-name"
+                        maxLength={80}
                         required
                       />
                     </label>
@@ -217,6 +229,7 @@ export default function SignIn() {
                         value={manualForm.lastName}
                         onChange={(event) => setManualForm((current) => ({ ...current, lastName: event.target.value }))}
                         autoComplete="family-name"
+                        maxLength={80}
                         required
                       />
                     </label>
@@ -233,6 +246,8 @@ export default function SignIn() {
                       autoComplete="username"
                       autoCapitalize="none"
                       spellCheck={false}
+                      pattern="[a-z0-9._-]{2,32}"
+                      maxLength={32}
                       required
                     />
                     <small>@umich.edu</small>
@@ -246,6 +261,8 @@ export default function SignIn() {
                     value={manualForm.password}
                     onChange={(event) => setManualForm((current) => ({ ...current, password: event.target.value }))}
                     autoComplete={manualMode === 'signin' ? 'current-password' : 'new-password'}
+                    minLength={8}
+                    maxLength={128}
                     required
                   />
                 </label>
@@ -258,6 +275,8 @@ export default function SignIn() {
                       value={manualForm.confirmPassword}
                       onChange={(event) => setManualForm((current) => ({ ...current, confirmPassword: event.target.value }))}
                       autoComplete="new-password"
+                      minLength={8}
+                      maxLength={128}
                       required
                     />
                   </label>
@@ -277,7 +296,7 @@ export default function SignIn() {
 
               {googleClientId ? (
                 <div className="signin-card__google" ref={googleButtonRef} aria-label="Continue with Google" />
-              ) : (
+              ) : import.meta.env.DEV ? (
                 <button
                   type="button"
                   className="signin-card__google-preview"
@@ -287,6 +306,8 @@ export default function SignIn() {
                   <span aria-hidden="true">G</span>
                   Continue with Google
                 </button>
+              ) : (
+                <p className="signin-card__notice" role="status">Google sign-in is not configured yet.</p>
               )}
 
               <Link to="/portal" className="signin-card__portal-link">
