@@ -16,9 +16,10 @@ import {
 } from '../lib/application'
 import type { ApplicationStatus } from '../lib/application'
 import {
+  INTERVIEW_BLOCK_WITH_BUFFER_LABEL,
   INTERVIEW_DAY_RANGE_LABEL,
-  INTERVIEW_SLOT_GROUPS,
 } from '../lib/interviews'
+import AvailabilityPicker from '../components/AvailabilityPicker'
 import Reveal from '../components/Reveal'
 import './Apply.css'
 
@@ -110,7 +111,6 @@ export default function Apply() {
   const [error, setError] = useState('')
   const [resumeFile, setResumeFile] = useState<File | null>(null)
 
-  const selectedAvailability = useMemo(() => new Set(form.availability), [form.availability])
   const selectedRolePreferences = useMemo(
     () => new Set(form.rolePreferences.filter(Boolean)),
     [form.rolePreferences],
@@ -140,35 +140,8 @@ export default function Apply() {
     })
   }
 
-  const toggleAvailability = (value: string) => {
-    setForm((current) => {
-      const availability = new Set(current.availability)
-
-      if (availability.has(value)) {
-        availability.delete(value)
-      } else {
-        availability.add(value)
-      }
-
-      return { ...current, availability: Array.from(availability) }
-    })
-  }
-
-  const toggleDay = (values: string[]) => {
-    setForm((current) => {
-      const availability = new Set(current.availability)
-      const allSelected = values.every((value) => availability.has(value))
-
-      values.forEach((value) => {
-        if (allSelected) {
-          availability.delete(value)
-        } else {
-          availability.add(value)
-        }
-      })
-
-      return { ...current, availability: Array.from(availability) }
-    })
+  const updateAvailability = (availability: string[]) => {
+    setForm((current) => ({ ...current, availability }))
   }
 
   const handleResumeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -212,7 +185,7 @@ export default function Apply() {
 
     if (form.availability.length === 0) {
       setSubmitting(false)
-      setError('Please select every interview block you are available for.')
+      setError('Please select every interview slot you are available for.')
       return
     }
 
@@ -266,7 +239,7 @@ export default function Apply() {
               UBLDA is recruiting three new e-board members on a compressed timeline.
               This replaces the written application: upload your resume, rank the
               board roles you are most interested in, and select every Google Meet
-              interview block you can make from {INTERVIEW_DAY_RANGE_LABEL}.
+              interview slot you can make from {INTERVIEW_DAY_RANGE_LABEL}.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -308,7 +281,7 @@ export default function Apply() {
                   <p className="section__label">Candidate Form</p>
                   <h2 className="apply-form__title">One clean form. No login.</h2>
                   <p className="apply-form__subtitle">
-                    Select all availability that works. We will assign one 20-minute slot after matching against e-board interviewer availability.
+                    Select all availability that works. We will assign one slot after matching against e-board interviewer availability.
                   </p>
                 </div>
 
@@ -473,44 +446,11 @@ export default function Apply() {
                   </div>
                 </fieldset>
 
-                <fieldset className="apply-form__group">
-                  <legend>Interview availability</legend>
-                  <p className="apply-form__helper">
-                    Select every 20-minute block you can make. Choosing more blocks makes Wednesday matching much easier.
-                  </p>
-                  <div className="availability-days">
-                    {INTERVIEW_SLOT_GROUPS.map((group) => {
-                      const values = group.slots.map((slot) => slot.value)
-                      const selectedCount = values.filter((value) => selectedAvailability.has(value)).length
-
-                      return (
-                        <section className="availability-day" key={group.date}>
-                          <div className="availability-day__header">
-                            <div>
-                              <h3>{group.label}</h3>
-                              <p>{selectedCount} of {values.length} blocks selected</p>
-                            </div>
-                            <button type="button" onClick={() => toggleDay(values)}>
-                              {selectedCount === values.length ? 'Clear day' : 'Select day'}
-                            </button>
-                          </div>
-                          <div className="availability-grid">
-                            {group.slots.map((slot) => (
-                              <label className="apply-form__checkbox" key={slot.value}>
-                                <input
-                                  type="checkbox"
-                                  checked={selectedAvailability.has(slot.value)}
-                                  onChange={() => toggleAvailability(slot.value)}
-                                />
-                                <span>{slot.timeLabel}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </section>
-                      )
-                    })}
-                  </div>
-                </fieldset>
+                <AvailabilityPicker
+                  selectedValues={form.availability}
+                  onChange={updateAvailability}
+                  helper={`Select every slot you can make. Each option reserves a ${INTERVIEW_BLOCK_WITH_BUFFER_LABEL}, and the morning / afternoon / evening shortcuts keep this quick.`}
+                />
 
                 <div className="apply-form__trap" aria-hidden="true">
                   <label htmlFor="website">Website</label>

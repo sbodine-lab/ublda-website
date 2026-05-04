@@ -43,7 +43,10 @@ const leadershipTabs = ['Overview', 'Recruiting', 'Members', 'Sponsors', 'Publis
 
 const statusClass = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
-const slotLabel = (value: string) => getInterviewSlotByValue(value)?.label || value || 'Unassigned'
+const slotLabel = (value: string) => {
+  const slot = getInterviewSlotByValue(value)
+  return slot ? `${slot.label} · ${slot.bufferLabel}` : value || 'Unassigned'
+}
 
 const localPreviewMember: MemberProfile = {
   firstName: 'Preview',
@@ -469,12 +472,12 @@ export default function Dashboard() {
           <article>
             <span>E-board coverage</span>
             <strong>{totalInterviewerSlots}</strong>
-            <p>unique 20-minute blocks submitted</p>
+            <p>unique buffered slots submitted</p>
           </article>
           <article>
             <span>Window</span>
             <strong>May 7-10</strong>
-            <p>Google Meet, 8 AM-10 PM ET</p>
+            <p>20-minute interviews + 10-minute buffers</p>
           </article>
         </div>
 
@@ -558,7 +561,7 @@ export default function Dashboard() {
                 <div className="candidate-card__availability">
                   <span>Candidate availability</span>
                   <p>{candidate.availability.slice(0, 4).map(slotLabel).join(' · ')}{candidate.availability.length > 4 ? ` · +${candidate.availability.length - 4} more` : ''}</p>
-                  <small>{realisticSlotValues.length} overlap block{realisticSlotValues.length === 1 ? '' : 's'} with assigned interviewer availability</small>
+                  <small>{realisticSlotValues.length} overlap buffered slot{realisticSlotValues.length === 1 ? '' : 's'} with assigned interviewer availability</small>
                 </div>
 
                 <label className="candidate-card__feedback">
@@ -596,7 +599,7 @@ export default function Dashboard() {
                 <strong>{interviewer.name}</strong>
                 <span>{interviewer.role} · max {interviewer.maxInterviews}</span>
               </div>
-              <p>{interviewer.availability.length} blocks submitted</p>
+              <p>{interviewer.availability.length} buffered slots submitted</p>
             </article>
           ))}
         </div>

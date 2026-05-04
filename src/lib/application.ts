@@ -216,7 +216,7 @@ export const validateApplicationPayload = (payload: unknown): ValidationResult =
   if (!rossStatusValues.has(rossStatus)) errors.push('Ross/BBA status is required.')
   if (!interestTypeValues.has(interestType)) errors.push('Interest type is required.')
   if (rolePreferences.length < 3) errors.push('Rank your top three board position interests.')
-  if (availability.length === 0) errors.push('Select every interview block you are available for.')
+  if (availability.length === 0) errors.push('Select every interview slot you are available for.')
   if (!resumeFile) {
     errors.push('Resume upload is required.')
   } else {

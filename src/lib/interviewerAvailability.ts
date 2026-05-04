@@ -67,8 +67,8 @@ export const validateInterviewerAvailabilityPayload = (payload: unknown): Valida
   if (!firstName) errors.push('First name is required.')
   if (!lastName) errors.push('Last name is required.')
   if (!uniqname || !uniqnamePattern.test(uniqname)) errors.push('A valid UMich uniqname is required.')
-  if (invalidSlot) errors.push('Availability includes an invalid interview block.')
-  if (availability.length === 0) errors.push('Select every interview block you can help interview.')
+  if (invalidSlot) errors.push('Availability includes an invalid interview slot.')
+  if (availability.length === 0) errors.push('Select every interview slot you can help interview.')
   if (notes.length > 800) errors.push('Notes must be 800 characters or fewer.')
 
   if (errors.length > 0) {

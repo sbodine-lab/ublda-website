@@ -81,8 +81,11 @@ test('forwards validated leadership interest submissions to the configured scrip
       label: 'Thu, May 7, 8:00 AM-8:20 AM ET',
       dayLabel: 'Thursday, May 7',
       timeLabel: '8:00 AM-8:20 AM ET',
+      bufferLabel: 'buffer until 8:30 AM ET',
       start: '2026-05-07T08:00:00-04:00',
       end: '2026-05-07T08:20:00-04:00',
+      bufferEnd: '2026-05-07T08:30:00-04:00',
+      startMinutes: 480,
     })
     assert.equal((forwardedBody?.resumeFile as Record<string, unknown>)?.name, 'alex-chen-resume.pdf')
     assert.match(String(forwardedBody?.submissionId), /^app_/)
