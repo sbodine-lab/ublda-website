@@ -589,6 +589,7 @@ function handleDashboardData_(sheet, data) {
   if (role === "super-admin" || role === "exec") {
     payload.candidates = dashboardCandidates_();
     payload.interviewerAvailability = dashboardInterviewerAvailability_();
+    payload.memberSignups = dashboardMemberSignups_();
     payload.adminAccounts = ADMIN_ACCOUNTS;
   }
 
@@ -823,6 +824,52 @@ function dashboardInterviewerAvailability_() {
       maxInterviews: safeString_(row[9]) || "As needed"
     };
   });
+}
+
+function dashboardMemberSignups_() {
+  var members = [];
+  var accountSheet = ensureSheet_(APPLICANT_ACCOUNTS_SHEET_NAME, APPLICANT_ACCOUNT_HEADERS);
+  var accountLastRow = accountSheet.getLastRow();
+
+  if (accountLastRow >= 2) {
+    var accountRows = accountSheet.getRange(2, 1, accountLastRow - 1, APPLICANT_ACCOUNT_HEADERS.length).getValues();
+    accountRows.forEach(function(row, index) {
+      var email = safeString_(row[2]);
+      members.push({
+        id: email || "account-" + (index + 2),
+        name: [safeString_(row[4]), safeString_(row[5])].filter(Boolean).join(" ") || email,
+        email: email,
+        uniqname: safeString_(row[3]),
+        status: safeString_(row[9]) || "Member account",
+        source: "Applicant Accounts",
+        updatedAt: row[1] instanceof Date ? row[1].toISOString() : safeString_(row[1]),
+        detail: "Submissions: " + safeString_(row[11] || 0)
+      });
+    });
+  }
+
+  var generalSheet = ensureSheet_(GENERAL_MEMBERS_SHEET_NAME, GENERAL_MEMBER_HEADERS);
+  var generalLastRow = generalSheet.getLastRow();
+
+  if (generalLastRow >= 2) {
+    var generalRows = generalSheet.getRange(2, 1, generalLastRow - 1, GENERAL_MEMBER_HEADERS.length).getValues();
+    generalRows.forEach(function(row, index) {
+      var uniqname = normalizeUniqname_(row[2]);
+      var email = uniqname ? uniqname + "@umich.edu" : "";
+      members.push({
+        id: email || "general-" + (index + 2),
+        name: [safeString_(row[0]), safeString_(row[1])].filter(Boolean).join(" ") || email,
+        email: email,
+        uniqname: uniqname,
+        status: "General member",
+        source: "General Members",
+        updatedAt: "",
+        detail: [safeString_(row[3]), safeString_(row[4])].filter(Boolean).join(" · ")
+      });
+    });
+  }
+
+  return members;
 }
 
 function splitList_(value) {

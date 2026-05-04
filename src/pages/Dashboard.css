@@ -520,6 +520,38 @@
   padding-bottom: 0;
 }
 
+.portal-empty-state {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) 0;
+  border-top: 1px solid rgba(216, 214, 208, 0.72);
+  border-bottom: 1px solid rgba(216, 214, 208, 0.72);
+}
+
+.portal-empty-state--compact {
+  padding: var(--space-4) 0;
+}
+
+.portal-empty-state strong {
+  color: var(--color-navy);
+  font-size: var(--text-base);
+  font-weight: 900;
+}
+
+.portal-empty-state p {
+  max-width: 68ch;
+  color: var(--color-gray-600);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.portal-empty-state a {
+  width: fit-content;
+  color: var(--color-navy);
+  font-size: var(--text-sm);
+  font-weight: 900;
+}
+
 .portal-mini-list {
   display: grid;
   gap: 0;
@@ -884,10 +916,15 @@
 .interview-admin-summary p,
 .candidate-card p,
 .candidate-card small,
-.interviewer-coverage-list p {
+.interviewer-coverage-list p,
+.interviewer-coverage-list small {
   color: var(--color-gray-600);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
+}
+
+.interviewer-coverage-list small {
+  display: block;
 }
 
 .dashboard-sync {
@@ -1109,12 +1146,14 @@
   font-size: var(--text-base);
 }
 
-.admin-account-list {
+.admin-account-list,
+.member-signup-list {
   display: grid;
   gap: 0;
 }
 
-.admin-account-list article {
+.admin-account-list article,
+.member-signup-list article {
   display: grid;
   grid-template-columns: minmax(200px, 0.8fr) auto minmax(0, 1fr);
   gap: var(--space-4);
@@ -1123,28 +1162,34 @@
   border-bottom: 1px solid rgba(216, 214, 208, 0.72);
 }
 
-.admin-account-list article:first-child {
+.admin-account-list article:first-child,
+.member-signup-list article:first-child {
   padding-top: 0;
 }
 
-.admin-account-list article:last-child {
+.admin-account-list article:last-child,
+.member-signup-list article:last-child {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
-.admin-account-list div {
+.admin-account-list div,
+.member-signup-list div {
   display: grid;
   gap: var(--space-1);
 }
 
-.admin-account-list strong {
+.admin-account-list strong,
+.member-signup-list strong {
   color: var(--color-navy);
   font-size: var(--text-base);
   font-weight: 900;
 }
 
 .admin-account-list span,
-.admin-account-list p {
+.admin-account-list p,
+.member-signup-list span,
+.member-signup-list p {
   color: var(--color-gray-600);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);

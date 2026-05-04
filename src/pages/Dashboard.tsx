@@ -7,17 +7,14 @@ import { readDashboardData } from '../lib/dashboardData'
 import type { DashboardData } from '../lib/dashboardData'
 import {
   calendarItems,
-  candidates,
   directoryMembers,
   leadershipActions,
-  leadershipMetrics,
   memberActions,
   newsItems,
   opportunities,
   publishingQueue,
   resources,
   sponsors,
-  interviewerAvailability,
 } from '../lib/memberData'
 import type { Candidate, DashboardAction, DashboardTab, MemberProfile, WorkspaceMode } from '../lib/memberData'
 import {
@@ -129,15 +126,42 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData>({})
   const [dashboardDataState, setDashboardDataState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [dashboardError, setDashboardError] = useState('')
-  const [candidateRows, setCandidateRows] = useState<Candidate[]>(candidates)
+  const [candidateRows, setCandidateRows] = useState<Candidate[]>([])
   const [interviewerAvoidance, setInterviewerAvoidance] = useState<InterviewerAvoidance>({})
   const [matchingNotice, setMatchingNotice] = useState('')
   const [assignmentSaveState, setAssignmentSaveState] = useState<Record<string, string>>({})
   const attendancePercent = effectiveMember ? Math.round((effectiveMember.attendance.attended / effectiveMember.attendance.total) * 100) : 0
   const actions = workspace === 'leadership' ? leadershipActions : memberActions
-  const liveInterviewerAvailability = dashboardData.interviewerAvailability?.length ? dashboardData.interviewerAvailability : interviewerAvailability
+  const liveInterviewerAvailability = dashboardData.interviewerAvailability || []
+  const memberSignups = dashboardData.memberSignups || []
   const totalInterviewerSlots = new Set(liveInterviewerAvailability.flatMap((interviewer) => interviewer.availability)).size
   const matchedCandidates = candidateRows.filter((candidate) => candidate.assignedSlot).length
+  const liveLeadershipMetrics = dashboardData.metrics?.length ? dashboardData.metrics : [
+    {
+      label: 'Candidate sign-ups',
+      value: String(candidateRows.length),
+      detail: `${matchedCandidates} matched to interview slots`,
+      tone: candidateRows.length ? 'healthy' as const : 'neutral' as const,
+    },
+    {
+      label: 'E-board responses',
+      value: String(liveInterviewerAvailability.length),
+      detail: `${totalInterviewerSlots} unique buffered slots submitted`,
+      tone: liveInterviewerAvailability.length ? 'healthy' as const : 'watch' as const,
+    },
+    {
+      label: 'Member sign-ups',
+      value: String(memberSignups.length),
+      detail: 'Applicant and general member account rows',
+      tone: memberSignups.length ? 'healthy' as const : 'neutral' as const,
+    },
+    {
+      label: 'Backend data',
+      value: dashboardDataState === 'ready' ? 'Ready' : dashboardDataState === 'loading' ? 'Loading' : 'Idle',
+      detail: dashboardData.backendStatus?.message || 'Waiting for live backend data',
+      tone: dashboardDataState === 'error' ? 'watch' as const : 'neutral' as const,
+    },
+  ]
 
   useEffect(() => {
     if (!tabs.includes(activeTab)) {
@@ -158,9 +182,7 @@ export default function Dashboard() {
       .then((nextData) => {
         if (cancelled) return
         setDashboardData(nextData)
-        if (nextData.candidates?.length) {
-          setCandidateRows(nextData.candidates)
-        }
+        setCandidateRows(nextData.candidates || [])
         setDashboardDataState('ready')
       })
       .catch((error) => {
@@ -420,7 +442,7 @@ export default function Dashboard() {
             <button type="button">Export slate</button>
           </div>
           <div className="leadership-metrics">
-            {leadershipMetrics.map((metric) => (
+            {liveLeadershipMetrics.map((metric) => (
               <article className={`leadership-metric leadership-metric--${metric.tone}`} key={metric.label}>
                 <span>{metric.label}</span>
                 <strong>{metric.value}</strong>
@@ -621,11 +643,11 @@ export default function Dashboard() {
 
         {workspace === 'leadership' && (
           <div className={`dashboard-sync dashboard-sync--${dashboardDataState}`}>
-            <strong>{dashboardData.backendStatus?.source === 'sheets' ? 'Live sheet data' : 'Preview data'}</strong>
+            <strong>{dashboardData.backendStatus?.source === 'sheets' ? 'Live sheet data' : 'Backend status'}</strong>
             <span>
               {dashboardDataState === 'loading'
                 ? 'Loading live recruiting data...'
-                : dashboardError || dashboardData.backendStatus?.message || 'Using the built-in sample slate until the account backend returns sheet data.'}
+                : dashboardError || dashboardData.backendStatus?.message || 'No live backend data has loaded yet.'}
             </span>
           </div>
         )}
@@ -637,8 +659,15 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="candidate-workbench">
-          {candidateRows.map((candidate) => {
+        {candidateRows.length === 0 ? (
+          <div className="portal-empty-state">
+            <strong>No candidate sign-ups loaded yet.</strong>
+            <p>When candidate forms reach the backend, they will appear here with resumes, ranked role interests, and interview availability.</p>
+            <Link to="/apply">Open candidate form</Link>
+          </div>
+        ) : (
+          <div className="candidate-workbench">
+            {candidateRows.map((candidate) => {
             const candidateSlots = candidate.availability
               .map((value) => getInterviewSlotByValue(value))
               .filter((slot): slot is NonNullable<typeof slot> => Boolean(slot))
@@ -775,8 +804,9 @@ export default function Dashboard() {
                 </div>
               </article>
             )
-          })}
-        </div>
+            })}
+          </div>
+        )}
       </section>
 
       <section className="portal-panel">
@@ -786,17 +816,25 @@ export default function Dashboard() {
             <p>Use this to see who is actually free before assigning interviews.</p>
           </div>
         </div>
-        <div className="interviewer-coverage-list">
-          {liveInterviewerAvailability.map((interviewer) => (
-            <article key={interviewer.name}>
-              <div>
-                <strong>{interviewer.name}</strong>
-                <span>{interviewer.role} · max {interviewer.maxInterviews}</span>
-              </div>
-              <p>{interviewer.availability.length} buffered slots submitted</p>
-            </article>
-          ))}
-        </div>
+        {liveInterviewerAvailability.length === 0 ? (
+          <div className="portal-empty-state portal-empty-state--compact">
+            <strong>No e-board availability loaded yet.</strong>
+            <p>Submitted interviewer availability will appear here with exact slot labels.</p>
+          </div>
+        ) : (
+          <div className="interviewer-coverage-list">
+            {liveInterviewerAvailability.map((interviewer) => (
+              <article key={interviewer.name}>
+                <div>
+                  <strong>{interviewer.name}</strong>
+                  <span>{interviewer.role} · max {interviewer.maxInterviews}</span>
+                </div>
+                <p>{interviewer.availability.length} buffered slots submitted</p>
+                <small>{interviewer.availability.slice(0, 6).map(slotLabel).join(' · ')}{interviewer.availability.length > 6 ? ` · +${interviewer.availability.length - 6} more` : ''}</small>
+              </article>
+            ))}
+          </div>
+        )}
         <div className="portal-control-stack">
           <Link to="/interviewer-availability">Collect e-board availability</Link>
           <Link to="/apply">Candidate form</Link>
@@ -886,40 +924,51 @@ export default function Dashboard() {
       <section className="portal-panel portal-panel--span-2">
         <div className="portal-panel__header">
           <div>
-            <h2>Ross ratio and member health</h2>
-            <p>Useful for leadership planning, not for public display.</p>
+            <h2>Member sign-ups</h2>
+            <p>Applicant accounts and general member rows from the backend.</p>
           </div>
         </div>
-        <div className="leadership-metrics">
-          {leadershipMetrics.map((metric) => (
-            <article className={`leadership-metric leadership-metric--${metric.tone}`} key={metric.label}>
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-              <p>{metric.detail}</p>
-            </article>
-          ))}
-        </div>
+        {memberSignups.length === 0 ? (
+          <div className="portal-empty-state">
+            <strong>No member sign-ups loaded yet.</strong>
+            <p>General member and applicant account rows will appear here after the backend returns them.</p>
+            <Link to="/join">Open member sign-up form</Link>
+          </div>
+        ) : (
+          <div className="member-signup-list">
+            {memberSignups.map((signup) => (
+              <article key={signup.id}>
+                <div>
+                  <strong>{signup.name}</strong>
+                  <span>{signup.email || signup.uniqname}</span>
+                </div>
+                <mark className={`portal-status portal-status--${statusClass(signup.status)}`}>{signup.status}</mark>
+                <p>{signup.source}{signup.detail ? ` · ${signup.detail}` : ''}</p>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="portal-panel">
         <div className="portal-panel__header">
           <div>
-            <h2>Attendance controls</h2>
-            <p>Future admin utility for events.</p>
+            <h2>Live member health</h2>
+            <p>Counts are derived from currently loaded backend rows.</p>
           </div>
         </div>
         <div className="portal-stat-list">
           <div>
-            <span>Tracked events</span>
-            <strong>4</strong>
+            <span>Member sign-ups</span>
+            <strong>{memberSignups.length}</strong>
           </div>
           <div>
-            <span>Active members</span>
-            <strong>30+</strong>
+            <span>Candidate sign-ups</span>
+            <strong>{candidateRows.length}</strong>
           </div>
           <div>
-            <span>Needs profile</span>
-            <strong>11</strong>
+            <span>E-board availability</span>
+            <strong>{liveInterviewerAvailability.length}</strong>
           </div>
         </div>
       </section>

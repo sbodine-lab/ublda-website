@@ -44,6 +44,9 @@ const localSuperAdminPayload = () => ({
   },
   role: 'super-admin',
   dashboardData: {
+    candidates: [],
+    interviewerAvailability: [],
+    memberSignups: [],
     backendStatus: {
       source: 'sheets',
       message: 'Signed in through Vercel super-admin session. Publish the Apps Script backend for live sheet data.',

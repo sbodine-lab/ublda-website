@@ -1,5 +1,5 @@
 import type { AdminAccount } from './dashboardAccess'
-import type { Candidate, InterviewerAvailability, LeadershipMetric } from './memberData'
+import type { Candidate, InterviewerAvailability, LeadershipMetric, MemberSignup } from './memberData'
 
 export type DashboardBackendStatus = {
   source: 'preview' | 'sheets'
@@ -10,6 +10,7 @@ export type DashboardBackendStatus = {
 export type DashboardData = {
   candidates?: Candidate[]
   interviewerAvailability?: InterviewerAvailability[]
+  memberSignups?: MemberSignup[]
   adminAccounts?: AdminAccount[]
   metrics?: LeadershipMetric[]
   backendStatus?: DashboardBackendStatus

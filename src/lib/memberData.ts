@@ -1,7 +1,6 @@
 import type { ApplicantAccount, ApplicantApplicationSummary } from './applicantAccount'
 import type { AdminScope, DashboardRole } from './dashboardAccess.ts'
 import { adminAccountForEmail, roleForEmail, scopesForEmail } from './dashboardAccess.ts'
-import { INTERVIEW_SLOTS } from './interviews.ts'
 
 export type WorkspaceMode = 'member' | 'leadership'
 export type DashboardTab =
@@ -100,6 +99,17 @@ export type InterviewerAvailability = {
   role: string
   availability: string[]
   maxInterviews: string
+}
+
+export type MemberSignup = {
+  id: string
+  name: string
+  email: string
+  uniqname: string
+  status: string
+  source: string
+  updatedAt: string
+  detail: string
 }
 
 export type Sponsor = {
@@ -363,81 +373,9 @@ export const calendarItems: CalendarItem[] = [
   },
 ]
 
-export const candidates: Candidate[] = [
-  {
-    id: 'maya-patel',
-    name: 'Maya Patel',
-    program: 'Ross BBA 2028',
-    email: 'mayap@umich.edu',
-    rolePreferences: ['VP of Partnerships & Sponsorships', 'VP of Events & Programming', 'VP of Marketing & Community'],
-    status: 'Matched',
-    availability: [INTERVIEW_SLOTS[28].value, INTERVIEW_SLOTS[29].value, INTERVIEW_SLOTS[74].value, INTERVIEW_SLOTS[75].value],
-    resumeUrl: 'https://drive.google.com/',
-    assignedSlot: INTERVIEW_SLOTS[29].value,
-    interviewers: ['Sam Bodine', 'Alexa Chiang'],
-    feedback: 'Strong sponsor instincts. Ask for concrete operating examples.',
-  },
-  {
-    id: 'jordan-lee',
-    name: 'Jordan Lee',
-    program: 'Ross BBA 2027',
-    email: 'jordlee@umich.edu',
-    rolePreferences: ['VP of Events & Programming', 'VP of Accessibility Projects', 'VP of Member Experience'],
-    status: 'Needs match',
-    availability: [INTERVIEW_SLOTS[40].value, INTERVIEW_SLOTS[41].value, INTERVIEW_SLOTS[90].value, INTERVIEW_SLOTS[91].value],
-    resumeUrl: 'https://drive.google.com/',
-    assignedSlot: '',
-    interviewers: ['Alexa Chiang'],
-    feedback: '',
-  },
-  {
-    id: 'taylor-brooks',
-    name: 'Taylor Brooks',
-    program: 'LSA 2028',
-    email: 'tbrooks@umich.edu',
-    rolePreferences: ['VP of Accessibility Projects', 'VP of Marketing & Community', 'Open to any role'],
-    status: 'Hold',
-    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[104].value, INTERVIEW_SLOTS[105].value],
-    resumeUrl: 'https://drive.google.com/',
-    assignedSlot: '',
-    interviewers: ['Cooper Ryan'],
-    feedback: 'Potential future project contributor if current Ross composition needs hold.',
-  },
-  {
-    id: 'nikhil-rao',
-    name: 'Nikhil Rao',
-    program: 'Ross BBA 2026',
-    email: 'nikrao@umich.edu',
-    rolePreferences: ['VP of Member Experience', 'VP of Partnerships & Sponsorships', 'Open to any role'],
-    status: 'Interviewed',
-    availability: [INTERVIEW_SLOTS[28].value, INTERVIEW_SLOTS[40].value, INTERVIEW_SLOTS[41].value],
-    resumeUrl: 'https://drive.google.com/',
-    assignedSlot: INTERVIEW_SLOTS[40].value,
-    interviewers: ['Sam Bodine', 'Cooper Ryan'],
-    feedback: 'Clear operator. Scorecard ready for Monday decision meeting.',
-  },
-]
+export const candidates: Candidate[] = []
 
-export const interviewerAvailability: InterviewerAvailability[] = [
-  {
-    name: 'Sam Bodine',
-    role: 'Co-President',
-    availability: [INTERVIEW_SLOTS[28].value, INTERVIEW_SLOTS[29].value, INTERVIEW_SLOTS[40].value, INTERVIEW_SLOTS[41].value, INTERVIEW_SLOTS[90].value],
-    maxInterviews: '5+',
-  },
-  {
-    name: 'Alexa Chiang',
-    role: 'Co-President',
-    availability: [INTERVIEW_SLOTS[29].value, INTERVIEW_SLOTS[40].value, INTERVIEW_SLOTS[41].value, INTERVIEW_SLOTS[74].value, INTERVIEW_SLOTS[75].value],
-    maxInterviews: '4',
-  },
-  {
-    name: 'Cooper Ryan',
-    role: 'E-board',
-    availability: [INTERVIEW_SLOTS[55].value, INTERVIEW_SLOTS[56].value, INTERVIEW_SLOTS[90].value, INTERVIEW_SLOTS[91].value, INTERVIEW_SLOTS[104].value, INTERVIEW_SLOTS[105].value],
-    maxInterviews: '3',
-  },
-]
+export const interviewerAvailability: InterviewerAvailability[] = []
 
 export const sponsors: Sponsor[] = [
   {
