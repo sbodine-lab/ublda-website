@@ -148,16 +148,6 @@ const interviewerUniqname = (interviewer: { name: string } & Record<string, unkn
   typeof interviewer.uniqname === 'string' ? interviewer.uniqname : interviewer.name.toLowerCase().replace(/[^a-z0-9]+/g, '')
 )
 
-const initialsForName = (name: string) => (
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
-)
-
 const managedMembersFromData = (
   signups: MemberSignup[],
   admins: AdminAccount[],
@@ -1185,7 +1175,7 @@ export default function Dashboard() {
         </section>
       )}
 
-      <div className="admin-dashboard__two admin-dashboard__two--wide">
+      <div className="admin-dashboard__two admin-dashboard__two--calendar">
         <section className="admin-panel admin-calendar-panel">
           <div className="admin-panel__title"><h2>Interview calendar</h2><span>{INTERVIEW_BLOCK_MINUTES} min + {INTERVIEW_BUFFER_MINUTES} min buffer spacing</span></div>
           <div className="admin-calendar">
@@ -1200,22 +1190,13 @@ export default function Dashboard() {
                     </div>
                     <div className="admin-calendar-coverage__slots">
                       {day.coverage.map(({ slot, interviewers }) => {
-                        const visibleInterviewers = interviewers.slice(0, 3)
-                        const hiddenCount = Math.max(interviewers.length - visibleInterviewers.length, 0)
                         const coverageClass = interviewers.length >= 2 ? 'admin-coverage-slot--strong' : interviewers.length === 1 ? 'admin-coverage-slot--covered' : 'admin-coverage-slot--empty'
+                        const interviewerNames = interviewers.map((interviewer) => interviewer.name).join(', ')
 
                         return (
-                          <article className={`admin-coverage-slot ${coverageClass}`} key={slot.value}>
+                          <article className={`admin-coverage-slot ${coverageClass}`} key={slot.value} title={interviewerNames || 'No e-board availability submitted for this slot'}>
                             <time>{slot.timeLabel.replace(' ET', '')}</time>
-                            <div>
-                              <strong>{interviewers.length || '0'}</strong>
-                              {interviewers.length > 0 && (
-                                <span aria-label={interviewers.map((interviewer) => interviewer.name).join(', ')}>
-                                  {visibleInterviewers.map((interviewer) => <mark key={interviewer.name} title={interviewer.name}>{initialsForName(interviewer.name)}</mark>)}
-                                  {hiddenCount > 0 && <mark title={`${hiddenCount} more interviewer${hiddenCount === 1 ? '' : 's'}`}>+{hiddenCount}</mark>}
-                                </span>
-                              )}
-                            </div>
+                            <strong aria-label={interviewerNames || 'No e-board availability'}>{interviewers.length}</strong>
                           </article>
                         )
                       })}

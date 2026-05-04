@@ -1,11 +1,9 @@
-import { normalizeUniqname } from './application.ts'
 import type { AdminScope, DashboardRole } from './dashboardAccess.ts'
 
 export const APPLICANT_SESSION_STORAGE_KEY = 'ubldaApplicantSessionToken'
 export const AUTH_SESSION_CHANGED_EVENT = 'ublda-auth-session-changed'
 
-const UMICH_EMAIL_DOMAIN = '@umich.edu'
-const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type ApplicantAccount = {
   firstName: string
@@ -69,6 +67,29 @@ const getString = (payload: Record<string, unknown>, key: string) => {
   return typeof value === 'string' ? value.trim() : ''
 }
 
+const normalizeEmail = (value: unknown) => (
+  typeof value === 'string' ? value.trim().toLowerCase() : ''
+)
+
+const emailToDisplayUniqname = (email: string) => {
+  const localPart = email.replace(/@.*$/, '').toLowerCase().replace(/[^a-z0-9._-]+/g, '')
+  return localPart || 'member'
+}
+
+const normalizeAccountIdentity = (body: Record<string, unknown>, errors: string[]) => {
+  const submittedEmail = normalizeEmail(getString(body, 'email'))
+  const submittedUniqname = normalizeEmail(getString(body, 'uniqname'))
+  const identity = submittedEmail || submittedUniqname
+  const email = identity.includes('@') ? identity : identity ? `${identity}@umich.edu` : ''
+
+  if (!email || !emailPattern.test(email)) {
+    errors.push('A valid email address is required.')
+  }
+
+  const uniqname = email ? emailToDisplayUniqname(email) : ''
+  return { email, uniqname }
+}
+
 const validatePassword = (password: string, errors: string[]) => {
   if (password.length < 8) {
     errors.push('Password must be at least 8 characters.')
@@ -114,10 +135,6 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
       errors.push('A valid Google sign-in credential is required.')
     }
 
-    if (profileEmail && !profileEmail.toLowerCase().endsWith(UMICH_EMAIL_DOMAIN)) {
-      errors.push('Use your UMich Google account to continue.')
-    }
-
     return errors.length
       ? { success: false, data: null, errors }
       : {
@@ -139,12 +156,7 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
         }
   }
 
-  const uniqname = normalizeUniqname(getString(body, 'uniqname') || getString(body, 'email'))
-  const email = `${uniqname}${UMICH_EMAIL_DOMAIN}`
-
-  if (!uniqname || !uniqnamePattern.test(uniqname)) {
-    errors.push('A valid UMich uniqname is required.')
-  }
+  const { email, uniqname } = normalizeAccountIdentity(body, errors)
 
   if (action === 'requestMagicLink') {
     return errors.length

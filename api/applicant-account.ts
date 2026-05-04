@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 type ApplicantAccount = {
   firstName: string
@@ -47,9 +48,8 @@ type ValidationResult =
   | { success: true; data: ApplicantAccountRequest; errors: [] }
   | { success: false; data: null; errors: string[] }
 
-const UMICH_EMAIL_DOMAIN = '@umich.edu'
-const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
-const INVALID_AUTH_ERROR = 'Invalid uniqname or password.'
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const INVALID_AUTH_ERROR = 'Invalid email or password.'
 const AUTH_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
 const AUTH_RATE_LIMIT_MAX_FAILURES = 8
 
@@ -71,12 +71,27 @@ const getString = (payload: Record<string, unknown>, key: string) => {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-const normalizeUniqname = (value: unknown) => {
-  if (typeof value !== 'string') {
-    return ''
+const normalizeEmail = (value: unknown) => (
+  typeof value === 'string' ? value.trim().toLowerCase() : ''
+)
+
+const emailToDisplayUniqname = (email: string) => {
+  const localPart = email.replace(/@.*$/, '').toLowerCase().replace(/[^a-z0-9._-]+/g, '')
+  return localPart || 'member'
+}
+
+const normalizeAccountIdentity = (body: Record<string, unknown>, errors: string[]) => {
+  const submittedEmail = normalizeEmail(getString(body, 'email'))
+  const submittedUniqname = normalizeEmail(getString(body, 'uniqname'))
+  const identity = submittedEmail || submittedUniqname
+  const email = identity.includes('@') ? identity : identity ? `${identity}@umich.edu` : ''
+
+  if (!email || !emailPattern.test(email)) {
+    errors.push('A valid email address is required.')
   }
 
-  return value.trim().toLowerCase().replace(/@.*$/, '')
+  const uniqname = email ? emailToDisplayUniqname(email) : ''
+  return { email, uniqname }
 }
 
 const validatePassword = (password: string, errors: string[]) => {
@@ -114,10 +129,6 @@ const validateApplicantAccountPayload = (payload: unknown): ValidationResult => 
     const profilePicture = profilePayload ? getString(profilePayload, 'picture') : ''
 
     if (credential.length < 20) errors.push('A valid Google sign-in credential is required.')
-    if (profileEmail && !profileEmail.toLowerCase().endsWith(UMICH_EMAIL_DOMAIN)) {
-      errors.push('Use your UMich Google account to continue.')
-    }
-
     return errors.length
       ? { success: false, data: null, errors }
       : {
@@ -139,12 +150,7 @@ const validateApplicantAccountPayload = (payload: unknown): ValidationResult => 
         }
   }
 
-  const uniqname = normalizeUniqname(getString(body, 'uniqname') || getString(body, 'email'))
-  const email = `${uniqname}${UMICH_EMAIL_DOMAIN}`
-
-  if (!uniqname || !uniqnamePattern.test(uniqname)) {
-    errors.push('A valid UMich uniqname is required.')
-  }
+  const { email, uniqname } = normalizeAccountIdentity(body, errors)
 
   if (action === 'requestMagicLink') {
     return errors.length
@@ -264,9 +270,9 @@ const verifyLocalSuperAdminSession = (sessionToken: string) => {
   }
 }
 
-const superAdminPasswordAccount = (uniqname: string, password: string): ApplicantAccount | null => {
-  const normalizedUniqname = uniqname.toLowerCase().replace(/@.*$/, '')
-  if (normalizedUniqname !== 'sbodine') {
+const superAdminPasswordAccount = (email: string, password: string): ApplicantAccount | null => {
+  const normalizedIdentity = email.toLowerCase()
+  if (normalizedIdentity !== 'sbodine' && normalizedIdentity !== 'sbodine@umich.edu') {
     return null
   }
 
@@ -301,10 +307,6 @@ const verifyGoogleCredential = async (credential: string): Promise<ApplicantAcco
   }
 
   const email = payload.email.toLowerCase()
-  if (!email.endsWith('@umich.edu')) {
-    throw new Error('Use your UMich Google account to continue.')
-  }
-
   const uniqname = email.replace(/@.*$/, '')
   const fallbackName = payload.name || uniqname
 
@@ -346,7 +348,7 @@ const requestIp = (req: VercelRequest) => {
   return req.socket?.remoteAddress || 'unknown'
 }
 
-const authAttemptKey = (req: VercelRequest, uniqname: string) => `${requestIp(req)}:${uniqname}`
+const authAttemptKey = (req: VercelRequest, email: string) => `${requestIp(req)}:${email}`
 
 const pruneExpiredAuthBuckets = (now: number) => {
   if (authAttemptBuckets.size < 128) return
@@ -412,7 +414,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   let fallbackToLocalAdmin = false
   const signInRateLimitKey = result.data.action === 'signIn'
-    ? authAttemptKey(req, result.data.uniqname)
+    ? authAttemptKey(req, result.data.email)
     : ''
 
   if (signInRateLimitKey && isRateLimited(signInRateLimitKey)) {
@@ -427,6 +429,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       account: superAdminAccountResponse,
       application: null,
     })
+  }
+
+  if (result.data.action === 'session') {
+    const restored = await createLocalRecruitingStore().restoreSession(result.data.sessionToken)
+    if (restored) {
+      return res.status(200).json({
+        success: true,
+        account: restored.account,
+        sessionToken: restored.sessionToken,
+        application: restored.application,
+      })
+    }
   }
 
   if (result.data.action === 'googleSignIn') {
@@ -446,7 +460,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (result.data.action === 'signIn') {
     try {
-      const adminAccount = superAdminPasswordAccount(result.data.uniqname, result.data.password)
+      const adminAccount = superAdminPasswordAccount(result.data.email, result.data.password)
       fallbackToLocalAdmin = Boolean(adminAccount)
       scriptPayload = adminAccount
         ? {
@@ -467,6 +481,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (signInRateLimitKey) recordAuthFailure(signInRateLimitKey)
       const message = error instanceof Error ? error.message : INVALID_AUTH_ERROR
       return res.status(401).json({ error: message })
+    }
+  }
+
+  if (result.data.action === 'create') {
+    const stored = await createLocalRecruitingStore().upsertAccount(result.data.account, result.data.password)
+    return res.status(200).json({
+      success: true,
+      accountCreated: true,
+      account: stored.account,
+      sessionToken: stored.sessionToken,
+      application: stored.application,
+    })
+  }
+
+  if (result.data.action === 'signIn' && !fallbackToLocalAdmin) {
+    const stored = await createLocalRecruitingStore().signIn(result.data.email, result.data.password)
+    if (stored) {
+      if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
+      return res.status(200).json({
+        success: true,
+        account: stored.account,
+        sessionToken: stored.sessionToken,
+        application: stored.application,
+      })
     }
   }
 
@@ -508,7 +546,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (result.data.action === 'signIn') {
         if (payload?.code === 'EMAIL_VERIFICATION_REQUIRED') {
           return res.status(403).json({
-            error: payload?.error || 'Check your UMich email to finish setting up your account before signing in.',
+            error: payload?.error || 'Check your email to finish setting up your account before signing in.',
             code: 'EMAIL_VERIFICATION_REQUIRED',
           })
         }

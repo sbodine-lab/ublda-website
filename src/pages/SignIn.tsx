@@ -3,7 +3,6 @@ import type { FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { useMemberAuth } from '../hooks/useMemberAuth'
-import { normalizeUniqname } from '../lib/application'
 import './SignIn.css'
 
 declare global {
@@ -29,7 +28,7 @@ export default function SignIn() {
   const [manualForm, setManualForm] = useState({
     firstName: '',
     lastName: '',
-    uniqname: '',
+    email: '',
     password: '',
     confirmPassword: '',
   })
@@ -121,7 +120,7 @@ export default function SignIn() {
     try {
       if (manualMode === 'signin') {
         await signInWithPassword({
-          uniqname: manualForm.uniqname,
+          email: manualForm.email,
           password: manualForm.password,
         })
         navigate('/dashboard')
@@ -145,7 +144,7 @@ export default function SignIn() {
           password: '',
           confirmPassword: '',
         }))
-        setNotice('Check your UMich email to finish signing in.')
+        setNotice('Account created. You can sign in with that email and password anytime.')
         return
       }
     } catch (caughtError) {
@@ -176,7 +175,7 @@ export default function SignIn() {
             <div className="signin-card">
               <div>
                 <h2>Continue to UBLDA</h2>
-                <p>Sign in with your uniqname and password, or create an account in under a minute.</p>
+                <p>Sign in or create an account with any email and password.</p>
               </div>
 
               <div className="signin-card__tabs" role="tablist" aria-label="Sign-in method">
@@ -233,21 +232,18 @@ export default function SignIn() {
                 )}
 
                 <label>
-                  <span>UMich uniqname</span>
-                  <div className="signin-card__email">
-                    <input
-                      type="text"
-                      value={manualForm.uniqname}
-                      onChange={(event) => setManualForm((current) => ({ ...current, uniqname: normalizeUniqname(event.target.value) }))}
-                      autoComplete="username"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      pattern="[a-z0-9._-]{2,32}"
-                      maxLength={32}
-                      required
-                    />
-                    <small>@umich.edu</small>
-                  </div>
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    value={manualForm.email}
+                    onChange={(event) => setManualForm((current) => ({ ...current, email: event.target.value.trim().toLowerCase() }))}
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    maxLength={160}
+                    placeholder="you@example.com"
+                    required
+                  />
                 </label>
 
                 <label>

@@ -14,9 +14,9 @@ type AuthContextValue = {
   member: MemberProfile | null
   sessionToken: string
   signInWithGoogle: (credential: string, profile?: GoogleProfile) => Promise<void>
-  signInWithPassword: (payload: { uniqname: string; password: string }) => Promise<void>
-  createAccount: (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => Promise<'signed-in' | 'verification-sent'>
-  requestSignInLink: (uniqname: string) => Promise<void>
+  signInWithPassword: (payload: { email: string; password: string }) => Promise<void>
+  createAccount: (payload: { firstName: string; lastName: string; email: string; password: string }) => Promise<'signed-in' | 'verification-sent'>
+  requestSignInLink: (email: string) => Promise<void>
   signOut: () => void
 }
 
@@ -152,7 +152,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signInWithGoogle = useCallback(async (credential: string, profile?: GoogleProfile) => {
-    if (import.meta.env.DEV && credential === 'local-preview-google-credential-token' && profile?.email.endsWith('@umich.edu')) {
+    if (import.meta.env.DEV && credential === 'local-preview-google-credential-token' && profile?.email) {
       const previewAccount: ApplicantAccount = {
         firstName: profile.firstName || 'Preview',
         lastName: profile.lastName || 'Member',
@@ -172,7 +172,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     applySession(result.account, result.application, result.sessionToken, true)
   }, [applySession, postAccountAction])
 
-  const signInWithPassword = useCallback(async (payload: { uniqname: string; password: string }) => {
+  const signInWithPassword = useCallback(async (payload: { email: string; password: string }) => {
     const result = await postAccountAction({ action: 'signIn', ...payload })
 
     if (!result.account || !result.sessionToken) {
@@ -182,7 +182,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     applySession(result.account, result.application, result.sessionToken, true)
   }, [applySession, postAccountAction])
 
-  const createAccount = useCallback(async (payload: { firstName: string; lastName: string; uniqname: string; password: string }) => {
+  const createAccount = useCallback(async (payload: { firstName: string; lastName: string; email: string; password: string }) => {
     const result = await postAccountAction({ action: 'create', ...payload })
 
     if (result.account && result.sessionToken) {
@@ -197,8 +197,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     throw new Error('Account creation did not return a verification link.')
   }, [applySession, postAccountAction])
 
-  const requestSignInLink = useCallback(async (uniqname: string) => {
-    await postAccountAction({ action: 'requestMagicLink', uniqname })
+  const requestSignInLink = useCallback(async (email: string) => {
+    await postAccountAction({ action: 'requestMagicLink', email })
   }, [postAccountAction])
 
   const member = useMemo(() => account ? buildMemberProfile(account, application) : null, [account, application])

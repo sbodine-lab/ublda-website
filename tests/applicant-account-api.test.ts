@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/applicant-account.ts'
 
@@ -23,27 +26,18 @@ const createResponse = () => {
   }
 }
 
-test('creates an applicant account through the configured script backend', async () => {
+test('creates an applicant account in the account backend with any email', async () => {
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
   const originalFetch = globalThis.fetch
-  let forwardedBody: Record<string, unknown> | null = null
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-account-api-'))
 
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-    globalThis.fetch = async (_url, init) => {
-      forwardedBody = JSON.parse(String(init?.body || '{}'))
-      return new Response(JSON.stringify({
-        success: true,
-        accountCreated: true,
-        magicLinkSent: true,
-        sessionToken: 'token-token-token-token-token-token',
-        account: {
-          firstName: 'Alex',
-        lastName: 'Chen',
-        uniqname: 'alexchen',
-        email: 'alexchen@umich.edu',
-      },
-      application: null,
-    }), { status: 200 })
+  delete process.env.GOOGLE_SCRIPT_URL
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'accounts.json')
+  globalThis.fetch = async () => {
+    throw new Error('legacy script should not be called')
   }
 
   try {
@@ -59,7 +53,7 @@ test('creates an applicant account through the configured script backend', async
         action: 'create',
         firstName: 'Alex',
         lastName: 'Chen',
-        uniqname: 'AlexChen',
+        email: 'alexchen@example.com',
         password: 'secure-password',
       },
     }, res)
@@ -67,21 +61,26 @@ test('creates an applicant account through the configured script backend', async
     assert.equal(result().statusCode, 200)
     assert.equal((result().payload as Record<string, unknown>).success, true)
     assert.equal((result().payload as Record<string, unknown>).accountCreated, true)
-    assert.equal((result().payload as Record<string, unknown>).magicLinkSent, true)
-    assert.equal((result().payload as Record<string, unknown>).sessionToken, undefined)
-    assert.equal((result().payload as Record<string, unknown>).account, undefined)
-    assert.equal(forwardedBody?.formType, 'applicantAccount')
-    assert.equal(forwardedBody?.action, 'create')
-    assert.equal((forwardedBody?.account as Record<string, unknown>).email, 'alexchen@umich.edu')
-    assert.equal(forwardedBody?.password, 'secure-password')
-    assert.equal(forwardedBody?.origin, 'https://ublda.org')
+    assert.equal(((result().payload as Record<string, unknown>).account as Record<string, unknown>).email, 'alexchen@example.com')
+    assert.match(String((result().payload as Record<string, unknown>).sessionToken), /^local_/)
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL
     } else {
       process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
     }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
     globalThis.fetch = originalFetch
+    await rm(dir, { recursive: true, force: true })
   }
 })
 

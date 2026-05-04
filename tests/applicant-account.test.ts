@@ -2,30 +2,30 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { validateApplicantAccountPayload } from '../src/lib/applicantAccount.ts'
 
-test('validates applicant account creation with a UMich identity', () => {
+test('validates applicant account creation with any email identity', () => {
   const result = validateApplicantAccountPayload({
     action: 'create',
     firstName: 'Sam',
     lastName: 'Bodine',
-    uniqname: 'SBoDine@umich.edu',
+    email: 'sam.test@example.com',
     password: 'secure-password',
   })
 
   assert.equal(result.success, true)
   assert.equal(result.data?.action, 'create')
-  assert.equal(result.data?.action === 'create' ? result.data.account.email : '', 'sbodine@umich.edu')
+  assert.equal(result.data?.action === 'create' ? result.data.account.email : '', 'sam.test@example.com')
 })
 
-test('validates uniqname and password sign-in requests', () => {
+test('validates email and password sign-in requests', () => {
   const result = validateApplicantAccountPayload({
     action: 'signIn',
-    uniqname: 'SBoDine@umich.edu',
+    email: 'Sam.Test@Example.com',
     password: 'secure-password',
   })
 
   assert.equal(result.success, true)
   assert.equal(result.data?.action, 'signIn')
-  assert.equal(result.data?.action === 'signIn' ? result.data.email : '', 'sbodine@umich.edu')
+  assert.equal(result.data?.action === 'signIn' ? result.data.email : '', 'sam.test@example.com')
 })
 
 test('validates passwordless sign-in link requests', () => {
@@ -42,7 +42,7 @@ test('validates passwordless sign-in link requests', () => {
 test('requires a usable password for account access', () => {
   const result = validateApplicantAccountPayload({
     action: 'signIn',
-    uniqname: 'sbodine',
+    email: 'sbodine@umich.edu',
     password: 'short',
   })
 
@@ -50,12 +50,12 @@ test('requires a usable password for account access', () => {
   assert.match(result.errors.join(' '), /password/i)
 })
 
-test('validates Google sign-in credentials with UMich profiles', () => {
+test('validates Google sign-in credentials with any verified email profile', () => {
   const result = validateApplicantAccountPayload({
     action: 'googleSignIn',
     credential: 'google-token-google-token-google-token',
     profile: {
-      email: 'alexchen@umich.edu',
+      email: 'alexchen@example.com',
       firstName: 'Alex',
       lastName: 'Chen',
     },

@@ -631,6 +631,14 @@
   grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
 }
 
+.admin-dashboard__two--calendar {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-dashboard__two--calendar .admin-side-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .admin-side-stack {
   display: grid;
   gap: var(--space-4);
@@ -1076,7 +1084,7 @@
 
 .admin-calendar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(210px, 1fr));
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
   gap: 0;
   overflow-x: auto;
   padding-bottom: 4px;
@@ -1156,18 +1164,18 @@
 .admin-calendar-coverage__slots {
   display: grid;
   gap: 6px;
-  max-height: 310px;
+  max-height: 250px;
   overflow-y: auto;
   padding-right: 2px;
 }
 
 .admin-coverage-slot {
   display: grid;
-  grid-template-columns: minmax(112px, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
-  min-height: 42px;
-  padding: 8px 9px;
+  min-height: 38px;
+  padding: 7px 8px;
   border: 1px solid var(--admin-line);
   border-left-width: 4px;
   border-radius: 7px;
@@ -1176,16 +1184,9 @@
 
 .admin-coverage-slot time {
   color: var(--color-navy);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 900;
   line-height: 1.25;
-}
-
-.admin-coverage-slot > div {
-  display: grid;
-  justify-items: end;
-  gap: 4px;
-  min-width: 0;
 }
 
 .admin-coverage-slot strong {
@@ -1199,25 +1200,6 @@
   font-size: 0.68rem;
   font-weight: 900;
   white-space: nowrap;
-}
-
-.admin-coverage-slot span {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 3px;
-}
-
-.admin-coverage-slot mark {
-  display: inline-grid;
-  width: 23px;
-  height: 23px;
-  place-items: center;
-  border-radius: var(--radius-full);
-  background: var(--admin-soft-teal);
-  color: var(--color-navy);
-  font-size: 0.61rem;
-  font-weight: 900;
 }
 
 .admin-coverage-slot--covered {
@@ -1587,6 +1569,8 @@
   .admin-dashboard__three,
   .admin-dashboard__two,
   .admin-dashboard__two--wide,
+  .admin-dashboard__two--calendar,
+  .admin-dashboard__two--calendar .admin-side-stack,
   .admin-settings-layout,
   .admin-overview-hero,
   .admin-page-heading {
