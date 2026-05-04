@@ -3,7 +3,6 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import {
   INTERVIEW_BLOCK_WITH_BUFFER_LABEL,
-  INTERVIEW_DAY_RANGE_LABEL,
 } from '../lib/interviews'
 import { normalizeUniqname } from '../lib/application'
 import AvailabilityPicker from '../components/AvailabilityPicker'
@@ -29,13 +28,6 @@ const initialForm: AvailabilityForm = {
   notes: '',
   website: '',
 }
-
-const scheduleFacts = [
-  '20 min interview',
-  '10 min buffer',
-  'Google Meet',
-  'Match Wednesday',
-]
 
 export default function InterviewerAvailability() {
   const [form, setForm] = useState(initialForm)
@@ -87,28 +79,9 @@ export default function InterviewerAvailability() {
   }
 
   return (
-    <main id="main-content" className="apply-page apply-page--interviewer">
-      <section className="interviewer-shell">
-        <div className="container interviewer-shell__grid">
-          <Reveal>
-            <aside className="interviewer-intro">
-              <p className="section__label">E-Board Availability</p>
-              <h1 className="apply-page__headline">
-                E-board <em>availability</em>
-              </h1>
-              <p className="apply-page__intro">
-                Select the slots you can cover. {INTERVIEW_DAY_RANGE_LABEL}.
-              </p>
-
-              <div className="interviewer-facts" aria-label="Interview schedule details">
-                {scheduleFacts.map((fact) => (
-                  <span key={fact}>{fact}</span>
-                ))}
-              </div>
-            </aside>
-          </Reveal>
-
-          <div className="interviewer-form-column">
+    <main id="main-content" className="apply-page apply-page--interviewer apply-page--simple-form">
+      <section className="interviewer-simple">
+        <div className="container container--narrow">
           {submitted ? (
             <Reveal>
               <div className="apply-form__success" role="alert" aria-live="polite">
@@ -129,11 +102,11 @@ export default function InterviewerAvailability() {
           ) : (
             <Reveal>
               <form className="apply-form" onSubmit={handleSubmit}>
-                <div className="apply-form__header">
-                  <p className="section__label">Interviewer Form</p>
+                <div className="apply-form__header interviewer-simple__header">
+                  <p className="section__label">E-Board Availability</p>
                   <h2 className="apply-form__title">Your availability.</h2>
                   <p className="apply-form__subtitle">
-                    Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
+                    May 7-10, 8 AM-10 PM ET. Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
                   </p>
                 </div>
 
@@ -206,7 +179,6 @@ export default function InterviewerAvailability() {
               </form>
             </Reveal>
           )}
-          </div>
         </div>
       </section>
     </main>
