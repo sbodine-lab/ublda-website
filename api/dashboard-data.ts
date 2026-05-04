@@ -1,4 +1,56 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
+const superAdminSessionSecret = () => (
+  process.env.UBLDA_SUPER_ADMIN_PASSWORD
+  || process.env.SAM_BODINE_PASSWORD
+  || process.env.GOOGLE_SCRIPT_URL
+  || 'ublda-local-session'
+)
+
+const signSessionPayload = (payload: string) => (
+  createHmac('sha256', superAdminSessionSecret()).update(payload).digest('base64url')
+)
+
+const safeEquals = (left: string, right: string) => {
+  const leftBuffer = Buffer.from(left)
+  const rightBuffer = Buffer.from(right)
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+const verifyLocalSuperAdminSession = (sessionToken: string) => {
+  const [prefix, payload, signature] = sessionToken.split('.')
+  if (prefix !== 'ublda_admin' || !payload || !signature) return false
+  if (!safeEquals(signature, signSessionPayload(payload))) return false
+
+  try {
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
+    return decoded.email === 'sbodine@umich.edu' && typeof decoded.exp === 'number' && decoded.exp > Date.now()
+  } catch {
+    return false
+  }
+}
+
+const localSuperAdminPayload = () => ({
+  success: true,
+  account: {
+    firstName: 'Sam',
+    lastName: 'Bodine',
+    uniqname: 'sbodine',
+    email: 'sbodine@umich.edu',
+    role: 'super-admin',
+    adminTitle: 'Super Admin',
+    adminScopes: ['recruiting', 'members', 'events', 'sponsors', 'publishing', 'system'],
+  },
+  role: 'super-admin',
+  dashboardData: {
+    backendStatus: {
+      source: 'sheets',
+      message: 'Signed in through Vercel super-admin session. Publish the Apps Script backend for live sheet data.',
+      updatedAt: new Date().toISOString(),
+    },
+  },
+})
 
 const getSessionToken = (body: unknown) => {
   if (!body || typeof body !== 'object') return ''
@@ -13,6 +65,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const sessionToken = getSessionToken(req.body)
   if (sessionToken.length < 24) {
     return res.status(401).json({ error: 'A valid member session is required.' })
+  }
+
+  if (verifyLocalSuperAdminSession(sessionToken)) {
+    return res.status(200).json(localSuperAdminPayload())
   }
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL

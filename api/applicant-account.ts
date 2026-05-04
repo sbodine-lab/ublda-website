@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { timingSafeEqual } from 'node:crypto'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 
 type ApplicantAccount = {
   firstName: string
@@ -203,6 +203,20 @@ const superAdminPassword = () => (
   || ''
 )
 
+const superAdminSessionSecret = () => superAdminPassword() || process.env.GOOGLE_SCRIPT_URL || 'ublda-local-session'
+
+const signSessionPayload = (payload: string) => (
+  createHmac('sha256', superAdminSessionSecret()).update(payload).digest('base64url')
+)
+
+const createSuperAdminSessionToken = () => {
+  const payload = Buffer.from(JSON.stringify({
+    email: 'sbodine@umich.edu',
+    exp: Date.now() + 1000 * 60 * 60 * 24 * 30,
+  })).toString('base64url')
+  return `ublda_admin.${payload}.${signSessionPayload(payload)}`
+}
+
 const constantTimeEquals = (submitted: string, expected: string) => {
   const submittedBuffer = Buffer.from(submitted)
   const expectedBuffer = Buffer.from(expected)
@@ -262,6 +276,24 @@ const verifyGoogleCredential = async (credential: string): Promise<ApplicantAcco
   }
 }
 
+const superAdminAccountResponse = {
+  firstName: 'Sam',
+  lastName: 'Bodine',
+  uniqname: 'sbodine',
+  email: 'sbodine@umich.edu',
+  role: 'super-admin',
+  adminTitle: 'Super Admin',
+  adminScopes: ['recruiting', 'members', 'events', 'sponsors', 'publishing', 'system'],
+}
+
+const localSuperAdminResponse = () => ({
+  success: true,
+  account: superAdminAccountResponse,
+  sessionToken: createSuperAdminSessionToken(),
+  application: null,
+  localAdminSession: true,
+})
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -280,6 +312,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ...result.data,
     origin: baseUrlForRequest(req),
   }
+  let fallbackToLocalAdmin = false
 
   if (result.data.action === 'googleSignIn') {
     try {
@@ -299,6 +332,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (result.data.action === 'signIn') {
     try {
       const adminAccount = superAdminPasswordAccount(result.data.uniqname, result.data.password)
+      fallbackToLocalAdmin = Boolean(adminAccount)
       scriptPayload = adminAccount
         ? {
             formType: 'applicantAccount',
@@ -322,6 +356,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (!scriptUrl) {
+    if (fallbackToLocalAdmin) {
+      return res.status(200).json(localSuperAdminResponse())
+    }
+
     return res.status(500).json({ error: 'Form backend not configured' })
   }
 
@@ -338,6 +376,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = await response.json().catch(() => null)
 
     if (!response.ok || payload?.success === false) {
+      if (fallbackToLocalAdmin) {
+        return res.status(200).json(localSuperAdminResponse())
+      }
+
       return res.status(response.ok ? 400 : 500).json({
         error: payload?.error || 'Failed to update applicant account',
       })
@@ -345,12 +387,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({
       success: true,
-      account: payload?.account || ('account' in result.data ? result.data.account : null),
+      account: payload?.account || (fallbackToLocalAdmin ? superAdminAccountResponse : 'account' in result.data ? result.data.account : null),
       sessionToken: payload?.sessionToken || '',
       application: payload?.application || null,
       magicLinkSent: Boolean(payload?.magicLinkSent),
     })
   } catch {
+    if (fallbackToLocalAdmin) {
+      return res.status(200).json(localSuperAdminResponse())
+    }
+
     return res.status(500).json({ error: 'Failed to update applicant account' })
   } finally {
     clearTimeout(timeout)
