@@ -141,6 +141,8 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
   const sheetCandidates = Array.isArray(dashboardData.candidates) ? dashboardData.candidates as Record<string, unknown>[] : []
   const sheetInterviewers = Array.isArray(dashboardData.interviewerAvailability) ? dashboardData.interviewerAvailability as Record<string, unknown>[] : []
   const sheetMembers = Array.isArray(dashboardData.memberSignups) ? dashboardData.memberSignups as Record<string, unknown>[] : []
+  const existingBackendStatus = dashboardData.backendStatus as { source?: unknown } | undefined
+  const hasSheetDashboard = existingBackendStatus?.source === 'sheets'
   const nextDashboardData = {
     ...dashboardData,
     candidates: storeCandidates.length ? mergeById(storeCandidates as unknown as Record<string, unknown>[], sheetCandidates) : dashboardData.candidates,
@@ -151,7 +153,7 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
     adminAccounts: dashboardData.adminAccounts || storeDashboardData.adminAccounts,
     backendStatus: hasStoreRecruitingData ? {
       source: storeDashboardData.backendStatus?.source || 'vercel',
-      message: dashboardData.backendStatus
+      message: hasSheetDashboard
         ? 'Loaded account data from Google Sheets and recruiting responses from the private Vercel backend.'
         : storeDashboardData.backendStatus?.message || 'Loaded recruiting data from the private Vercel backend.',
       updatedAt: new Date().toISOString(),
