@@ -1,0 +1,349 @@
+/* ============================================================================
+   UBLDA member face — spec §8 (design contract), §7 (a11y contract).
+
+   Rules this file obeys, verbatim:
+   · Only `--p-*` tokens. `--space-*` never appears inside `.portal`.
+   · Teal never appears here at all. It is reserved, in portal.css, for the five
+     "you are here / this is live" rules; a sixth use would dilute the signal,
+     and it can never be text on a light surface anyway.
+   · Gold means one thing — needs attention — and nothing on the member face
+     needs attention, so gold does not appear.
+   · Elevation is borders. The one shadow token belongs to overlays.
+   · Weights 400 / 500 / 600 / 700 only. Serif for titles and figures only.
+   · `min-height`, never `height` (SC 1.4.12). Never `outline: none`.
+   ========================================================================== */
+
+/* ── Load + error ────────────────────────────────────────────────────── */
+
+.member-loading { display: flex; flex-direction: column; gap: var(--p-4); }
+.member-loading__bar { min-height: 32px; max-width: 320px; }
+.member-loading__block { min-height: 160px; }
+
+.member-error { border-color: var(--p-danger-ink); border-left-width: 3px; }
+
+/* ── 1. Identity strip ───────────────────────────────────────────────── */
+
+.member-identity {
+  flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: var(--p-4);
+}
+.member-identity__text { display: flex; flex-direction: column; gap: var(--p-1); min-width: 0; }
+.member-identity__name {
+  font-family: var(--font-display); font-size: var(--p-text-xl);
+  letter-spacing: -0.02em; line-height: 1.1;
+}
+.member-identity__meta { color: var(--p-text-muted); font-size: var(--p-text-sm); }
+.member-identity__actions {
+  margin-left: auto; display: flex; flex-wrap: wrap; gap: var(--p-2); align-items: center;
+}
+
+/* ── 3. Access prompt ────────────────────────────────────────────────── */
+
+.member-prompt {
+  border: 1px solid var(--p-border-strong); border-radius: var(--p-radius);
+  background: var(--p-surface-sunken); padding: var(--p-3) var(--p-4);
+  font-size: var(--p-text-sm); max-width: none;
+}
+.member-prompt strong { font-weight: 600; color: var(--p-text-strong); }
+
+/* ── 2. Event cards ──────────────────────────────────────────────────── */
+
+.member-cardlist { display: flex; flex-direction: column; gap: var(--p-4); }
+
+.member-card {
+  display: flex; gap: var(--p-4); min-width: 0;
+  border: 1px solid var(--p-hairline); border-radius: var(--p-radius);
+  background: var(--p-surface); padding: var(--p-4);
+}
+.member-card--past { background: var(--p-surface-sunken); }
+
+.member-card__date {
+  flex: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  min-width: 56px; padding: var(--p-2) var(--p-1);
+  border-right: 1px solid var(--p-hairline);
+}
+.member-card__month {
+  font-size: var(--p-text-micro); font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--p-text-muted);
+}
+.member-card__day {
+  font-family: var(--font-display); font-size: var(--p-text-xl); line-height: 1.05;
+  color: var(--p-text-strong); font-variant-numeric: tabular-nums;
+}
+
+.member-card__body { display: flex; flex-direction: column; gap: var(--p-2); min-width: 0; flex: 1 1 auto; }
+.member-card__title {
+  font-family: var(--font-display); font-size: var(--p-text-lg);
+  letter-spacing: -0.01em; line-height: 1.2;
+}
+.member-card__titlelink { color: inherit; text-decoration: none; }
+.member-card__titlelink:hover { text-decoration: underline; text-underline-offset: 3px; }
+.member-card__when { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-card__where { display: flex; align-items: center; gap: var(--p-2); font-size: var(--p-text-sm); }
+.member-card__speaker { font-size: var(--p-text-sm); color: var(--p-text-muted); }
+.member-card__summary { font-size: var(--p-text-sm); }
+.member-card__access {
+  border-top: 1px solid var(--p-hairline); padding-top: var(--p-3);
+  display: flex; flex-direction: column; gap: var(--p-2);
+}
+.member-card__accesshead {
+  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--p-text-muted); max-width: none;
+}
+.member-card__actions { display: flex; flex-wrap: wrap; gap: var(--p-2); margin-top: var(--p-1); }
+
+/* ── Access commitment list ──────────────────────────────────────────── */
+
+.member-access-list { display: flex; flex-direction: column; gap: var(--p-1); list-style: none; }
+.member-access-list__row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: var(--p-2); min-height: 28px;
+}
+.member-access-list__label { font-size: var(--p-text-sm); min-width: 0; }
+
+/* ── RSVP row ────────────────────────────────────────────────────────── */
+
+.member-rsvp {
+  display: flex; flex-direction: column; gap: var(--p-2);
+  border-top: 1px solid var(--p-hairline); padding-top: var(--p-3);
+}
+.member-rsvp__row { display: flex; flex-wrap: wrap; gap: var(--p-2); }
+.member-rsvp__btn { flex: 1 1 auto; min-width: 132px; }
+/* The chosen answer is navy — structure, not decoration — and it is always
+   restated in words underneath, so colour is never the only cue. */
+.member-rsvp__btn[data-selected="true"] {
+  background: var(--color-navy); border-color: var(--color-navy); color: var(--color-white);
+  font-weight: 700;
+}
+.member-rsvp__btn[data-selected="true"]:hover { background: var(--color-navy-light); border-color: var(--color-navy-light); }
+.member-rsvp__btn[data-selected="true"]:focus-visible {
+  outline-color: var(--p-focus-on-dark); box-shadow: 0 0 0 4px var(--p-focus-halo-dark);
+}
+:root[data-theme="dark"] .member-rsvp__btn[data-selected="true"] {
+  background: var(--color-navy-light); border-color: var(--p-border-strong);
+}
+.member-rsvp__note { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+
+/* ── 4. Announcements ────────────────────────────────────────────────── */
+
+.member-news { display: flex; flex-direction: column; gap: var(--p-4); list-style: none; }
+.member-news__item {
+  display: flex; flex-direction: column; gap: var(--p-2);
+  border-left: 3px solid var(--p-border-strong); padding-left: var(--p-4);
+}
+.member-news__title { font-family: var(--font-display); font-size: var(--p-text-md); }
+.member-news__meta { color: var(--p-text-muted); font-size: var(--p-text-xs); max-width: none; }
+.member-news__body { font-size: var(--p-text-sm); white-space: pre-wrap; }
+
+/* ── 5. Participation ────────────────────────────────────────────────── */
+
+/* Counts only. No denominator, no percentage, no streak — a ratio here would
+   be an accusation aimed at exactly the people this club exists for. */
+.member-count { display: flex; align-items: baseline; gap: var(--p-2); max-width: none; }
+.member-count__figure {
+  font-family: var(--font-display); font-size: var(--p-text-stat); line-height: 1;
+  color: var(--p-text-strong);
+}
+.member-count__label { font-size: var(--p-text-sm); color: var(--p-text-muted); }
+
+.member-chips { display: flex; flex-wrap: wrap; gap: var(--p-2); list-style: none; }
+.member-chip {
+  display: inline-flex; flex-direction: column; gap: 2px;
+  min-height: 44px; padding: var(--p-2) var(--p-3);
+  border: 1px solid var(--p-border-strong); border-radius: var(--p-radius);
+  background: var(--p-surface); color: var(--p-text); text-decoration: none;
+}
+.member-chip:hover { background: var(--p-row-hover); }
+.member-chip__kind {
+  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--p-text-muted);
+}
+.member-chip__title { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-chip__when { font-size: var(--p-text-xs); color: var(--p-text-muted); }
+
+/* ── 6. Who to ask ───────────────────────────────────────────────────── */
+
+.member-officers {
+  display: grid; gap: var(--p-3); list-style: none;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.member-officer {
+  display: flex; flex-direction: column; gap: var(--p-1);
+  border: 1px solid var(--p-hairline); border-radius: var(--p-radius);
+  padding: var(--p-3) var(--p-4); min-width: 0;
+}
+.member-officer__name { font-weight: 600; color: var(--p-text-strong); }
+.member-officer__title { font-size: var(--p-text-xs); color: var(--p-text-muted); }
+.member-officer__ask { font-size: var(--p-text-sm); }
+.member-officer__mail {
+  display: inline-flex; align-items: center; gap: var(--p-2);
+  min-height: 44px; font-size: var(--p-text-sm); word-break: break-all;
+}
+
+/* ── Event detail ────────────────────────────────────────────────────── */
+
+.member-facts { display: flex; flex-direction: column; gap: var(--p-1); }
+.member-facts__row {
+  display: flex; flex-wrap: wrap; gap: var(--p-2) var(--p-4);
+  min-height: 28px; padding: var(--p-1) 0;
+  border-bottom: 1px solid var(--p-hairline);
+}
+.member-facts__row:last-child { border-bottom: 0; }
+.member-facts dt {
+  flex: 0 0 128px; font-size: var(--p-text-xs); font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase; color: var(--p-text-muted);
+}
+.member-facts dd { flex: 1 1 200px; font-size: var(--p-text-sm); min-width: 0; }
+
+.member-detail__summary { font-size: var(--p-text-sm); }
+.member-detail__contact { font-size: var(--p-text-sm); }
+.member-detail__link { font-size: var(--p-text-sm); }
+
+.member-note {
+  display: flex; flex-direction: column; gap: var(--p-3);
+  border: 1px solid var(--p-border-strong); border-radius: var(--p-radius);
+  padding: var(--p-4); background: var(--p-surface-sunken);
+}
+.member-note__title { font-family: var(--font-display); font-size: var(--p-text-md); }
+/* "Who can read this" is stated in words in BOTH states, every time. */
+.member-note__who {
+  border-left: 3px solid var(--p-border-strong); padding-left: var(--p-3);
+  font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text);
+}
+.member-note__who[data-shared="true"] {
+  border-left-color: var(--p-info-ink); background: var(--p-info-wash); color: var(--p-info-ink);
+  padding: var(--p-2) var(--p-3); border-radius: 0 var(--p-radius) var(--p-radius) 0;
+}
+.member-note__hint { font-size: var(--p-text-xs); color: var(--p-text-muted); }
+
+/* ── Forms ───────────────────────────────────────────────────────────── */
+
+.member-form { gap: var(--p-5); }
+.member-form__row { display: grid; gap: var(--p-4); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+/* ── Resources ───────────────────────────────────────────────────────── */
+
+.member-resources { display: flex; flex-direction: column; gap: var(--p-4); list-style: none; }
+.member-resource {
+  display: flex; flex-direction: column; gap: var(--p-1);
+  border-bottom: 1px solid var(--p-hairline); padding-bottom: var(--p-4);
+}
+.member-resource:last-child { border-bottom: 0; padding-bottom: 0; }
+.member-resource__title { font-family: var(--font-display); font-size: var(--p-text-md); }
+.member-resource__link {
+  display: inline-flex; align-items: center; gap: var(--p-2);
+  min-height: 32px; color: var(--p-accent-ink);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.member-resource__desc { font-size: var(--p-text-sm); }
+.member-resource__format {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--p-2);
+  font-size: var(--p-text-xs); color: var(--p-text-muted); max-width: none;
+}
+.member-resource__formatlabel {
+  font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--p-text-muted);
+}
+
+/* ── Access editor ───────────────────────────────────────────────────── */
+
+.member-access-editor { display: flex; flex-direction: column; gap: var(--p-5); }
+.member-access-editor__group { background: var(--p-surface); }
+
+.member-need { display: flex; flex-direction: column; gap: var(--p-2); }
+.member-need__detail {
+  display: flex; flex-direction: column; gap: var(--p-3);
+  margin: 0 0 var(--p-2) var(--p-6);
+  border-left: 2px solid var(--p-border-strong); padding-left: var(--p-4);
+}
+
+.member-withdraw {
+  flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: var(--p-4);
+  border-color: var(--p-border-strong); border-left-width: 3px;
+}
+.member-withdraw__text { display: flex; flex-direction: column; gap: var(--p-2); min-width: 0; flex: 1 1 300px; }
+
+/* ── Consent panel ───────────────────────────────────────────────────── */
+
+.member-consent {
+  display: flex; flex-direction: column; gap: var(--p-4);
+  border: 1px solid var(--p-border-strong); border-radius: var(--p-radius);
+  padding: var(--p-5); background: var(--p-surface-sunken);
+}
+.member-consent__title { font-family: var(--font-display); font-size: var(--p-text-lg); }
+/* ACCESS_CONSENT_TEXT, rendered verbatim and stored verbatim with the consent. */
+.member-consent__text {
+  border-left: 3px solid var(--p-border-strong); padding-left: var(--p-4);
+  font-size: var(--p-text-md); font-weight: 500; color: var(--p-text-strong);
+}
+.member-consent__leads { display: flex; flex-direction: column; gap: var(--p-2); }
+.member-consent__leadhead {
+  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--p-text-muted); max-width: none;
+}
+.member-consent__leadlist {
+  display: grid; gap: var(--p-2); list-style: none;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.member-consent__leadlist li {
+  display: flex; flex-direction: column; gap: 2px;
+  border: 1px solid var(--p-hairline); border-radius: var(--p-radius);
+  background: var(--p-surface); padding: var(--p-2) var(--p-3);
+  font-size: var(--p-text-sm); min-width: 0;
+}
+.member-consent__leadname { font-weight: 600; color: var(--p-text-strong); }
+.member-consent__leadtitle { font-size: var(--p-text-xs); color: var(--p-text-muted); }
+.member-consent__note { font-size: var(--p-text-xs); color: var(--p-text-muted); }
+
+/* ── The live preview of the admin card ──────────────────────────────── */
+
+.member-preview {
+  display: flex; flex-direction: column; gap: var(--p-2);
+  border: 1px dashed var(--p-border-strong); border-radius: var(--p-radius);
+  background: var(--p-surface); padding: var(--p-4);
+}
+.member-preview__title {
+  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--p-text-muted);
+}
+.member-preview__name { font-weight: 600; color: var(--p-text-strong); }
+/* Blank is never rendered as "no access needs". These are the literal words. */
+.member-preview__notshared {
+  font-family: var(--font-display); font-size: var(--p-text-lg); color: var(--p-text-strong);
+}
+.member-preview__needs { display: flex; flex-direction: column; gap: var(--p-2); list-style: none; }
+.member-preview__needs li {
+  display: flex; flex-direction: column; gap: 2px;
+  border-left: 2px solid var(--p-border-strong); padding-left: var(--p-3);
+}
+.member-preview__need { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-preview__priority {
+  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--p-text-muted);
+}
+.member-preview__detail { font-size: var(--p-text-sm); }
+.member-preview__generalblock {
+  display: flex; flex-direction: column; gap: 2px;
+  border-top: 1px solid var(--p-hairline); padding-top: var(--p-2);
+}
+.member-preview__generallabel {
+  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--p-text-muted); max-width: none;
+}
+.member-preview__general { font-size: var(--p-text-sm); white-space: pre-wrap; }
+.member-preview__note { font-size: var(--p-text-xs); color: var(--p-text-muted); max-width: 60ch; }
+
+/* ── Reflow: 320px and 200% zoom (SC 1.4.10) ─────────────────────────── */
+
+@media (max-width: 640px) {
+  .member-card { flex-direction: column; gap: var(--p-3); }
+  .member-card__date {
+    flex-direction: row; gap: var(--p-2); align-items: baseline;
+    min-width: 0; border-right: 0; border-bottom: 1px solid var(--p-hairline);
+    padding: 0 0 var(--p-2);
+  }
+  .member-card__day { font-size: var(--p-text-lg); }
+  .member-identity__actions { margin-left: 0; width: 100%; }
+  .member-rsvp__btn { flex: 1 1 100%; }
+  .member-access-list__row { justify-content: flex-start; }
+  .member-facts dt { flex: 1 1 100%; }
+  .member-need__detail { margin-left: var(--p-3); }
+}

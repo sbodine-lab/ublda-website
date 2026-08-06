@@ -2,6 +2,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react'
 import { APPLICANT_SESSION_STORAGE_KEY, AUTH_SESSION_CHANGED_EVENT } from '../lib/applicantAccount'
 import type { ApplicantAccount, ApplicantApplicationSummary, GoogleProfile } from '../lib/applicantAccount'
+import {
+  canPublish as canPublishEmail,
+  effectiveRoleForAccount,
+  scopesForEmail,
+} from '../lib/dashboardAccess'
+import type { AdminScope, DashboardRole } from '../lib/dashboardAccess'
 import { buildMemberProfile } from '../lib/memberData'
 import type { MemberProfile } from '../lib/memberData'
 
@@ -13,6 +19,18 @@ type AuthContextValue = {
   application: ApplicantApplicationSummary | null
   member: MemberProfile | null
   sessionToken: string
+  /**
+   * A RENDERING HINT, never an authorization decision (spec §4.2). It decides
+   * which sidebar items exist and which route a sign-in lands on. Every write is
+   * re-checked server-side against the session, so a tampered client value buys
+   * a 403, not access.
+   */
+  role: DashboardRole
+  isAdmin: boolean
+  isSuperAdmin: boolean
+  /** `super-admin` satisfies every scope, matching `requireScope` on the server. */
+  hasScope: (scope: AdminScope) => boolean
+  canPublish: boolean
   signInWithGoogle: (credential: string, profile?: GoogleProfile) => Promise<void>
   signInWithPassword: (payload: { email: string; password: string }) => Promise<void>
   createAccount: (payload: { firstName: string; lastName: string; email: string; password: string }) => Promise<'signed-in' | 'verification-sent'>
@@ -104,6 +122,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         lastName: 'Bodine',
         uniqname: 'sbodine',
         email: 'sbodine@umich.edu',
+        // DEV ONLY. This branch is the local preview session, which the store
+        // already treats as the super admin; without the verified marker the
+        // preview lands on the member face and the admin shell is unreachable
+        // locally. Production never reaches this line — `restoreSession` hard
+        // rejects the preview token and a test pins that.
+        verifiedVia: 'google',
       }, null, storedToken)
       return
     }
@@ -167,6 +191,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         lastName: profile.lastName || 'Member',
         uniqname: profile.email.replace(/@.*$/, ''),
         email: profile.email.toLowerCase(),
+        // DEV ONLY, and honest: this branch *is* the simulated Google path.
+        verifiedVia: 'google',
       }
       applySession(previewAccount, null, 'local-preview-session-token', true)
       return
@@ -212,18 +238,56 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   const member = useMemo(() => account ? buildMemberProfile(account, application) : null, [account, application])
 
+  /**
+   * Elevation follows `effectiveRoleForAccount`, the same rule the store uses:
+   * an explicitly granted role wins, otherwise only a Google-verified identity
+   * gets the roster's role. Anyone can self-register an officer's address on the
+   * public form, so a matching email string alone is worth nothing.
+   */
+  const role = useMemo<DashboardRole>(() => {
+    if (!account) return 'member'
+    return effectiveRoleForAccount({
+      email: account.email,
+      role: account.role,
+      verifiedVia: account.verifiedVia,
+    })
+  }, [account])
+
+  const isAdmin = role === 'exec' || role === 'super-admin'
+  const isSuperAdmin = role === 'super-admin'
+
+  const scopes = useMemo<AdminScope[]>(() => {
+    if (!account || !isAdmin) return []
+    // A console-granted scope set is the truth when it exists; the static roster
+    // is the fallback so a fresh Google sign-in is not scopeless.
+    const granted = account.adminScopes
+    return granted && granted.length > 0 ? granted : scopesForEmail(account.email)
+  }, [account, isAdmin])
+
+  const hasScope = useCallback(
+    (scope: AdminScope) => isSuperAdmin || scopes.includes(scope),
+    [isSuperAdmin, scopes],
+  )
+
+  const canPublish = Boolean(account && isAdmin && canPublishEmail(account.email))
+
   const value = useMemo<AuthContextValue>(() => ({
     status,
     account,
     application,
     member,
     sessionToken,
+    role,
+    isAdmin,
+    isSuperAdmin,
+    hasScope,
+    canPublish,
     signInWithGoogle,
     signInWithPassword,
     createAccount,
     requestSignInLink,
     signOut,
-  }), [account, application, createAccount, member, requestSignInLink, sessionToken, signInWithGoogle, signInWithPassword, signOut, status])
+  }), [account, application, canPublish, createAccount, hasScope, isAdmin, isSuperAdmin, member, requestSignInLink, role, sessionToken, signInWithGoogle, signInWithPassword, signOut, status])
 
   return (
     <AuthContext.Provider value={value}>

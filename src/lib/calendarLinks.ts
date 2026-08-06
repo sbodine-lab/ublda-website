@@ -1,0 +1,108 @@
+/**
+ * Google Calendar links, in one place.
+ *
+ * Two callers with two different shapes of truth:
+ *  · the marketing events page, whose dates are hand-authored English
+ *    ("October 1, 2026" + "7:00 PM - 8:00 PM") — `buildGCalUrl`, moved here
+ *    verbatim so its behaviour is unchanged;
+ *  · the portal, whose events carry real ISO instants — `googleCalendarUrl`.
+ *
+ * Everything the club runs is authored in Detroit time. The portal path sends
+ * Google a UTC instant, which is unambiguous everywhere; the marketing path
+ * sends a floating local time, which is what that page has always done.
+ */
+
+const GCAL_RENDER = 'https://calendar.google.com/calendar/render'
+
+/**
+ * The shape the marketing events page passes in. Declared structurally rather
+ * than imported so `src/pages/Events.tsx` keeps its own local `Event` type.
+ */
+export type MarketingCalendarEvent = {
+  /** "October 1, 2026" */
+  date: string
+  /** "7:00 PM - 8:00 PM". Absent means an all-day entry. */
+  time?: string
+  title: string
+  description: string
+  location: string
+}
+
+export function buildGCalUrl(event: MarketingCalendarEvent): string {
+  const months: Record<string, string> = {
+    January: '01', February: '02', March: '03', April: '04',
+    May: '05', June: '06', July: '07', August: '08',
+    September: '09', October: '10', November: '11', December: '12',
+  }
+
+  const parts = event.date.split(/[\s,]+/)
+  const m = months[parts[0]] || '01'
+  const d = parts[1].padStart(2, '0')
+  const y = parts[2]
+
+  let dates: string
+  if (event.time) {
+    const [startStr, endStr] = event.time.split(' - ')
+    const toMil = (t: string) => {
+      const match = t.match(/(\d+):(\d+)\s*(AM|PM)/i)
+      if (!match) return '000000'
+      let h = parseInt(match[1])
+      const min = match[2]
+      const ampm = match[3].toUpperCase()
+      if (ampm === 'PM' && h !== 12) h += 12
+      if (ampm === 'AM' && h === 12) h = 0
+      return `${String(h).padStart(2, '0')}${min}00`
+    }
+    dates = `${y}${m}${d}T${toMil(startStr)}/${y}${m}${d}T${toMil(endStr)}`
+  } else {
+    const nextDay = String(parseInt(d) + 1).padStart(2, '0')
+    dates = `${y}${m}${d}/${y}${m}${nextDay}`
+  }
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates,
+    details: event.description,
+    location: event.location,
+  })
+
+  return `${GCAL_RENDER}?${params.toString()}`
+}
+
+/** ISO instant → Google's `20261001T230000Z`. Returns '' for anything unparseable. */
+const toUtcStamp = (iso: string): string => {
+  const ms = Date.parse(iso || '')
+  if (Number.isNaN(ms)) return ''
+  return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+}
+
+export type PortalCalendarEvent = {
+  title: string
+  startsAt: string
+  endsAt?: string
+  details?: string
+  location?: string
+}
+
+/**
+ * The portal's add-to-calendar link. Returns '' when `startsAt` is not a real
+ * instant, so a caller can simply not render the control rather than shipping a
+ * link to a broken Google page.
+ */
+export function googleCalendarUrl(event: PortalCalendarEvent): string {
+  const start = toUtcStamp(event.startsAt)
+  if (!start) return ''
+
+  const end = toUtcStamp(event.endsAt || '') || start
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates: `${start}/${end}`,
+  })
+
+  if (event.details) params.set('details', event.details)
+  if (event.location) params.set('location', event.location)
+
+  return `${GCAL_RENDER}?${params.toString()}`
+}

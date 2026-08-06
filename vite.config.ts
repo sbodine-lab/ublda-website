@@ -6,7 +6,12 @@ import { buildApplicationSubmission, validateApplicationPayload } from './src/li
 import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
 import { buildInterviewBookingSubmission, validateInterviewBookingPayload } from './src/lib/interviewBooking.ts'
 import { buildInterviewerAvailabilitySubmission, validateInterviewerAvailabilityPayload } from './src/lib/interviewerAvailability.ts'
+import { ADMIN_SCOPES, SUPER_ADMIN_EMAIL, adminAccountForEmail } from './src/lib/dashboardAccess.ts'
+import { bookingEmailLaunchError, sendBookingConfirmationEmail } from './server/bookingEmail.ts'
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
+import { handlePortalRequest } from './server/portalApi.ts'
+import { buildRecruitingExport, parseRecruitingExportType } from './server/recruitingExport.ts'
+import { housingApiPayloadForRoute } from './server/housingApi.ts'
 
 const store = createLocalRecruitingStore()
 
@@ -29,7 +34,36 @@ const sendJson = (res: ServerResponse, statusCode: number, payload: unknown) => 
   res.statusCode = statusCode
   res.setHeader('Content-Type', 'application/json')
   res.setHeader('Cache-Control', 'no-store, max-age=0')
+  // setApiSecurityHeaders sets this in production; dev has to match or a header-sniffing bug
+  // only shows up after deploy.
+  res.setHeader('X-Content-Type-Options', 'nosniff')
   res.end(JSON.stringify(payload))
+}
+
+const DEV_PREVIEW_SESSION_TOKEN = 'local-preview-session-token'
+
+/**
+ * DEV ONLY, and deliberately confined to this file. server/portalApi.ts ships to production
+ * and must never know this token exists; here it is swapped for a real store session so the
+ * preview shell exercises exactly the production code path.
+ */
+const devPortalSessionToken = async (body: Record<string, unknown>) => {
+  const token = typeof body.sessionToken === 'string' ? body.sessionToken.trim() : ''
+  if (token !== DEV_PREVIEW_SESSION_TOKEN) return token
+
+  const roster = adminAccountForEmail(SUPER_ADMIN_EMAIL)
+  const session = await store.upsertAccount({
+    firstName: 'Sam',
+    lastName: 'Bodine',
+    uniqname: SUPER_ADMIN_EMAIL.replace(/@.*$/, ''),
+    email: SUPER_ADMIN_EMAIL,
+    role: 'super-admin',
+    adminTitle: roster?.title || 'Co-President',
+    adminScopes: [...ADMIN_SCOPES],
+    verifiedVia: 'google',
+  })
+
+  return session.sessionToken
 }
 
 const bookingStatusCode = (error: unknown) => {
@@ -42,6 +76,36 @@ const bookingStatusCode = (error: unknown) => {
 const devApiPlugin = () => ({
   name: 'ublda-dev-api',
   configureServer(server: import('vite').ViteDevServer) {
+    server.middlewares.use('/api', async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+      const url = new URL(req.url || '/', 'http://localhost')
+      const housingPath = url.pathname
+      const isHousingApi = [
+        /^\/facilities(?:\/|$)/,
+        /^\/map\/layers(?:\/|$)/,
+        /^\/analytics\/geographies(?:\/|$)/,
+        /^\/provider\/claim-facility$/,
+        /^\/submissions\/facility-correction$/,
+        /^\/referrals$/,
+        /^\/admin\/review-queue$/,
+        /^\/housing(?:\/|$)/,
+      ].some((pattern) => pattern.test(housingPath))
+
+      if (!isHousingApi) {
+        next()
+        return
+      }
+
+      const body = req.method && ['GET', 'HEAD'].includes(req.method) ? undefined : await readJsonBody(req)
+      const query = Object.fromEntries(url.searchParams.entries())
+      const payload = housingApiPayloadForRoute(req.method, housingPath, {
+        query,
+        body,
+        headers: req.headers as Record<string, string | string[] | undefined>,
+      })
+
+      sendJson(res, payload.status, payload)
+    })
+
     server.middlewares.use('/api/applicant-account', async (req, res) => {
       if (req.method !== 'POST') {
         sendJson(res, 405, { error: 'Method not allowed' })
@@ -82,11 +146,14 @@ const devApiPlugin = () => ({
         const profile = result.data.profile
         const fallbackEmail = profile?.email || 'preview.member@umich.edu'
         const uniqname = fallbackEmail.replace(/@.*$/, '')
+        // Mirror the production handler: Google is a verified provider, so an officer's
+        // account resolves to their roster role. Without this, dev can never reach /dashboard.
         const session = await store.upsertAccount({
           firstName: profile?.firstName || 'Preview',
           lastName: profile?.lastName || 'Member',
           uniqname,
           email: fallbackEmail,
+          verifiedVia: 'google',
         })
 
         sendJson(res, 200, { success: true, ...session, localPreview: true })
@@ -105,8 +172,36 @@ const devApiPlugin = () => ({
         return
       }
 
-      const session = await store.upsertAccount(result.data.account, result.data.password)
-      sendJson(res, 200, { success: true, ...session })
+      if (result.data.action === 'logout') {
+        await store.deleteSession(result.data.sessionToken)
+        sendJson(res, 200, { success: true })
+        return
+      }
+
+      if (result.data.action === 'create') {
+        const session = await store.upsertAccount(result.data.account, result.data.password)
+        sendJson(res, 200, { success: true, ...session })
+        return
+      }
+
+      sendJson(res, 400, { error: 'Applicant account action is invalid.' })
+    })
+
+    server.middlewares.use('/api/portal', async (req, res) => {
+      if (req.method !== 'POST') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const body = await readJsonBody(req)
+      const sessionToken = await devPortalSessionToken(body)
+      // Same function the Vercel handler calls. Dev and prod cannot drift.
+      const result = await handlePortalRequest({
+        method: 'POST',
+        body: { ...body, sessionToken },
+      })
+
+      sendJson(res, result.status, result.body)
     })
 
     server.middlewares.use('/api/apply', async (req, res) => {
@@ -223,22 +318,102 @@ const devApiPlugin = () => ({
         return
       }
 
+      const emailLaunchError = bookingEmailLaunchError()
+      if (emailLaunchError) {
+        sendJson(res, 503, emailLaunchError)
+        return
+      }
+
       try {
         const submission = buildInterviewBookingSubmission(result.data, req.headers['user-agent'] || '')
         const booking = await store.bookInterviewSlot(submission)
+        const email = await sendBookingConfirmationEmail({
+          submission,
+          slot: booking.slot,
+          interviewers: booking.interviewers,
+          candidate: booking.candidate,
+        })
 
         sendJson(res, 200, {
           success: true,
           candidate: booking.candidate,
           slot: booking.slot,
           interviewers: booking.interviewers,
-          email: { sent: false, reason: 'Confirmation email provider is not configured yet.' },
+          email,
           localPreview: true,
         })
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Could not book that interview slot.'
         sendJson(res, bookingStatusCode(error), { success: false, error: message })
       }
+    })
+
+    server.middlewares.use('/api/resume', async (req, res) => {
+      if (req.method !== 'GET') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const url = new URL(req.url || '/', 'http://localhost')
+      const candidateEmail = (url.searchParams.get('candidate') || '').trim().toLowerCase()
+      const sessionToken = (url.searchParams.get('sessionToken') || '').trim()
+
+      if (!candidateEmail) {
+        sendJson(res, 400, { error: 'Candidate email is required.' })
+        return
+      }
+
+      if (sessionToken !== 'local-preview-session-token') {
+        const dashboard = await store.dashboardData(sessionToken)
+        if (dashboard?.role !== 'super-admin' && dashboard?.role !== 'exec') {
+          sendJson(res, 401, { error: 'A recruiting admin session is required.' })
+          return
+        }
+      }
+
+      const resume = await store.readCandidateResume(candidateEmail)
+      if (!resume) {
+        sendJson(res, 404, { error: 'Resume was not found.' })
+        return
+      }
+
+      res.statusCode = 200
+      res.setHeader('Content-Type', resume.mimeType || 'application/octet-stream')
+      res.setHeader('Content-Disposition', `inline; filename="${resume.fileName.replace(/["\r\n]/g, '') || 'resume.pdf'}"`)
+      res.setHeader('Content-Length', String(resume.content.length))
+      res.setHeader('Cache-Control', 'no-store, max-age=0')
+      res.end(resume.content)
+    })
+
+    server.middlewares.use('/api/recruiting-export', async (req, res) => {
+      if (req.method !== 'GET') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const url = new URL(req.url || '/', 'http://localhost')
+      const sessionToken = (url.searchParams.get('sessionToken') || '').trim()
+      const exportType = parseRecruitingExportType((url.searchParams.get('type') || '').trim())
+
+      if (!exportType) {
+        sendJson(res, 400, { error: 'Choose a valid export type.' })
+        return
+      }
+
+      if (sessionToken !== 'local-preview-session-token') {
+        const dashboard = await store.dashboardData(sessionToken)
+        if (dashboard?.role !== 'super-admin' && dashboard?.role !== 'exec') {
+          sendJson(res, 401, { error: 'A recruiting admin session is required.' })
+          return
+        }
+      }
+
+      const csv = buildRecruitingExport(exportType, await store.leadershipDashboardData())
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+      res.setHeader('Content-Disposition', `attachment; filename="${csv.fileName}"`)
+      res.setHeader('Cache-Control', 'no-store, max-age=0')
+      res.end(csv.content)
     })
 
     server.middlewares.use('/api/dashboard-data', async (req, res) => {

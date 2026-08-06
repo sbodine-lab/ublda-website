@@ -1,9 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { useMemberAuth } from '../hooks/useMemberAuth'
 import './SignIn.css'
+
+/**
+ * `?next=` is honored only when it is a same-origin path into the portal.
+ * Anything else — an absolute URL, a protocol-relative `//evil.example`, a
+ * backslash-smuggled host, or a path outside the portal — is ignored rather
+ * than followed, so the sign-in screen cannot be turned into an open redirect.
+ */
+const hasControlCharacter = (value: string) => (
+  Array.from(value).some((character) => {
+    const code = character.charCodeAt(0)
+    return code < 0x20 || code === 0x7f
+  })
+)
+
+function safeNextPath(raw: string): string {
+  if (!raw) return ''
+  if (!raw.startsWith('/')) return ''
+  if (raw.startsWith('//') || raw.includes('\\')) return ''
+  if (hasControlCharacter(raw)) return ''
+  return /^\/(dashboard|members)(?:$|[/?#])/.test(raw) ? raw : ''
+}
 
 declare global {
   interface Window {
@@ -21,8 +42,8 @@ declare global {
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 
 export default function SignIn() {
-  const navigate = useNavigate()
-  const { status, signInWithGoogle, signInWithPassword, createAccount } = useMemberAuth()
+  const location = useLocation()
+  const { status, isAdmin, signInWithGoogle, signInWithPassword, createAccount } = useMemberAuth()
   const googleButtonRef = useRef<HTMLDivElement | null>(null)
   const [manualMode, setManualMode] = useState<'signin' | 'create'>('signin')
   const [manualForm, setManualForm] = useState({
@@ -57,7 +78,9 @@ export default function SignIn() {
 
           try {
             await signInWithGoogle(response.credential)
-            navigate('/dashboard')
+            // No navigate() here: the redirect below runs on the next render,
+            // by which point the account — and therefore the correct landing
+            // route — is actually known.
           } catch (caughtError) {
             const message = caughtError instanceof Error ? caughtError.message : ''
             setError(message || 'Google sign-in failed.')
@@ -84,10 +107,13 @@ export default function SignIn() {
     script.defer = true
     script.onload = renderGoogleButton
     document.head.appendChild(script)
-  }, [navigate, signInWithGoogle])
+  }, [signInWithGoogle])
 
+  // While `status` is still 'loading' this renders the form rather than
+  // redirecting — the same rule `RequireRole` follows (spec §2).
   if (status === 'signed-in') {
-    return <Navigate to="/dashboard" replace />
+    const requested = safeNextPath(new URLSearchParams(location.search).get('next') || '')
+    return <Navigate to={requested || (isAdmin ? '/dashboard' : '/members')} replace />
   }
 
   const handlePreviewGoogle = async () => {
@@ -102,7 +128,6 @@ export default function SignIn() {
         lastName: 'Bodine',
         name: 'Sam Bodine',
       })
-      navigate('/dashboard')
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : ''
       setError(message || 'Preview Google sign-in failed.')
@@ -123,7 +148,6 @@ export default function SignIn() {
           email: manualForm.email,
           password: manualForm.password,
         })
-        navigate('/dashboard')
         return
       }
 
@@ -134,7 +158,6 @@ export default function SignIn() {
       if (manualMode === 'create') {
         const result = await createAccount(manualForm)
         if (result === 'signed-in') {
-          navigate('/dashboard')
           return
         }
 

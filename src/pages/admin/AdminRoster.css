@@ -1,0 +1,255 @@
+/* ============================================================================
+   /dashboard/roster — and the member drawer it opens.
+
+   Rules this file obeys (spec §8):
+   · Only --p-* tokens. No --space-*, no raw hex, no shadows outside the one
+     overlay token the dialog already carries.
+   · Elevation is borders. Teal appears nowhere in this file; gold appears only
+     through the shared --p-warn-ink, which means "needs attention".
+   · Weights 400 / 500 / 600 / 700 only.
+   · min-height, never height. Never `outline: none`.
+   ========================================================================== */
+
+/* ── Header strip ────────────────────────────────────────────────────── */
+
+.roster-stats { display: block; }
+
+/* ── Intake bulk bar ─────────────────────────────────────────────────── */
+
+.roster-bulk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-4);
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius);
+  background: var(--p-surface-sunken);
+  padding: var(--p-4);
+}
+
+.roster-bulk__fields {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.roster-bulk__fields .p-legend {
+  padding: 0 0 var(--p-2);
+  font-size: var(--p-text-sm);
+  font-weight: 600;
+  color: var(--p-text-strong);
+}
+
+.roster-bulk__grid {
+  display: grid;
+  gap: var(--p-3);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.roster-bulk__act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-3);
+}
+
+.roster-bulk__act .p-meta { max-width: 46ch; }
+
+/* ── Roster filters ──────────────────────────────────────────────────── */
+
+.roster-filters {
+  display: grid;
+  gap: var(--p-3);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  align-items: start;
+}
+
+.roster-filters__search { grid-column: span 2; }
+
+@media (max-width: 767px) {
+  .roster-filters { grid-template-columns: minmax(0, 1fr); }
+  .roster-filters__search { grid-column: auto; }
+}
+
+/* ── Member drawer ───────────────────────────────────────────────────── */
+
+.roster-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-5);
+  min-width: 0;
+}
+
+/* Programmatic focus target: the drawer body is a scrollable region of reading
+   material, so opening the dialog lands here rather than on a control halfway
+   down it. The ring is offset inward so it never sits under the sticky head. */
+.roster-drawer:focus { outline: 2px solid var(--p-focus); outline-offset: -2px; border-radius: var(--p-radius); }
+
+.roster-drawer__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-2);
+  min-width: 0;
+}
+
+.roster-drawer__block + .roster-drawer__block {
+  border-top: 1px solid var(--p-hairline);
+  padding-top: var(--p-5);
+}
+
+.roster-drawer__heading {
+  font-family: var(--font-body);
+  font-size: var(--p-text-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--p-text-muted);
+}
+
+.roster-drawer__list {
+  display: grid;
+  gap: var(--p-2) var(--p-5);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+.roster-drawer__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.roster-drawer__term {
+  font-size: var(--p-text-xs);
+  font-weight: 500;
+  color: var(--p-text-muted);
+}
+
+.roster-drawer__value {
+  font-size: var(--p-text-sm);
+  color: var(--p-text);
+  overflow-wrap: anywhere;
+}
+
+.roster-drawer__tags { list-style: none; }
+
+/* The mailto and LinkedIn links are the only sub-40px targets in the drawer:
+   inline links whose height is set by line-height. On touch that is not good
+   enough (§7.1 — 44px under a coarse pointer), so they grow their own hit area
+   there and nowhere else. */
+@media (pointer: coarse) {
+  .roster-drawer__value a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* ── Participation history ───────────────────────────────────────────── */
+
+.roster-drawer__history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-1);
+  list-style: none;
+}
+
+.roster-drawer__historyrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-2) var(--p-3);
+  min-height: var(--p-row-h);
+  padding: var(--p-2) var(--p-3);
+  border: 1px solid var(--p-hairline);
+  border-radius: var(--p-radius);
+  background: var(--p-surface);
+}
+
+.roster-drawer__historytitle {
+  font-size: var(--p-text-sm);
+  font-weight: 600;
+  color: var(--p-text-strong);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ── Access block ────────────────────────────────────────────────────── */
+
+/* A quiet frame, deliberately not a coloured callout: this is somebody's
+   private information, not a status banner. */
+.roster-drawer__block--access {
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius);
+  background: var(--p-surface-sunken);
+  padding: var(--p-4);
+}
+
+.roster-drawer__block--access + .roster-drawer__block { border-top: 0; }
+
+.roster-drawer__needs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-2);
+  list-style: none;
+}
+
+.roster-drawer__need {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-2);
+  min-height: 28px;
+}
+
+.roster-drawer__needlabel {
+  font-size: var(--p-text-sm);
+  font-weight: 600;
+  color: var(--p-text-strong);
+}
+
+.roster-drawer__note {
+  font-size: var(--p-text-sm);
+  color: var(--p-text);
+  white-space: pre-wrap;
+  border-left: 3px solid var(--p-border-strong);
+  padding-left: var(--p-3);
+}
+
+/* "Not shared" is a fact about the portal, never a claim about the person.
+   Set as plain text, not a pill, so it never reads as a status. */
+.roster-drawer__notshared {
+  font-size: var(--p-text-md);
+  font-weight: 600;
+  color: var(--p-text-strong);
+}
+
+/* ── Officer record form ─────────────────────────────────────────────── */
+
+.roster-drawer__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-4);
+  min-width: 0;
+}
+
+.roster-drawer__grid {
+  display: grid;
+  gap: var(--p-3);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+@media (max-width: 767px) {
+  .roster-drawer__list,
+  .roster-drawer__grid { grid-template-columns: minmax(0, 1fr); }
+
+  /* SC 1.4.10: below 768px the shared table becomes a card list whose value
+     cell is a flex item with `min-width: auto`, so a long uniqname or email has
+     no break opportunity and widens the page at 320px. Scoped to this screen's
+     own panels rather than patched into the shared stylesheet. */
+  :is([aria-labelledby="roster-intake-heading"], [aria-labelledby="roster-members-heading"])
+    .p-table :is(td, th) > span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
