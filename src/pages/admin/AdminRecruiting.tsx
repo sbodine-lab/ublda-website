@@ -81,7 +81,7 @@ const formatMinutes = (totalMinutes: number) => {
 
 /**
  * Known issue, logged and deliberately not fixed in this build (spec §10.17):
- * `api/resume.ts` takes the session token as a query parameter, so it lands in
+ * the resume route takes the session token as a query parameter, so it lands in
  * access logs and `Referer`. The fix is a fetch + blob-URL rewrite of the
  * viewer with tests attached; it is out of scope here.
  */
@@ -248,7 +248,8 @@ export default function AdminRecruiting() {
   }
 
   /**
-   * Addition 1 of 2. Wired to the existing `api/recruiting-export.ts`. Fetched
+   * Addition 1 of 2. Wired to `server/routes/recruitingExportRoute.ts`, which
+   * `/api/recruiting-export` rewrites to via `api/recruiting.ts`. Fetched
    * rather than linked so the session token never enters browser history or a
    * `Referer` header — it still reaches the server in the query string, which is
    * that endpoint's shape and not this screen's to change.
