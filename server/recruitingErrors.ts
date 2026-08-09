@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import type { VercelResponse } from '../api/types.ts'
+import type { VercelResponse } from './types.ts'
 
 type RecruitingErrorMetadata = Record<string, string | number | boolean | null | undefined>
 

@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from './types.ts'
+import type { VercelRequest, VercelResponse } from '../server/types.ts'
 import { randomUUID } from 'node:crypto'
 import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 import type { DashboardCalendarEvent } from '../src/lib/dashboardData.ts'

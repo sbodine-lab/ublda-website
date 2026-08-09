@@ -1,17 +1,17 @@
-import type { VercelRequest, VercelResponse } from './types.ts'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
-import { canAccessRecruitingAdmin } from '../server/recruitingAdmin.ts'
+import type { VercelRequest, VercelResponse } from '../types.ts'
+import { createLocalRecruitingStore } from '../localRecruitingStore.js'
+import { canAccessRecruitingAdmin } from '../recruitingAdmin.ts'
 import {
   methodNotAllowed,
   queryOrBearerSessionToken,
   setApiSecurityHeaders,
-} from '../server/apiUtils.ts'
+} from '../apiUtils.ts'
 import {
   logRecruitingError,
   recruitingErrorMessage,
   sendRecruitingErrorResponse,
   safeRecruitingSubmissionMetadata,
-} from '../server/recruitingErrors.ts'
+} from '../recruitingErrors.ts'
 
 const asRows = (value: unknown): Record<string, unknown>[] => (
   Array.isArray(value) ? value.filter((row): row is Record<string, unknown> => Boolean(row) && typeof row === 'object') : []

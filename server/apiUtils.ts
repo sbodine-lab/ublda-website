@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '../api/types.ts'
+import type { VercelRequest, VercelResponse } from './types.ts'
 
 export type JsonRecord = Record<string, unknown>
 

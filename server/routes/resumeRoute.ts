@@ -1,17 +1,17 @@
-import type { VercelRequest, VercelResponse } from './types.ts'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
-import { canAccessRecruitingAdmin } from '../server/recruitingAdmin.ts'
+import type { VercelRequest, VercelResponse } from '../types.ts'
+import { createLocalRecruitingStore } from '../localRecruitingStore.js'
+import { canAccessRecruitingAdmin } from '../recruitingAdmin.ts'
 import {
   contentDisposition,
   methodNotAllowed,
   setApiSecurityHeaders,
   singleValue,
-} from '../server/apiUtils.ts'
+} from '../apiUtils.ts'
 import {
   logRecruitingError,
   sendRecruitingErrorResponse,
   safeRecruitingSubmissionMetadata,
-} from '../server/recruitingErrors.ts'
+} from '../recruitingErrors.ts'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)

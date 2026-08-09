@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from './types.ts'
+import type { VercelRequest, VercelResponse } from '../server/types.ts'
 import { setApiSecurityHeaders } from '../server/apiUtils.ts'
 import { handlePortalRequest } from '../server/portalApi.ts'
 

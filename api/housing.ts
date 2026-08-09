@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from './types.ts'
+import type { VercelRequest, VercelResponse } from '../server/types.ts'
 import { setApiSecurityHeaders, singleValue } from '../server/apiUtils.ts'
 import { housingApiPayloadForRoute } from '../server/housingApi.ts'
 import type { QueryValue } from '../server/housingApi.ts'
