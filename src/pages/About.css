@@ -3,7 +3,7 @@
 }
 
 .about__headline {
-  font-size: clamp(var(--text-4xl), 6vw, var(--text-6xl));
+  font-size: var(--type-lg);
   line-height: 1.08;
   letter-spacing: -0.03em;
   max-width: 750px;
@@ -28,7 +28,7 @@
 }
 
 .about__timeline-headline {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-16);
 }
 
@@ -83,7 +83,7 @@
   display: inline-block;
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-teal);
@@ -133,7 +133,7 @@
 }
 
 .about__values-headline {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-16);
 }
 
@@ -154,7 +154,7 @@
 
 .value-card__title {
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--text-xl);
   color: var(--color-navy);
   margin-bottom: var(--space-3);
@@ -172,7 +172,7 @@
 }
 
 .about__cta-headline {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-4);
 }
 

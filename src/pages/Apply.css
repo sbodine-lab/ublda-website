@@ -3,7 +3,7 @@
 }
 
 .apply-page__headline {
-  font-size: clamp(var(--text-4xl), 5vw, var(--text-5xl));
+  font-size: var(--type-lg);
   line-height: 1.08;
   letter-spacing: 0;
   margin-bottom: var(--space-5);
@@ -40,7 +40,7 @@
   padding-right: var(--space-5);
   color: var(--color-navy);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--leading-snug);
 }
 
@@ -77,7 +77,7 @@
 }
 
 .apply-form__title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   letter-spacing: 0;
   margin: var(--space-2) 0 var(--space-3);
 }
@@ -154,13 +154,13 @@
 .apply-form__field label,
 .apply-form__label-text {
   font-size: var(--text-base);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-navy);
 }
 
 .apply-form__field label span {
   color: var(--color-gray-400);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .apply-account {
@@ -188,7 +188,7 @@
   border-radius: calc(var(--radius-md) - 3px);
   color: var(--color-gray-600);
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: var(--tracking-wide);
   transition: background var(--duration-fast) var(--ease-out),
               color var(--duration-fast) var(--ease-out);
@@ -206,7 +206,7 @@
   border: 1px solid rgba(43, 186, 176, 0.26);
   border-radius: var(--radius-md);
   padding: var(--space-4);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .apply-form__label-row {
@@ -220,7 +220,7 @@
   flex: 0 0 auto;
   color: var(--color-gray-400);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .apply-form input,
@@ -274,7 +274,7 @@
   padding: var(--space-2) var(--space-4);
   font: inherit;
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -348,7 +348,7 @@
 
 .apply-form__checkbox span {
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--leading-snug);
 }
 
@@ -382,7 +382,7 @@
 .availability-summary span {
   color: var(--color-gray-700);
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .availability-quick-actions {
@@ -400,7 +400,7 @@
   color: var(--color-navy);
   padding: 0 var(--space-3);
   font-size: var(--text-sm);
-  font-weight: 900;
+  font-weight: 600;
   transition: background var(--duration-fast) var(--ease-out),
               border-color var(--duration-fast) var(--ease-out),
               transform var(--duration-fast) var(--ease-out);
@@ -436,7 +436,7 @@
   color: var(--color-navy);
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -451,7 +451,7 @@
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
-  font-weight: 900;
+  font-weight: 600;
   transition: background var(--duration-fast) var(--ease-out),
               border-color var(--duration-fast) var(--ease-out),
               transform var(--duration-fast) var(--ease-out);
@@ -472,7 +472,7 @@
   color: var(--color-teal);
   cursor: pointer;
   font-size: var(--text-sm);
-  font-weight: 900;
+  font-weight: 600;
   list-style-position: inside;
   padding: var(--space-1) 0;
 }
@@ -502,13 +502,13 @@
 .availability-part__header strong {
   color: var(--color-navy);
   font-size: var(--text-base);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .availability-part__header span {
   color: var(--color-gray-500);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .availability-grid {
@@ -542,7 +542,7 @@
 .availability-slot strong {
   color: var(--color-navy);
   font-size: var(--text-sm);
-  font-weight: 900;
+  font-weight: 600;
   line-height: var(--leading-snug);
   overflow-wrap: anywhere;
 }
@@ -550,7 +550,7 @@
 .availability-slot small {
   color: var(--color-gray-500);
   font-size: var(--text-xs);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--leading-snug);
 }
 
@@ -564,7 +564,7 @@
 .apply-form__file-name {
   color: var(--color-navy);
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .apply-portal {
@@ -582,14 +582,14 @@
 .apply-portal__label {
   color: var(--color-gray-500);
   font-size: var(--text-xs);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
 }
 
 .apply-portal__email {
   color: var(--color-navy);
-  font-weight: 800;
+  font-weight: 600;
   overflow-wrap: anywhere;
 }
 
@@ -599,19 +599,19 @@
   gap: 2px;
   color: var(--color-navy);
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .apply-portal__status small {
   color: var(--color-gray-500);
   font-size: var(--text-xs);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .apply-portal__signout {
   color: var(--color-gray-600);
   font-size: var(--text-sm);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .apply-form__error {
@@ -621,7 +621,7 @@
   border: 1px solid rgba(159, 29, 29, 0.2);
   border-radius: var(--radius-md);
   padding: var(--space-4);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .apply-form__submit {
@@ -638,7 +638,7 @@
 .apply-form__secondary-link {
   color: var(--color-navy);
   font-size: var(--text-sm);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .apply-form__submit:disabled {
@@ -703,7 +703,7 @@
 }
 
 .apply-page--interviewer .apply-form__title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-3);
 }
 
@@ -799,7 +799,7 @@
 
 .apply-page--interviewer .availability-day__details summary {
   color: var(--color-navy);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .apply-page--interviewer .availability-grid {
@@ -865,7 +865,7 @@
   margin: 0 0 var(--space-4);
   color: var(--color-navy);
   font-family: var(--font-display);
-  font-size: clamp(4rem, 9vw, 7.5rem);
+  font-size: var(--type-lg);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 0.88;
@@ -889,7 +889,7 @@
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-full);
   color: var(--color-navy);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .booking-layout {
@@ -930,7 +930,7 @@
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-full);
   color: var(--color-navy);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .booking-days {
@@ -962,7 +962,7 @@
 .booking-day header span {
   color: var(--color-teal);
   font-size: var(--text-xs);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .booking-slot-list {
@@ -986,15 +986,15 @@
 }
 
 .booking-slot span {
-  font-size: 0.82rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.2;
 }
 
 .booking-slot small {
   color: var(--color-gray-600);
   font-size: var(--text-xs);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .booking-slot--selected {
@@ -1032,7 +1032,7 @@
 .booking-card > div:first-child small {
   color: rgba(255, 255, 255, 0.72);
   font-size: var(--text-xs);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .booking-card > div:first-child strong {
@@ -1044,7 +1044,7 @@
   display: grid;
   gap: var(--space-2);
   color: var(--color-navy);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .booking-card input,
@@ -1077,7 +1077,7 @@
   border-radius: var(--radius-sm);
   background: rgba(43, 186, 176, 0.12);
   color: #087d79;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -1091,7 +1091,7 @@
 .booking-card__helper {
   color: var(--color-gray-600);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.35;
 }
 
@@ -1312,7 +1312,7 @@
 }
 
 .apply-page--simple-form .apply-form__title {
-  font-size: clamp(var(--text-4xl), 6vw, var(--text-6xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-4);
 }
 
@@ -1414,7 +1414,7 @@
   .apply-form select,
   .apply-form textarea {
     min-height: 48px;
-    font-size: 16px;
+    font-size: var(--type-md);
     padding: var(--space-3);
   }
 
@@ -1457,7 +1457,7 @@
   }
 
   .availability-slot strong {
-    font-size: 0.75rem;
+    font-size: var(--type-sm);
     line-height: 1.15;
   }
 
@@ -1485,7 +1485,7 @@
   }
 
   .booking-page__header h1 {
-    font-size: 4rem;
+    font-size: var(--type-lg);
     line-height: 0.95;
   }
 

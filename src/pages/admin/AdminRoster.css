@@ -35,7 +35,7 @@
 .roster-bulk__fields .p-legend {
   padding: 0 0 var(--p-2);
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
 }
 
@@ -99,7 +99,7 @@
 .roster-drawer__heading {
   font-family: var(--font-body);
   font-size: var(--p-text-xs);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--p-text-muted);
@@ -121,7 +121,7 @@
 
 .roster-drawer__term {
   font-size: var(--p-text-xs);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--p-text-muted);
 }
 
@@ -168,7 +168,7 @@
 
 .roster-drawer__historytitle {
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
   min-width: 0;
   overflow-wrap: anywhere;
@@ -204,7 +204,7 @@
 
 .roster-drawer__needlabel {
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
 }
 
@@ -220,7 +220,7 @@
    Set as plain text, not a pill, so it never reads as a status. */
 .roster-drawer__notshared {
   font-size: var(--p-text-md);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
 }
 

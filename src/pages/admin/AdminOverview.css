@@ -55,7 +55,7 @@
 .overview-row__title {
   color: var(--p-text-strong);
   font-size: var(--p-text-md);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: var(--p-border);
@@ -104,7 +104,7 @@
 .overview-pulse dt {
   color: var(--p-text);
   font-size: var(--p-text-sm);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .overview-pulse dd {

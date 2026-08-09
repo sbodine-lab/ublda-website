@@ -142,7 +142,7 @@
   min-width: 2ch;
   color: var(--p-text-muted);
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .library-row__text {
@@ -174,7 +174,7 @@
   background: var(--p-info-wash);
   color: var(--p-info-ink);
   font-size: var(--p-text-xs);
-  font-weight: 600;
+  font-weight: 500;
   max-width: 60ch;
 }
 

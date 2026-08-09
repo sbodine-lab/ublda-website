@@ -43,7 +43,7 @@
   background: var(--p-surface-sunken); padding: var(--p-3) var(--p-4);
   font-size: var(--p-text-sm); max-width: none;
 }
-.member-prompt strong { font-weight: 600; color: var(--p-text-strong); }
+.member-prompt strong { font-weight: 500; color: var(--p-text-strong); }
 
 /* ── 2. Event cards ──────────────────────────────────────────────────── */
 
@@ -62,7 +62,7 @@
   border-right: 1px solid var(--p-hairline);
 }
 .member-card__month {
-  font-size: var(--p-text-micro); font-weight: 700; letter-spacing: .08em;
+  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .08em;
   text-transform: uppercase; color: var(--p-text-muted);
 }
 .member-card__day {
@@ -77,7 +77,7 @@
 }
 .member-card__titlelink { color: inherit; text-decoration: none; }
 .member-card__titlelink:hover { text-decoration: underline; text-underline-offset: 3px; }
-.member-card__when { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-card__when { font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text-strong); }
 .member-card__where { display: flex; align-items: center; gap: var(--p-2); font-size: var(--p-text-sm); }
 .member-card__speaker { font-size: var(--p-text-sm); color: var(--p-text-muted); }
 .member-card__summary { font-size: var(--p-text-sm); }
@@ -86,7 +86,7 @@
   display: flex; flex-direction: column; gap: var(--p-2);
 }
 .member-card__accesshead {
-  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .04em;
+  font-size: var(--p-text-xs); font-weight: 500; letter-spacing: .04em;
   text-transform: uppercase; color: var(--p-text-muted); max-width: none;
 }
 .member-card__actions { display: flex; flex-wrap: wrap; gap: var(--p-2); margin-top: var(--p-1); }
@@ -112,7 +112,7 @@
    restated in words underneath, so colour is never the only cue. */
 .member-rsvp__btn[data-selected="true"] {
   background: var(--color-navy); border-color: var(--color-navy); color: var(--color-white);
-  font-weight: 700;
+  font-weight: 600;
 }
 .member-rsvp__btn[data-selected="true"]:hover { background: var(--color-navy-light); border-color: var(--color-navy-light); }
 .member-rsvp__btn[data-selected="true"]:focus-visible {
@@ -121,7 +121,7 @@
 :root[data-theme="dark"] .member-rsvp__btn[data-selected="true"] {
   background: var(--color-navy-light); border-color: var(--p-border-strong);
 }
-.member-rsvp__note { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-rsvp__note { font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text-strong); }
 
 /* ── 4. Announcements ────────────────────────────────────────────────── */
 
@@ -154,10 +154,10 @@
 }
 .member-chip:hover { background: var(--p-row-hover); }
 .member-chip__kind {
-  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  font-size: var(--p-text-micro); font-weight: 500; letter-spacing: .06em;
   text-transform: uppercase; color: var(--p-text-muted);
 }
-.member-chip__title { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-chip__title { font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text-strong); }
 .member-chip__when { font-size: var(--p-text-xs); color: var(--p-text-muted); }
 
 /* ── 6. Who to ask ───────────────────────────────────────────────────── */
@@ -171,7 +171,7 @@
   border: 1px solid var(--p-hairline); border-radius: var(--p-radius);
   padding: var(--p-3) var(--p-4); min-width: 0;
 }
-.member-officer__name { font-weight: 600; color: var(--p-text-strong); }
+.member-officer__name { font-weight: 500; color: var(--p-text-strong); }
 .member-officer__title { font-size: var(--p-text-xs); color: var(--p-text-muted); }
 .member-officer__ask { font-size: var(--p-text-sm); }
 .member-officer__mail {
@@ -189,7 +189,7 @@
 }
 .member-facts__row:last-child { border-bottom: 0; }
 .member-facts dt {
-  flex: 0 0 128px; font-size: var(--p-text-xs); font-weight: 600;
+  flex: 0 0 128px; font-size: var(--p-text-xs); font-weight: 500;
   letter-spacing: .04em; text-transform: uppercase; color: var(--p-text-muted);
 }
 .member-facts dd { flex: 1 1 200px; font-size: var(--p-text-sm); min-width: 0; }
@@ -207,7 +207,7 @@
 /* "Who can read this" is stated in words in BOTH states, every time. */
 .member-note__who {
   border-left: 3px solid var(--p-border-strong); padding-left: var(--p-3);
-  font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text);
+  font-size: var(--p-text-sm); font-weight: 400; color: var(--p-text);
 }
 .member-note__who[data-shared="true"] {
   border-left-color: var(--p-info-ink); background: var(--p-info-wash); color: var(--p-info-ink);
@@ -240,7 +240,7 @@
   font-size: var(--p-text-xs); color: var(--p-text-muted); max-width: none;
 }
 .member-resource__formatlabel {
-  font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--p-text-muted);
+  font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--p-text-muted);
 }
 
 /* ── Access editor ───────────────────────────────────────────────────── */
@@ -272,11 +272,11 @@
 /* ACCESS_CONSENT_TEXT, rendered verbatim and stored verbatim with the consent. */
 .member-consent__text {
   border-left: 3px solid var(--p-border-strong); padding-left: var(--p-4);
-  font-size: var(--p-text-md); font-weight: 500; color: var(--p-text-strong);
+  font-size: var(--p-text-md); font-weight: 400; color: var(--p-text-strong);
 }
 .member-consent__leads { display: flex; flex-direction: column; gap: var(--p-2); }
 .member-consent__leadhead {
-  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .04em;
+  font-size: var(--p-text-xs); font-weight: 500; letter-spacing: .04em;
   text-transform: uppercase; color: var(--p-text-muted); max-width: none;
 }
 .member-consent__leadlist {
@@ -289,7 +289,7 @@
   background: var(--p-surface); padding: var(--p-2) var(--p-3);
   font-size: var(--p-text-sm); min-width: 0;
 }
-.member-consent__leadname { font-weight: 600; color: var(--p-text-strong); }
+.member-consent__leadname { font-weight: 500; color: var(--p-text-strong); }
 .member-consent__leadtitle { font-size: var(--p-text-xs); color: var(--p-text-muted); }
 .member-consent__note { font-size: var(--p-text-xs); color: var(--p-text-muted); }
 
@@ -301,10 +301,10 @@
   background: var(--p-surface); padding: var(--p-4);
 }
 .member-preview__title {
-  font-size: var(--p-text-xs); font-weight: 600; letter-spacing: .06em;
+  font-size: var(--p-text-xs); font-weight: 500; letter-spacing: .06em;
   text-transform: uppercase; color: var(--p-text-muted);
 }
-.member-preview__name { font-weight: 600; color: var(--p-text-strong); }
+.member-preview__name { font-weight: 500; color: var(--p-text-strong); }
 /* Blank is never rendered as "no access needs". These are the literal words. */
 .member-preview__notshared {
   font-family: var(--font-display); font-size: var(--p-text-lg); color: var(--p-text-strong);
@@ -314,9 +314,9 @@
   display: flex; flex-direction: column; gap: 2px;
   border-left: 2px solid var(--p-border-strong); padding-left: var(--p-3);
 }
-.member-preview__need { font-size: var(--p-text-sm); font-weight: 600; color: var(--p-text-strong); }
+.member-preview__need { font-size: var(--p-text-sm); font-weight: 500; color: var(--p-text-strong); }
 .member-preview__priority {
-  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  font-size: var(--p-text-micro); font-weight: 500; letter-spacing: .06em;
   text-transform: uppercase; color: var(--p-text-muted);
 }
 .member-preview__detail { font-size: var(--p-text-sm); }
@@ -325,7 +325,7 @@
   border-top: 1px solid var(--p-hairline); padding-top: var(--p-2);
 }
 .member-preview__generallabel {
-  font-size: var(--p-text-micro); font-weight: 600; letter-spacing: .06em;
+  font-size: var(--p-text-micro); font-weight: 500; letter-spacing: .06em;
   text-transform: uppercase; color: var(--p-text-muted); max-width: none;
 }
 .member-preview__general { font-size: var(--p-text-sm); white-space: pre-wrap; }

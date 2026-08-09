@@ -32,7 +32,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--text-lg);
   letter-spacing: var(--tracking-wider);
   color: var(--color-navy);
@@ -57,7 +57,7 @@
 
 .nav__link {
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-gray-600);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
@@ -92,7 +92,7 @@
 
 .nav__cta {
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-white);
   background: var(--color-navy);
   padding: var(--space-3) var(--space-6);
@@ -160,7 +160,7 @@
   display: inline-flex;
   align-self: flex-start;
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-white);
   background: var(--color-navy);
   padding: var(--space-3) var(--space-8);

@@ -21,7 +21,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--text-lg);
   letter-spacing: var(--tracking-wider);
   color: var(--color-white);
@@ -48,7 +48,7 @@
   margin-top: var(--space-6);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-navy-deep);
   background: var(--color-teal);
   padding: var(--space-2) var(--space-6);
@@ -74,7 +74,7 @@
 
 .footer__heading {
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);

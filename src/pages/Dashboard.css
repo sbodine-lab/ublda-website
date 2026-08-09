@@ -46,8 +46,8 @@
   border-radius: 8px;
   background: var(--admin-surface);
   color: var(--color-navy);
-  font-size: 0.9rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
   letter-spacing: 0;
   display: inline-flex;
   align-items: center;
@@ -96,8 +96,8 @@
 .admin-forms-menu summary::after {
   content: "v";
   color: currentColor;
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-forms-menu[open] summary {
@@ -144,7 +144,7 @@
 .admin-overview-hero h1,
 .admin-page-heading h1 {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 5.6vw, 5.15rem);
+  font-size: var(--type-lg);
   font-weight: 400;
   line-height: 0.98;
   letter-spacing: 0;
@@ -155,7 +155,7 @@
 .admin-page-heading p {
   margin-top: var(--space-3);
   color: var(--admin-muted);
-  font-size: 1rem;
+  font-size: var(--type-md);
   max-width: 68ch;
 }
 
@@ -241,7 +241,7 @@
 .admin-overview-hero__cards strong {
   display: block;
   margin-top: 3px;
-  font-size: 1.86rem;
+  font-size: var(--type-md);
   line-height: 1;
 }
 
@@ -249,9 +249,9 @@
 .admin-overview-hero__cards em {
   display: block;
   color: var(--admin-muted);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
   font-style: normal;
-  font-weight: 780;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -292,16 +292,16 @@
 .admin-composer h2,
 .admin-danger-zone h2 {
   font-family: var(--font-body);
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
   letter-spacing: 0;
 }
 
 .admin-panel__title span,
 .admin-table-toolbar p {
   color: var(--admin-muted);
-  font-size: 0.86rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-quick-actions {
@@ -364,7 +364,7 @@
 .admin-stat strong {
   display: block;
   font-family: var(--font-display);
-  font-size: 2.3rem;
+  font-size: var(--type-lg);
   line-height: 1;
   font-weight: 400;
   color: var(--color-navy);
@@ -374,16 +374,16 @@
   display: block;
   margin-top: 5px;
   color: var(--color-navy);
-  font-size: 0.98rem;
-  font-weight: 850;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-stat small {
   display: block;
   margin-top: 7px;
   color: #087d79;
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-stat--watch small {
@@ -481,8 +481,8 @@
 .admin-mini-list strong {
   display: block;
   color: var(--color-navy);
-  font-size: 0.9rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-task-row small,
@@ -492,16 +492,16 @@
   display: block;
   margin-top: 2px;
   color: var(--admin-muted);
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   line-height: 1.35;
 }
 
 .admin-task-row em,
 .admin-activity time {
   color: var(--admin-muted);
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   font-style: normal;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .admin-activity {
@@ -533,8 +533,8 @@
   border-radius: var(--radius-full);
   background: var(--admin-soft-teal);
   color: #087d79;
-  font-size: 0.76rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -566,14 +566,14 @@
 .admin-role-banner strong,
 .admin-recruiting-controls strong {
   color: var(--color-navy);
-  font-size: 0.95rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-role-banner span,
 .admin-recruiting-controls span {
   color: var(--admin-muted);
-  font-size: 0.88rem;
+  font-size: var(--type-sm);
 }
 
 .admin-recruiting-controls {
@@ -630,15 +630,15 @@
 .admin-candidate-card strong {
   display: block;
   color: var(--color-navy);
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-candidate-card small,
 .admin-candidate-card__meta span {
   color: var(--admin-muted);
-  font-size: 0.78rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -658,8 +658,8 @@
   border-radius: var(--radius-full);
   background: rgba(43, 186, 176, 0.08);
   color: var(--color-navy);
-  font-size: 0.76rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-card__meta a {
@@ -680,8 +680,8 @@
   display: grid;
   gap: var(--space-2);
   color: var(--color-navy);
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-card__actions {
@@ -696,8 +696,8 @@
   border-radius: 8px;
   background: var(--admin-surface);
   color: var(--color-navy);
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-card__actions button:first-child {
@@ -741,14 +741,14 @@
 
 .admin-interviewer-slot-card strong {
   color: var(--color-navy);
-  font-size: 0.94rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-interviewer-slot-card small,
 .admin-interviewer-slot-card p {
   color: var(--admin-muted);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
   line-height: 1.4;
 }
 
@@ -764,8 +764,8 @@
 
 .admin-interviewer-slot-days span {
   color: #087d79;
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-interviewer-slot-days div {
@@ -781,8 +781,8 @@
   border-radius: 7px;
   background: var(--admin-soft-teal);
   color: var(--color-navy);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.15;
 }
 
@@ -806,7 +806,7 @@
 }
 
 .admin-recruiting-title-row h1 {
-  font-size: clamp(4.2rem, 6.1vw, 5.6rem);
+  font-size: var(--type-lg);
   line-height: 0.92;
 }
 
@@ -819,8 +819,8 @@
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.82);
   color: var(--color-navy);
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-recruiting-actions {
@@ -831,7 +831,7 @@
 .admin-recruiting-actions a {
   min-height: 58px;
   padding: 0 25px;
-  font-size: 1rem;
+  font-size: var(--type-md);
   box-shadow: 0 10px 18px rgba(15, 43, 60, 0.04);
 }
 
@@ -893,15 +893,15 @@
 
 .admin-recruiting-metrics strong {
   color: var(--color-navy);
-  font-size: 1.08rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-recruiting-metrics small {
   margin-top: 5px;
   color: var(--admin-muted);
-  font-size: 0.94rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-recruiting-planner-grid {
@@ -931,8 +931,8 @@
   border-radius: 0;
   background: transparent;
   color: rgba(15, 43, 60, 0.68);
-  font-size: 1.08rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-day-tabs button.active {
@@ -975,8 +975,8 @@
   border-radius: 0;
   background: transparent;
   color: rgba(15, 43, 60, 0.76);
-  font-size: 0.96rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-slot-row > div:first-child {
@@ -986,20 +986,20 @@
 
 .admin-slot-row strong {
   color: var(--color-navy);
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-slot-row > span {
   color: #087d79;
-  font-size: 0.98rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-slot-row small {
   color: #087d79;
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-slot-row mark {
@@ -1014,8 +1014,8 @@
   border-radius: 7px;
   background: rgba(237, 246, 232, 0.88);
   color: #344235;
-  font-size: 0.88rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-slot-row--partial {
@@ -1099,7 +1099,7 @@
 .admin-slot-initials i {
   color: var(--admin-muted);
   font-style: normal;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .admin-slot-assignment {
@@ -1111,8 +1111,8 @@
 .admin-slot-assignment strong {
   overflow: hidden;
   color: var(--color-navy);
-  font-size: 0.96rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1120,8 +1120,8 @@
 .admin-slot-assignment small {
   overflow: hidden;
   color: #087d79;
-  font-size: 0.78rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1136,8 +1136,8 @@
   background: rgba(233, 247, 245, 0.8);
   color: var(--color-navy);
   font-style: normal;
-  font-size: 0.86rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-member-initial--af {
@@ -1180,8 +1180,8 @@
   margin: 0;
   color: var(--color-navy);
   font-family: var(--font-body);
-  font-size: 1.18rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-candidate-profile {
@@ -1201,8 +1201,8 @@
   border-radius: var(--radius-full);
   background: #dbe6ff;
   color: var(--color-navy);
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-candidate-profile strong,
@@ -1212,15 +1212,15 @@
 
 .admin-candidate-profile strong {
   color: var(--color-navy);
-  font-size: 1.08rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-candidate-profile small {
   margin-top: 4px;
   color: var(--admin-muted);
-  font-size: 0.88rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-profile em {
@@ -1229,8 +1229,8 @@
   gap: 6px;
   color: var(--admin-muted);
   font-style: normal;
-  font-size: 0.8rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-profile em svg {
@@ -1251,8 +1251,8 @@
   margin: 0 0 4px;
   color: var(--color-navy);
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -1262,8 +1262,8 @@
   align-items: center;
   gap: 10px;
   color: var(--admin-muted);
-  font-size: 0.9rem;
-  font-weight: 760;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-candidate-windows svg {
@@ -1274,7 +1274,7 @@
 .admin-candidate-windows strong {
   justify-self: end;
   color: rgba(15, 43, 60, 0.72);
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .admin-recommended-slots article {
@@ -1293,7 +1293,7 @@
   border-radius: 7px;
   background: linear-gradient(180deg, #178f8c, #0a7776);
   color: var(--color-white);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .admin-recommended-slots strong,
@@ -1303,20 +1303,20 @@
 
 .admin-recommended-slots strong {
   color: var(--color-navy);
-  font-size: 0.88rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-recommended-slots time {
   margin-left: 18px;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .admin-recommended-slots small {
   margin-top: 2px;
   color: var(--admin-muted);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-recommended-slots mark {
@@ -1329,8 +1329,8 @@
   border-radius: 7px;
   background: rgba(233, 247, 245, 0.88);
   color: #087d79;
-  font-size: 0.9rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-selected-candidate > button {
@@ -1341,8 +1341,8 @@
   border-radius: 7px;
   background: linear-gradient(180deg, #128b88, #087d79);
   color: var(--color-white);
-  font-size: 0.96rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-eboard-summary {
@@ -1380,17 +1380,17 @@
 
 .admin-resume-list strong {
   color: var(--color-navy);
-  font-size: 0.94rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-resume-list small,
 .admin-resume-list span,
 .admin-resume-list em {
   color: var(--admin-muted);
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   font-style: normal;
-  font-weight: 750;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -1401,8 +1401,8 @@
   border-radius: 8px;
   background: var(--admin-soft-teal);
   color: #087d79;
-  font-size: 0.82rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-eboard-summary__head,
@@ -1416,8 +1416,8 @@
 .admin-eboard-summary__head {
   padding-top: 8px;
   color: var(--admin-muted);
-  font-size: 0.76rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-eboard-summary__head span:first-child {
@@ -1434,7 +1434,7 @@
   color: var(--color-white);
   background: #0b8886;
   border: 0;
-  font-size: 0.72rem;
+  font-size: var(--type-sm);
 }
 
 .admin-eboard-summary .admin-member-initial--af { background: #d49a19; }
@@ -1445,16 +1445,16 @@
 
 .admin-eboard-summary strong {
   color: var(--color-navy);
-  font-size: 0.86rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-eboard-summary small,
 .admin-eboard-summary em {
   color: var(--admin-muted);
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   font-style: normal;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .admin-eboard-summary em {
@@ -1487,8 +1487,8 @@
   display: grid;
   gap: var(--space-2);
   color: var(--color-navy);
-  font-size: 0.82rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-form-grid fieldset {
@@ -1509,8 +1509,8 @@
   background: var(--admin-surface);
   color: var(--color-navy);
   padding: 0 var(--space-3);
-  font-size: 0.88rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-dashboard textarea {
@@ -1555,8 +1555,8 @@
   border: 1px solid var(--admin-line);
   border-radius: var(--radius-full);
   color: var(--admin-muted);
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-scope--active {
@@ -1597,16 +1597,16 @@
 .admin-table__row--head {
   min-height: 44px;
   color: var(--admin-muted);
-  font-size: 0.75rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .admin-table__row strong {
   color: var(--color-navy);
-  font-size: 0.9rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-table__row strong small,
@@ -1614,22 +1614,22 @@
   display: block;
   margin-top: 3px;
   color: var(--admin-muted);
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.35;
 }
 
 .admin-table__row > span,
 .admin-table__row a {
   color: var(--color-navy);
-  font-size: 0.84rem;
-  font-weight: 760;
+  font-size: var(--type-sm);
+  font-weight: 600;
   min-width: 0;
 }
 
 .admin-table__row a {
   color: #087d79;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .admin-table--members .admin-table__row {
@@ -1664,7 +1664,7 @@
   padding: var(--space-5);
   color: var(--color-navy);
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 600;
   list-style: none;
 }
 
@@ -1681,7 +1681,7 @@
   place-items: center;
   background: var(--admin-soft-teal);
   color: #087d79;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .admin-advanced-panel[open] summary::after {
@@ -1690,13 +1690,13 @@
 
 .admin-advanced-panel summary span {
   display: block;
-  font-size: 1.05rem;
+  font-size: var(--type-md);
 }
 
 .admin-advanced-panel summary small {
   color: var(--admin-muted);
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-advanced-panel > .admin-table,
@@ -1720,18 +1720,18 @@
 .admin-mini-list button {
   min-height: 32px;
   padding: 0 10px;
-  font-size: 0.76rem;
+  font-size: var(--type-sm);
 }
 
 .admin-row-actions small {
   width: 100%;
   color: var(--admin-muted);
-  font-size: 0.74rem;
+  font-size: var(--type-sm);
 }
 
 .admin-empty-copy {
   color: var(--admin-muted);
-  font-size: 0.86rem;
+  font-size: var(--type-sm);
   line-height: 1.45;
 }
 
@@ -1746,7 +1746,7 @@
 }
 
 .admin-empty-state strong {
-  font-size: 1.05rem;
+  font-size: var(--type-md);
 }
 
 .admin-empty-state p {
@@ -1769,12 +1769,12 @@
 }
 
 .admin-coverage-list strong {
-  font-size: 0.9rem;
+  font-size: var(--type-sm);
 }
 
 .admin-coverage-list small {
   color: var(--admin-muted);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
 }
 
 .admin-coverage-list article > span {
@@ -1830,13 +1830,13 @@
 }
 
 .admin-calendar__day header strong {
-  font-size: 0.92rem;
+  font-size: var(--type-sm);
 }
 
 .admin-calendar__day header span {
   color: var(--admin-muted);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-calendar__body {
@@ -1865,13 +1865,13 @@
 
 .admin-calendar-coverage__header strong {
   color: var(--color-navy);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
 }
 
 .admin-calendar-coverage__header span {
   color: #087d79;
-  font-size: 0.72rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-calendar-coverage__slots {
@@ -1903,15 +1903,15 @@
 
 .admin-coverage-slot time {
   color: var(--color-navy);
-  font-size: 0.64rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.25;
 }
 
 .admin-coverage-slot small {
   color: var(--admin-muted);
-  font-size: 0.62rem;
-  font-weight: 800;
+  font-size: var(--type-sm);
+  font-weight: 600;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1926,8 +1926,8 @@
   border-radius: var(--radius-full);
   background: var(--color-gray-100);
   color: var(--admin-muted);
-  font-size: 0.68rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -1982,18 +1982,18 @@
 
 .admin-interview-card time {
   color: #087d79;
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-interview-card strong {
   color: var(--color-navy);
-  font-size: 0.92rem;
+  font-size: var(--type-sm);
 }
 
 .admin-interview-card small {
   color: var(--admin-muted);
-  font-size: 0.76rem;
+  font-size: var(--type-sm);
   line-height: 1.35;
 }
 
@@ -2010,8 +2010,8 @@
   place-items: center;
   background: var(--admin-soft-teal);
   color: var(--color-navy);
-  font-size: 0.7rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-interview-card--manual {
@@ -2026,7 +2026,7 @@
   border: 1px solid rgba(212, 160, 52, 0.32);
   border-radius: var(--radius-full);
   color: #8c6818;
-  font-size: 0.72rem;
+  font-size: var(--type-sm);
 }
 
 .admin-finalized-calendar {
@@ -2061,14 +2061,14 @@
 
 .admin-finalized-day header strong {
   color: var(--color-navy);
-  font-size: 0.96rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
 }
 
 .admin-finalized-day header span {
   color: var(--admin-muted);
-  font-size: 0.78rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-finalized-day > div {
@@ -2095,25 +2095,25 @@
   border-radius: 7px;
   background: rgba(43, 186, 176, 0.12);
   color: #087d79;
-  font-size: 0.68rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-finalized-interview-card time {
   color: #087d79;
-  font-size: 0.8rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-finalized-interview-card strong {
   color: var(--color-navy);
-  font-size: 0.92rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-finalized-interview-card small {
   color: var(--admin-muted);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
   line-height: 1.35;
 }
 
@@ -2123,13 +2123,13 @@
 }
 
 .admin-avoidance {
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   color: var(--color-navy);
 }
 
 .admin-avoidance summary {
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .admin-avoidance label {
@@ -2138,7 +2138,7 @@
   gap: 6px;
   margin-top: 6px;
   color: var(--admin-muted);
-  font-size: 0.78rem;
+  font-size: var(--type-sm);
 }
 
 .admin-avoidance input {
@@ -2173,8 +2173,8 @@
 .admin-opportunity-grid span,
 .admin-resource-grid span:first-child {
   color: #087d79;
-  font-size: 0.75rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -2182,8 +2182,8 @@
 .admin-opportunity-grid h3,
 .admin-resource-grid h3 {
   font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: var(--type-md);
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -2192,7 +2192,7 @@
 .admin-opportunity-grid small,
 .admin-resource-grid small {
   color: var(--admin-muted);
-  font-size: 0.82rem;
+  font-size: var(--type-sm);
   line-height: 1.45;
 }
 
@@ -2218,8 +2218,8 @@
   border: 1px solid var(--admin-line);
   border-radius: var(--radius-full);
   color: var(--color-navy);
-  font-size: 0.82rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-settings-layout {
@@ -2246,8 +2246,8 @@
   padding: 0 var(--space-3);
   border-radius: 6px;
   color: var(--admin-muted);
-  font-size: 0.84rem;
-  font-weight: 850;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-settings-layout > nav button.active {
@@ -2281,14 +2281,14 @@
 
 .admin-permission-table__row--head {
   color: var(--admin-muted);
-  font-size: 0.75rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .admin-permission-table__row strong {
-  font-size: 0.92rem;
+  font-size: var(--type-sm);
 }
 
 .admin-permission-table__row span:not(:first-child) {
@@ -2301,8 +2301,8 @@
   place-items: center;
   background: rgba(15, 43, 60, 0.06);
   color: var(--admin-muted);
-  font-size: 0.78rem;
-  font-weight: 900;
+  font-size: var(--type-sm);
+  font-weight: 600;
 }
 
 .admin-permission-table__row span.allowed {
@@ -2335,7 +2335,7 @@
 
 .admin-danger-zone p {
   color: var(--admin-muted);
-  font-size: 0.9rem;
+  font-size: var(--type-sm);
 }
 
 .admin-danger-zone button {
@@ -2379,7 +2379,7 @@
 
   .admin-overview-hero h1,
   .admin-page-heading h1 {
-    font-size: clamp(2.55rem, 12vw, 4rem);
+    font-size: var(--type-lg);
   }
 
   .admin-overview-hero__cards,

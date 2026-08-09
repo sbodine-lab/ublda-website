@@ -3,7 +3,7 @@
 }
 
 .team-page__headline {
-  font-size: clamp(var(--text-4xl), 6vw, var(--text-6xl));
+  font-size: var(--type-lg);
   line-height: 1.08;
   letter-spacing: -0.03em;
   margin-bottom: var(--space-6);
@@ -30,7 +30,7 @@
 .team-section__divider {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-navy);
@@ -81,7 +81,7 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--text-sm);
   letter-spacing: var(--tracking-wide);
   margin: 0 auto var(--space-5);
@@ -89,7 +89,7 @@
 
 .team-card__name {
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--text-lg);
   color: var(--color-navy);
   margin-bottom: var(--space-1);

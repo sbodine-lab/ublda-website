@@ -100,7 +100,7 @@
 
 .evtcard__fact dt {
   font-size: var(--p-text-micro);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--p-text-muted);
@@ -108,7 +108,7 @@
 
 .evtcard__fact dd {
   font-size: var(--p-text-sm);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--p-text-strong);
 }
 
@@ -128,7 +128,7 @@
   gap: var(--p-2);
   min-height: var(--p-control-h);
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
   cursor: pointer;
 }
@@ -169,7 +169,7 @@
 
 .evtattention__title {
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
 }
 
@@ -207,7 +207,7 @@
 
 .evtaccess__label {
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
 }
 
@@ -240,7 +240,7 @@
 .evtaccess__notestitle {
   font-family: var(--font-body);
   font-size: var(--p-text-sm);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--p-text-strong);
 }
 

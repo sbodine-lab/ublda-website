@@ -23,7 +23,7 @@
   display: inline-block;
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-teal);
@@ -32,7 +32,7 @@
 
 .brand-hero__title {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, var(--text-7xl));
+  font-size: var(--type-lg);
   line-height: var(--leading-tight);
   color: var(--color-navy);
   margin-bottom: var(--space-6);
@@ -69,7 +69,7 @@
 .brand-toc__link {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-gray-600);
   text-decoration: none;
   padding: var(--space-2) 0;
@@ -91,7 +91,7 @@
 
 .brand-section__title {
   font-family: var(--font-display);
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-size: var(--type-lg);
   line-height: var(--leading-tight);
   margin-bottom: var(--space-4);
 }
@@ -108,7 +108,7 @@
 .brand-subsection {
   font-family: var(--font-body);
   font-size: var(--text-xl);
-  font-weight: 600;
+  font-weight: 500;
   margin-top: var(--space-16);
   margin-bottom: var(--space-6);
   padding-left: var(--space-4);
@@ -128,7 +128,7 @@
 }
 
 .brand-tip strong {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════════
@@ -162,7 +162,7 @@
 .brand-swatch__label {
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -180,7 +180,7 @@
 .brand-copy {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-navy);
   background: none;
   border: none;
@@ -196,7 +196,7 @@
 
 .brand-swatch__token {
   font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.75rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
 }
 
@@ -230,7 +230,7 @@
 .brand-type-card__label {
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-teal);
@@ -247,7 +247,7 @@
 .brand-type-card__sample--body {
   font-family: var(--font-body);
   font-size: var(--text-3xl);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--leading-tight);
   margin: var(--space-4) 0 var(--space-3);
 }
@@ -307,7 +307,7 @@
 .brand-type-scale__name {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-teal);
 }
 
@@ -397,7 +397,7 @@
 
 .brand-logo-lockup__text {
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--text-xl);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -438,7 +438,7 @@
   display: inline-block;
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   margin-bottom: var(--space-4);
@@ -474,7 +474,7 @@
   position: absolute;
   left: 0;
   color: var(--color-teal);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .brand-rule--dont li::before {
@@ -482,7 +482,7 @@
   position: absolute;
   left: 0;
   color: var(--color-gold);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ═══════════════════════════════════════════
@@ -503,7 +503,7 @@
 }
 
 .brand-button-demo code {
-  font-size: 0.75rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
   max-width: 200px;
 }
@@ -511,7 +511,7 @@
 .brand-btn {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   padding: var(--space-3) var(--space-8);
   border-radius: var(--radius-full);
   border: 1.5px solid transparent;
@@ -575,7 +575,7 @@
 .brand-card-demo h4 {
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-3);
 }
 
@@ -586,7 +586,7 @@
 }
 
 .brand-card-demo code {
-  font-size: 0.7rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
   display: block;
   word-break: break-all;
@@ -623,7 +623,7 @@
 .brand-section-label {
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-navy);
@@ -632,7 +632,7 @@
 }
 
 .brand-label-demo code {
-  font-size: 0.75rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
 }
 
@@ -652,7 +652,7 @@
 
 .brand-accent-demo__text {
   font-family: var(--font-display);
-  font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+  font-size: var(--type-lg);
   color: var(--color-navy);
   line-height: var(--leading-snug);
   margin-bottom: var(--space-4);
@@ -664,7 +664,7 @@
 }
 
 .brand-accent-demo code {
-  font-size: 0.75rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
 }
 
@@ -704,7 +704,7 @@
   border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   margin: 0 auto;
 }
 
@@ -786,8 +786,8 @@
 
 .brand-ig-mock__label {
   font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: var(--type-sm);
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   padding: 4px 10px;
@@ -810,7 +810,7 @@
 
 .brand-ig-mock__body h3 {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: var(--type-md);
   line-height: var(--leading-snug);
   margin-bottom: var(--space-2);
 }
@@ -845,14 +845,14 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--text-lg);
   color: var(--color-teal);
   margin-bottom: var(--space-3);
 }
 
 .brand-ig-mock__swipe {
-  font-weight: 600;
+  font-weight: 500;
   opacity: 1 !important;
   color: var(--color-teal);
   margin-top: var(--space-2);
@@ -864,7 +864,7 @@
   gap: var(--space-2);
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   opacity: 0.6;
@@ -878,7 +878,7 @@
 .brand-ig-template__info h4 {
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-4);
 }
 
@@ -956,14 +956,14 @@
 .brand-social-size h4 {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-2);
 }
 
 .brand-social-size__dim {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-teal);
   display: block;
   margin-bottom: var(--space-3);
@@ -1071,15 +1071,15 @@
 .brand-highlight-icon span {
   font-size: var(--text-xs);
   color: var(--color-gray-600);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .brand-highlight-icon__download {
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: var(--type-sm);
   color: var(--color-teal);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .brand-highlight-icon__download:hover {
@@ -1175,7 +1175,7 @@
   display: block;
   font-family: var(--font-body);
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-gray-600);
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-gray-100);
@@ -1183,7 +1183,7 @@
 }
 
 .brand-slide-mock__spec {
-  font-size: 0.7rem;
+  font-size: var(--type-sm);
   color: var(--color-gray-400);
   padding: 0 var(--space-4) var(--space-3);
   background: var(--color-white);
@@ -1214,7 +1214,7 @@
 .brand-voice-card h4 {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-4);
 }
 
@@ -1230,12 +1230,12 @@
 }
 
 .brand-voice-card__yes {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-teal);
 }
 
 .brand-voice-card__no {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-gold);
 }
 
@@ -1249,7 +1249,7 @@
 .brand-phrase {
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 400;
   padding: var(--space-2) var(--space-4);
   background: var(--color-cream);
   border: 1px solid var(--color-gray-100);
@@ -1282,7 +1282,7 @@
 .brand-language__item h4 {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-3);
 }
 
@@ -1312,7 +1312,7 @@
 .brand-cheat h4 {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-4);
 }
 
@@ -1334,13 +1334,13 @@
 }
 
 .brand-cheat td:last-child {
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-navy);
 }
 
 .brand-code {
   font-family: 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.75rem;
+  font-size: var(--type-sm);
   line-height: 1.7;
   color: var(--color-gray-800);
   background: var(--color-gray-50);

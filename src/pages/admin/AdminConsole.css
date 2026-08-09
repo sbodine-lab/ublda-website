@@ -60,7 +60,7 @@
 
 .console-check__label {
   font-size: var(--p-text-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--p-text-strong);
   min-width: 0;
 }
