@@ -6,10 +6,8 @@ import { buildApplicationSubmission, validateApplicationPayload } from './src/li
 import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
 import { buildInterviewBookingSubmission, validateInterviewBookingPayload } from './src/lib/interviewBooking.ts'
 import { buildInterviewerAvailabilitySubmission, validateInterviewerAvailabilityPayload } from './src/lib/interviewerAvailability.ts'
-import { ADMIN_SCOPES, SUPER_ADMIN_EMAIL, adminAccountForEmail } from './src/lib/dashboardAccess.ts'
 import { bookingEmailLaunchError, sendBookingConfirmationEmail } from './server/bookingEmail.ts'
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
-import { handlePortalRequest } from './server/portalApi.ts'
 import { buildRecruitingExport, parseRecruitingExportType } from './server/recruitingExport.ts'
 import { housingApiPayloadForRoute } from './server/housingApi.ts'
 
@@ -38,32 +36,6 @@ const sendJson = (res: ServerResponse, statusCode: number, payload: unknown) => 
   // only shows up after deploy.
   res.setHeader('X-Content-Type-Options', 'nosniff')
   res.end(JSON.stringify(payload))
-}
-
-const DEV_PREVIEW_SESSION_TOKEN = 'local-preview-session-token'
-
-/**
- * DEV ONLY, and deliberately confined to this file. server/portalApi.ts ships to production
- * and must never know this token exists; here it is swapped for a real store session so the
- * preview shell exercises exactly the production code path.
- */
-const devPortalSessionToken = async (body: Record<string, unknown>) => {
-  const token = typeof body.sessionToken === 'string' ? body.sessionToken.trim() : ''
-  if (token !== DEV_PREVIEW_SESSION_TOKEN) return token
-
-  const roster = adminAccountForEmail(SUPER_ADMIN_EMAIL)
-  const session = await store.upsertAccount({
-    firstName: 'Sam',
-    lastName: 'Bodine',
-    uniqname: SUPER_ADMIN_EMAIL.replace(/@.*$/, ''),
-    email: SUPER_ADMIN_EMAIL,
-    role: 'super-admin',
-    adminTitle: roster?.title || 'Co-President',
-    adminScopes: [...ADMIN_SCOPES],
-    verifiedVia: 'google',
-  })
-
-  return session.sessionToken
 }
 
 const bookingStatusCode = (error: unknown) => {
@@ -185,23 +157,6 @@ const devApiPlugin = () => ({
       }
 
       sendJson(res, 400, { error: 'Applicant account action is invalid.' })
-    })
-
-    server.middlewares.use('/api/portal', async (req, res) => {
-      if (req.method !== 'POST') {
-        sendJson(res, 405, { error: 'Method not allowed' })
-        return
-      }
-
-      const body = await readJsonBody(req)
-      const sessionToken = await devPortalSessionToken(body)
-      // Same function the Vercel handler calls. Dev and prod cannot drift.
-      const result = await handlePortalRequest({
-        method: 'POST',
-        body: { ...body, sessionToken },
-      })
-
-      sendJson(res, result.status, result.body)
     })
 
     server.middlewares.use('/api/apply', async (req, res) => {
