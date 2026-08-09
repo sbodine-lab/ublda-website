@@ -27,7 +27,6 @@ export default function Footer() {
               <Link to="/events" className="footer__link">Events</Link>
               <Link to="/team" className="footer__link">Team</Link>
               <Link to="/join" className="footer__link">Join Us</Link>
-              <Link to="/dashboard" className="footer__link">Member Dashboard</Link>
               <Link to="/portal" className="footer__link">Interview Portal</Link>
             </div>
 

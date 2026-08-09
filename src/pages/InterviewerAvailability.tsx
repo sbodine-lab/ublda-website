@@ -107,7 +107,7 @@ export default function InterviewerAvailability() {
                 <div className="apply-form__header interviewer-simple__header">
                   <h2 className="apply-form__title">Your availability.</h2>
                   <p className="apply-form__subtitle">
-                    May 7-10, 8 AM-10 PM ET. Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
+                    May 7-9, 8 AM-10 PM ET. Each slot includes a {INTERVIEW_BLOCK_WITH_BUFFER_LABEL}.
                   </p>
                 </div>
 
@@ -172,8 +172,8 @@ export default function InterviewerAvailability() {
                   <button type="submit" className="btn btn--primary btn--lg apply-form__submit" disabled={submitting}>
                     {submitting ? 'Submitting...' : 'Submit e-board availability'}
                   </button>
-                  <Link to="/apply" className="apply-form__secondary-link">
-                    Candidate form
+                  <Link to="/interview-signup" className="apply-form__secondary-link">
+                    Interview signup form
                   </Link>
                 </div>
               </form>

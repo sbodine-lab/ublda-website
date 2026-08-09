@@ -14,11 +14,6 @@ export const INTERVIEW_WINDOW_DAYS = [
     shortLabel: 'Sat, May 9',
     label: 'Saturday, May 9',
   },
-  {
-    date: '2026-05-10',
-    shortLabel: 'Sun, May 10',
-    label: 'Sunday, May 10',
-  },
 ] as const
 
 export const INTERVIEW_START_HOUR_ET = 8
@@ -130,7 +125,7 @@ export const INTERVIEW_SLOT_GROUPS = INTERVIEW_WINDOW_DAYS.map((day) => ({
   })),
 }))
 
-export const INTERVIEW_WINDOW_LABEL = 'Thursday, May 7 through Sunday, May 10'
+export const INTERVIEW_WINDOW_LABEL = 'Thursday, May 7 through Saturday, May 9'
 export const INTERVIEW_DAY_RANGE_LABEL = `${INTERVIEW_WINDOW_LABEL}, ${formatHour(INTERVIEW_START_HOUR_ET)}-${formatHour(INTERVIEW_END_HOUR_ET)} ET`
 export const INTERVIEW_BLOCK_WITH_BUFFER_LABEL = `${INTERVIEW_BLOCK_MINUTES}-minute interview + ${INTERVIEW_BUFFER_MINUTES}-minute buffer`
 
@@ -143,6 +138,7 @@ export const BOARD_POSITION_OPTIONS = FUNCTION_PREFERENCE_OPTIONS
 
 export const INTERVIEWER_OPTIONS = [
   'Sam Bodine',
+  'Sam Naber',
   'Alexa Chiang',
   'Cooper Perry',
   'E-board member',

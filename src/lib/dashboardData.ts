@@ -20,12 +20,26 @@ export type DashboardCalendarEvent = {
   updatedAt: string
 }
 
+export type DashboardLaunchReadinessCheck = {
+  id: string
+  label: string
+  status: 'pass' | 'warn' | 'fail'
+  detail: string
+}
+
+export type DashboardLaunchReadiness = {
+  overall: 'pass' | 'warn' | 'fail'
+  generatedAt: string
+  checks: DashboardLaunchReadinessCheck[]
+}
+
 export type DashboardData = {
   candidates?: Candidate[]
   interviewerAvailability?: InterviewerAvailability[]
   memberSignups?: MemberSignup[]
   adminAccounts?: AdminAccount[]
   calendarEvents?: DashboardCalendarEvent[]
+  launchReadiness?: DashboardLaunchReadiness
   metrics?: LeadershipMetric[]
   backendStatus?: DashboardBackendStatus
 }

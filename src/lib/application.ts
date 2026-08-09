@@ -182,6 +182,16 @@ export const isResumeFileAllowed = (name: string, mimeType: string) => {
   return resumeMimeTypeValues.has(mimeType) || hasAllowedExtension
 }
 
+export const decodedResumeContentSize = (contentBase64: string) => {
+  const compact = contentBase64.replace(/\s+/g, '')
+  if (!compact || compact.length % 4 === 1 || !/^[A-Za-z0-9+/]*={0,2}$/.test(compact)) {
+    return null
+  }
+
+  const padding = compact.endsWith('==') ? 2 : compact.endsWith('=') ? 1 : 0
+  return Math.max(0, Math.floor((compact.length * 3) / 4) - padding)
+}
+
 export const validateApplicationPayload = (payload: unknown): ValidationResult => {
   if (!payload || typeof payload !== 'object') {
     return { success: false, data: null, errors: ['Submission was empty.'] }
@@ -220,11 +230,14 @@ export const validateApplicationPayload = (payload: unknown): ValidationResult =
   if (!resumeFile) {
     errors.push('Resume upload is required.')
   } else {
+    const decodedSize = resumeFile.contentBase64 ? decodedResumeContentSize(resumeFile.contentBase64) : null
     if (!resumeFile.name) errors.push('Resume file name is required.')
     if (!isResumeFileAllowed(resumeFile.name, resumeFile.mimeType)) errors.push('Resume must be a PDF, DOC, or DOCX file.')
     if (!resumeFile.contentBase64) errors.push('Resume file could not be read. Please try uploading it again.')
+    if (resumeFile.contentBase64 && decodedSize === null) errors.push('Resume file could not be read. Please try uploading it again.')
     if (!Number.isFinite(resumeFile.size) || resumeFile.size <= 0) errors.push('Resume file is empty.')
     if (resumeFile.size > MAX_RESUME_FILE_SIZE_BYTES) errors.push('Resume file must be 2 MB or smaller.')
+    if (decodedSize !== null && decodedSize > MAX_RESUME_FILE_SIZE_BYTES) errors.push('Resume file must be 2 MB or smaller.')
   }
   if (weeklyCommitment !== 'Not specified' && !commitmentValues.has(weeklyCommitment)) errors.push('Weekly commitment selection is invalid.')
   if (countWords(notes) > NOTES_WORD_LIMIT) errors.push(`Optional notes must be ${NOTES_WORD_LIMIT} words or fewer.`)

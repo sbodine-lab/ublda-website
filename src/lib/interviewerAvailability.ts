@@ -69,6 +69,7 @@ export const validateInterviewerAvailabilityPayload = (payload: unknown): Valida
   if (!uniqname || !uniqnamePattern.test(uniqname)) errors.push('A valid UMich uniqname is required.')
   if (invalidSlot) errors.push('Availability includes an invalid interview slot.')
   if (availability.length === 0) errors.push('Select every interview slot you can help interview.')
+  if (maxInterviews.length > 80) errors.push('Max interviews must be 80 characters or fewer.')
   if (notes.length > 800) errors.push('Notes must be 800 characters or fewer.')
 
   if (errors.length > 0) {

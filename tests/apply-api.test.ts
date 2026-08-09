@@ -87,7 +87,7 @@ test('persists validated leadership interest submissions to the recruiting backe
     assert.equal(/[<>]/.test(`${storeData.candidates?.[0].name} ${storeData.candidates?.[0].program} ${storeData.candidates?.[0].feedback}`), false)
     assert.deepEqual(storeData.candidates?.[0].rolePreferences, ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'])
     assert.equal(storeData.candidates?.[0].availability.length, 2)
-    assert.equal(storeData.candidates?.[0].resumeUrl, 'local-preview://alex-chen-resume.pdf')
+    assert.equal(storeData.candidates?.[0].resumeUrl, '/api/resume?candidate=alexchen%40umich.edu')
   } finally {
     if (originalScriptUrl === undefined) {
       delete process.env.GOOGLE_SCRIPT_URL

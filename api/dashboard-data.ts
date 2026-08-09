@@ -1,111 +1,37 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import type { VercelRequest, VercelResponse } from './types.ts'
 import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
-
-const superAdminSessionSecret = () => (
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD
-  || process.env.SAM_BODINE_PASSWORD
-  || ''
-)
-
-const localAdminFallbackEnabled = () => process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK === 'true'
-
-const setApiSecurityHeaders = (res: VercelResponse) => {
-  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
-  res.setHeader?.('Pragma', 'no-cache')
-  res.setHeader?.('X-Content-Type-Options', 'nosniff')
-}
-
-const signSessionPayload = (payload: string) => {
-  const secret = superAdminSessionSecret()
-  if (!secret) {
-    return ''
-  }
-
-  return createHmac('sha256', secret).update(payload).digest('base64url')
-}
-
-const safeEquals = (left: string, right: string) => {
-  const leftBuffer = Buffer.from(left)
-  const rightBuffer = Buffer.from(right)
-  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer)
-}
-
-const verifyLocalSuperAdminSession = (sessionToken: string) => {
-  if (!localAdminFallbackEnabled() || !superAdminSessionSecret()) return false
-
-  const [prefix, payload, signature] = sessionToken.split('.')
-  if (prefix !== 'ublda_admin' || !payload || !signature) return false
-  const expectedSignature = signSessionPayload(payload)
-  if (!expectedSignature || !safeEquals(signature, expectedSignature)) return false
-
-  try {
-    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
-    return decoded.email === 'sbodine@umich.edu' && typeof decoded.exp === 'number' && decoded.exp > Date.now()
-  } catch {
-    return false
-  }
-}
-
-const localSuperAdminPayload = () => ({
-  success: true,
-  account: {
-    firstName: 'Sam',
-    lastName: 'Bodine',
-    uniqname: 'sbodine',
-    email: 'sbodine@umich.edu',
-    role: 'super-admin',
-    adminTitle: 'Super Admin',
-    adminScopes: ['recruiting', 'members', 'announcements', 'resources', 'system'],
-  },
-  role: 'super-admin',
-  dashboardData: {
-    candidates: [],
-    interviewerAvailability: [],
-    memberSignups: [],
-    backendStatus: {
-      source: 'vercel',
-      message: 'Signed in through Vercel super-admin session. Publish the Apps Script backend for live sheet data.',
-      updatedAt: new Date().toISOString(),
-    },
-  },
-})
+import {
+  bodyRecord,
+  getString,
+  methodNotAllowed,
+  setApiSecurityHeaders,
+} from '../server/apiUtils.ts'
+import {
+  localSuperAdminDashboardPayload,
+  verifyLocalSuperAdminSession,
+} from '../server/adminSessions.ts'
+import { postJsonWithTimeout } from '../server/googleScript.ts'
+import {
+  logRecruitingError,
+  sendRecruitingErrorResponse,
+} from '../server/recruitingErrors.ts'
 
 const getSessionToken = (body: unknown) => {
-  if (!body || typeof body !== 'object') return ''
-  const token = (body as Record<string, unknown>).sessionToken
-  return typeof token === 'string' ? token.trim() : ''
-}
-
-const fetchScriptJson = async (
-  scriptUrl: string,
-  body: Record<string, unknown>,
-  signal: AbortSignal,
-) => {
-  const response = await fetch(scriptUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal,
-  })
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.success === false) {
-    throw new Error(payload?.error || 'Could not load dashboard data')
-  }
-
-  return payload
+  const payload = bodyRecord(body)
+  return getString(payload, 'sessionToken', { stripMarkup: false })
 }
 
 const fetchSheetDashboard = async (
   scriptUrl: string,
   sessionToken: string,
-  signal: AbortSignal,
-) => fetchScriptJson(scriptUrl, {
-  formType: 'applicantAccount',
-  action: 'dashboardData',
-  sessionToken,
-}, signal)
+) => {
+  const result = await postJsonWithTimeout(scriptUrl, {
+    formType: 'applicantAccount',
+    action: 'dashboardData',
+    sessionToken,
+  }, 'Could not load dashboard data')
+  return result.payload || {}
+}
 
 const dashboardResponse = (payload: Record<string, unknown>) => ({
   success: true,
@@ -134,10 +60,33 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
     return payload
   }
 
-  const storeDashboardData = await createLocalRecruitingStore().leadershipDashboardData()
+  let storeDashboardData: Awaited<ReturnType<ReturnType<typeof createLocalRecruitingStore>['leadershipDashboardData']>> | null = null
+  let storeErrorMessage = ''
+  try {
+    storeDashboardData = await createLocalRecruitingStore().leadershipDashboardData()
+  } catch (error) {
+    logRecruitingError('dashboard_recruiting_merge_failed', error)
+    storeErrorMessage = error instanceof Error
+      ? error.message
+      : 'Recruiting storage is temporarily unavailable.'
+  }
   const dashboardData = (payload.dashboardData && typeof payload.dashboardData === 'object'
     ? payload.dashboardData
     : {}) as Record<string, unknown>
+  if (!storeDashboardData) {
+    return {
+      ...payload,
+      dashboardData: {
+        ...dashboardData,
+        backendStatus: dashboardData.backendStatus || {
+          source: 'vercel',
+          message: storeErrorMessage || 'Recruiting storage is temporarily unavailable.',
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    }
+  }
+
   const storeCandidates = Array.isArray(storeDashboardData.candidates) ? storeDashboardData.candidates : []
   const storeInterviewers = Array.isArray(storeDashboardData.interviewerAvailability) ? storeDashboardData.interviewerAvailability : []
   const storeMembers = Array.isArray(storeDashboardData.memberSignups) ? storeDashboardData.memberSignups : []
@@ -158,6 +107,7 @@ const withRecruitingStoreData = async (payload: Record<string, unknown>) => {
     memberSignups: meaningfulStoreMembers.length ? mergeById(storeMembers as unknown as Record<string, unknown>[], sheetMembers) : dashboardData.memberSignups,
     adminAccounts: dashboardData.adminAccounts || storeDashboardData.adminAccounts,
     calendarEvents: storeCalendarEvents.length ? storeCalendarEvents : dashboardData.calendarEvents,
+    launchReadiness: storeDashboardData.launchReadiness,
     backendStatus: hasStoreRecruitingData ? {
       source: storeDashboardData.backendStatus?.source || 'vercel',
       message: hasSheetDashboard
@@ -177,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return methodNotAllowed(res)
   }
 
   const sessionToken = getSessionToken(req.body)
@@ -187,23 +137,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (verifyLocalSuperAdminSession(sessionToken)) {
-    return res.status(200).json(await withRecruitingStoreData(localSuperAdminPayload()))
+    return res.status(200).json(await withRecruitingStoreData(localSuperAdminDashboardPayload()))
   }
 
-  const storeSession = await createLocalRecruitingStore().dashboardData(sessionToken)
+  let storeSession: Awaited<ReturnType<ReturnType<typeof createLocalRecruitingStore>['dashboardData']>> | null = null
+  let storeSessionError: unknown = null
+  try {
+    storeSession = await createLocalRecruitingStore().dashboardData(sessionToken)
+  } catch (error) {
+    storeSessionError = error
+    logRecruitingError('dashboard_local_session_failed', error)
+  }
   if (storeSession) {
     return res.status(200).json(dashboardResponse(await withRecruitingStoreData(storeSession as unknown as Record<string, unknown>)))
   }
 
   if (!scriptUrl) {
+    if (storeSessionError) {
+      return sendRecruitingErrorResponse(res, storeSessionError, 'Dashboard storage is temporarily unavailable.')
+    }
     return res.status(500).json({ error: 'Dashboard backend not configured' })
   }
 
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 8000)
-
   try {
-    const payload = await fetchSheetDashboard(scriptUrl, sessionToken, controller.signal)
+    const payload = await fetchSheetDashboard(scriptUrl, sessionToken)
     const mergedPayload = await withRecruitingStoreData(payload)
 
     return res.status(200).json(dashboardResponse(mergedPayload))
@@ -212,7 +169,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const authFailure = /session|required|auth|authorized|permission/i.test(message)
     return res.status(authFailure ? 401 : 500).json({ error: message || 'Could not load dashboard data' })
-  } finally {
-    clearTimeout(timeout)
   }
 }
