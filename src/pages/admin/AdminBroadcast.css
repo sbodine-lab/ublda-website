@@ -1,0 +1,207 @@
+/* ============================================================================
+   /dashboard/broadcast — spec §6 T3, §8.
+
+   Only `--p-*` tokens. Elevation is borders, not shadows. Weights 400/500/600/700.
+   Teal never appears here; ink forms only. `--p-hairline` separates rows,
+   `--p-border-strong` bounds anything a reader has to find and act on.
+   ========================================================================== */
+
+/* ── Announcement list ────────────────────────────────────────────────── */
+
+.broadcast-list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.broadcast-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--p-4);
+  padding: var(--p-4) 0;
+  border-bottom: 1px solid var(--p-hairline);
+}
+
+.broadcast-row:first-child { padding-top: 0; }
+.broadcast-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.broadcast-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-1);
+  min-width: 0;
+  flex: 1 1 20rem;
+}
+
+.broadcast-row__title {
+  font-family: var(--font-display);
+  font-size: var(--p-text-md);
+  color: var(--p-text-strong);
+}
+
+/* Gold means exactly one thing in this portal — needs attention — so a pin
+   marker takes the neutral ink, not the warn ink. */
+.broadcast-row__pin { color: var(--p-text-muted); }
+
+.broadcast-row__body {
+  color: var(--p-text);
+  font-size: var(--p-text-sm);
+  white-space: pre-wrap;
+  max-width: 68ch;
+}
+
+.broadcast-row__meta {
+  color: var(--p-text-muted);
+  font-size: var(--p-text-xs);
+  max-width: 60ch;
+}
+
+.broadcast-row__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--p-2);
+  margin-left: auto;
+}
+
+.broadcast-gate {
+  color: var(--p-text-muted);
+  font-size: var(--p-text-xs);
+  max-width: 44ch;
+  text-align: right;
+}
+
+/* ── Composer, shared by both panels ──────────────────────────────────── */
+
+.broadcast-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-4);
+  padding: var(--p-panel-pad, 20px);
+  border: 1px solid var(--p-border-strong);
+  border-radius: var(--p-radius);
+  background: var(--p-surface-sunken);
+}
+
+.broadcast-form__title {
+  font-family: var(--font-display);
+  font-size: var(--p-text-md);
+  color: var(--p-text-strong);
+}
+
+/* `min(240px, 100%)`, never a bare `240px`: a bare minimum track is a hard floor
+   and pushes the form past a 320px viewport once page and panel padding are
+   counted. SC 1.4.10 is reflow with no horizontal scroll. */
+.broadcast-form__row {
+  display: grid;
+  gap: var(--p-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.broadcast-form em {
+  font-style: italic;
+  color: var(--p-text);
+}
+
+/* ── Member library ───────────────────────────────────────────────────── */
+
+.library-list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.library-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--p-4);
+  padding: var(--p-4) 0;
+  border-bottom: 1px solid var(--p-hairline);
+}
+
+.library-row:first-child { padding-top: 0; }
+.library-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* Reorder controls. Buttons, never drag-only (SC 2.5.7), and 44px in both
+   pointer modes because they are the primary way this list is operated. */
+.library-row__order {
+  display: flex;
+  align-items: center;
+  gap: var(--p-2);
+  flex: none;
+}
+
+.library-row__order .p-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.library-row__position {
+  min-width: 2ch;
+  color: var(--p-text-muted);
+  font-size: var(--p-text-sm);
+  font-weight: 500;
+}
+
+.library-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-1);
+  min-width: 0;
+  flex: 1 1 18rem;
+}
+
+.library-row__title {
+  font-family: var(--font-display);
+  font-size: var(--p-text-md);
+  color: var(--p-text-strong);
+}
+
+.library-row__desc {
+  color: var(--p-text);
+  font-size: var(--p-text-sm);
+  max-width: 68ch;
+}
+
+/* The format note is the point of the row, so it is set as ink on a wash
+   rather than as another line of grey metadata. */
+.library-row__format {
+  align-self: flex-start;
+  padding: 2px var(--p-3);
+  border-radius: var(--radius-full);
+  background: var(--p-info-wash);
+  color: var(--p-info-ink);
+  font-size: var(--p-text-xs);
+  font-weight: 500;
+  max-width: 60ch;
+}
+
+.library-row__meta {
+  color: var(--p-text-muted);
+  font-size: var(--p-text-xs);
+  max-width: 60ch;
+  overflow-wrap: anywhere;
+}
+
+.library-row__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--p-2);
+  margin-left: auto;
+}
+
+/* ── Reflow: one column at 320px, no loss of function (SC 1.4.10) ─────── */
+
+@media (max-width: 767px) {
+  .broadcast-row__side,
+  .library-row__side {
+    margin-left: 0;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .broadcast-gate { text-align: left; }
+}

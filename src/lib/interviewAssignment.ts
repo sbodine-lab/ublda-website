@@ -34,15 +34,15 @@ type ValidationResult =
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
+  return typeof value === 'string' ? value.replace(/[<>]/g, '').trim() : ''
 }
 
 const createSubmissionId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `assignment_${crypto.randomUUID()}`
+  if (typeof crypto === 'undefined' || !('randomUUID' in crypto)) {
+    throw new Error('A secure random source is required to save interview assignments.')
   }
 
-  return `assignment_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  return `assignment_${crypto.randomUUID()}`
 }
 
 export const validateInterviewAssignmentPayload = (payload: unknown): ValidationResult => {

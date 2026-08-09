@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { randomUUID } from 'node:crypto'
 import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 
 type InterviewSlot = {
@@ -93,7 +94,7 @@ const setApiSecurityHeaders = (res: VercelResponse) => {
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
+  return typeof value === 'string' ? value.replace(/[<>]/g, '').trim() : ''
 }
 
 const normalizeUniqname = (value: unknown) => (typeof value === 'string' ? value.trim().toLowerCase().replace(/@.*$/, '') : '')
@@ -130,13 +131,7 @@ const availabilitySummary = (slots: InterviewSlot[]) => {
     .join('; ')
 }
 
-const createSubmissionId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `interviewer_${crypto.randomUUID()}`
-  }
-
-  return `interviewer_${Date.now()}_${Math.random().toString(36).slice(2)}`
-}
+const createSubmissionId = () => `interviewer_${randomUUID()}`
 
 const validateInterviewerAvailabilityPayload = (payload: unknown) => {
   if (!payload || typeof payload !== 'object') {

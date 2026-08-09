@@ -1,0 +1,158 @@
+/* ============================================================================
+   /dashboard/overview — spec §6 T3, §8.
+
+   Only `--p-*` tokens, never `--space-*`. Elevation is borders, not shadows.
+   Weights 400 / 500 / 600 / 700 only. Teal appears nowhere in this file: it
+   fails 4.5:1 on every light surface, so links take `--p-accent-ink`.
+   ========================================================================== */
+
+/* `min(320px, 100%)` rather than a bare `320px`: a bare minimum track is a hard
+   floor, and at 320px viewport width the page padding pushed the panel 16px past
+   the edge — measured, then fixed. SC 1.4.10 is reflow with no horizontal scroll. */
+.overview-split {
+  display: grid;
+  gap: var(--p-5);
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  align-items: start;
+}
+
+/* ── Next 14 days ─────────────────────────────────────────────────────── */
+
+.overview-list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.overview-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--p-3);
+  min-height: var(--p-row-h);
+  padding: var(--p-3) 0;
+  /* Decorative row separation only — this is what --p-hairline is for. */
+  border-bottom: 1px solid var(--p-hairline);
+}
+
+.overview-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.overview-row:first-child {
+  padding-top: 0;
+}
+
+.overview-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-1);
+  min-width: 0;
+  flex: 1 1 18rem;
+}
+
+.overview-row__title {
+  color: var(--p-text-strong);
+  font-size: var(--p-text-md);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--p-border);
+}
+
+.overview-row__title:hover {
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+.overview-row__meta {
+  color: var(--p-text-muted);
+  font-size: var(--p-text-xs);
+  max-width: 60ch;
+}
+
+.overview-row__pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-2);
+  margin-left: auto;
+}
+
+/* ── Recruiting pulse ─────────────────────────────────────────────────── */
+
+.overview-pulse {
+  display: flex;
+  flex-direction: column;
+}
+
+.overview-pulse__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--p-4);
+  min-height: var(--p-row-h);
+  padding: var(--p-2) 0;
+  border-bottom: 1px solid var(--p-hairline);
+}
+
+.overview-pulse__row:last-child {
+  border-bottom: 0;
+}
+
+.overview-pulse dt {
+  color: var(--p-text);
+  font-size: var(--p-text-sm);
+  font-weight: 400;
+}
+
+.overview-pulse dd {
+  color: var(--p-text-strong);
+  font-family: var(--font-display);
+  font-size: var(--p-text-lg);
+  line-height: 1.1;
+}
+
+.overview-foot {
+  font-size: var(--p-text-sm);
+}
+
+/* ── Storage + launch readiness ───────────────────────────────────────── */
+
+.overview-backend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-2);
+  max-width: none;
+}
+
+.overview-checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-3);
+  list-style: none;
+}
+
+.overview-check {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-1);
+  padding-bottom: var(--p-3);
+  border-bottom: 1px solid var(--p-hairline);
+}
+
+.overview-check:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ── Reflow: one column at 320px, no loss of function (SC 1.4.10) ─────── */
+
+@media (max-width: 767px) {
+  .overview-row__pills {
+    margin-left: 0;
+    width: 100%;
+  }
+}

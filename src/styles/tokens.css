@@ -22,17 +22,26 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
 
-  --text-xs:   0.875rem;
-  --text-sm:   0.9375rem;
-  --text-base: 1rem;
-  --text-lg:   1.125rem;
-  --text-xl:   1.25rem;
-  --text-2xl:  1.5rem;
-  --text-3xl:  2rem;
-  --text-4xl:  2.75rem;
-  --text-5xl:  3.5rem;
-  --text-6xl:  4.5rem;
-  --text-7xl:  6rem;
+  /* Three sizes, site-wide. Nothing renders at anything else — every legacy
+     scale name below resolves to one of these. Hierarchy inside a tier comes
+     from family, weight and colour, not from size. */
+  --type-sm: 0.875rem;                        /* labels, meta, captions, fine print */
+  --type-md: 1.0625rem;                       /* body, UI, controls, sub-headings    */
+  --type-lg: clamp(2.25rem, 4.2vw, 3.25rem);  /* hero, page + section titles, stats  */
+
+  /* Legacy aliases. Kept so ~570 call sites need no churn, and so a stray
+     var(--text-4xl) in new code still lands on the scale. */
+  --text-xs:   var(--type-sm);
+  --text-sm:   var(--type-sm);
+  --text-base: var(--type-md);
+  --text-lg:   var(--type-md);
+  --text-xl:   var(--type-md);
+  --text-2xl:  var(--type-md);
+  --text-3xl:  var(--type-lg);
+  --text-4xl:  var(--type-lg);
+  --text-5xl:  var(--type-lg);
+  --text-6xl:  var(--type-lg);
+  --text-7xl:  var(--type-lg);
 
   --leading-tight:  1.1;
   --leading-snug:   1.25;

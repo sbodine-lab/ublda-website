@@ -134,14 +134,12 @@ export const INTERVIEW_WINDOW_LABEL = 'Thursday, May 7 through Sunday, May 10'
 export const INTERVIEW_DAY_RANGE_LABEL = `${INTERVIEW_WINDOW_LABEL}, ${formatHour(INTERVIEW_START_HOUR_ET)}-${formatHour(INTERVIEW_END_HOUR_ET)} ET`
 export const INTERVIEW_BLOCK_WITH_BUFFER_LABEL = `${INTERVIEW_BLOCK_MINUTES}-minute interview + ${INTERVIEW_BUFFER_MINUTES}-minute buffer`
 
-export const BOARD_POSITION_OPTIONS = [
-  'VP of Member Experience',
-  'VP of Events & Programming',
-  'VP of Partnerships & Sponsorships',
-  'VP of Marketing & Community',
-  'VP of Accessibility Projects',
-  'Open to any role',
+export const FUNCTION_PREFERENCE_OPTIONS = [
+  'Events and Programming',
+  'Marketing and Social Media',
+  'Outreach and Partnerships',
 ] as const
+export const BOARD_POSITION_OPTIONS = FUNCTION_PREFERENCE_OPTIONS
 
 export const INTERVIEWER_OPTIONS = [
   'Sam Bodine',
@@ -161,7 +159,7 @@ export const INTERVIEW_STATUS_OPTIONS = [
 ] as const
 
 export type InterviewStatus = (typeof INTERVIEW_STATUS_OPTIONS)[number]
-export type BoardPosition = (typeof BOARD_POSITION_OPTIONS)[number]
+export type BoardPosition = (typeof FUNCTION_PREFERENCE_OPTIONS)[number]
 export type InterviewerName = (typeof INTERVIEWER_OPTIONS)[number]
 
 const slotByValue = new Map(INTERVIEW_SLOTS.map((slot) => [slot.value, slot]))

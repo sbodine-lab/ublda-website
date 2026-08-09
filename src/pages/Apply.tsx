@@ -26,7 +26,7 @@ import './Apply.css'
 
 const processSteps = [
   'Upload resume',
-  'Rank roles',
+  'Rank functions',
   'Select availability',
   'Get matched',
 ]
@@ -69,10 +69,10 @@ const successMessage = (status: ApplicationStatus | '') => {
   }
 
   if (status === 'Needs review') {
-    return 'Your resume, role interests, and availability are saved.'
+    return 'Your resume, function preferences, and availability are saved.'
   }
 
-  return 'Your resume, role rankings, and availability are in.'
+  return 'Your resume, function rankings, and availability are in.'
 }
 
 const resumeAccept = RESUME_MIME_TYPES.join(',')
@@ -180,7 +180,7 @@ export default function Apply() {
 
     if (rankedRoles.length < 3 || new Set(rankedRoles).size !== rankedRoles.length) {
       setSubmitting(false)
-      setError('Please rank three different board positions.')
+      setError('Please rank all three function preferences.')
       return
     }
 
@@ -233,12 +233,12 @@ export default function Apply() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="apply-page__headline">
-              Resume, roles, availability.
+              Resume, functions, availability.
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="apply-page__intro">
-              Upload your resume, rank board roles, and select every Google Meet
+              Upload your resume, rank function preferences, and select every Google Meet
               slot you can make from {INTERVIEW_DAY_RANGE_LABEL}.
             </p>
           </Reveal>
@@ -384,7 +384,7 @@ export default function Apply() {
                 </fieldset>
 
                 <fieldset className="apply-form__group">
-                  <legend>Resume and role interests</legend>
+                  <legend>Resume and function preferences</legend>
                   <div className="apply-form__field">
                     <label htmlFor="resume">Resume</label>
                     <input
@@ -398,6 +398,10 @@ export default function Apply() {
                     {resumeFile && <p className="apply-form__file-name">{resumeFile.name}</p>}
                   </div>
 
+                  <p className="apply-form__helper">
+                    These are not final role assignments. We will focus the interview on your first choice and use the other two as a quick skills check.
+                  </p>
+
                   <div className="apply-form__rank-grid">
                     {['First choice', 'Second choice', 'Third choice'].map((label, index) => (
                       <div className="apply-form__field" key={label}>
@@ -408,7 +412,7 @@ export default function Apply() {
                           onChange={(event) => updateRolePreference(index, event.target.value)}
                           required
                         >
-                          <option value="" disabled>Select role</option>
+                          <option value="" disabled>Select function</option>
                           {ROLE_OPTIONS.map((role) => (
                             <option
                               key={role}

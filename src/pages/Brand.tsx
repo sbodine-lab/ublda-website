@@ -126,8 +126,8 @@ export default function Brand() {
                 Headlines, hero text, section titles, pull quotes, event titles
               </p>
               <div className="brand-type-card__specimen">
-                <span style={{ fontSize: '3rem' }}>Aa</span>
-                <span style={{ fontSize: '3rem', fontStyle: 'italic' }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)' }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)', fontStyle: 'italic' }}>Aa</span>
                 <span className="brand-type-card__chars">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</span>
               </div>
             </div>
@@ -138,45 +138,38 @@ export default function Brand() {
                 Plus Jakarta Sans
               </h3>
               <p className="brand-type-card__meta">
-                Google Fonts &middot; Weights: 400, 500, 600, 700
+                Google Fonts &middot; Weights in use: 400, 500, 600
               </p>
               <p className="brand-type-card__use">
                 Body text, navigation, buttons, labels, captions, form fields
               </p>
               <div className="brand-type-card__specimen">
-                <span style={{ fontSize: '2rem', fontWeight: 400 }}>Aa</span>
-                <span style={{ fontSize: '2rem', fontWeight: 500 }}>Aa</span>
-                <span style={{ fontSize: '2rem', fontWeight: 600 }}>Aa</span>
-                <span style={{ fontSize: '2rem', fontWeight: 700 }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)', fontWeight: 400 }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)', fontWeight: 500 }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)', fontWeight: 600 }}>Aa</span>
                 <span className="brand-type-card__chars">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</span>
               </div>
             </div>
           </div>
 
           <h3 className="brand-subsection">Type Scale</h3>
+          <p className="brand-section__desc">
+            Three sizes, everywhere. Nothing on the site renders at a fourth. Within a tier,
+            hierarchy comes from typeface, weight and colour &mdash; never from another size.
+          </p>
           <div className="brand-type-scale">
             {[
-              ['7xl', '6rem / 96px', 'Hero headlines (web only)'],
-              ['6xl', '4.5rem / 72px', 'Large hero text'],
-              ['5xl', '3.5rem / 56px', 'Page titles'],
-              ['4xl', '2.75rem / 44px', 'Section headings'],
-              ['3xl', '2rem / 32px', 'Sub-headings'],
-              ['2xl', '1.5rem / 24px', 'Card titles, large body'],
-              ['xl', '1.25rem / 20px', 'Lead paragraphs'],
-              ['lg', '1.125rem / 18px', 'Body large'],
-              ['base', '1rem / 16px', 'Default body text'],
-              ['sm', '0.9375rem / 15px', 'Secondary text'],
-              ['xs', '0.875rem / 14px', 'Labels, captions, fine print'],
-            ].map(([name, size, use]) => (
+              ['lg', 'var(--type-lg)', 'clamp(2.25rem, 4.2vw, 3.25rem)', 'Hero, page + section titles, stat figures', 'display'],
+              ['md', 'var(--type-md)', '1.0625rem / 17px', 'Body, UI, controls, sub-headings, card titles', 'body'],
+              ['sm', 'var(--type-sm)', '0.875rem / 14px', 'Labels, meta, captions, fine print', 'body'],
+            ].map(([name, token, size, use, family]) => (
               <div key={name} className="brand-type-scale__row">
                 <span className="brand-type-scale__name">{name}</span>
-                <span className="brand-type-scale__size">{size}</span>
-                <span className="brand-type-scale__preview" style={{ fontSize: name === '7xl' ? '3rem' : name === '6xl' ? '2.5rem' : name === '5xl' ? '2rem' : undefined }}>
-                  {name === 'xs' || name === 'sm' || name === 'base' || name === 'lg' || name === 'xl' ? (
-                    <span style={{ fontFamily: 'var(--font-body)' }}>The quick brown fox</span>
-                  ) : (
-                    <span style={{ fontFamily: 'var(--font-display)' }}>The quick brown fox</span>
-                  )}
+                <span className="brand-type-scale__size">{token}<br />{size}</span>
+                <span className="brand-type-scale__preview" style={{ fontSize: token }}>
+                  <span style={{ fontFamily: family === 'display' ? 'var(--font-display)' : 'var(--font-body)' }}>
+                    The quick brown fox
+                  </span>
                 </span>
                 <span className="brand-type-scale__use">{use}</span>
               </div>
@@ -470,7 +463,7 @@ export default function Brand() {
           <div className="brand-combos">
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#0F2B3C', color: '#fff' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Navy + <span style={{ color: '#2BBAB0', fontStyle: 'italic' }}>Teal</span>
                 </span>
               </div>
@@ -478,7 +471,7 @@ export default function Brand() {
             </div>
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#FAF9F6', color: '#0F2B3C' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Cream + <span style={{ color: '#2BBAB0', fontStyle: 'italic' }}>Teal</span>
                 </span>
               </div>
@@ -486,7 +479,7 @@ export default function Brand() {
             </div>
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#2BBAB0', color: '#0F2B3C' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Teal + Navy
                 </span>
               </div>
@@ -494,7 +487,7 @@ export default function Brand() {
             </div>
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#0F2B3C', color: '#D4A034' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Navy + Gold
                 </span>
               </div>

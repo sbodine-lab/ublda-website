@@ -10,10 +10,16 @@ const publicLinks = [
   { label: 'Team', path: '/team' },
 ]
 
-const memberLinks = [
-  ...publicLinks,
-  { label: 'Dashboard', path: '/dashboard' },
-]
+/**
+ * The portal link has to match the signed-in person's face, or a member hits a
+ * guard redirect on every click: `/dashboard` bounces them to `/members` (spec
+ * §2). An exec goes to the admin shell; everyone else goes to the member shell.
+ */
+const linksFor = (signedIn: boolean, isAdmin: boolean) => (
+  signedIn
+    ? [...publicLinks, { label: 'Dashboard', path: isAdmin ? '/dashboard' : '/members' }]
+    : publicLinks
+)
 
 function NavLetters({ text }: { text: string }) {
   return (
@@ -35,9 +41,12 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
-  const { status, signOut } = useMemberAuth()
+  const { status, isAdmin, signOut } = useMemberAuth()
   const signedIn = status === 'signed-in'
-  const links = signedIn ? memberLinks : publicLinks
+  const links = linksFor(signedIn, isAdmin)
+  const isCurrent = (path: string) => (
+    location.pathname === path || location.pathname.startsWith(`${path}/`)
+  )
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -70,7 +79,8 @@ export default function Nav() {
             <Link
               key={link.path}
               to={link.path}
-              className={`nav__link ${location.pathname === link.path ? 'nav__link--active' : ''}`}
+              className={`nav__link ${isCurrent(link.path) ? 'nav__link--active' : ''}`}
+              aria-current={isCurrent(link.path) ? 'page' : undefined}
               onClick={() => setMobileOpen(false)}
             >
               <NavLetters text={link.label} />

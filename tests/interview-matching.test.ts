@@ -12,7 +12,7 @@ const candidate = (overrides: Partial<Candidate>): Candidate => ({
   name: 'Candidate',
   program: 'Ross BBA',
   email: 'candidate@umich.edu',
-  rolePreferences: ['VP of Events & Programming'],
+  rolePreferences: ['Events and Programming'],
   status: 'Needs match',
   availability: [INTERVIEW_SLOTS[0].value],
   resumeUrl: 'https://drive.google.com/',

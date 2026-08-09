@@ -139,7 +139,7 @@ const slotByValue = new Map(interviewSlots.map((slot) => [slot.value, slot]))
 
 const getString = (payload: Record<string, unknown>, key: string) => {
   const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
+  return typeof value === 'string' ? value.replace(/[<>]/g, '').trim() : ''
 }
 
 const normalizeUniqname = (value: unknown) => (
@@ -250,7 +250,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const result = validateInterviewAssignmentPayload(req.body ?? {})
+  const body = req.body && typeof req.body === 'object' ? req.body as Record<string, unknown> : {}
+  if (getString(body, 'sessionToken').length < 24) {
+    return res.status(401).json({ error: 'A valid admin session is required.' })
+  }
+
+  const result = validateInterviewAssignmentPayload(body)
   if (!result.success) {
     return res.status(400).json({
       error: result.errors[0] || 'Please check the assignment and try again.',
@@ -265,8 +270,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? { role: 'super-admin' }
       : await store.dashboardData(result.data.sessionToken)
 
-    if (!localSession || !['super-admin', 'exec'].includes(localSession.role)) {
+    if (!localSession) {
       return res.status(401).json({ error: 'A valid admin session is required.' })
+    }
+    if (!['super-admin', 'exec'].includes(localSession.role)) {
+      return res.status(403).json({ error: 'Admin access is required.' })
     }
 
     const saved = await store.saveInterviewAssignment(submission)

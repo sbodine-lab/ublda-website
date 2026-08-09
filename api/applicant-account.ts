@@ -1,54 +1,28 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import type { VercelRequest, VercelResponse } from './types.ts'
+import {
+  validateApplicantAccountPayload,
+} from '../src/lib/applicantAccount.ts'
+import type { ApplicantAccount } from '../src/lib/applicantAccount.ts'
 import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
+import {
+  methodNotAllowed,
+  requestIp,
+  setApiSecurityHeaders,
+} from '../server/apiUtils.ts'
+import {
+  localAdminFallbackEnabled,
+  localSuperAdminAuthResponse,
+  superAdminAccount,
+  superAdminPasswordAccount,
+  verifyLocalSuperAdminSession,
+} from '../server/adminSessions.ts'
+import { postRawJsonWithTimeout } from '../server/googleScript.ts'
+import {
+  logRecruitingError,
+  sendRecruitingErrorResponse,
+  safeRecruitingSubmissionMetadata,
+} from '../server/recruitingErrors.ts'
 
-type ApplicantAccount = {
-  firstName: string
-  lastName: string
-  uniqname: string
-  email: string
-}
-
-type GoogleProfile = {
-  email: string
-  firstName: string
-  lastName: string
-  name?: string
-  picture?: string
-}
-
-type ApplicantAccountRequest =
-  | {
-      action: 'create'
-      account: ApplicantAccount
-      password: string
-    }
-  | {
-      action: 'signIn'
-      uniqname: string
-      email: string
-      password: string
-    }
-  | {
-      action: 'requestMagicLink'
-      uniqname: string
-      email: string
-    }
-  | {
-      action: 'session'
-      sessionToken: string
-    }
-  | {
-      action: 'googleSignIn'
-      credential: string
-      profile?: GoogleProfile
-    }
-
-type ValidationResult =
-  | { success: true; data: ApplicantAccountRequest; errors: [] }
-  | { success: false; data: null; errors: string[] }
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const INVALID_AUTH_ERROR = 'Invalid email or password.'
 const AUTH_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
 const AUTH_RATE_LIMIT_MAX_FAILURES = 8
@@ -59,141 +33,6 @@ type AuthAttemptBucket = {
 }
 
 const authAttemptBuckets = new Map<string, AuthAttemptBucket>()
-
-const setApiSecurityHeaders = (res: VercelResponse) => {
-  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
-  res.setHeader?.('Pragma', 'no-cache')
-  res.setHeader?.('X-Content-Type-Options', 'nosniff')
-}
-
-const getString = (payload: Record<string, unknown>, key: string) => {
-  const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
-}
-
-const normalizeEmail = (value: unknown) => (
-  typeof value === 'string' ? value.trim().toLowerCase() : ''
-)
-
-const emailToDisplayUniqname = (email: string) => {
-  const localPart = email.replace(/@.*$/, '').toLowerCase().replace(/[^a-z0-9._-]+/g, '')
-  return localPart || 'member'
-}
-
-const normalizeAccountIdentity = (body: Record<string, unknown>, errors: string[]) => {
-  const submittedEmail = normalizeEmail(getString(body, 'email'))
-  const submittedUniqname = normalizeEmail(getString(body, 'uniqname'))
-  const identity = submittedEmail || submittedUniqname
-  const email = identity.includes('@') ? identity : identity ? `${identity}@umich.edu` : ''
-
-  if (!email || !emailPattern.test(email)) {
-    errors.push('A valid email address is required.')
-  }
-
-  const uniqname = email ? emailToDisplayUniqname(email) : ''
-  return { email, uniqname }
-}
-
-const validatePassword = (password: string, errors: string[]) => {
-  if (password.length < 8) errors.push('Password must be at least 8 characters.')
-  if (password.length > 128) errors.push('Password must be 128 characters or fewer.')
-}
-
-const validateApplicantAccountPayload = (payload: unknown): ValidationResult => {
-  if (!payload || typeof payload !== 'object') {
-    return { success: false, data: null, errors: ['Request was empty.'] }
-  }
-
-  const body = payload as Record<string, unknown>
-  const action = getString(body, 'action')
-  const errors: string[] = []
-
-  if (action === 'session') {
-    const sessionToken = getString(body, 'sessionToken')
-    if (sessionToken.length < 24) errors.push('A valid applicant session is required.')
-
-    return errors.length
-      ? { success: false, data: null, errors }
-      : { success: true, data: { action, sessionToken }, errors: [] }
-  }
-
-  if (action === 'googleSignIn') {
-    const credential = getString(body, 'credential')
-    const profilePayload = body.profile && typeof body.profile === 'object'
-      ? body.profile as Record<string, unknown>
-      : null
-    const profileEmail = profilePayload ? getString(profilePayload, 'email') : ''
-    const profileFirstName = profilePayload ? getString(profilePayload, 'firstName') : ''
-    const profileLastName = profilePayload ? getString(profilePayload, 'lastName') : ''
-    const profileName = profilePayload ? getString(profilePayload, 'name') : ''
-    const profilePicture = profilePayload ? getString(profilePayload, 'picture') : ''
-
-    if (credential.length < 20) errors.push('A valid Google sign-in credential is required.')
-    return errors.length
-      ? { success: false, data: null, errors }
-      : {
-          success: true,
-          data: {
-            action,
-            credential,
-            profile: profileEmail
-              ? {
-                  email: profileEmail.toLowerCase(),
-                  firstName: profileFirstName,
-                  lastName: profileLastName,
-                  name: profileName,
-                  picture: profilePicture,
-                }
-              : undefined,
-          },
-          errors: [],
-        }
-  }
-
-  const { email, uniqname } = normalizeAccountIdentity(body, errors)
-
-  if (action === 'requestMagicLink') {
-    return errors.length
-      ? { success: false, data: null, errors }
-      : { success: true, data: { action, uniqname, email }, errors: [] }
-  }
-
-  const password = getString(body, 'password')
-
-  if (action === 'signIn') {
-    validatePassword(password, errors)
-
-    return errors.length
-      ? { success: false, data: null, errors }
-      : { success: true, data: { action, uniqname, email, password }, errors: [] }
-  }
-
-  if (action !== 'create') errors.push('Applicant account action is invalid.')
-
-  const firstName = getString(body, 'firstName')
-  const lastName = getString(body, 'lastName')
-
-  if (!firstName) errors.push('First name is required.')
-  if (!lastName) errors.push('Last name is required.')
-  validatePassword(password, errors)
-
-  return errors.length
-    ? { success: false, data: null, errors }
-    : {
-        success: true,
-        data: {
-          action: 'create',
-          account: {
-            firstName,
-            lastName,
-            uniqname,
-            email,
-          },
-          password,
-        },
-        errors: [],
-      }
-}
 
 const baseUrlForRequest = (req: VercelRequest) => {
   const origin = req.headers.origin
@@ -217,76 +56,6 @@ type GoogleTokenInfo = {
   family_name?: string
   name?: string
   picture?: string
-}
-
-const superAdminPassword = () => (
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD
-  || process.env.SAM_BODINE_PASSWORD
-  || ''
-)
-
-const localAdminFallbackEnabled = () => process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK === 'true'
-
-const superAdminSessionSecret = () => superAdminPassword()
-
-const signSessionPayload = (payload: string) => {
-  const secret = superAdminSessionSecret()
-  if (!secret) {
-    throw new Error('Super-admin session secret is not configured.')
-  }
-
-  return createHmac('sha256', secret).update(payload).digest('base64url')
-}
-
-const createSuperAdminSessionToken = () => {
-  const payload = Buffer.from(JSON.stringify({
-    email: 'sbodine@umich.edu',
-    exp: Date.now() + 1000 * 60 * 60 * 24 * 30,
-  })).toString('base64url')
-  return `ublda_admin.${payload}.${signSessionPayload(payload)}`
-}
-
-const constantTimeEquals = (submitted: string, expected: string) => {
-  const submittedBuffer = Buffer.from(submitted)
-  const expectedBuffer = Buffer.from(expected)
-
-  return submittedBuffer.length === expectedBuffer.length && timingSafeEqual(submittedBuffer, expectedBuffer)
-}
-
-const verifyLocalSuperAdminSession = (sessionToken: string) => {
-  if (!localAdminFallbackEnabled() || !superAdminSessionSecret()) {
-    return false
-  }
-
-  const [prefix, payload, signature] = sessionToken.split('.')
-  if (prefix !== 'ublda_admin' || !payload || !signature) return false
-  if (!constantTimeEquals(signature, signSessionPayload(payload))) return false
-
-  try {
-    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { email?: string; exp?: number }
-    return decoded.email === 'sbodine@umich.edu' && typeof decoded.exp === 'number' && decoded.exp > Date.now()
-  } catch {
-    return false
-  }
-}
-
-const superAdminPasswordAccount = (email: string, password: string): ApplicantAccount | null => {
-  const normalizedIdentity = email.toLowerCase()
-  if (normalizedIdentity !== 'sbodine' && normalizedIdentity !== 'sbodine@umich.edu') {
-    return null
-  }
-
-  const expectedPassword = superAdminPassword()
-  if (!expectedPassword || !constantTimeEquals(password, expectedPassword)) {
-    throw new Error(INVALID_AUTH_ERROR)
-  }
-
-  return {
-    firstName: 'Sam',
-    lastName: 'Bodine',
-    uniqname: 'sbodine',
-    email: 'sbodine@umich.edu',
-  }
 }
 
 const verifyGoogleCredential = async (credential: string): Promise<ApplicantAccount> => {
@@ -316,36 +85,6 @@ const verifyGoogleCredential = async (credential: string): Promise<ApplicantAcco
     uniqname,
     email,
   }
-}
-
-const superAdminAccountResponse = {
-  firstName: 'Sam',
-  lastName: 'Bodine',
-  uniqname: 'sbodine',
-  email: 'sbodine@umich.edu',
-  role: 'super-admin',
-  adminTitle: 'Super Admin',
-  adminScopes: ['recruiting', 'members', 'announcements', 'resources', 'system'],
-}
-
-const localSuperAdminResponse = () => ({
-  success: true,
-  account: superAdminAccountResponse,
-  sessionToken: createSuperAdminSessionToken(),
-  application: null,
-})
-
-const requestIp = (req: VercelRequest) => {
-  const forwardedFor = req.headers['x-forwarded-for']
-  if (Array.isArray(forwardedFor)) {
-    return forwardedFor[0] || 'unknown'
-  }
-
-  if (typeof forwardedFor === 'string') {
-    return forwardedFor.split(',')[0]?.trim() || 'unknown'
-  }
-
-  return req.socket?.remoteAddress || 'unknown'
 }
 
 const authAttemptKey = (req: VercelRequest, email: string) => `${requestIp(req)}:${email}`
@@ -396,7 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return methodNotAllowed(res)
   }
 
   const result = validateApplicantAccountPayload(req.body ?? {})
@@ -413,6 +152,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     origin: baseUrlForRequest(req),
   }
   let fallbackToLocalAdmin = false
+  let googleStoredSession: Awaited<ReturnType<ReturnType<typeof createLocalRecruitingStore>['upsertAccount']>> | null = null
   const signInRateLimitKey = result.data.action === 'signIn'
     ? authAttemptKey(req, result.data.email)
     : ''
@@ -426,20 +166,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (result.data.action === 'session' && verifyLocalSuperAdminSession(result.data.sessionToken)) {
     return res.status(200).json({
       success: true,
-      account: superAdminAccountResponse,
+      account: superAdminAccount,
       application: null,
     })
   }
 
   if (result.data.action === 'session') {
-    const restored = await createLocalRecruitingStore().restoreSession(result.data.sessionToken)
-    if (restored) {
-      return res.status(200).json({
-        success: true,
-        account: restored.account,
-        sessionToken: restored.sessionToken,
-        application: restored.application,
-      })
+    try {
+      const restored = await createLocalRecruitingStore().restoreSession(result.data.sessionToken)
+      if (restored) {
+        return res.status(200).json({
+          success: true,
+          account: restored.account,
+          sessionToken: restored.sessionToken,
+          application: restored.application,
+        })
+      }
+    } catch (error) {
+      logRecruitingError('applicant_session_restore_failed', error)
+      if (!process.env.GOOGLE_SCRIPT_URL) {
+        return sendRecruitingErrorResponse(res, error, 'Session storage is temporarily unavailable.')
+      }
+    }
+  }
+
+  if (result.data.action === 'logout') {
+    try {
+      await createLocalRecruitingStore().deleteSession(result.data.sessionToken)
+      return res.status(200).json({ success: true })
+    } catch (error) {
+      logRecruitingError('applicant_logout_failed', error)
+      return sendRecruitingErrorResponse(res, error, 'Could not sign out right now.')
     }
   }
 
@@ -452,6 +209,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         account,
         origin: baseUrlForRequest(req),
       }
+
+      // Google is the only provider that may elevate an officer to their roster role
+      // (effectiveRoleForAccount refuses to elevate a password account that merely matches
+      // an officer's email). Record the verified identity in the store so the portal — which
+      // reads sessions from the store, never from Apps Script — can resolve that role later.
+      try {
+        googleStoredSession = await createLocalRecruitingStore().upsertAccount({
+          ...account,
+          verifiedVia: 'google',
+        })
+      } catch (error) {
+        logRecruitingError('applicant_google_store_upsert_failed', error, safeRecruitingSubmissionMetadata({
+          email: account.email,
+        }))
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Google sign-in failed.'
       return res.status(401).json({ error: message })
@@ -460,7 +232,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (result.data.action === 'signIn') {
     try {
-      const adminAccount = superAdminPasswordAccount(result.data.email, result.data.password)
+      const adminAccount = superAdminPasswordAccount(result.data.email, result.data.password, INVALID_AUTH_ERROR)
       fallbackToLocalAdmin = Boolean(adminAccount)
       scriptPayload = adminAccount
         ? {
@@ -485,55 +257,78 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (result.data.action === 'create') {
-    const stored = await createLocalRecruitingStore().upsertAccount(result.data.account, result.data.password)
-    return res.status(200).json({
-      success: true,
-      accountCreated: true,
-      account: stored.account,
-      sessionToken: stored.sessionToken,
-      application: stored.application,
-    })
-  }
-
-  if (result.data.action === 'signIn' && !fallbackToLocalAdmin) {
-    const stored = await createLocalRecruitingStore().signIn(result.data.email, result.data.password)
-    if (stored) {
-      if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
+    try {
+      const stored = await createLocalRecruitingStore().upsertAccount(result.data.account, result.data.password)
       return res.status(200).json({
         success: true,
+        accountCreated: true,
         account: stored.account,
         sessionToken: stored.sessionToken,
         application: stored.application,
       })
+    } catch (error) {
+      logRecruitingError('applicant_account_create_failed', error, safeRecruitingSubmissionMetadata({
+        email: result.data.account.email,
+      }))
+      return sendRecruitingErrorResponse(res, error, 'Could not create that account right now.')
+    }
+  }
+
+  if (result.data.action === 'signIn' && !fallbackToLocalAdmin) {
+    try {
+      const stored = await createLocalRecruitingStore().signIn(result.data.email, result.data.password)
+      if (stored) {
+        if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
+        return res.status(200).json({
+          success: true,
+          account: stored.account,
+          sessionToken: stored.sessionToken,
+          application: stored.application,
+        })
+      }
+    } catch (error) {
+      logRecruitingError('applicant_account_signin_failed', error, safeRecruitingSubmissionMetadata({
+        email: result.data.email,
+      }))
+      if (!process.env.GOOGLE_SCRIPT_URL) {
+        return sendRecruitingErrorResponse(res, error, 'Could not sign in right now.')
+      }
     }
   }
 
   const scriptUrl = process.env.GOOGLE_SCRIPT_URL
   if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
     if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
-    return res.status(200).json(localSuperAdminResponse())
+    return res.status(200).json(localSuperAdminAuthResponse())
+  }
+
+  if (result.data.action === 'session' && !scriptUrl) {
+    return res.status(401).json({ error: 'Session expired. Please sign in again.' })
+  }
+
+  // Google sign-in no longer depends on Apps Script being configured: the store already
+  // holds the verified account, so hand back its session directly. When Apps Script IS
+  // configured we still forward below, to keep the legacy sheet in sync.
+  if (googleStoredSession && !scriptUrl) {
+    return res.status(200).json({
+      success: true,
+      account: googleStoredSession.account,
+      sessionToken: googleStoredSession.sessionToken,
+      application: googleStoredSession.application,
+    })
   }
 
   if (!scriptUrl) {
     return res.status(500).json({ error: 'Form backend not configured' })
   }
 
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 8000)
-
   try {
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scriptPayload),
-      signal: controller.signal,
-    })
-    const payload = await response.json().catch(() => null)
+    const { response, payload } = await postRawJsonWithTimeout(scriptUrl, scriptPayload)
 
     if (!response.ok || payload?.success === false) {
       if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
         if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
-        return res.status(200).json(localSuperAdminResponse())
+        return res.status(200).json(localSuperAdminAuthResponse())
       }
 
       if (result.data.action === 'requestMagicLink' && response.ok) {
@@ -562,9 +357,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
 
+    // The portal resolves sessions from the store only, so a Google sign-in returns the
+    // store session even when Apps Script answered — otherwise the officer signs in and is
+    // then 401'd by /api/portal.
+    if (googleStoredSession) {
+      return res.status(200).json({
+        success: true,
+        account: googleStoredSession.account,
+        sessionToken: googleStoredSession.sessionToken,
+        application: googleStoredSession.application || payload?.application || null,
+      })
+    }
+
     return res.status(200).json({
       success: true,
-      account: payload?.account || (fallbackToLocalAdmin ? superAdminAccountResponse : 'account' in result.data ? result.data.account : null),
+      account: payload?.account || (fallbackToLocalAdmin ? superAdminAccount : 'account' in result.data ? result.data.account : null),
       sessionToken: payload?.sessionToken || '',
       application: payload?.application || null,
       magicLinkSent: Boolean(payload?.magicLinkSent),
@@ -572,7 +379,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch {
     if (fallbackToLocalAdmin && localAdminFallbackEnabled()) {
       if (signInRateLimitKey) clearAuthFailures(signInRateLimitKey)
-      return res.status(200).json(localSuperAdminResponse())
+      return res.status(200).json(localSuperAdminAuthResponse())
     }
 
     if (result.data.action === 'signIn' && signInRateLimitKey) {
@@ -580,7 +387,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     return res.status(500).json({ error: 'Failed to update applicant account' })
-  } finally {
-    clearTimeout(timeout)
   }
 }

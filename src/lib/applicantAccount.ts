@@ -13,6 +13,11 @@ export type ApplicantAccount = {
   role?: DashboardRole
   adminTitle?: string
   adminScopes?: AdminScope[]
+  /**
+   * How this identity was proven. Role elevation requires a verified provider, never a
+   * matching email string — anyone can self-register an officer's address on the public form.
+   */
+  verifiedVia?: 'google' | 'password' | ''
 }
 
 export type GoogleProfile = {
@@ -50,6 +55,10 @@ export type ApplicantAccountRequest =
     }
   | {
       action: 'session'
+      sessionToken: string
+    }
+  | {
+      action: 'logout'
       sessionToken: string
     }
   | {
@@ -109,7 +118,7 @@ export const validateApplicantAccountPayload = (payload: unknown): ValidationRes
   const action = getString(body, 'action')
   const errors: string[] = []
 
-  if (action === 'session') {
+  if (action === 'session' || action === 'logout') {
     const sessionToken = getString(body, 'sessionToken')
     if (sessionToken.length < 24) {
       errors.push('A valid applicant session is required.')

@@ -1,0 +1,71 @@
+/* ============================================================================
+   Admin Check-in (spec §6 T2, §7.1, §8).
+
+   The one screen in the portal that is used standing up. Everything here is
+   sized for that: 44px targets in BOTH pointer modes, a search field wide
+   enough to type a name into without looking, and no control that needs a
+   second press to take effect.
+
+   Rules this file obeys:
+   · Only `--p-*` tokens inside `.portal`. Never `--space-*`.
+   · Teal is never text on a light surface.
+   · Elevation is borders, not shadows. Weights 400 / 500 / 600 / 700 only.
+   · `min-height`, never `height`. Never `outline: none`.
+   ========================================================================== */
+
+.chk-skeleton { min-height: 120px; }
+
+/* ── Search ──────────────────────────────────────────────────────────── */
+
+.chk-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-3);
+  align-items: flex-end;
+}
+
+.chk-search { flex: 1 1 320px; max-width: 460px; }
+
+/* A door-height control regardless of the density setting: this is the field
+   somebody types into while holding a laptop. */
+.chk-search .p-input {
+  min-height: 48px;
+  font-size: var(--p-text-md);
+}
+
+/* ── Roster rows ─────────────────────────────────────────────────────── */
+
+.chk-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* The check-in control is 44px in both pointer modes (`p-btn--target` in
+   portal.css) and gets a little more width here so the word never wraps. */
+.chk-roster .p-table__actions { min-width: 132px; }
+
+/* ── Walk-in ─────────────────────────────────────────────────────────── */
+
+.chk-walkin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-3);
+  align-items: flex-end;
+}
+
+.chk-walkin__field { flex: 1 1 320px; max-width: 460px; }
+
+.chk-walkin__field .p-input { min-height: 48px; }
+
+/* ≥8px between adjacent targets is inherited from the flex gap above. */
+.chk-walkin__submit { min-height: 48px; }
+
+/* ── Breakpoints ─────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .chk-search,
+  .chk-walkin__field { flex: 1 1 100%; max-width: 100%; }
+  .chk-walkin__submit { width: 100%; }
+}

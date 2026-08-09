@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
-import { mkdtemp } from 'node:fs/promises'
+import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/dashboard-data.ts'
+import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
+import { buildApplicationSubmission, validateApplicationPayload } from '../src/lib/application.ts'
+import { INTERVIEW_SLOTS } from '../src/lib/interviews.ts'
 
 const createResponse = () => {
   let statusCode = 0
@@ -92,6 +95,142 @@ test('rejects dashboard data requests without a session', async () => {
   }, res)
 
   assert.equal(result().statusCode, 401)
+})
+
+test('does not merge recruiting data into member dashboard responses', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
+  const originalFetch = globalThis.fetch
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
+
+  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    success: true,
+    account: {
+      firstName: 'Regular',
+      lastName: 'Member',
+      uniqname: 'regular',
+      email: 'regular@example.com',
+      role: 'member',
+    },
+    role: 'member',
+    dashboardData: {
+      memberSignups: [{ id: 'regular@example.com', email: 'regular@example.com' }],
+      backendStatus: { source: 'sheets', message: 'Loaded member dashboard', updatedAt: '2026-05-04T00:00:00.000Z' },
+    },
+  }), { status: 200 })
+
+  try {
+    const application = validateApplicationPayload({
+      firstName: 'Candidate',
+      lastName: 'Student',
+      uniqname: 'candidate',
+      year: 'Sophomore',
+      expectedGraduation: 'May 2028',
+      college: 'Ross BBA',
+      rossStatus: 'ross-bba',
+      interestType: 'leadership-interview',
+      rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
+      availability: [INTERVIEW_SLOTS[0].value],
+      resumeFile: {
+        name: 'candidate-resume.pdf',
+        mimeType: 'application/pdf',
+        size: 1024,
+        contentBase64: 'cmVzdW1l',
+      },
+      weeklyCommitment: '2-3 hours/week',
+      notes: '',
+    })
+    assert.equal(application.success, true)
+    await createLocalRecruitingStore().saveApplication(buildApplicationSubmission(application.data!, 'dashboard-leak-test'))
+
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { sessionToken: 'member-session-token-member-session' },
+    }, res)
+
+    assert.equal(result().statusCode, 200)
+    const dashboardData = (result().payload as Record<string, unknown>).dashboardData as Record<string, unknown>
+    assert.equal(dashboardData.candidates, undefined)
+    assert.equal(dashboardData.interviewerAvailability, undefined)
+    assert.equal(dashboardData.adminAccounts, undefined)
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
+    globalThis.fetch = originalFetch
+    await rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('loads dashboard data for local member sessions without exposing admin collections', async () => {
+  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
+  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
+  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
+
+  delete process.env.GOOGLE_SCRIPT_URL
+  delete process.env.BLOB_READ_WRITE_TOKEN
+  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
+
+  try {
+    const account = await createLocalRecruitingStore().upsertAccount({
+      firstName: 'Regular',
+      lastName: 'Member',
+      uniqname: 'regular.member',
+      email: 'regular.member@example.com',
+    }, 'regular-password')
+    const { res, result } = createResponse()
+
+    await handler({
+      method: 'POST',
+      headers: {},
+      body: { sessionToken: account.sessionToken },
+    }, res)
+
+    assert.equal(result().statusCode, 200)
+    const payload = result().payload as Record<string, unknown>
+    assert.equal(payload.role, 'member')
+    const dashboardData = payload.dashboardData as Record<string, unknown>
+    assert.equal(dashboardData.candidates, undefined)
+    assert.equal(dashboardData.interviewerAvailability, undefined)
+    assert.equal(Array.isArray(dashboardData.memberSignups), true)
+  } finally {
+    if (originalScriptUrl === undefined) {
+      delete process.env.GOOGLE_SCRIPT_URL
+    } else {
+      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
+    }
+    if (originalDataFile === undefined) {
+      delete process.env.UBLDA_LOCAL_DATA_FILE
+    } else {
+      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
+    }
+    if (originalBlobToken === undefined) {
+      delete process.env.BLOB_READ_WRITE_TOKEN
+    } else {
+      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    }
+    await rm(dir, { recursive: true, force: true })
+  }
 })
 
 test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () => {

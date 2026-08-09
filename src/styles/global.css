@@ -60,8 +60,26 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-navy);
 }
 
+/* Without these, an unclassed heading falls back to the UA's em-based defaults
+   (h1 2em, h2 1.5em …) and renders off the three-size scale. Deliberately bare
+   element selectors — every class-based size in the app still outranks them,
+   inside `.portal` as well as out. */
+h1, h2, h3 {
+  font-size: var(--type-lg);
+}
+
+h4, h5, h6 {
+  font-size: var(--type-md);
+}
+
 p {
   max-width: 60ch;
+}
+
+/* The UA default for these is `bold` (700), which is a step heavier than
+   anything else on the site now. Brought onto the same ladder. */
+strong, b {
+  font-weight: 600;
 }
 
 ::selection {
@@ -128,7 +146,7 @@ p {
   color: var(--color-white);
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 500;
   border-radius: var(--radius-full);
   text-decoration: none;
   white-space: nowrap;

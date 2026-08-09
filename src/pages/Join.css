@@ -3,7 +3,7 @@
 }
 
 .join-page__headline {
-  font-size: clamp(var(--text-4xl), 7vw, var(--text-7xl));
+  font-size: var(--type-lg);
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: var(--space-6);
@@ -28,7 +28,7 @@
 }
 
 .join-form__title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-3);
 }
 
@@ -60,7 +60,7 @@
 .join-form__label {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-navy);
   letter-spacing: var(--tracking-wide);
 }
@@ -195,7 +195,7 @@
 }
 
 .join-eboard__title {
-  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+  font-size: var(--type-lg);
   line-height: 1.1;
   letter-spacing: -0.02em;
   margin-top: var(--space-3);
@@ -263,7 +263,7 @@
 }
 
 .join-reasons__title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-12);
 }
 
@@ -309,7 +309,7 @@
 }
 
 .join-faq__title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-4xl));
+  font-size: var(--type-lg);
   margin-bottom: var(--space-10);
 }
 
@@ -331,7 +331,7 @@
 .join-faq__question {
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-navy);
   margin-bottom: var(--space-2);
 }

@@ -51,15 +51,15 @@ test('persists validated leadership interest submissions to the recruiting backe
       method: 'POST',
       headers: { 'user-agent': 'api-handler-test' },
       body: {
-        firstName: 'Alex',
-        lastName: 'Chen',
+        firstName: '<script>Alex</script>',
+        lastName: '<img src=x onerror=alert(1)>',
         uniqname: 'AlexChen@umich.edu',
         year: 'Sophomore',
         expectedGraduation: 'May 2028',
-        college: 'Ross BBA',
+        college: '<b>Ross BBA</b>',
         rossStatus: 'ross-bba',
         interestType: 'leadership-interview',
-        rolePreferences: ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'],
+        rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
         availability: [INTERVIEW_SLOTS[0].value, INTERVIEW_SLOTS[1].value],
         resumeFile: {
           name: 'alex-chen-resume.pdf',
@@ -68,7 +68,7 @@ test('persists validated leadership interest submissions to the recruiting backe
           contentBase64: 'cmVzdW1l',
         },
         weeklyCommitment: '2-3 hours/week',
-        notes: '',
+        notes: '<script>alert(1)</script>',
         website: '',
       },
     }, res)
@@ -84,7 +84,8 @@ test('persists validated leadership interest submissions to the recruiting backe
     const storeData = await createLocalRecruitingStore().leadershipDashboardData()
     assert.equal(storeData.candidates?.length, 1)
     assert.equal(storeData.candidates?.[0].email, 'alexchen@umich.edu')
-    assert.deepEqual(storeData.candidates?.[0].rolePreferences, ['VP of Events & Programming', 'VP of Member Experience', 'VP of Marketing & Community'])
+    assert.equal(/[<>]/.test(`${storeData.candidates?.[0].name} ${storeData.candidates?.[0].program} ${storeData.candidates?.[0].feedback}`), false)
+    assert.deepEqual(storeData.candidates?.[0].rolePreferences, ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'])
     assert.equal(storeData.candidates?.[0].availability.length, 2)
     assert.equal(storeData.candidates?.[0].resumeUrl, 'local-preview://alex-chen-resume.pdf')
   } finally {

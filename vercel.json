@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|src/|@vite/|@react-refresh|@id/|node_modules/|favicon\\.svg|logo\\.svg|highlights/|partners-blda\\.webp).*)", "destination": "/index.html" }
   ]
 }
