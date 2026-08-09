@@ -1,17 +1,13 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import type { VercelRequest, VercelResponse } from './types.ts'
+import {
+  bodyRecord,
+  getString,
+  methodNotAllowed,
+  setApiSecurityHeaders,
+} from '../server/apiUtils.ts'
+import { postJsonWithTimeout } from '../server/googleScript.ts'
 
 const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
-
-const setApiSecurityHeaders = (res: VercelResponse) => {
-  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
-  res.setHeader?.('Pragma', 'no-cache')
-  res.setHeader?.('X-Content-Type-Options', 'nosniff')
-}
-
-const getString = (payload: Record<string, unknown>, key: string) => {
-  const value = payload[key]
-  return typeof value === 'string' ? value.trim() : ''
-}
 
 const normalizeUniqname = (emailOrUniqname: string) => (
   emailOrUniqname.trim().toLowerCase().replace(/@umich\.edu$/i, '').replace(/@.*$/, '')
@@ -21,10 +17,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiSecurityHeaders(res)
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return methodNotAllowed(res)
   }
 
-  const body = req.body && typeof req.body === 'object' ? req.body as Record<string, unknown> : {}
+  const body = bodyRecord(req.body)
   const firstName = getString(body, 'firstName')
   const lastName = getString(body, 'lastName')
   const email = getString(body, 'email')
@@ -54,16 +50,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ formType: 'generalMember', firstName, lastName, uniqname, year, college: major }),
-    })
-
-    if (!response.ok) {
-      return res.status(500).json({ error: 'Failed to submit' })
-    }
-
+    await postJsonWithTimeout(scriptUrl, {
+      formType: 'generalMember',
+      firstName,
+      lastName,
+      uniqname,
+      year,
+      college: major,
+    }, 'Failed to submit')
     return res.status(200).json({ success: true })
   } catch {
     return res.status(500).json({ error: 'Failed to submit' })

@@ -1,31 +1,39 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
+import type { VercelRequest, VercelResponse } from './types.ts'
 import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
 import {
   buildInterviewBookingSubmission,
   validateInterviewBookingPayload,
 } from '../src/lib/interviewBooking.ts'
-
-const setApiSecurityHeaders = (res: VercelResponse) => {
-  res.setHeader?.('Cache-Control', 'no-store, max-age=0')
-  res.setHeader?.('Pragma', 'no-cache')
-  res.setHeader?.('X-Content-Type-Options', 'nosniff')
-}
+import {
+  bookingEmailLaunchError,
+  sendRecruitingFailureAlertEmail,
+  sendBookingConfirmationEmail,
+} from '../server/bookingEmail.ts'
+import {
+  acceptsHoneypot,
+  headerValue,
+  methodNotAllowed,
+  requestIp,
+  setApiSecurityHeaders,
+  validationError,
+} from '../server/apiUtils.ts'
+import {
+  logRecruitingError,
+  recruitingErrorCode,
+  recruitingErrorMessage,
+  recruitingErrorStatus,
+  safeRecruitingSubmissionMetadata,
+} from '../server/recruitingErrors.ts'
 
 const BOOKING_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
 const BOOKING_RATE_LIMIT_MAX_ATTEMPTS = 6
 
-const requestIp = (req: VercelRequest) => {
-  const forwardedFor = req.headers['x-forwarded-for']
-  if (Array.isArray(forwardedFor)) return forwardedFor[0] || 'unknown'
-  if (typeof forwardedFor === 'string') return forwardedFor.split(',')[0]?.trim() || 'unknown'
-  return req.socket?.remoteAddress || 'unknown'
-}
-
 const bookingStatusCode = (error: unknown) => {
   const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : ''
+  if (code === 'BLOB_UNAVAILABLE') return 503
   if (code === 'SLOT_TAKEN' || code === 'ALREADY_BOOKED' || code === 'NO_INTERVIEWER_COVERAGE') return 409
   if (code === 'INVALID_SLOT') return 400
-  return 500
+  return recruitingErrorStatus(error)
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -34,40 +42,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const store = createLocalRecruitingStore()
 
   if (req.method === 'GET') {
-    const slots = await store.publicInterviewSlots()
-    return res.status(200).json({
-      success: true,
-      timeZone: 'Eastern Time (ET, Ann Arbor)',
-      slots,
-    })
+    try {
+      const slots = await store.publicInterviewSlots()
+      return res.status(200).json({
+        success: true,
+        timeZone: 'Eastern Time (ET, Ann Arbor)',
+        slots,
+      })
+    } catch (error) {
+      logRecruitingError('interview_booking_slots_failed', error)
+      return res.status(bookingStatusCode(error)).json({
+        error: recruitingErrorMessage(error, 'Could not load interview slots.'),
+      })
+    }
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return methodNotAllowed(res)
   }
 
-  const body = req.body ?? {}
-  if (body && typeof body === 'object' && typeof body.website === 'string' && body.website.trim()) {
+  if (acceptsHoneypot(req.body)) {
     return res.status(200).json({ success: true })
   }
 
-  const result = validateInterviewBookingPayload(body)
+  const result = validateInterviewBookingPayload(req.body ?? {})
   if (!result.success) {
-    return res.status(400).json({
-      error: result.errors[0] || 'Please check the form and try again.',
-      errors: result.errors,
-    })
+    return validationError(res, result.errors, 'Please check the form and try again.')
   }
 
-  const rateLimit = await store.consumeRateLimit(`booking:${requestIp(req)}`, BOOKING_RATE_LIMIT_MAX_ATTEMPTS, BOOKING_RATE_LIMIT_WINDOW_MS)
-  if (rateLimit.limited) {
-    res.setHeader?.('Retry-After', String(rateLimit.retryAfterSeconds))
-    return res.status(429).json({ error: 'Too many booking attempts. Please wait a few minutes and try again.' })
+  const emailLaunchError = bookingEmailLaunchError()
+  if (emailLaunchError) {
+    return res.status(503).json(emailLaunchError)
   }
+
+  let submission: ReturnType<typeof buildInterviewBookingSubmission> | null = null
 
   try {
-    const submission = buildInterviewBookingSubmission(result.data, req.headers['user-agent'] || '')
+    const rateLimit = await store.consumeRateLimit(`booking:${requestIp(req)}`, BOOKING_RATE_LIMIT_MAX_ATTEMPTS, BOOKING_RATE_LIMIT_WINDOW_MS)
+    if (rateLimit.limited) {
+      res.setHeader?.('Retry-After', String(rateLimit.retryAfterSeconds))
+      return res.status(429).json({ error: 'Too many booking attempts. Please wait a few minutes and try again.' })
+    }
+
+    submission = buildInterviewBookingSubmission(result.data, headerValue(req.headers['user-agent']))
     const saved = await store.bookInterviewSlot(submission)
+    const email = await sendBookingConfirmationEmail({
+      submission,
+      slot: saved.slot,
+      interviewers: saved.interviewers,
+      candidate: saved.candidate,
+    })
 
     return res.status(200).json({
       success: true,
@@ -84,13 +108,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         name: saved.candidate.name,
         email: saved.candidate.email,
       },
-      email: {
-        sent: false,
-        reason: 'Confirmation email provider is not configured yet.',
-      },
+      email,
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Could not book that interview slot.'
-    return res.status(bookingStatusCode(error)).json({ error: message })
+    let recoveryAlertSent = false
+    if (recruitingErrorStatus(error) >= 500) {
+      const alert = await sendRecruitingFailureAlertEmail({
+        workflow: 'interview-booking',
+        name: `${result.data.firstName} ${result.data.lastName}`.trim(),
+        email: result.data.email,
+        slotLabel: result.data.slotValue,
+        resumeFileName: result.data.resumeFile.name,
+        resumeFileSize: result.data.resumeFile.size,
+        errorCode: recruitingErrorCode(error),
+        errorMessage: recruitingErrorMessage(error, 'Could not book that interview slot.'),
+        submissionId: submission?.submissionId,
+      })
+      recoveryAlertSent = alert.sent
+    }
+    logRecruitingError('interview_booking_submit_failed', error, {
+      ...safeRecruitingSubmissionMetadata(result.data),
+      recoveryAlertSent,
+    })
+    return res.status(bookingStatusCode(error)).json({
+      error: recruitingErrorMessage(error, 'Could not book that interview slot.'),
+    })
   }
 }

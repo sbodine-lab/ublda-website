@@ -1,4 +1,22 @@
-# React + TypeScript + Vite
+# UBLDA Website
+
+## Interview launch checklist
+
+The interview signup flow can be opened without automated confirmation email. Candidates see their booked slot in the browser after submitting, and admins can send manual follow-up from the dashboard/export. Before opening the form publicly, configure these Vercel environment variables:
+
+- `BLOB_READ_WRITE_TOKEN` for private recruiting data, slot locks, and resume uploads.
+- `UBLDA_SUPER_ADMIN_PASSWORD` for signed fallback admin sessions.
+
+Optional automated confirmation email:
+
+- `RESEND_API_KEY` for booking confirmation email.
+- `UBLDA_EMAIL_FROM`, normally `UBLDA Interviews <interviews@ublda.org>`.
+- `UBLDA_EMAIL_DOMAIN_VERIFIED=true` only after the sender domain passes SPF/DKIM verification in Resend.
+- `UBLDA_REQUIRE_BOOKING_EMAIL=true` only if the form should fail closed when automated confirmation email is unavailable.
+
+Admins can check the dashboard Settings > Backend panel for live launch readiness. Candidate and interviewer CSV exports are available from the Recruiting and E-board admin tabs.
+
+## Local development
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

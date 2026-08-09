@@ -371,6 +371,7 @@
 .community__logo-item:nth-child(2) img { height: 54px; }  /* OCCB */
 .community__logo-item:nth-child(3) img { height: 50px; }  /* BLDA */
 .community__logo-item:nth-child(4) img { height: 38px; }  /* Nestidd */
+.community__logo-item:nth-child(5) img { height: 62px; }  /* Arc Thrift */
 
 .community__logo--blda {
   border-radius: var(--radius-sm);

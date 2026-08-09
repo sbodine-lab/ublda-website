@@ -17,6 +17,9 @@ const board: Member[] = [
   { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
   { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
   { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
+  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Leads the voice, visibility, and storytelling that help UBLDA reach more students across campus.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
+  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with campus partners, employers, and community organizations that move the mission forward.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
+  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Creates thoughtful programming and event experiences that bring members together around disability inclusion.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
 ]
 
 const LinkedInIcon = () => (
@@ -41,7 +44,7 @@ export default function Team() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="team-page__intro">
-              Six students building the disability inclusion movement
+              Nine students building the disability inclusion movement
               at Michigan Ross through events, education, and real community.
             </p>
           </Reveal>

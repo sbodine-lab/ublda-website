@@ -97,8 +97,14 @@ export type Candidate = {
 export type InterviewerAvailability = {
   name: string
   role: string
+  email?: string
+  uniqname?: string
   availability: string[]
+  availabilitySummary?: string
   maxInterviews: string
+  notes?: string
+  updatedAt?: string
+  submissionCount?: number
 }
 
 export type MemberSignup = {
@@ -194,7 +200,7 @@ export const memberActions: DashboardAction[] = [
   },
   {
     title: 'Choose a leadership interview slot',
-    description: 'Drop your resume and select every interview slot you can make.',
+    description: 'Upload your resume, rank roles, and book one covered interview slot.',
     status: 'Open now',
     href: '/portal',
     tone: 'ready',
@@ -242,7 +248,7 @@ export const leadershipMetrics: LeadershipMetric[] = [
   {
     label: 'Interview coverage',
     value: '4 days',
-    detail: '30-minute Google Meet holds with 20-minute buffers, May 7-10',
+    detail: '30-minute Google Meet holds with 20-minute buffers, May 7-9',
     tone: 'watch',
   },
   {
@@ -352,7 +358,7 @@ export const directoryMembers: DirectoryMember[] = [
 export const calendarItems: CalendarItem[] = [
   {
     title: 'Leadership interviews',
-    date: 'May 7-10',
+    date: 'May 7-9',
     time: '8:00 AM-10:00 PM ET',
     location: 'Google Meet',
     status: 'Invited',

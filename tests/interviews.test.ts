@@ -13,7 +13,7 @@ test('builds 30-minute interview slots with 20-minute buffers between starts', (
   assert.equal(INTERVIEW_BLOCK_MINUTES, 30)
   assert.equal(INTERVIEW_BUFFER_MINUTES, 20)
   assert.equal(INTERVIEW_SLOT_INTERVAL_MINUTES, 50)
-  assert.equal(INTERVIEW_SLOTS.length, 68)
+  assert.equal(INTERVIEW_SLOTS.length, 51)
   assert.equal(INTERVIEW_SLOTS[0].timeLabel, '8:00 AM-8:30 AM ET')
   assert.equal(INTERVIEW_SLOTS[0].bufferLabel, 'buffer until 8:50 AM ET')
   assert.equal(INTERVIEW_SLOTS[1].timeLabel, '8:50 AM-9:20 AM ET')

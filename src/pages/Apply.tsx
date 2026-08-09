@@ -288,7 +288,7 @@ export default function Apply() {
                 <div className="apply-form__notice">
                   <strong>Timeline</strong>
                   <span>
-                    Monday: form opens. Wednesday: matching. Thursday-Sunday: interviews. Monday, May 11: decisions.
+                    Monday: form opens. Wednesday: matching. Thursday-Saturday: interviews. Monday, May 11: decisions.
                   </span>
                 </div>
 

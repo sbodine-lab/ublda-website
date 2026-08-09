@@ -21,6 +21,8 @@ const values = [
   },
 ]
 
+const showStoryTimeline = false
+
 export default function About() {
   return (
     <main id="main-content" className="about">
@@ -45,95 +47,97 @@ export default function About() {
         </div>
       </section>
 
-      <section className="section about__timeline">
-        <div className="container">
-          <Reveal>
-            <h2 className="about__timeline-headline">Our story so far.</h2>
-          </Reveal>
-          <div className="about__timeline-track">
+      {showStoryTimeline && (
+        <section className="section about__timeline">
+          <div className="container">
             <Reveal>
-              <div className="timeline-item">
-                <div className="timeline-item__marker" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Mar 2025</span>
-                  <h3 className="timeline-item__title">The conversation that started it</h3>
-                  <p className="timeline-item__desc">
-                    Sam Bodine reached out to Francesca Colombo, then-president of BLDA
-                    (Business Leaders for Diverse Abilities), about the potential for
-                    carrying the mission to the undergraduate level. That conversation
-                    planted the seed for what became UBLDA.
-                  </p>
-                </div>
-              </div>
+              <h2 className="about__timeline-headline">Our story so far.</h2>
             </Reveal>
-            <Reveal delay={0.05}>
-              <div className="timeline-item">
-                <div className="timeline-item__marker" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Sep – Nov 2025</span>
-                  <h3 className="timeline-item__title">Getting it off the ground</h3>
-                  <p className="timeline-item__desc">
-                    Sam, Alexa Chiang, and Cooper Perry got to campus and started putting
-                    the org together. Structure, planning, outreach, all of it.
-                  </p>
+            <div className="about__timeline-track">
+              <Reveal>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Mar 2025</span>
+                    <h3 className="timeline-item__title">The conversation that started it</h3>
+                    <p className="timeline-item__desc">
+                      Sam Bodine reached out to Francesca Colombo, then-president of BLDA
+                      (Business Leaders for Diverse Abilities), about the potential for
+                      carrying the mission to the undergraduate level. That conversation
+                      planted the seed for what became UBLDA.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <div className="timeline-item">
-                <div className="timeline-item__marker" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Dec 2025</span>
-                  <h3 className="timeline-item__title">Brought on the rest of the team</h3>
-                  <p className="timeline-item__desc">
-                    Lindsey Ye, Landon Miller, and Alex Forstner joined as VPs. The six
-                    of us became the inaugural e-board.
-                  </p>
+              </Reveal>
+              <Reveal delay={0.05}>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Sep – Nov 2025</span>
+                    <h3 className="timeline-item__title">Getting it off the ground</h3>
+                    <p className="timeline-item__desc">
+                      Sam, Alexa Chiang, and Cooper Perry got to campus and started putting
+                      the org together. Structure, planning, outreach, all of it.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.15}>
-              <div className="timeline-item">
-                <div className="timeline-item__marker" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Jan 2026</span>
-                  <h3 className="timeline-item__title">BBA Meet the Clubs</h3>
-                  <p className="timeline-item__desc">
-                    Introduced UBLDA to Ross for the first time. Started signing up members
-                    and got the word out.
-                  </p>
+              </Reveal>
+              <Reveal delay={0.1}>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Dec 2025</span>
+                    <h3 className="timeline-item__title">Brought on the rest of the team</h3>
+                    <p className="timeline-item__desc">
+                      Lindsey Ye, Landon Miller, and Alex Forstner joined as VPs. The six
+                      of us became the inaugural e-board.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.2}>
-              <div className="timeline-item">
-                <div className="timeline-item__marker timeline-item__marker--active" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Mar 2026</span>
-                  <h3 className="timeline-item__title">Our first event</h3>
-                  <p className="timeline-item__desc">
-                    Fireside Chat with Andrew Parker, CEO &amp; Co-Founder of Nestidd.
-                    First event we ever hosted on our own.
-                  </p>
+              </Reveal>
+              <Reveal delay={0.15}>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Jan 2026</span>
+                    <h3 className="timeline-item__title">BBA Meet the Clubs</h3>
+                    <p className="timeline-item__desc">
+                      Introduced UBLDA to Ross for the first time. Started signing up members
+                      and got the word out.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.25}>
-              <div className="timeline-item">
-                <div className="timeline-item__marker timeline-item__marker--future" />
-                <div className="timeline-item__content">
-                  <span className="timeline-item__date">Fall 2026 &amp; beyond</span>
-                  <h3 className="timeline-item__title">A lot more coming</h3>
-                  <p className="timeline-item__desc">
-                    Accessibility consulting, mentorship, an expanded speaker series, and
-                    new leadership roles. We have a lot planned.
-                  </p>
+              </Reveal>
+              <Reveal delay={0.2}>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker timeline-item__marker--active" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Mar 2026</span>
+                    <h3 className="timeline-item__title">Our first event</h3>
+                    <p className="timeline-item__desc">
+                      Fireside Chat with Andrew Parker, CEO &amp; Co-Founder of Nestidd.
+                      First event we ever hosted on our own.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Reveal>
+              </Reveal>
+              <Reveal delay={0.25}>
+                <div className="timeline-item">
+                  <div className="timeline-item__marker timeline-item__marker--future" />
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__date">Fall 2026 &amp; beyond</span>
+                    <h3 className="timeline-item__title">A lot more coming</h3>
+                    <p className="timeline-item__desc">
+                      Accessibility consulting, mentorship, an expanded speaker series, and
+                      new leadership roles. We have a lot planned.
+                    </p>
+                  </div>
+                </div>
+              </Reveal>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="about__image-section">
         <div className="container">

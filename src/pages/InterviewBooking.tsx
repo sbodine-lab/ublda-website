@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import type { PublicInterviewSlot } from '../lib/interviewBooking'
+import {
+  MAX_RESUME_FILE_SIZE_BYTES,
+  RESUME_MIME_TYPES,
+  isResumeFileAllowed,
+} from '../lib/application'
 import { BOARD_POSITION_OPTIONS, INTERVIEW_WINDOW_DAYS } from '../lib/interviews'
 import Reveal from '../components/Reveal'
 import './Apply.css'
@@ -33,6 +37,35 @@ const slotsByDay = (slots: PublicInterviewSlot[]) => (
   }))
 )
 
+const resumeAccept = RESUME_MIME_TYPES.join(',')
+
+const fileSizeLabel = (bytes: number) => `${Math.round(bytes / 1024 / 1024)} MB`
+
+const fileToResumePayload = (file: File) =>
+  new Promise<{ name: string; mimeType: string; size: number; contentBase64: string }>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onerror = () => reject(new Error('Resume file could not be read. Please try uploading it again.'))
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : ''
+      const contentBase64 = result.includes(',') ? result.split(',')[1] : result
+
+      if (!contentBase64) {
+        reject(new Error('Resume file could not be read. Please try uploading it again.'))
+        return
+      }
+
+      resolve({
+        name: file.name,
+        mimeType: file.type,
+        size: file.size,
+        contentBase64,
+      })
+    }
+
+    reader.readAsDataURL(file)
+  })
+
 export default function InterviewBooking() {
   const [form, setForm] = useState(initialForm)
   const [slots, setSlots] = useState<PublicInterviewSlot[]>([])
@@ -40,10 +73,12 @@ export default function InterviewBooking() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
 
   const availableSlots = useMemo(() => slots.filter((slot) => slot.isAvailable), [slots])
+  const visibleSlots = useMemo(() => slots.filter((slot) => slot.interviewerCount > 0 || slot.isBooked), [slots])
   const selectedSlot = useMemo(() => slots.find((slot) => slot.value === form.slotValue), [form.slotValue, slots])
-  const dayGroups = useMemo(() => slotsByDay(slots), [slots])
+  const dayGroups = useMemo(() => slotsByDay(visibleSlots).filter((day) => day.slots.length > 0), [visibleSlots])
   const selectedRolePreferences = useMemo(
     () => new Set(form.rolePreferences.filter(Boolean)),
     [form.rolePreferences],
@@ -52,7 +87,7 @@ export default function InterviewBooking() {
   const loadSlots = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/interview-booking')
+      const response = await fetch(`/api/interview-booking?ts=${Date.now()}`, { cache: 'no-store' })
       const payload = await response.json().catch(() => null) as { slots?: PublicInterviewSlot[]; error?: string } | null
 
       if (!response.ok) {
@@ -92,6 +127,33 @@ export default function InterviewBooking() {
     })
   }
 
+  const handleResumeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    setError('')
+    setSuccessMessage('')
+
+    if (!file) {
+      setResumeFile(null)
+      return
+    }
+
+    if (!isResumeFileAllowed(file.name, file.type)) {
+      event.target.value = ''
+      setResumeFile(null)
+      setError('Resume must be a PDF, DOC, or DOCX file.')
+      return
+    }
+
+    if (file.size > MAX_RESUME_FILE_SIZE_BYTES) {
+      event.target.value = ''
+      setResumeFile(null)
+      setError(`Resume file must be ${fileSizeLabel(MAX_RESUME_FILE_SIZE_BYTES)} or smaller.`)
+      return
+    }
+
+    setResumeFile(file)
+  }
+
   const selectSlot = (slotValue: string) => {
     setError('')
     setSuccessMessage('')
@@ -106,22 +168,43 @@ export default function InterviewBooking() {
 
     try {
       const rankedFunctions = form.rolePreferences.filter(Boolean)
-      if (rankedFunctions.length < 3 || new Set(rankedFunctions).size !== rankedFunctions.length) {
-        throw new Error('Please rank all three function preferences.')
+      if (!form.slotValue) {
+        throw new Error('Choose an available interview slot.')
       }
 
+      if (rankedFunctions.length < 1 || new Set(rankedFunctions).size !== rankedFunctions.length) {
+        throw new Error('Please select your first-choice function.')
+      }
+
+      if (!resumeFile) {
+        throw new Error('Please upload your resume.')
+      }
+
+      const resumeFilePayload = await fileToResumePayload(resumeFile)
       const response = await fetch('/api/interview-booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          rolePreferences: rankedFunctions,
+          resumeFile: resumeFilePayload,
+        }),
       })
-      const payload = await response.json().catch(() => null) as { error?: string; slot?: { label?: string }; interviewers?: string[] } | null
+      const payload = await response.json().catch(() => null) as {
+        error?: string
+        slot?: { label?: string }
+        interviewers?: string[]
+        email?: { sent?: boolean }
+      } | null
 
       if (!response.ok) {
         throw new Error(payload?.error || 'That slot could not be booked.')
       }
 
-      setSuccessMessage(`You are booked for ${payload?.slot?.label || selectedSlot?.label}. We saved this in Eastern Time.`)
+      const confirmation = payload?.email?.sent
+        ? ' A confirmation email is on the way.'
+        : ' Your resume and role preferences are saved.'
+      setSuccessMessage(`You are booked for ${payload?.slot?.label || selectedSlot?.label}.${confirmation}`)
       await loadSlots()
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : ''
@@ -139,58 +222,77 @@ export default function InterviewBooking() {
           <Reveal>
             <div className="booking-page__header">
               <div>
-                <p className="section__label">UBLDA interviews</p>
-                <h1>Choose your interview slot.</h1>
+                <h1>Book your interview.</h1>
                 <p>
-                  All times are listed in Eastern Time (ET, Ann Arbor). Pick one available Google Meet slot that works for you.
+                  Choose a covered Google Meet time, add your basics, and send your resume. A board member will follow up shortly with the interview link and details.
                 </p>
               </div>
-              <Link to="/apply">Need the full candidate form?</Link>
+              <ol className="booking-steps" aria-label="Booking steps">
+                <li><span>1</span> Pick a time</li>
+                <li><span>2</span> Add details</li>
+                <li><span>3</span> Confirm</li>
+              </ol>
             </div>
 
             <div className="booking-layout">
               <section className="booking-board" aria-label="Available interview slots">
                 <div className="booking-board__topline">
-                  <strong>{availableSlots.length} open slot{availableSlots.length === 1 ? '' : 's'}</strong>
+                  <div>
+                    <span>Step 1</span>
+                    <strong>{availableSlots.length} open slot{availableSlots.length === 1 ? '' : 's'}</strong>
+                  </div>
                   <button type="button" onClick={() => void loadSlots()}>Refresh</button>
                 </div>
 
                 {loading ? (
                   <p className="booking-empty">Loading interview slots...</p>
                 ) : availableSlots.length === 0 ? (
-                  <div className="booking-empty">
-                    <strong>All available interview slots are currently full.</strong>
-                    <p>Email sbodine@umich.edu if you need help finding a time.</p>
-                  </div>
+                  visibleSlots.length === 0 ? (
+                    <div className="booking-empty">
+                      <strong>No covered interview slots are open yet.</strong>
+                      <p>Check back after e-board interviewers submit availability.</p>
+                    </div>
+                  ) : (
+                    <div className="booking-board__notice" role="status">
+                      All covered interview slots are currently occupied.
+                    </div>
+                  )
                 ) : (
+                  availableSlots.length < visibleSlots.length && (
+                    <div className="booking-board__notice" role="status">
+                      Occupied slots stay visible below so you can see what has already been taken.
+                    </div>
+                  )
+                )}
+
+                {!loading && visibleSlots.length > 0 && (
                   <div className="booking-days">
                     {dayGroups.map((day) => {
-                      const dayOpenSlots = day.slots.filter((slot) => slot.isAvailable)
+                      const openCount = day.slots.filter((slot) => slot.isAvailable).length
+                      const occupiedCount = day.slots.filter((slot) => slot.isBooked).length
                       return (
                         <section className="booking-day" key={day.date}>
                           <header>
                             <strong>{day.shortLabel}</strong>
-                            <span>{dayOpenSlots.length} open</span>
+                            <span>{openCount} open{occupiedCount ? ` · ${occupiedCount} occupied` : ''}</span>
                           </header>
                           <div className="booking-slot-list">
-                            {day.slots.map((slot) => (
-                              <button
-                                type="button"
-                                className={`booking-slot ${form.slotValue === slot.value ? 'booking-slot--selected' : ''}`}
-                                key={slot.value}
-                                onClick={() => selectSlot(slot.value)}
-                                disabled={!slot.isAvailable}
-                              >
-                                <span>{slot.timeLabel}</span>
-                                <small>
-                                  {slot.isBooked
-                                    ? 'Booked'
-                                    : slot.interviewerCount > 0
-                                      ? `${slot.interviewerCount} e-board available`
-                                      : 'No e-board coverage'}
-                                </small>
-                              </button>
-                            ))}
+                            {day.slots.map((slot) => {
+                              const statusLabel = slot.isBooked ? 'Occupied' : slot.isAvailable ? 'Slot open' : 'No interviewer coverage'
+                              return (
+                                <button
+                                  type="button"
+                                  className={`booking-slot ${form.slotValue === slot.value ? 'booking-slot--selected' : ''} ${slot.isBooked ? 'booking-slot--occupied' : ''}`}
+                                  key={slot.value}
+                                  onClick={() => selectSlot(slot.value)}
+                                  disabled={!slot.isAvailable}
+                                  aria-label={`${slot.label}: ${statusLabel}`}
+                                >
+                                  <span>{slot.timeLabel}</span>
+                                  <small>{statusLabel}</small>
+                                </button>
+                              )
+                            })}
                           </div>
                         </section>
                       )
@@ -200,10 +302,15 @@ export default function InterviewBooking() {
               </section>
 
               <form className="booking-card" onSubmit={handleSubmit}>
-                <div>
+                <div className="booking-card__slot-summary">
                   <span>Selected slot</span>
                   <strong>{selectedSlot ? selectedSlot.label : 'Choose a time'}</strong>
                   <small>Eastern Time (ET, Ann Arbor)</small>
+                </div>
+
+                <div className="booking-card__section-heading">
+                  <span>Step 2</span>
+                  <strong>Your details</strong>
                 </div>
 
                 <label>
@@ -219,21 +326,32 @@ export default function InterviewBooking() {
                   <input type="email" value={form.email} onChange={updateField('email')} required maxLength={160} placeholder="you@example.com" />
                 </label>
                 <label>
+                  Resume
+                  <span className="booking-card__file-control">
+                    <span>{resumeFile ? 'Replace resume' : 'Upload resume'}</span>
+                    <small>{resumeFile ? resumeFile.name : 'No file selected'}</small>
+                  </span>
+                  <input className="booking-card__file-input" type="file" accept={resumeAccept} onChange={handleResumeChange} required />
+                  <span className="booking-card__helper">
+                    PDF, DOC, or DOCX. Max {fileSizeLabel(MAX_RESUME_FILE_SIZE_BYTES)}.
+                  </span>
+                </label>
+                <label>
                   Function preferences
                   <span className="booking-card__helper">
-                    We will focus on #1 in the interview and use #2-#3 as quick skill checks.
+                    Pick the function you most want to discuss so we can center your interview around it. If you want to be considered for multiple roles, select a second or third choice and we will interview accordingly.
                   </span>
                 </label>
                 <div className="booking-card__rank-grid">
                   {['First choice', 'Second choice', 'Third choice'].map((label, index) => (
                     <label key={label}>
-                      {label}
+                      {index === 0 ? label : `${label} (optional)`}
                       <select
                         value={form.rolePreferences[index]}
                         onChange={(event) => updateRolePreference(index, event.target.value)}
-                        required
+                        required={index === 0}
                       >
-                        <option value="" disabled>Select function</option>
+                        <option value="" disabled={index === 0}>{index === 0 ? 'Select function' : 'No backup preference'}</option>
                         {BOARD_POSITION_OPTIONS.map((role) => (
                           <option
                             key={role}
@@ -260,11 +378,15 @@ export default function InterviewBooking() {
                 {error && <p className="apply-form__error" role="alert">{error}</p>}
                 {successMessage && <p className="booking-success" role="status">{successMessage}</p>}
 
-                <button type="submit" className="btn btn--primary" disabled={submitting || !form.slotValue}>
+                <div className="booking-card__section-heading">
+                  <span>Step 3</span>
+                  <strong>Confirm booking</strong>
+                </div>
+                <button type="submit" className="btn btn--primary" disabled={submitting}>
                   {submitting ? 'Booking...' : 'Book interview slot'}
                 </button>
                 <p className="booking-card__fineprint">
-                  One slot per email. If your plans change, email sbodine@umich.edu so we can reschedule cleanly.
+                  One slot per email. If your plans change, email sbodine@umich.edu so we can reschedule.
                 </p>
               </form>
             </div>
