@@ -35,7 +35,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
           <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </a>
-        <h1 id="decision-sign-in-title">a decision is waiting.</h1>
+        <h1 id="decision-sign-in-title">a decision is waiting</h1>
 
         {snapshot.auth.status === "misconfigured" ? (
           <Alert variant="destructive">
