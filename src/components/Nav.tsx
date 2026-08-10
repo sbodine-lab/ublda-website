@@ -75,10 +75,6 @@ export default function Nav() {
           ))}
         </nav>
 
-        <Link to="/workspace" className="nav__cta">
-          Admin sign in
-        </Link>
-
         <button
           className={`nav__burger ${mobileOpen ? 'nav__burger--open' : ''}`}
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -110,9 +106,6 @@ export default function Nav() {
                 {link.path === '/advisory' && <span aria-hidden="true"> ↗</span>}
               </Link>
             ))}
-            <Link to="/workspace" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
-              Admin sign in
-            </Link>
           </motion.div>
         )}
       </AnimatePresence>
