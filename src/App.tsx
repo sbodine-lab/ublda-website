@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
 import Team from './pages/Team'
+import Advisory from './pages/Advisory'
 import Join from './pages/Join'
 import Links from './pages/Links'
 import Brand from './pages/Brand'
@@ -21,7 +22,7 @@ const DecisionCenterEntry = lazy(() => (
 ))
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
-const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing']
+const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory']
 const DECISION_PREFIXES = ['/decision', '/decisions', '/d', '/results']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/events" element={<Events />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/advisory" element={<Advisory />} />
         <Route path="/join" element={<Join />} />
         <Route path="/apply" element={<InterviewBooking />} />
         <Route path="/portal" element={<InterviewBooking />} />

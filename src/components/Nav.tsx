@@ -7,6 +7,7 @@ const publicLinks = [
   { label: 'About', path: '/about' },
   { label: 'Events', path: '/events' },
   { label: 'Team', path: '/team' },
+  { label: 'Advisory', path: '/advisory' },
 ]
 
 function NavLetters({ text }: { text: string }) {
@@ -65,7 +66,7 @@ export default function Nav() {
             <Link
               key={link.path}
               to={link.path}
-              className={`nav__link ${isCurrent(link.path) ? 'nav__link--active' : ''}`}
+              className={`nav__link ${link.path === '/advisory' ? 'nav__link--advisory' : ''} ${isCurrent(link.path) ? 'nav__link--active' : ''}`}
               aria-current={isCurrent(link.path) ? 'page' : undefined}
               onClick={() => setMobileOpen(false)}
             >
@@ -102,10 +103,11 @@ export default function Nav() {
               <Link
                 key={link.path}
                 to={link.path}
-                className="nav__mobile-link"
+                className={`nav__mobile-link ${link.path === '/advisory' ? 'nav__mobile-link--advisory' : ''}`}
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
+                {link.path === '/advisory' && <span aria-hidden="true"> ↗</span>}
               </Link>
             ))}
             <Link to="/decisions" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>

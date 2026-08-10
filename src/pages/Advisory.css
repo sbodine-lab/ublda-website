@@ -1,0 +1,743 @@
+/* ============================================================================
+   UBLDA Advisory — sub-brand page.
+   Deliberately its own visual system (grotesque sans, white canvas,
+   monochrome navy) distinct from the marketing site's serif/cream language, the way a
+   private-bank sub-brand sits inside a parent brand. Scoped under .adv.
+   ========================================================================== */
+
+.adv {
+  /* Sub-brand palette: monochrome navy. Ink for text, navy-light for
+     hover states; no secondary hue. */
+  --adv-ink: var(--color-navy);
+  --adv-accent: var(--color-navy-light);
+  --adv-card: #f2f4f5;
+  --adv-hairline: #e3e5e7;
+  --adv-muted: #55636e;
+  --adv-font: 'Neue Haas Grotesk Text', 'Helvetica Neue', Helvetica, Inter, Arial, sans-serif;
+  --adv-body-max: 830px;
+
+  font-family: var(--adv-font);
+  background: var(--color-white);
+  color: var(--adv-ink);
+}
+
+/* Family only — colour comes from the class-level rules so modifiers like
+   the accent and on-dark headings don't lose a specificity fight. */
+.adv h1,
+.adv h2,
+.adv h3 {
+  font-family: var(--adv-font);
+  letter-spacing: normal;
+}
+
+.adv-site {
+  background: var(--color-white);
+}
+
+/* Page entrance: a soft rise so switching into the sub-brand chrome reads as
+   arriving somewhere new. Applied to main and footer, never their wrapper —
+   a transform on the wrapper would become the containing block for the
+   fixed-position nav and pin it to the page instead of the viewport. */
+@media (prefers-reduced-motion: no-preference) {
+  .adv,
+  .adv-footer {
+    animation: adv-enter 0.5s var(--ease-out) both;
+  }
+
+  @keyframes adv-enter {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Premium scrollbar for the sub-brand: thin, rounded, brand-inked. Applied to
+   <html> while the Advisory page is mounted. */
+html.adv-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy) #eef1f2;
+}
+
+html.adv-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+html.adv-scroll::-webkit-scrollbar-track {
+  background: #eef1f2;
+}
+
+html.adv-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-navy);
+  border-radius: 999px;
+  border: 3px solid #eef1f2;
+}
+
+html.adv-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-navy-light);
+}
+
+/* ─── Sub-brand nav: hairline text bar, transparent over the hero ─── */
+.adv-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  font-family: 'Neue Haas Grotesk Text', 'Helvetica Neue', Helvetica, Inter, Arial, sans-serif;
+  /* Idle underlay: guarantees ≥4.5:1 for the white nav text however light
+     the shader drifts beneath it. */
+  background: linear-gradient(180deg, rgba(9, 30, 42, 0.55) 0%, rgba(9, 30, 42, 0) 100%);
+  transition: background var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.adv-nav--scrolled {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 1px 0 rgba(15, 43, 60, 0.08);
+}
+
+.adv-nav__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-5) var(--space-8);
+}
+
+.adv-nav--scrolled .adv-nav__inner {
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+
+.adv-nav__lockup {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.adv-nav__wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--color-white);
+  white-space: nowrap;
+  transition: color var(--duration-normal) var(--ease-out);
+}
+
+.adv-nav__wordmark strong {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.adv-nav__divider {
+  width: 1px;
+  height: 16px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.adv-nav--scrolled .adv-nav__wordmark {
+  color: var(--color-navy);
+}
+
+.adv-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.adv-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.adv-nav--scrolled .adv-nav__link {
+  color: var(--adv-muted, #55636e);
+}
+
+.adv-nav__link:hover,
+.adv-nav__link:focus-visible {
+  color: var(--color-white);
+}
+
+.adv-nav--scrolled .adv-nav__link:hover,
+.adv-nav--scrolled .adv-nav__link:focus-visible {
+  color: var(--color-navy);
+}
+
+.adv-nav__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-white);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.adv-nav__cta svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.adv-nav__cta:hover svg,
+.adv-nav__cta:focus-visible svg {
+  transform: translateX(3px);
+}
+
+.adv-nav--scrolled .adv-nav__cta {
+  color: var(--color-navy);
+}
+
+.adv-nav__cta:hover,
+.adv-nav__cta:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
+.adv-nav--scrolled .adv-nav__cta:hover,
+.adv-nav--scrolled .adv-nav__cta:focus-visible {
+  color: var(--color-navy);
+}
+
+.adv-nav__cta-short {
+  display: none;
+}
+
+/* ─── Sub-brand footer ─── */
+.adv-footer {
+  border-top: 1px solid var(--adv-hairline, #e3e5e7);
+  padding: var(--space-16) 0 var(--space-8);
+  background: var(--color-white);
+  font-family: 'Neue Haas Grotesk Text', 'Helvetica Neue', Helvetica, Inter, Arial, sans-serif;
+  color: var(--color-navy);
+}
+
+.adv-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-10);
+}
+
+.adv-footer__wordmark {
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+.adv-footer__wordmark strong {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.adv-footer__tagline {
+  margin-top: var(--space-4);
+  font-size: 0.9375rem;
+  color: #55636e;
+  max-width: 36ch;
+}
+
+.adv-footer__heading {
+  /* Global h4 styling reaches for the parent serif; the sub-brand stays
+     grotesque. */
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: var(--space-4);
+}
+
+.adv-footer__link {
+  display: block;
+  font-size: 0.9375rem;
+  color: #55636e;
+  padding: var(--space-2) 0;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.adv-footer__link:hover,
+.adv-footer__link:focus-visible {
+  color: var(--color-navy);
+}
+
+.adv-footer__bottom {
+  margin-top: var(--space-12);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--adv-hairline, #e3e5e7);
+  font-size: 0.875rem;
+  color: #55636e;
+}
+
+.adv-footer__bottom p {
+  max-width: none;
+}
+
+/* Centered content column, matching the reference's narrow measure. */
+.adv-body {
+  max-width: var(--adv-body-max);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.adv-section {
+  padding: var(--space-20) 0 var(--space-8);
+}
+
+.adv-h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--space-8);
+}
+
+.adv .adv-h2--accent {
+  color: var(--adv-ink);
+}
+
+.adv .adv-h2--light {
+  color: var(--color-white);
+}
+
+.adv-lead {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  max-width: 60ch;
+  margin-bottom: var(--space-8);
+}
+
+/* ─── Hero ─── */
+.adv-hero {
+  position: relative;
+  height: min(92vh, 900px);
+  min-height: 480px;
+  margin: var(--space-2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--adv-ink);
+  display: flex;
+  align-items: flex-end;
+}
+
+.adv-hero__media,
+.adv-statement__media {
+  position: absolute;
+  inset: 0;
+}
+
+/* Scrim keeps the pale title ≥4.5:1 wherever the gradient drifts. */
+.adv-hero__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 30, 42, 0.25) 0%, rgba(9, 30, 42, 0.6) 100%);
+}
+
+/* Endorsed lockup: bold parent name over a light sub-brand descriptor, the
+   standard parent-brand/sub-brand arrangement. */
+.adv-hero__lockup {
+  position: relative;
+  z-index: 1;
+  padding: 0 var(--space-8) var(--space-12);
+}
+
+.adv-hero__title {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  color: #c9d1d6;
+}
+
+.adv-hero__parent {
+  font-weight: 700;
+  color: #e8edef;
+}
+
+.adv-hero__sub {
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+/* ─── Statement band ─── */
+.adv-statement {
+  position: relative;
+  height: min(70vh, 640px);
+  min-height: 360px;
+  margin: var(--space-2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--adv-ink);
+  display: grid;
+  place-items: center;
+}
+
+.adv-statement__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 30, 42, 0.45);
+}
+
+.adv-statement__text {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 400;
+  color: #c9d1d6;
+  text-align: center;
+  padding: 0 var(--space-6);
+  max-width: none;
+}
+
+/* ─── Benefits: flat editorial list, no boxes ─── */
+.adv-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--space-10);
+}
+
+.adv-benefit {
+  display: flex;
+  gap: var(--space-5);
+  border-top: 1px solid var(--adv-hairline);
+  padding: var(--space-6) 0;
+}
+
+.adv-benefit__num {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--adv-muted);
+  letter-spacing: 0.06em;
+  padding-top: 5px;
+}
+
+.adv-benefit__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.adv-benefit__desc {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--adv-ink);
+}
+
+/* ─── Service rows ─── */
+.adv-services {
+  border-top: 1px solid var(--adv-hairline);
+}
+
+.adv-service {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--adv-hairline);
+}
+
+.adv-service__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.adv-service__desc {
+  font-size: 1rem;
+  color: var(--adv-ink);
+  max-width: 70ch;
+}
+
+/* ─── Dark clients band ─── */
+.adv-dark {
+  background: var(--adv-ink);
+  padding: var(--space-20) 0;
+  margin-top: var(--space-12);
+}
+
+.adv-clients {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.adv-client {
+  position: relative;
+  min-height: 420px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #14374e;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+}
+
+.adv-client__media {
+  position: absolute;
+  inset: 0;
+}
+
+.adv-client__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9, 30, 42, 0.72) 0%, rgba(9, 30, 42, 0.35) 45%, rgba(9, 30, 42, 0.72) 100%);
+}
+
+.adv-client--open {
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: transparent;
+  min-height: 0;
+}
+
+.adv-client__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.adv .adv-client__name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.adv-client__tag {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adv-ink);
+  background: var(--color-white);
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-3);
+}
+
+.adv-client__note {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: var(--space-4);
+  max-width: 48ch;
+}
+
+.adv-client__pill {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  align-self: flex-end;
+}
+
+.adv-client--open .adv-client__pill {
+  margin-top: var(--space-6);
+}
+
+/* ─── Pills ─── */
+.adv-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--adv-ink);
+  color: var(--color-white);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.adv-client .adv-pill {
+  background: rgba(9, 30, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.adv-pill:hover,
+.adv-pill:focus-visible {
+  background: var(--adv-accent);
+  color: var(--color-white);
+}
+
+.adv-pill--wide {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  color: var(--adv-ink);
+  border-color: var(--adv-ink);
+  margin-top: var(--space-10);
+}
+
+.adv-pill--wide:hover,
+.adv-pill--wide:focus-visible {
+  background: var(--adv-ink);
+  color: var(--color-white);
+}
+
+/* ─── People ─── */
+.adv-people {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.adv-person {
+  border: 1px solid var(--adv-hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.adv-person__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--adv-card);
+  color: var(--adv-ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.adv-person__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.adv-person__role {
+  color: var(--adv-muted);
+  margin: var(--space-1) auto 0;
+}
+
+.adv-person__location {
+  color: var(--adv-muted);
+  font-size: 0.9375rem;
+  margin: 0 auto;
+}
+
+.adv-person__links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.adv-person__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--adv-hairline);
+  color: var(--adv-ink);
+  transition: border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.adv-person__link:hover,
+.adv-person__link:focus-visible {
+  border-color: var(--adv-accent);
+  color: var(--adv-accent);
+}
+
+/* ─── Manifesto + facts ─── */
+.adv-manifesto__text {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--adv-ink);
+  max-width: 26ch;
+  margin-bottom: var(--space-12);
+}
+
+.adv-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  border-top: 1px solid var(--adv-hairline);
+  padding-top: var(--space-8);
+}
+
+.adv-fact__label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adv-muted);
+  margin-bottom: var(--space-2);
+}
+
+.adv-fact__value {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  color: var(--adv-ink);
+}
+
+/* Last section needs breathing room above the footer. */
+.adv > .adv-body:last-child {
+  padding-bottom: var(--space-20);
+}
+
+/* Anchor targets land below the floating nav. */
+.adv section[id] {
+  scroll-margin-top: 88px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 720px) {
+  .adv-nav__inner {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .adv-nav__links {
+    display: none;
+  }
+
+  .adv-nav__cta-full {
+    display: none;
+  }
+
+  .adv-nav__cta-short {
+    display: inline;
+  }
+
+  .adv-footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .adv-benefits,
+  .adv-people,
+  .adv-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .adv-hero,
+  .adv-statement {
+    margin: var(--space-1);
+  }
+
+  .adv-hero__lockup {
+    padding: 0 var(--space-6) var(--space-10);
+  }
+
+  .adv-client {
+    min-height: 340px;
+  }
+}
