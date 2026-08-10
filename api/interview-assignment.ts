@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const adminAccess = await recruitingAdminAccessForSession(result.data.sessionToken)
-    if (!adminAccess.authorized) {
+    if (adminAccess.authorized === false) {
       return res.status(adminAccess.status).json({ error: adminAccess.error })
     }
 
