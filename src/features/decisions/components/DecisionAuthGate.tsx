@@ -36,9 +36,6 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
           <span>UBLDA</span>
         </a>
         <h1 id="decision-sign-in-title">A decision is waiting</h1>
-        <p className="dc-auth-copy">
-          Sign in with an approved account to see the question and respond. Decision details stay hidden until your identity is verified.
-        </p>
 
         {snapshot.auth.status === "misconfigured" ? (
           <Alert variant="destructive">

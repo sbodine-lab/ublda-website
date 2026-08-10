@@ -165,11 +165,6 @@
   line-height: 1.03;
 }
 
-.dc-auth-copy {
-  color: var(--dc-muted, #6b6860);
-  font-size: 0.98rem;
-}
-
 .dc-auth-denied {
   display: grid;
   gap: 0.75rem;
@@ -178,7 +173,7 @@
 .dc-google-button {
   width: auto;
   min-width: 248px;
-  margin-top: 30px;
+  margin-top: 24px;
   background: linear-gradient(135deg, rgb(15 43 60 / 88%), rgb(26 61 82 / 76%)) !important;
 }
 
