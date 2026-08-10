@@ -9,7 +9,9 @@ import {
 import { Link, useParams } from "react-router-dom"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { DecisionAuthGate } from "../components/DecisionAuthGate"
 import { useDecisionData } from "../decisionDataContext"
@@ -39,72 +41,82 @@ function BallotChoices({
       ...(decision.allowOther ? [{ value: "other" as const, label: "Propose something else" }] : []),
     ]
     return (
-      <div className="dc-choice-list" role="radiogroup" aria-label="Your response">
+      <ToggleGroup
+        type="single"
+        orientation="vertical"
+        variant="outline"
+        spacing={2}
+        className="dc-choice-group"
+        aria-label="Your response"
+        value={answer.choice ?? ""}
+        onValueChange={(value) => value && onChange({ type: "binary", choice: value as "yes" | "no" | "other", otherText: value === "other" ? answer.otherText : undefined })}
+      >
         {choices.map((choice) => (
-          <button
+          <ToggleGroupItem
             key={choice.value}
-            type="button"
-            role="radio"
-            aria-checked={answer.choice === choice.value}
-            className={cn("dc-choice-button", answer.choice === choice.value && "dc-choice-selected")}
-            onClick={() => onChange({ type: "binary", choice: choice.value, otherText: choice.value === "other" ? answer.otherText : undefined })}
+            value={choice.value}
+            className="dc-ballot-choice"
           >
-            <span className="dc-choice-marker" aria-hidden="true">{answer.choice === choice.value && <Check />}</span>
-            <span><b>{choice.label}</b></span>
-          </button>
+            {answer.choice === choice.value && <Check data-icon="inline-start" aria-hidden="true" />}
+            {choice.label}
+          </ToggleGroupItem>
         ))}
         {answer.choice === "other" && (
-          <label className="dc-field-block dc-other-field">
-            <span>What do you propose?</span>
+          <Field className="dc-other-field">
+            <FieldLabel htmlFor="binary-other">What do you propose?</FieldLabel>
             <Textarea
+              id="binary-other"
               value={answer.otherText ?? ""}
               onChange={(event) => onChange({ ...answer, otherText: event.target.value })}
               rows={3}
               required
             />
-          </label>
+          </Field>
         )}
-      </div>
+      </ToggleGroup>
     )
   }
 
   if (answer.type === "single") {
     return (
-      <div className="dc-choice-list" role="radiogroup" aria-label="Choose one option">
+      <ToggleGroup
+        type="single"
+        orientation="vertical"
+        variant="outline"
+        spacing={2}
+        className="dc-choice-group"
+        aria-label="Choose one option"
+        value={answer.otherText !== undefined ? "other" : (answer.optionId ?? "")}
+        onValueChange={(value) => {
+          if (!value) return
+          onChange(value === "other" ? { type: "single", otherText: answer.otherText ?? "" } : { type: "single", optionId: value })
+        }}
+      >
         {decision.options.map((option) => (
-          <button
+          <ToggleGroupItem
             key={option.id}
-            type="button"
-            role="radio"
-            aria-checked={answer.optionId === option.id && !answer.otherText}
-            className={cn("dc-choice-button", answer.optionId === option.id && !answer.otherText && "dc-choice-selected")}
-            onClick={() => onChange({ type: "single", optionId: option.id })}
+            value={option.id}
+            className="dc-ballot-choice"
           >
-            <span className="dc-choice-marker" aria-hidden="true">{answer.optionId === option.id && !answer.otherText && <Check />}</span>
-            <span><b>{option.label}</b></span>
-          </button>
+            {answer.optionId === option.id && answer.otherText === undefined && <Check data-icon="inline-start" aria-hidden="true" />}
+            {option.label}
+          </ToggleGroupItem>
         ))}
         {decision.allowOther && (
           <>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={answer.otherText !== undefined}
-              className={cn("dc-choice-button", answer.otherText !== undefined && "dc-choice-selected")}
-              onClick={() => onChange({ type: "single", otherText: answer.otherText ?? "" })}
-            >
-              <span className="dc-choice-marker" aria-hidden="true">{answer.otherText !== undefined && <Check />}</span>
-              <span><b>Propose something else</b></span>
-            </button>
+            <ToggleGroupItem value="other" className="dc-ballot-choice">
+              {answer.otherText !== undefined && <Check data-icon="inline-start" aria-hidden="true" />}
+              Propose something else
+            </ToggleGroupItem>
             {answer.otherText !== undefined && (
-              <label className="dc-field-block dc-other-field">
-                <span>What do you propose?</span>
-                <Textarea value={answer.otherText} onChange={(event) => onChange({ type: "single", otherText: event.target.value })} rows={3} />
-              </label>
+              <Field className="dc-other-field">
+                <FieldLabel htmlFor="single-other">What do you propose?</FieldLabel>
+                <Textarea id="single-other" value={answer.otherText} onChange={(event) => onChange({ type: "single", otherText: event.target.value })} rows={3} />
+              </Field>
             )}
           </>
         )}
-      </div>
+      </ToggleGroup>
     )
   }
 
@@ -137,15 +149,16 @@ function BallotChoices({
   }
 
   return (
-    <label className="dc-field-block">
-      <span>Your input</span>
+    <Field>
+      <FieldLabel htmlFor="ballot-input">Your input</FieldLabel>
       <Textarea
+        id="ballot-input"
         value={answer.text}
         onChange={(event) => onChange({ type: "input", text: event.target.value })}
         placeholder="Write the context, concern, or recommendation the board should consider."
         rows={6}
       />
-    </label>
+    </Field>
   )
 }
 
@@ -198,7 +211,7 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
           <Button asChild className="dc-touch dc-live-results-button"><Link to="/results" state={{ decisionSlug: decision.slug }}>view live results</Link></Button>
         )}
         {decision.status === "open" && decision.rules.allowResponseEdits && (
-          <Button variant="outline" className="dc-touch dc-confirmation-edit" onClick={() => {
+          <Button variant="outline" className="dc-touch" onClick={() => {
             setJustSubmitted(false)
             setEditing(true)
           }}><Pencil /> edit</Button>
@@ -228,7 +241,7 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
       {error && <p className="dc-inline-error" role="alert">{error}</p>}
       <div className="dc-submit-bar">
         {existing && <Button type="button" variant="ghost" className="dc-touch" onClick={() => setEditing(false)}>Cancel</Button>}
-        <Button type="button" size="lg" className="dc-touch dc-submit-button" onClick={submit} disabled={submitting}>
+        <Button type="button" size="lg" className="dc-touch" onClick={submit} disabled={submitting}>
           {submitting ? "submitting…" : "submit"}
         </Button>
       </div>

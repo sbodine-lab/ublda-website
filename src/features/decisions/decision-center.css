@@ -65,21 +65,6 @@
   text-transform: uppercase;
 }
 
-.dc-preview-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  border: 1px solid #b8ddd8;
-  border-radius: 999px;
-  background: var(--dc-teal-wash, #e8f6f4);
-  color: var(--dc-teal-ink, #0b5e58);
-  padding: 3px 9px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .dc-logo-lockup {
   display: inline-flex;
   align-items: center;
@@ -173,50 +158,13 @@
   gap: 0.75rem;
 }
 
-.dc-google-button {
-  width: auto;
+.dc-auth-action {
   min-width: 248px;
   margin-top: 24px;
-  background: linear-gradient(135deg, rgb(15 43 60 / 88%), rgb(26 61 82 / 76%)) !important;
 }
 
-.dc-google-mark {
-  display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  border-radius: 50%;
-  background: white;
-  color: #4285f4;
-  font-family: Arial, sans-serif;
-  font-weight: 800;
-}
-
-.dc-open-browser-button {
-  width: auto;
-  min-width: 248px;
+.dc-auth-secondary-action {
   margin-top: 12px;
-  border-color: rgb(43 186 176 / 34%);
-  background: linear-gradient(135deg, rgb(255 255 255 / 78%), rgb(232 246 244 / 62%));
-  color: var(--dc-navy, #0f3042);
-}
-
-.dc-open-browser-button:hover {
-  border-color: var(--dc-teal, #27b7ad);
-  background: color-mix(in srgb, var(--dc-teal-wash, #e8f6f4) 80%, white);
-}
-
-.dc-auth-action {
-  min-height: 48px;
-  padding-inline: 24px;
-  overflow: hidden;
-  border-radius: 999px !important;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 58%),
-    inset 0 -1px 0 rgb(15 43 60 / 8%),
-    0 10px 28px rgb(15 43 60 / 10%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
-  backdrop-filter: blur(18px) saturate(145%);
 }
 
 .dc-inline-error {
@@ -462,22 +410,6 @@
   padding: 0 0 12px;
 }
 
-.dc-filter-row {
-  display: flex;
-  gap: 3px;
-}
-
-.dc-filter-button {
-  color: var(--dc-muted) !important;
-  padding-inline: 13px !important;
-}
-
-.dc-filter-button-active {
-  background: transparent !important;
-  color: var(--dc-navy) !important;
-  box-shadow: inset 0 -2px 0 var(--dc-navy);
-}
-
 .dc-search-field {
   position: relative;
   width: min(100%, 250px);
@@ -624,7 +556,6 @@
   text-align: center;
 }
 
-.dc-empty-state > svg,
 .dc-results-locked > svg {
   width: 38px;
   height: 38px;
@@ -632,13 +563,11 @@
   color: var(--dc-teal-ink);
 }
 
-.dc-empty-state h2,
 .dc-not-found h1,
 .dc-results-locked h1 {
   font-size: 2.2rem;
 }
 
-.dc-empty-state p,
 .dc-not-found p,
 .dc-results-locked p {
   margin: 8px 0 20px;
@@ -730,90 +659,23 @@
   padding-top: 36px;
 }
 
-.dc-choice-list,
 .dc-ranking-list {
   display: grid;
   gap: 10px;
   margin-top: 19px;
 }
 
-.dc-choice-button,
-.dc-type-button {
-  display: flex;
-  align-items: flex-start;
-  gap: 13px;
+.dc-choice-group {
   width: 100%;
-  min-height: 72px;
-  border: 1px solid var(--dc-border);
-  border-radius: 8px;
-  background: var(--dc-paper);
-  color: var(--dc-navy);
-  padding: 15px;
-  text-align: left;
-  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+  align-items: stretch;
+  margin-top: 19px;
 }
 
-.dc-choice-button:hover,
-.dc-type-button:hover {
-  border-color: var(--dc-teal);
-}
-
-.dc-choice-button:focus-visible,
-.dc-type-button:focus-visible,
-.dc-advanced-trigger:focus-visible {
-  outline: 3px solid rgb(43 186 176 / 25%);
-  outline-offset: 2px;
-}
-
-.dc-choice-selected,
-.dc-type-button-selected {
-  border-color: var(--dc-teal);
-  background: var(--dc-teal-wash);
-  box-shadow: inset 3px 0 0 var(--dc-teal);
-}
-
-.dc-choice-marker {
-  display: grid;
-  flex: 0 0 auto;
-  width: 21px;
-  height: 21px;
-  place-items: center;
-  margin-top: 1px;
-  border: 1.5px solid #9f9c94;
-  border-radius: 50%;
-  background: white;
-}
-
-.dc-choice-selected .dc-choice-marker,
-.dc-type-button-selected .dc-choice-marker {
-  border-color: var(--dc-teal-ink);
-  background: var(--dc-teal-ink);
-  color: white;
-}
-
-.dc-choice-marker svg {
-  width: 13px;
-  height: 13px;
-}
-
-.dc-choice-button > span:last-child,
-.dc-type-button > span:last-child {
-  display: flex;
-  flex-direction: column;
-}
-
-.dc-choice-button b,
-.dc-type-button b {
-  font-size: 0.9rem;
-}
-
-.dc-choice-button small,
-.dc-type-button small,
-.dc-rank-label small {
-  margin-top: 3px;
-  color: var(--dc-muted);
-  font-size: 0.72rem;
-  line-height: 1.4;
+.dc-ballot-choice {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 52px;
+  padding-inline: 16px;
 }
 
 .dc-other-field {
@@ -996,14 +858,10 @@
   gap: 22px;
 }
 
-.dc-type-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.dc-type-group {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-}
-
-.dc-type-button {
-  min-height: 76px;
 }
 
 .dc-options-editor {
@@ -2024,45 +1882,6 @@
   font-weight: 750;
 }
 
-/* Status colors */
-.dc-status-badge {
-  height: 23px !important;
-  gap: 6px !important;
-  border-radius: 999px !important;
-  padding: 2px 8px !important;
-  font-size: 0.66rem !important;
-}
-
-.dc-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.dc-status-open {
-  border-color: #aadbd6 !important;
-  background: var(--dc-teal-wash) !important;
-  color: var(--dc-teal-ink) !important;
-}
-
-.dc-status-draft {
-  background: #f1efea !important;
-  color: #66625b !important;
-}
-
-.dc-status-closed {
-  border-color: #d6b668 !important;
-  background: #fff6de !important;
-  color: #80600d !important;
-}
-
-.dc-status-finalized {
-  border-color: var(--dc-navy) !important;
-  background: var(--dc-navy) !important;
-  color: white !important;
-}
-
 @media (max-width: 1070px) {
   .dc-create-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -2102,10 +1921,6 @@
   .dc-logo-full::after {
     font-size: 0.8rem;
     content: "Decisions";
-  }
-
-  .dc-topbar-actions .dc-preview-pill {
-    display: none;
   }
 
   .dc-mobile-nav {
@@ -2168,16 +1983,6 @@
     align-items: stretch;
     flex-direction: column;
     gap: 9px;
-  }
-
-  .dc-filter-row {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .dc-filter-button {
-    flex: 0 0 auto;
   }
 
   .dc-search-field {
@@ -2271,7 +2076,6 @@
     height: 27px;
   }
 
-  .dc-type-grid,
   .dc-member-checklist,
   .dc-two-column-fields,
   .dc-integration-grid,
@@ -2363,25 +2167,6 @@
   }
 }
 
-/* Centered mobile ballot flow */
-.dc-submit-button,
-.dc-confirmation-edit {
-  width: auto !important;
-  min-width: 148px;
-  min-height: 48px;
-  padding-inline: 26px;
-  border: 1px solid rgb(255 255 255 / 58%);
-  border-radius: 999px !important;
-  background: linear-gradient(135deg, rgb(15 43 60 / 88%), rgb(26 61 82 / 76%)) !important;
-  color: white !important;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 60%),
-    inset 0 -1px 0 rgb(15 43 60 / 10%),
-    0 10px 28px rgb(15 43 60 / 12%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
-  backdrop-filter: blur(18px) saturate(145%);
-}
-
 .dc-submit-check {
   display: inline-grid;
   width: auto;
@@ -2416,7 +2201,6 @@
 .dc-live-results-button {
   min-height: 46px;
   margin-bottom: 10px;
-  border-radius: 999px !important;
 }
 
 @keyframes dc-check-pop {
@@ -2461,45 +2245,6 @@
     padding-top: 0;
   }
 
-  .dc-choice-list {
-    width: 100%;
-    margin: 0;
-  }
-
-  .dc-choice-button {
-    justify-content: flex-start;
-    min-height: 56px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    padding: 12px 0;
-    text-align: left;
-  }
-
-  .dc-choice-button:hover {
-    border-color: transparent;
-    background: transparent;
-  }
-
-  .dc-choice-button:focus-visible {
-    outline: none;
-  }
-
-  .dc-choice-selected {
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .dc-choice-selected .dc-choice-marker {
-    border-color: var(--dc-navy-hover);
-    background: var(--dc-navy-hover);
-  }
-
-  .dc-choice-button > span:last-child {
-    min-width: 0;
-  }
-
   .dc-other-field {
     width: min(100%, 340px);
     margin: 18px auto 0;
@@ -2511,20 +2256,14 @@
   }
 
   .dc-submit-bar {
-    align-items: center;
-    flex-direction: row;
-    justify-content: center;
+    align-items: stretch;
+    flex-direction: column-reverse;
     width: 100%;
     margin-top: 22px;
   }
 
   .dc-submit-bar > * {
-    width: auto;
-  }
-
-  .dc-submit-button,
-  .dc-confirmation-edit {
-    min-width: 148px;
+    width: 100%;
   }
 }
 
@@ -2548,15 +2287,6 @@
 
   .dc-auth-action {
     min-width: 236px;
-  }
-
-  .dc-preview-pill {
-    font-size: 0.58rem;
-  }
-
-  .dc-choice-button,
-  .dc-type-button {
-    padding: 14px 12px;
   }
 
   .dc-other-field {

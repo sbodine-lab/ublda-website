@@ -74,8 +74,8 @@ export default function Nav() {
           ))}
         </nav>
 
-        <Link to="/join" className="nav__cta">
-          Join
+        <Link to="/decisions" className="nav__cta">
+          Admin sign in
         </Link>
 
         <button
@@ -108,8 +108,8 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
-            <Link to="/join" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
-              Join
+            <Link to="/decisions" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
+              Admin sign in
             </Link>
           </motion.div>
         )}

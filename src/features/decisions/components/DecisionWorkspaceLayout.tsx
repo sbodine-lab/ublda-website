@@ -1,6 +1,7 @@
 import { BarChart3, Bot, LogOut, Menu, Plus, Settings, Vote } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -54,7 +55,7 @@ export function DecisionWorkspaceLayout() {
           </nav>
 
           <div className="dc-topbar-actions">
-            {adapter.mode === "demo" && <span className="dc-preview-pill">Local preview</span>}
+            {adapter.mode === "demo" && <Badge variant="outline">Local preview</Badge>}
             {viewer && (
               <Avatar className="dc-desktop-avatar">
                 <AvatarFallback>{initials(viewer.displayName)}</AvatarFallback>

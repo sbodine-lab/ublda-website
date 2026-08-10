@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
 import { useDecisionData } from "../decisionDataContext"
 import { ballotTypeLabels, outcomeRuleLabels, resultsVisibilityLabels, tieRuleLabels } from "../format"
@@ -208,14 +210,23 @@ export function CreateDecisionPage() {
             <div className="dc-form-section-number">2</div>
             <div className="dc-form-section-content">
               <div className="dc-section-heading"><h2 id="response-section-title">Response format</h2><p>Use the lightest format that fits the decision.</p></div>
-              <div className="dc-type-grid" role="radiogroup" aria-label="Response format">
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                className="dc-type-group"
+                value={ballotType}
+                onValueChange={(value) => {
+                  if (!value) return
+                  setBallotType(value as BallotType)
+                  setOutcomeRule("advisory")
+                  setApprovalThreshold("")
+                }}
+                aria-label="Response format"
+              >
                 {(Object.entries(ballotTypeLabels) as Array<[BallotType, string]>).map(([value, label]) => (
-                  <button key={value} type="button" role="radio" aria-checked={ballotType === value} className={cn("dc-type-button", ballotType === value && "dc-type-button-selected")} onClick={() => { setBallotType(value); setOutcomeRule("advisory"); setApprovalThreshold("") }}>
-                    <span className="dc-choice-marker" aria-hidden="true">{ballotType === value && <Check />}</span>
-                    <span><b>{label}</b><small>{value === "binary" ? "Fast approval or objection" : value === "single" ? "One option from a set" : value === "ranked" ? "Order every option" : "Collect perspective, not a vote"}</small></span>
-                  </button>
+                  <ToggleGroupItem key={value} value={value}>{label}</ToggleGroupItem>
                 ))}
-              </div>
+              </ToggleGroup>
 
               {(ballotType === "single" || ballotType === "ranked") && (
                 <div className="dc-options-editor">
@@ -265,12 +276,14 @@ export function CreateDecisionPage() {
           <section className="dc-form-section dc-advanced-section" aria-labelledby="rules-section-title">
             <div className="dc-form-section-number">4</div>
             <div className="dc-form-section-content">
-              <button type="button" className="dc-advanced-trigger" onClick={() => setAdvancedOpen((value) => !value)} aria-expanded={advancedOpen}>
-                <span><b id="rules-section-title">Deadline and decision rules</b><small>Optional. Blank rules mean advisory results and manual finalization.</small></span>
-                <ChevronDown className={cn(advancedOpen && "dc-chevron-open")} />
-              </button>
-              {advancedOpen && (
-                <div className="dc-advanced-fields">
+              <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button type="button" variant="ghost" className="dc-advanced-trigger">
+                    <span id="rules-section-title">Deadline and rules</span>
+                    <ChevronDown data-icon="inline-end" className={cn(advancedOpen && "dc-chevron-open")} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="dc-advanced-fields">
                   <div className="dc-two-column-fields">
                     <label className="dc-field-block"><span>Response deadline <small>Optional</small></span><Input type="datetime-local" value={deadline} onChange={(event) => setDeadline(event.target.value)} /></label>
                     <label className="dc-field-block"><span>Timezone <small>From this device</small></span><Input value={timezone} readOnly /></label>
@@ -300,8 +313,8 @@ export function CreateDecisionPage() {
                     <Switch id="response-edits" checked={allowResponseEdits} onCheckedChange={setAllowResponseEdits} />
                   </div>
                   <Alert><Info /><AlertTitle>Counting is explicit.</AlertTitle><AlertDescription>Advisory is the default. Borda gives an option N points for first place through 1 point for last place. An admin still records the board’s final outcome.</AlertDescription></Alert>
-                </div>
-              )}
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </section>
 

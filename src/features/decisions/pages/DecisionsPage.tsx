@@ -2,6 +2,14 @@ import { useMemo, useState } from "react"
 import { ArrowRight, CalendarClock, CircleCheck, Plus, Users } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime } from "../format"
@@ -39,30 +47,29 @@ export function DecisionsPage() {
         </Button>
       </header>
 
-      <section className="dc-list-toolbar" aria-label="Decision filters">
-        <div className="dc-filter-row" role="group" aria-label="Status">
+      <Tabs className="dc-list-toolbar" value={filter} onValueChange={(value) => setFilter(value as Filter)}>
+        <TabsList variant="line" aria-label="Decision status">
           {filters.map((item) => (
-            <Button
+            <TabsTrigger
               key={item.id}
-              type="button"
-              size="sm"
-              variant="ghost"
-              className={cn("dc-filter-button dc-touch", filter === item.id && "dc-filter-button-active")}
-              aria-pressed={filter === item.id}
-              onClick={() => setFilter(item.id)}
+              value={item.id}
             >
               {item.label}
-            </Button>
+            </TabsTrigger>
           ))}
-        </div>
-      </section>
+        </TabsList>
+      </Tabs>
 
       {decisions.length === 0 ? (
-        <section className="dc-empty-state">
-          <CircleCheck aria-hidden="true" />
-          <h2>No decisions here</h2>
-          <Button asChild className="dc-touch"><Link to="/decisions/new">Create one</Link></Button>
-        </section>
+        <Empty className="dc-empty-state">
+          <EmptyHeader>
+            <EmptyMedia variant="icon"><CircleCheck /></EmptyMedia>
+            <EmptyTitle>No decisions here</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button asChild className="dc-touch"><Link to="/decisions/new">Create one</Link></Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <div className="dc-decision-list">
           {decisions.map((decision) => {
