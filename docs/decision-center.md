@@ -316,4 +316,20 @@ Available tools depend on the token's exact scopes:
 
 Use a separate token per person and client, request the smallest scope set, add an expiration when practical, and revoke a key immediately when the client is retired or a token may have been exposed.
 
+## Codex skill
+
+The reusable skill package lives in [`skills/ublda-decisions`](../skills/ublda-decisions). Install it for the current macOS user with:
+
+```sh
+mkdir -p "$HOME/.codex/skills"
+cp -R skills/ublda-decisions "$HOME/.codex/skills/ublda-decisions"
+```
+
+Create a personal key at `/decisions/integrations` with `decisions:write` and
+`decisions:publish`, store it as `UBLDA_DECISION_TOKEN` in the local secret
+environment, then invoke `$ublda-decisions`. The skill creates and publishes
+through the REST API and returns the opaque `/d/<slug>` link for the group chat.
+It never stores the token in the repository or derives a public URL from the
+private decision title.
+
 More gateway implementation detail is in [`server/decisionAgent/README.md`](../server/decisionAgent/README.md).

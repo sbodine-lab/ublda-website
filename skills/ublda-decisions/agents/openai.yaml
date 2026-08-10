@@ -1,0 +1,5 @@
+interface:
+  display_name: "UBLDA Decisions"
+  short_description: "Create and publish UBLDA decision forms"
+  default_prompt: "Use $ublda-decisions to create and publish a new board decision form."
+
