@@ -1,6 +1,11 @@
-# UBLDA Decision Center setup and operations
+# UBLDA workspace setup and operations
 
-The Decision Center turns a board question into one private link: an eligible member verifies an approved email identity, reads the full context, and submits one response. The workspace supports exact participation tracking, explicit counting rules, manual finalization, a scoped REST API, and a stateless remote MCP endpoint.
+The authenticated UBLDA workspace contains two lightweight internal tools:
+
+- Decisions turns a board question into one private link, one roster-bound response per person, live aggregate results, and an explicit final outcome.
+- Scheduling turns a set of dates into one private availability link, autosaves each roster member's grid, ranks full-duration meeting windows live, and lets an admin choose the final time.
+
+Both tools use the same Clerk identity and Convex member roster. Adding Alexa, Cooper, or any other teammate happens once in **members** with an approved identity alias; access is never hardcoded into the application.
 
 ## Current status
 
@@ -37,6 +42,10 @@ Useful demo checks:
 - `/decisions/v_b9071df54e2a4c96a8137f40/results` — closed-decision results
 - `/decisions/settings` — roster and approved identity aliases
 - `/decisions/integrations` — personal agent-key and MCP setup UI
+- `/scheduling` — scheduling dashboard and live poll results
+- `/scheduling/new` — create a scheduling poll and copy its private link
+- `/s/s_preview_fall_kickoff` — phone-first availability grid
+- `/s/s_preview_fall_kickoff/results` — live ranked meeting windows
 
 Do not silently fall back to the demo in a production build. If live configuration is incomplete, use the fail-closed adapter so private routes show a setup error instead of fictional data.
 
@@ -161,7 +170,7 @@ The checked-in `vercel.json` already keeps the gateway to one Vercel Function:
 
 - `/mcp` rewrites to the MCP handler
 - `/api/decision-agent/:path*` rewrites to the REST handler
-- the SPA fallback preserves `/decisions/*` and `/d/*` routes
+- the SPA fallback preserves `/decisions/*`, `/d/*`, `/scheduling/*`, and `/s/*` routes
 
 Before any authorized release, run:
 

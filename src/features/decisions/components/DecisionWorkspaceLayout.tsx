@@ -1,4 +1,4 @@
-import { BarChart3, Bot, LogOut, Menu, Plus, Settings, Vote } from "lucide-react"
+import { Bot, CalendarDays, LogOut, Menu, Settings, Vote } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -17,9 +17,8 @@ import { useDecisionData } from "../decisionDataContext"
 import { initials } from "../format"
 
 const desktopLinks = [
-  { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-  { to: "/decisions/new", label: "New", icon: Plus },
-  { to: "/results", label: "Results", icon: BarChart3 },
+  { to: "/decisions", label: "decisions", icon: Vote, end: true },
+  { to: "/scheduling", label: "scheduling", icon: CalendarDays },
 ]
 
 export function DecisionWorkspaceLayout() {
@@ -27,21 +26,20 @@ export function DecisionWorkspaceLayout() {
   const location = useLocation()
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
   const mobileLinks = [
-    { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-    { to: "/decisions/new", label: "New", icon: Plus },
-    { to: "/results", label: "Results", icon: BarChart3 },
+    { to: "/decisions", label: "decisions", icon: Vote, end: true },
+    { to: "/scheduling", label: "scheduling", icon: CalendarDays },
   ]
 
   return (
     <div className="dc-app-shell">
       <header className="dc-topbar">
         <div className="dc-topbar-inner">
-          <Link to="/decisions" className="dc-logo-lockup" aria-label="UBLDA Decision Center">
+          <Link to="/decisions" className="dc-logo-lockup" aria-label="UBLDA workspace">
             <img src="/logo.png" alt="" />
-            <span className="dc-logo-full">UBLDA <b>Decisions</b></span>
+            <span className="dc-logo-full"><strong>UBLDA</strong> <b>workspace</b></span>
           </Link>
 
-          <nav className="dc-desktop-nav" aria-label="Decision Center">
+          <nav className="dc-desktop-nav" aria-label="UBLDA workspace">
             {desktopLinks.map(({ to, label, end }) => (
               <NavLink
                 key={to}
@@ -55,7 +53,7 @@ export function DecisionWorkspaceLayout() {
           </nav>
 
           <div className="dc-topbar-actions">
-            {adapter.mode === "demo" && <Badge variant="outline">Local preview</Badge>}
+            {adapter.mode === "demo" && <Badge variant="outline">local preview</Badge>}
             {viewer && (
               <Avatar className="dc-desktop-avatar">
                 <AvatarFallback>{initials(viewer.displayName)}</AvatarFallback>
@@ -69,7 +67,7 @@ export function DecisionWorkspaceLayout() {
               </SheetTrigger>
               <SheetContent side="right" className="dc-account-sheet">
                 <SheetHeader>
-                  <SheetTitle>Decision Center</SheetTitle>
+                  <SheetTitle>UBLDA workspace</SheetTitle>
                   <SheetDescription>{viewer?.displayName ?? "UBLDA member"}</SheetDescription>
                 </SheetHeader>
                 <nav aria-label="Account and settings" className="dc-sheet-nav">
@@ -78,12 +76,12 @@ export function DecisionWorkspaceLayout() {
                       <Link to={to} className="dc-sheet-link"><Icon />{label}</Link>
                     </SheetClose>
                   ))}
-                  <SheetClose asChild><Link to="/decisions/settings" className="dc-sheet-link"><Settings />Members</Link></SheetClose>
-                  <SheetClose asChild><Link to="/decisions/integrations" className="dc-sheet-link"><Bot />Integrations</Link></SheetClose>
+                  <SheetClose asChild><Link to="/decisions/settings" className="dc-sheet-link"><Settings />members</Link></SheetClose>
+                  <SheetClose asChild><Link to="/decisions/integrations" className="dc-sheet-link"><Bot />integrations</Link></SheetClose>
                 </nav>
                 <div className="dc-sheet-footer">
                   <Button variant="outline" className="dc-touch" onClick={() => void adapter.signOut()}>
-                    <LogOut /> Sign out
+                    <LogOut /> sign out
                   </Button>
                 </div>
               </SheetContent>

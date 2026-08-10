@@ -10,6 +10,12 @@ import { tallyOptions } from "../convex/lib/tally.ts";
 import { decisionUpdateViolation } from "../convex/lib/updatePolicy.ts";
 import { planIdentityAliasSync } from "../convex/lib/identityPolicy.ts";
 import { decisionPublicSlug } from "../convex/lib/publicIds.ts";
+import { availabilityPublicSlug } from "../convex/lib/publicIds.ts";
+import {
+  availabilityResults,
+  normalizeAvailabilitySlots,
+  slotKey,
+} from "../convex/lib/availability.ts";
 import {
   canonicalDecisionTimeZone,
   DEFAULT_DECISION_TIME_ZONE,
@@ -22,6 +28,67 @@ test("new decision links use only the opaque server-generated document ID", () =
   assert.equal(slug, `d_${documentId}`);
   assert.match(slug, /^d_[a-z0-9]+$/);
   assert.equal(slug.includes("private-board-topic"), false);
+});
+
+test("scheduling links are opaque and never expose the poll title", () => {
+  const documentId = "j57d3f1mqb8k0vp2rc6sz4tn9xwyhae";
+  const slug = availabilityPublicSlug(documentId);
+  assert.equal(slug, `s_${documentId}`);
+  assert.equal(slug.includes("fall-kickoff"), false);
+});
+
+test("availability slots are bounded, deduplicated, and sorted", () => {
+  const shape = {
+    dateKeys: ["2026-08-18", "2026-08-19"],
+    startMinutes: 17 * 60,
+    endMinutes: 19 * 60,
+    durationMinutes: 45,
+  };
+  assert.deepEqual(
+    normalizeAvailabilitySlots(shape, [
+      slotKey("2026-08-19", 17 * 60 + 15),
+      slotKey("2026-08-18", 17 * 60),
+      slotKey("2026-08-18", 17 * 60),
+      slotKey("2026-08-20", 17 * 60),
+      slotKey("2026-08-18", 16 * 60),
+    ]),
+    ["2026-08-18@1020", "2026-08-19@1035"],
+  );
+});
+
+test("best times require every 15-minute slot in the meeting duration", () => {
+  const shape = {
+    dateKeys: ["2026-08-18"],
+    startMinutes: 17 * 60,
+    endMinutes: 18 * 60 + 15,
+    durationMinutes: 45,
+  };
+  const result = availabilityResults(shape, [
+    {
+      memberId: "member-a",
+      availableSlotKeys: [1020, 1035, 1050, 1065].map((minute) => slotKey("2026-08-18", minute)),
+    },
+    {
+      memberId: "member-b",
+      availableSlotKeys: [1035, 1050, 1065].map((minute) => slotKey("2026-08-18", minute)),
+    },
+  ]);
+  assert.deepEqual(result.candidates.slice(0, 2), [
+    {
+      dateKey: "2026-08-18",
+      startMinutes: 1035,
+      endMinutes: 1080,
+      availableCount: 2,
+      availableMemberIds: ["member-a", "member-b"],
+    },
+    {
+      dateKey: "2026-08-18",
+      startMinutes: 1020,
+      endMinutes: 1065,
+      availableCount: 1,
+      availableMemberIds: ["member-a"],
+    },
+  ]);
 });
 
 test("decision time zones default and normalize to canonical IANA identifiers", () => {

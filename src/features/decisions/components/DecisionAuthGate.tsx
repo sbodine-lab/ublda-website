@@ -22,7 +22,12 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
   if (snapshot.auth.status === "signed-in") return children
 
   const openHref = typeof window === "undefined" ? "/decisions" : window.location.href
-  const isWorkspaceSignIn = location.pathname === "/decisions" || location.pathname.startsWith("/decisions/") || location.pathname === "/results"
+  const isSchedulingLink = location.pathname === "/schedule" || location.pathname.startsWith("/s/")
+  const isWorkspaceSignIn = location.pathname === "/decisions"
+    || location.pathname.startsWith("/decisions/")
+    || location.pathname === "/results"
+    || location.pathname === "/scheduling"
+    || location.pathname.startsWith("/scheduling/")
 
   const signIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -61,7 +66,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
           <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </a>
-        <h1 id="decision-sign-in-title">{isWorkspaceSignIn ? "admin sign in" : "a decision is waiting"}</h1>
+        <h1 id="decision-sign-in-title">{isWorkspaceSignIn ? "admin sign in" : isSchedulingLink ? "a scheduling poll is waiting" : "a decision is waiting"}</h1>
 
         {snapshot.auth.status === "misconfigured" ? (
           <Alert variant="destructive">

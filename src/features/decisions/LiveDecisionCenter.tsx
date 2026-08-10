@@ -44,6 +44,21 @@ import type {
   DecisionRecord,
   DecisionSignInCredentials,
 } from "./types"
+import { AvailabilityDataProvider } from "@/features/availability/AvailabilityDataProvider"
+import {
+  createLiveAvailabilityAdapter,
+  type MutableLiveAvailabilityAdapter,
+} from "@/features/availability/liveAdapter"
+import {
+  mapAvailabilityDetail,
+  mapAvailabilitySummary,
+  type BackendAvailabilityDetail,
+  type BackendAvailabilitySummary,
+} from "@/features/availability/liveContracts"
+import type {
+  AvailabilitySnapshot,
+  CreateAvailabilityPollInput,
+} from "@/features/availability/types"
 
 type EmptyArgs = Record<string, never>
 type BackendDraftInput = ReturnType<typeof decisionInputForBackend>
@@ -139,6 +154,42 @@ const revokeAgentKeyRef = makeFunctionReference<
   { agentKeyId: string },
   unknown
 >("agentKeys:revokeAgentKey")
+const availabilityListRef = makeFunctionReference<"query", EmptyArgs, BackendAvailabilitySummary[]>(
+  "availability:list",
+)
+const availabilityDetailRef = makeFunctionReference<
+  "query",
+  { slug: string },
+  BackendAvailabilityDetail
+>("availability:getBySlug")
+const createAvailabilityRef = makeFunctionReference<
+  "mutation",
+  {
+    input: {
+      title: string
+      note?: string
+      durationMinutes: number
+      dateKeys: string[]
+      startMinutes: number
+      endMinutes: number
+      timezone?: string
+      electorateMemberIds?: string[]
+      deadlineAt?: number
+      resultsVisibility?: "after_submit" | "admins_only"
+    }
+  },
+  { pollId: string; slug: string }
+>("availability:create")
+const saveAvailabilityRef = makeFunctionReference<
+  "mutation",
+  { pollId: string; availableSlotKeys: string[] },
+  { availableSlotKeys: string[]; savedAt: number }
+>("availability:saveResponse")
+const finalizeAvailabilityRef = makeFunctionReference<
+  "mutation",
+  { pollId: string; dateKey: string; startMinutes: number },
+  unknown
+>("availability:finalize")
 
 const convexClients = new Map<string, ConvexReactClient>()
 
@@ -193,6 +244,18 @@ function pathSlug(pathname: string, stateSlug?: string): { slug?: string; curren
   }
 }
 
+function availabilityPathSlug(pathname: string): { slug?: string; currentRoute: boolean } {
+  const publicMatch = pathname.match(/^\/s\/([^/]+)(?:\/results)?$/)
+  const workspaceMatch = pathname.match(/^\/scheduling\/([^/]+)\/results$/)
+  const encoded = publicMatch?.[1] ?? workspaceMatch?.[1]
+  if (!encoded) return { currentRoute: pathname === "/schedule" || pathname === "/scheduling" }
+  try {
+    return { slug: decodeURIComponent(encoded), currentRoute: false }
+  } catch {
+    return { currentRoute: false }
+  }
+}
+
 function activityType(action: string): DecisionActivity["type"] | undefined {
   const types: Record<string, DecisionActivity["type"]> = {
     "decision.created": "created",
@@ -219,7 +282,13 @@ type MembershipState =
   | { status: "idle" | "ready" }
   | { status: "denied"; message: string }
 
-function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }) {
+function LiveDecisionBridge({
+  adapter,
+  availabilityAdapter,
+}: {
+  adapter: MutableLiveDecisionAdapter
+  availabilityAdapter: MutableLiveAvailabilityAdapter
+}) {
   const clerk = useClerk()
   const clerkAuth = useClerkAuth()
   const { signIn: clerkSignIn } = useSignIn()
@@ -229,6 +298,7 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
     ? String(location.state.decisionSlug)
     : undefined
   const route = pathSlug(location.pathname, stateSlug)
+  const availabilityRoute = availabilityPathSlug(location.pathname)
   const [membership, setMembership] = useState<MembershipState>({ status: "idle" })
   const attemptedRef = useRef(false)
   const attemptGenerationRef = useRef(0)
@@ -244,6 +314,9 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   const upsertMemberMutation = useMutation(upsertMemberRef)
   const createAgentKeyAction = useAction(createAgentKeyRef)
   const revokeAgentKeyMutation = useMutation(revokeAgentKeyRef)
+  const createAvailabilityMutation = useMutation(createAvailabilityRef)
+  const saveAvailabilityMutation = useMutation(saveAvailabilityRef)
+  const finalizeAvailabilityMutation = useMutation(finalizeAvailabilityRef)
 
   useEffect(() => {
     if (
@@ -334,6 +407,22 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
     query: agentKeysRef,
     args: ready ? {} : "skip",
   })
+  const availabilityListState = useQueryState({
+    query: availabilityListRef,
+    args: ready ? {} : "skip",
+  })
+  const availabilityRows = useMemo(() => (
+    availabilityListState.status === "success" ? availabilityListState.data : []
+  ), [availabilityListState])
+  const resolvedAvailabilitySlug = availabilityRoute.slug
+    ?? (availabilityRoute.currentRoute ? availabilityRows[0]?.slug : undefined)
+  const availabilityDetailState = useQueryState({
+    query: availabilityDetailRef,
+    args: ready && resolvedAvailabilitySlug ? { slug: resolvedAvailabilitySlug } : "skip",
+  })
+  const availabilityDetail = availabilityDetailState.status === "success"
+    ? availabilityDetailState.data
+    : undefined
 
   const snapshot = useMemo<DecisionCenterSnapshot>(() => {
     let auth: DecisionCenterSnapshot["auth"]
@@ -469,6 +558,34 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   useEffect(() => {
     adapter.replaceSnapshot(snapshot)
   }, [adapter, snapshot])
+
+  const availabilitySnapshot = useMemo<AvailabilitySnapshot>(() => ({
+    polls: availabilityRows.map(mapAvailabilitySummary),
+    activePoll: availabilityDetail
+      ? mapAvailabilityDetail(
+          availabilityDetail,
+          availabilityRows.find((row) => row.slug === availabilityDetail.slug),
+        )
+      : undefined,
+    loading: membership.status === "ready" && (
+      availabilityListState.status === "pending"
+      || Boolean(resolvedAvailabilitySlug) && availabilityDetailState.status === "pending"
+    ),
+    error: availabilityListState.status === "error" || availabilityDetailState.status === "error"
+      ? "Scheduling could not be loaded."
+      : undefined,
+  }), [
+    availabilityDetail,
+    availabilityDetailState.status,
+    availabilityListState.status,
+    availabilityRows,
+    membership.status,
+    resolvedAvailabilitySlug,
+  ])
+
+  useEffect(() => {
+    availabilityAdapter.replaceSnapshot(availabilitySnapshot)
+  }, [availabilityAdapter, availabilitySnapshot])
 
   const operations = useMemo(() => ({
     async signIn(credentials: DecisionSignInCredentials) {
@@ -670,24 +787,70 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
     upsertMemberMutation,
   ])
 
+  const availabilityOperations = useMemo(() => ({
+    async createPoll(input: CreateAvailabilityPollInput) {
+      try {
+        const created = await createAvailabilityMutation(withoutUndefined({
+          input: {
+            title: input.title,
+            note: input.note?.trim() || undefined,
+            durationMinutes: input.durationMinutes,
+            dateKeys: input.dateKeys,
+            startMinutes: input.startMinutes,
+            endMinutes: input.endMinutes,
+            timezone: input.timezone,
+            electorateMemberIds: input.electorateMemberIds,
+            deadlineAt: input.deadline ? new Date(input.deadline).getTime() : undefined,
+            resultsVisibility: input.resultsVisibility === "after-submit" ? "after_submit" as const : "admins_only" as const,
+          },
+        }))
+        return { id: created.pollId, slug: created.slug }
+      } catch (caught) {
+        throw new Error(cleanConvexError(caught, "The scheduling poll could not be created."))
+      }
+    },
+    async saveResponse(pollId: string, slotKeys: string[]) {
+      try {
+        await saveAvailabilityMutation({ pollId, availableSlotKeys: slotKeys })
+      } catch (caught) {
+        throw new Error(cleanConvexError(caught, "Your availability could not be saved."))
+      }
+    },
+    async finalizePoll(pollId: string, dateKey: string, startMinutes: number) {
+      try {
+        await finalizeAvailabilityMutation({ pollId, dateKey, startMinutes })
+      } catch (caught) {
+        throw new Error(cleanConvexError(caught, "The meeting time could not be chosen."))
+      }
+    },
+  }), [createAvailabilityMutation, finalizeAvailabilityMutation, saveAvailabilityMutation])
+
   useEffect(() => {
     adapter.replaceOperations(operations)
   }, [adapter, operations])
 
+  useEffect(() => {
+    availabilityAdapter.replaceOperations(availabilityOperations)
+  }, [availabilityAdapter, availabilityOperations])
+
   return (
-    <DecisionDataProvider adapter={adapter}>
-      <DecisionCenterRoutes />
-    </DecisionDataProvider>
+    <AvailabilityDataProvider adapter={availabilityAdapter}>
+      <DecisionDataProvider adapter={adapter}>
+        <DecisionCenterRoutes />
+      </DecisionDataProvider>
+    </AvailabilityDataProvider>
   )
 }
 
 function SessionScopedLiveDecisionBridge({
   adapter,
+  availabilityAdapter,
 }: {
   adapter: MutableLiveDecisionAdapter
+  availabilityAdapter: MutableLiveAvailabilityAdapter
 }) {
   const { sessionId } = useClerkAuth()
-  return <LiveDecisionBridge key={sessionId ?? "signed-out"} adapter={adapter} />
+  return <LiveDecisionBridge key={sessionId ?? "signed-out"} adapter={adapter} availabilityAdapter={availabilityAdapter} />
 }
 
 export function LiveDecisionCenter({
@@ -698,6 +861,7 @@ export function LiveDecisionCenter({
   convexUrl: string
 }) {
   const adapter = useMemo(() => createLiveDecisionAdapter(), [])
+  const availabilityAdapter = useMemo(() => createLiveAvailabilityAdapter(), [])
   const client = convexClientFor(convexUrl)
 
   return (
@@ -711,7 +875,7 @@ export function LiveDecisionCenter({
       }}
     >
       <ConvexProviderWithClerk client={client} useAuth={useClerkAuth}>
-        <SessionScopedLiveDecisionBridge adapter={adapter} />
+        <SessionScopedLiveDecisionBridge adapter={adapter} availabilityAdapter={availabilityAdapter} />
       </ConvexProviderWithClerk>
     </ClerkProvider>
   )

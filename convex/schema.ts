@@ -42,6 +42,14 @@ export const tieBreakRule = v.union(
   v.literal("runoff"),
   v.literal("creator_decides"),
 );
+export const availabilityPollStatus = v.union(
+  v.literal("open"),
+  v.literal("finalized"),
+);
+export const availabilityResultsVisibility = v.union(
+  v.literal("after_submit"),
+  v.literal("admins_only"),
+);
 export const agentScope = v.union(
   v.literal("decisions:read"),
   v.literal("decisions:write"),
@@ -167,6 +175,52 @@ export default defineSchema({
     .index("by_decision", ["decisionId"])
     .index("by_member", ["memberId"])
     .index("by_decision_and_member", ["decisionId", "memberId"]),
+
+  availabilityPolls: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    note: v.string(),
+    durationMinutes: v.number(),
+    dateKeys: v.array(v.string()),
+    startMinutes: v.number(),
+    endMinutes: v.number(),
+    slotMinutes: v.number(),
+    timezone: v.string(),
+    status: availabilityPollStatus,
+    resultsVisibility: availabilityResultsVisibility,
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    deadlineAt: v.optional(v.number()),
+    finalizedDateKey: v.optional(v.string()),
+    finalizedStartMinutes: v.optional(v.number()),
+    finalizedAt: v.optional(v.number()),
+    finalizedByMemberId: v.optional(v.id("members")),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"])
+    .index("by_creator_and_status", ["createdByMemberId", "status"]),
+
+  availabilityElectorate: defineTable({
+    pollId: v.id("availabilityPolls"),
+    memberId: v.id("members"),
+    displayNameSnapshot: v.string(),
+    includedAt: v.number(),
+  })
+    .index("by_poll", ["pollId"])
+    .index("by_member", ["memberId"])
+    .index("by_poll_and_member", ["pollId", "memberId"]),
+
+  availabilityResponses: defineTable({
+    pollId: v.id("availabilityPolls"),
+    memberId: v.id("members"),
+    availableSlotKeys: v.array(v.string()),
+    submittedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_poll", ["pollId"])
+    .index("by_member", ["memberId"])
+    .index("by_poll_and_member", ["pollId", "memberId"]),
 
   agentKeys: defineTable({
     name: v.string(),

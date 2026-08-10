@@ -70,6 +70,20 @@ const demoMembers: DecisionMember[] = [
     identityAliases: ["operations.lead@example.invalid"],
     active: true,
   },
+  {
+    id: "member-programming",
+    displayName: "Programming Lead",
+    role: "member",
+    identityAliases: ["programming.lead@example.invalid"],
+    active: true,
+  },
+  {
+    id: "member-membership",
+    displayName: "Membership Lead",
+    role: "member",
+    identityAliases: ["membership.lead@example.invalid"],
+    active: true,
+  },
 ]
 
 const demoElectorate = demoMembers.map((member) => member.id)
