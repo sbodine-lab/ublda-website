@@ -33,6 +33,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 import {
   PROGRAM_SLOT_STATUS_LABELS,
   PROGRAM_TERM_LABELS,
@@ -115,7 +116,7 @@ const slotTone = (status: ProgramSlotStatus) => {
 }
 
 function StatusBadge({ label, tone = 'outline' }: { label: string; tone?: string }) {
-  return <Badge variant="outline" className={`speaker-badge speaker-badge--${tone}`}>{label}</Badge>
+  return <Badge variant="outline" className={cn('speaker-badge', `speaker-badge--${tone}`)}>{label}</Badge>
 }
 
 function SignIn({ onSignedIn }: { onSignedIn: (account: SpeakerOpsAccount, token: string) => void }) {
@@ -762,7 +763,14 @@ function SpeakerWorkspace({
           {navigation.map((item) => {
             const Icon = item.icon
             return (
-              <Button key={item.id} variant="ghost" size="sm" data-active={view === item.id} onClick={() => setView(item.id)}>
+              <Button
+                key={item.id}
+                variant="ghost"
+                size="sm"
+                data-active={view === item.id}
+                aria-current={view === item.id ? 'page' : undefined}
+                onClick={() => setView(item.id)}
+              >
                 <Icon data-icon="inline-start" />{item.label}
               </Button>
             )
@@ -784,10 +792,21 @@ function SpeakerWorkspace({
         </header>
 
         <div className="speaker-mobile-nav" aria-label="Speaker Ops sections">
-          {navigation.map((item) => <Button key={item.id} variant={view === item.id ? 'secondary' : 'ghost'} size="sm" onClick={() => setView(item.id)}>{item.label}</Button>)}
+          {navigation.map((item) => (
+            <Button
+              key={item.id}
+              variant="ghost"
+              size="sm"
+              data-active={view === item.id}
+              aria-current={view === item.id ? 'page' : undefined}
+              onClick={() => setView(item.id)}
+            >
+              {item.label}
+            </Button>
+          ))}
         </div>
 
-        <div className="speaker-content">
+        <div className="speaker-content" data-view={view}>
           {(view === 'pipeline' || view === 'slots') && (
             <ProgramSlots
               workspace={workspace}
