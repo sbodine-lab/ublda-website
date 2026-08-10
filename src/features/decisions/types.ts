@@ -172,6 +172,15 @@ export interface CreatedAgentKey {
   secret: string
 }
 
+export interface DecisionSignInCredentials {
+  email: string
+  password: string
+}
+
+export type DecisionSignInResult =
+  | { status: "complete" }
+  | { status: "needs-verification" }
+
 export interface DecisionCenterSnapshot {
   auth: DecisionAuthState
   decisions: DecisionRecord[]
@@ -185,7 +194,8 @@ export interface DecisionCenterAdapter {
   readonly mode: "demo" | "live"
   subscribe(listener: () => void): () => void
   getSnapshot(): DecisionCenterSnapshot
-  signIn(): Promise<void>
+  signIn(credentials: DecisionSignInCredentials): Promise<DecisionSignInResult>
+  verifySignInCode(code: string): Promise<void>
   signOut(): Promise<void>
   submitResponse(
     decisionId: string,

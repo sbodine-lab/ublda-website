@@ -315,6 +315,10 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           viewer: { memberId: "member-preview-admin", displayName: "Preview Admin", role: "admin" },
         },
       })
+      return { status: "complete" }
+    },
+    async verifySignInCode() {
+      return undefined
     },
     async signOut() {
       update({ ...snapshot, auth: { status: "signed-out" } })
@@ -520,6 +524,7 @@ export function createUnavailableLiveDecisionAdapter(message: string): DecisionC
     subscribe: () => () => undefined,
     getSnapshot: () => snapshot,
     signIn: unavailable,
+    verifySignInCode: unavailable,
     signOut: unavailable,
     submitResponse: unavailable,
     createDecision: unavailable,

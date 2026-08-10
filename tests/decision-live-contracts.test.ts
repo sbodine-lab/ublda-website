@@ -218,7 +218,8 @@ test("mutable live adapter publishes snapshots and delegates operations", async 
 
   let signedOut = false
   adapter.replaceOperations({
-    async signIn() {},
+    async signIn() { return { status: "complete" } },
+    async verifySignInCode() {},
     async signOut() { signedOut = true },
     async submitResponse() { throw new Error("unused") },
     async createDecision() { throw new Error("unused") },

@@ -1,9 +1,11 @@
-import { useState, type PropsWithChildren } from "react"
-import { ArrowUpRight, ShieldCheck } from "lucide-react"
+import { useState, type FormEvent, type PropsWithChildren } from "react"
+import { ArrowUpRight } from "lucide-react"
 import { useLocation } from "react-router-dom"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useDecisionData } from "../decisionDataContext"
 
@@ -12,19 +14,39 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
   const location = useLocation()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [verificationCode, setVerificationCode] = useState("")
+  const [needsVerification, setNeedsVerification] = useState(false)
 
   if (snapshot.auth.status === "signed-in") return children
 
   const openHref = typeof window === "undefined" ? "/decisions" : window.location.href
   const isWorkspaceSignIn = location.pathname === "/decisions" || location.pathname.startsWith("/decisions/") || location.pathname === "/results"
 
-  const signIn = async () => {
+  const signIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     setSubmitting(true)
     setError(undefined)
     try {
-      await adapter.signIn()
+      const result = await adapter.signIn({ email, password })
+      setNeedsVerification(result.status === "needs-verification")
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "sign-in could not be started.")
+      setError(caught instanceof Error ? caught.message : "sign-in could not be completed.")
+    } finally {
+      setPassword("")
+      setSubmitting(false)
+    }
+  }
+
+  const verify = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSubmitting(true)
+    setError(undefined)
+    try {
+      await adapter.verifySignInCode(verificationCode)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "sign-in could not be completed.")
     } finally {
       setSubmitting(false)
     }
@@ -57,15 +79,68 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
             </Button>
           </div>
         ) : (
-          <Button className="dc-auth-action dc-touch" size="lg" onClick={signIn} disabled={submitting || snapshot.auth.status === "loading"}>
-            {submitting || snapshot.auth.status === "loading" ? <Spinner data-icon="inline-start" /> : <ShieldCheck data-icon="inline-start" aria-hidden="true" />}
-            {isWorkspaceSignIn ? "sign in" : "continue to sign in"}
-          </Button>
+          needsVerification ? (
+            <form className="dc-auth-form" onSubmit={verify}>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="decision-verification-code">verification code</FieldLabel>
+                  <Input
+                    id="decision-verification-code"
+                    name="code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={verificationCode}
+                    onChange={(event) => setVerificationCode(event.target.value)}
+                    required
+                    autoFocus
+                  />
+                </Field>
+                <Button type="submit" size="lg" className="dc-touch" disabled={submitting || !verificationCode.trim()}>
+                  {submitting && <Spinner data-icon="inline-start" />}
+                  verify
+                </Button>
+              </FieldGroup>
+            </form>
+          ) : (
+            <form className="dc-auth-form" onSubmit={signIn}>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="decision-email">email</FieldLabel>
+                  <Input
+                    id="decision-email"
+                    name="email"
+                    type="email"
+                    autoComplete="username"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                    autoFocus
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="decision-password">password</FieldLabel>
+                  <Input
+                    id="decision-password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                  />
+                </Field>
+                <Button type="submit" size="lg" className="dc-touch" disabled={submitting || snapshot.auth.status === "loading" || !email.trim() || !password}>
+                  {submitting || snapshot.auth.status === "loading" ? <Spinner data-icon="inline-start" /> : null}
+                  sign in
+                </Button>
+              </FieldGroup>
+            </form>
+          )
         )}
 
         {error && <p className="dc-inline-error" role="alert">{error}</p>}
 
-        <Button variant="outline" size="lg" className="dc-auth-action dc-auth-secondary-action dc-touch" asChild>
+        <Button variant="outline" size="lg" className="dc-auth-secondary-action dc-touch" asChild>
           <a href={openHref} target="_blank" rel="noreferrer">
             open in your browser <ArrowUpRight data-icon="inline-end" aria-hidden="true" />
           </a>

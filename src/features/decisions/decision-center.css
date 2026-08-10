@@ -158,12 +158,18 @@
   gap: 0.75rem;
 }
 
-.dc-auth-action {
-  min-width: 248px;
+.dc-auth-form {
+  width: min(100%, 320px);
   margin-top: 24px;
+  text-align: left;
+}
+
+.dc-auth-form [data-slot="input"] {
+  min-height: 48px;
 }
 
 .dc-auth-secondary-action {
+  width: min(100%, 320px);
   margin-top: 12px;
 }
 
@@ -2285,8 +2291,9 @@
     margin-bottom: 24px;
   }
 
-  .dc-auth-action {
-    min-width: 236px;
+  .dc-auth-form,
+  .dc-auth-secondary-action {
+    width: min(100%, 300px);
   }
 
   .dc-other-field {

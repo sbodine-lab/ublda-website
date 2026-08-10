@@ -76,17 +76,19 @@ Record both deployment URLs:
 
 Keep `npx convex dev` running while developing against the live development database. Do not run `npx convex deploy` until a production deployment is explicitly authorized.
 
-### 2. Configure Clerk Hobby with Google
+### 2. Configure Clerk Hobby for pre-created accounts
 
 Create a dedicated Clerk application, then:
 
-1. Enable Google as the primary sign-in method. This accepts ordinary consumer Gmail accounts as well as Google Workspace accounts; UBLDA does not need its own Workspace organization.
-2. Leave Clerk **Organizations** disabled; the Decision Center's own roster is the membership boundary.
-3. Disable passwords, phone, and other social connections. If the board wants a fallback that does not depend on Google OAuth, enable **email verification code** for both sign-up and sign-in, with email verification required at sign-up. It verifies control of an approved inbox and works with the same member-alias model; never substitute an unverified typed name.
-4. Add `http://localhost:5173` for local development and the final UBLDA host for production redirects/origins.
-5. Copy the publishable key to `VITE_CLERK_PUBLISHABLE_KEY`.
-6. In Clerk's [**Convex integration** setup](https://clerk.com/docs/guides/development/integrations/databases/convex), activate the integration. It maps the required `aud: "convex"` session claim.
-7. In Clerk's **Sessions > Claims** editor, add the verified identity fields used by the roster linker without replacing the integration's audience claim:
+1. Enable email address and password sign-in.
+2. Set the application to Clerk **Restricted** mode. Do not enable public sign-up. The UBLDA interface intentionally exposes only email, password, and the provider-required verification-code step; it has no create-account link.
+3. Pre-create each approved administrator/member in Clerk. Deliver initial passwords outside the repository and require secure password handling; never place a member password in source, an env file, a test, a screenshot, or deployment logs.
+4. Keep email verification code available for device-trust or second-factor challenges. It is not an account-creation path. The custom sign-in flow sends the code only after a correct password reaches a provider-required verification step.
+5. Leave Clerk **Organizations** disabled; the Decision Center's own roster remains the membership boundary. Disable Google, phone, and unused social connections so the live provider matches the sign-in-only interface.
+6. Add `http://localhost:5173` for local development and the final UBLDA host for production redirects/origins.
+7. Copy the publishable key to `VITE_CLERK_PUBLISHABLE_KEY`.
+8. In Clerk's [**Convex integration** setup](https://clerk.com/docs/guides/development/integrations/databases/convex), activate the integration. It maps the required `aud: "convex"` session claim.
+9. In Clerk's **Sessions > Claims** editor, add the verified identity fields used by the roster linker without replacing the integration's audience claim:
 
    ```json
    {
@@ -97,12 +99,12 @@ Create a dedicated Clerk application, then:
    }
    ```
 
-8. Copy the integration's Frontend API/issuer URL, including `https://`, for `CLERK_JWT_ISSUER_DOMAIN`. It must match the `domain` in `convex/auth.config.ts`; `applicationID: "convex"` matches the integration audience.
-9. Inspect one development token before bootstrap and confirm `aud` is `convex`, `email` is the signed-in primary verified address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
+10. Copy the integration's Frontend API/issuer URL, including `https://`, for `CLERK_JWT_ISSUER_DOMAIN`. It must match the `domain` in `convex/auth.config.ts`; `applicationID: "convex"` matches the integration audience.
+11. Inspect one development token before bootstrap and confirm `aud` is `convex`, `email` is the signed-in primary verified address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
 
 The installed Convex client also supports Clerk's older preconfigured `convex` JWT template. For a new setup, use Clerk's current Convex integration flow above rather than hand-building the audience claim.
 
-Google authentication does **not** mean domain-only authentication. Approved `@umich.edu` and Gmail aliases can resolve to the same roster member. If email-code fallback is enabled, the verified address must still be pre-approved on that same roster member.
+Authentication is one pre-created Clerk user per person, while authorization is one UBLDA member record. Approved `@umich.edu` and personal aliases can still resolve to the same roster member, and the database enforces one ballot per member rather than one ballot per email or device.
 
 ### 3. Set Convex deployment variables
 

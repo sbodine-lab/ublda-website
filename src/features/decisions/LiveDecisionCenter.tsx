@@ -1,4 +1,4 @@
-import { ClerkProvider, useAuth as useClerkAuth, useClerk } from "@clerk/react"
+import { ClerkProvider, useAuth as useClerkAuth, useClerk, useSignIn } from "@clerk/react"
 import {
   ConvexReactClient,
   useAction,
@@ -42,6 +42,7 @@ import type {
   DecisionActivity,
   DecisionCenterSnapshot,
   DecisionRecord,
+  DecisionSignInCredentials,
 } from "./types"
 
 type EmptyArgs = Record<string, never>
@@ -221,6 +222,7 @@ type MembershipState =
 function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }) {
   const clerk = useClerk()
   const clerkAuth = useClerkAuth()
+  const { signIn: clerkSignIn } = useSignIn()
   const convexAuth = useConvexAuth()
   const location = useLocation()
   const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
@@ -469,8 +471,35 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   }, [adapter, snapshot])
 
   const operations = useMemo(() => ({
-    async signIn() {
-      clerk.openSignIn({ forceRedirectUrl: window.location.href })
+    async signIn(credentials: DecisionSignInCredentials) {
+      const { error } = await clerkSignIn.password({
+        emailAddress: credentials.email.trim(),
+        password: credentials.password,
+      })
+      if (error) throw new Error("The email or password is incorrect.")
+
+      if (clerkSignIn.status === "complete") {
+        const { error: finalizeError } = await clerkSignIn.finalize()
+        if (finalizeError) throw new Error("Sign-in could not be completed.")
+        return { status: "complete" as const }
+      }
+
+      if (clerkSignIn.status === "needs_second_factor" || clerkSignIn.status === "needs_client_trust") {
+        const emailFactor = clerkSignIn.supportedSecondFactors.find((factor) => factor.strategy === "email_code")
+        if (!emailFactor) throw new Error("This account requires a sign-in method that is not available here.")
+        const { error: codeError } = await clerkSignIn.mfa.sendEmailCode()
+        if (codeError) throw new Error("A verification code could not be sent.")
+        return { status: "needs-verification" as const }
+      }
+
+      throw new Error("Sign-in could not be completed.")
+    },
+    async verifySignInCode(code: string) {
+      const { error } = await clerkSignIn.mfa.verifyEmailCode({ code: code.trim() })
+      if (error) throw new Error("That verification code is incorrect.")
+      if (clerkSignIn.status !== "complete") throw new Error("Sign-in could not be completed.")
+      const { error: finalizeError } = await clerkSignIn.finalize()
+      if (finalizeError) throw new Error("Sign-in could not be completed.")
     },
     async signOut() {
       await clerk.signOut({ redirectUrl: window.location.href })
@@ -629,6 +658,7 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   }), [
     adapter,
     clerk,
+    clerkSignIn,
     closeDecisionMutation,
     createAgentKeyAction,
     createDecisionMutation,
