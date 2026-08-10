@@ -20,7 +20,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
     try {
       await adapter.signIn()
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Sign-in could not be started.")
+      setError(caught instanceof Error ? caught.message : "sign-in could not be started.")
     } finally {
       setSubmitting(false)
     }
@@ -28,34 +28,34 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
   return (
     <main id="main-content" className="dc-auth-page">
-      {adapter.mode === "demo" && <span className="dc-preview-pill dc-auth-preview-pill">Local preview</span>}
+      {adapter.mode === "demo" && <span className="dc-preview-pill dc-auth-preview-pill">local preview</span>}
 
       <section className="dc-auth-panel" aria-labelledby="decision-sign-in-title">
         <a href="/" aria-label="UBLDA home" className="dc-logo-lockup dc-auth-logo">
           <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </a>
-        <h1 id="decision-sign-in-title">A decision is waiting</h1>
+        <h1 id="decision-sign-in-title">a decision is waiting</h1>
 
         {snapshot.auth.status === "misconfigured" ? (
           <Alert variant="destructive">
-            <AlertTitle>Sign-in is not configured</AlertTitle>
+            <AlertTitle>sign-in is not configured</AlertTitle>
             <AlertDescription>{snapshot.auth.message}</AlertDescription>
           </Alert>
         ) : snapshot.auth.status === "access-denied" ? (
           <div className="dc-auth-denied">
             <Alert variant="destructive">
-              <AlertTitle>This account is not approved</AlertTitle>
+              <AlertTitle>this account is not approved</AlertTitle>
               <AlertDescription>{snapshot.auth.message}</AlertDescription>
             </Alert>
             <Button variant="outline" className="dc-touch" onClick={() => void adapter.signOut()}>
-              Try another account
+              try another account
             </Button>
           </div>
         ) : (
           <Button className="dc-google-button dc-auth-action dc-touch" size="lg" onClick={signIn} disabled={submitting || snapshot.auth.status === "loading"}>
             {submitting || snapshot.auth.status === "loading" ? <Spinner /> : <ShieldCheck aria-hidden="true" />}
-            Continue to sign in
+            continue to sign in
           </Button>
         )}
 
@@ -63,7 +63,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
         <Button variant="outline" size="lg" className="dc-open-browser-button dc-auth-action dc-touch" asChild>
           <a href={openHref} target="_blank" rel="noreferrer">
-            Open in your browser <ArrowUpRight aria-hidden="true" />
+            open in your browser <ArrowUpRight aria-hidden="true" />
           </a>
         </Button>
       </section>
