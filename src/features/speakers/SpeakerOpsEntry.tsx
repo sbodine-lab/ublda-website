@@ -165,10 +165,7 @@ function SignIn({ onSignedIn }: { onSignedIn: (account: SpeakerOpsAccount, token
   return (
     <main id="main-content" className="speaker-auth">
       <section className="speaker-auth__panel" aria-labelledby="speaker-signin-title">
-        <div className="speaker-wordmark" aria-label="UBLDA">
-          <span className="speaker-wordmark__mark">U</span>
-          <span>UBLDA</span>
-        </div>
+        <a href="/" className="speaker-auth__logo" aria-label="UBLDA home"><img src="/logo.png" alt="" /></a>
         <div className="speaker-auth__heading">
           <h1 id="speaker-signin-title">Speaker Ops</h1>
           <p>Leadership access only.</p>
@@ -778,7 +775,6 @@ function SpeakerWorkspace({
   return (
     <main id="main-content" className="speaker-ops">
       <aside className="speaker-sidebar">
-        <Link to="/workspace" className="speaker-wordmark"><span className="speaker-wordmark__mark">U</span><span>UBLDA</span></Link>
         <nav className="speaker-suite-nav" aria-label="Leadership workspace">
           {leadershipNavigation.map(({ to, label, icon: Icon, current }) => (
             <Link key={to} to={to} className="speaker-suite-link" data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
@@ -820,6 +816,7 @@ function SpeakerWorkspace({
             <div className="speaker-topbar__title"><PanelLeft aria-hidden="true" /><h1>Speaker Ops</h1><StatusBadge label="2026–27" /></div>
             <p>Plan one or two firesides. Do not offer a date until Ross confirms a room.</p>
           </div>
+          <Link to="/workspace" className="speaker-topbar__logo" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /></Link>
         </header>
 
         <div className="speaker-mobile-nav" aria-label="Speaker Ops sections">

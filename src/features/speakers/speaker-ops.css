@@ -232,28 +232,27 @@
   padding-top: 2px;
 }
 
-.speaker-wordmark {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--speaker-blue);
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.09em;
-}
-
-.speaker-wordmark__mark {
-  width: 26px;
-  height: 26px;
+.speaker-auth__logo {
+  position: relative;
+  z-index: 1;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 7px;
-  background: linear-gradient(145deg, #1b3c63, #102642);
-  box-shadow: 0 5px 14px rgba(20, 43, 74, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  font-size: 11px;
-  letter-spacing: 0;
+  align-self: flex-end;
+  border-radius: 10px;
+  transition: background-color 180ms ease, transform 220ms var(--speaker-ease);
+}
+
+.speaker-auth__logo:hover {
+  background: rgba(20, 43, 74, 0.045);
+  transform: translateY(-1px);
+}
+
+.speaker-auth__logo img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
 }
 
 .speaker-ops {
@@ -294,11 +293,6 @@
 
 .speaker-sidebar > * {
   position: relative;
-}
-
-.speaker-sidebar .speaker-wordmark {
-  padding: 0 8px;
-  text-decoration: none;
 }
 
 .speaker-suite-nav {
@@ -504,6 +498,7 @@
   min-height: 112px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 24px 36px;
   overflow: hidden;
   background: linear-gradient(110deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.7), rgba(247, 250, 253, 0.82));
@@ -532,6 +527,30 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
+}
+
+.speaker-topbar__logo {
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  margin-left: 24px;
+  border-radius: 11px;
+  transition: background-color 180ms ease, transform 220ms var(--speaker-ease);
+}
+
+.speaker-topbar__logo:hover {
+  background: rgba(20, 43, 74, 0.045);
+  transform: translateY(-1px);
+}
+
+.speaker-topbar__logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .speaker-topbar__title {
@@ -1165,6 +1184,17 @@
   .speaker-topbar p {
     max-width: 560px;
     font-size: 12px;
+  }
+
+  .speaker-topbar__logo {
+    width: 40px;
+    height: 40px;
+    margin-left: 14px;
+  }
+
+  .speaker-topbar__logo img {
+    width: 36px;
+    height: 36px;
   }
 
   .speaker-mobile-nav {
