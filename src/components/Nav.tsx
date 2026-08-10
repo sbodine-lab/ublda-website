@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useMemberAuth } from '../hooks/useMemberAuth'
 import './Nav.css'
 
 const publicLinks = [
@@ -9,17 +8,6 @@ const publicLinks = [
   { label: 'Events', path: '/events' },
   { label: 'Team', path: '/team' },
 ]
-
-/**
- * The portal link has to match the signed-in person's face, or a member hits a
- * guard redirect on every click: `/dashboard` bounces them to `/members` (spec
- * §2). An exec goes to the admin shell; everyone else goes to the member shell.
- */
-const linksFor = (signedIn: boolean, isAdmin: boolean) => (
-  signedIn
-    ? [...publicLinks, { label: 'Dashboard', path: isAdmin ? '/dashboard' : '/members' }]
-    : publicLinks
-)
 
 function NavLetters({ text }: { text: string }) {
   return (
@@ -41,9 +29,7 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
-  const { status, isAdmin, signOut } = useMemberAuth()
-  const signedIn = status === 'signed-in'
-  const links = linksFor(signedIn, isAdmin)
+  const links = publicLinks
   const isCurrent = (path: string) => (
     location.pathname === path || location.pathname.startsWith(`${path}/`)
   )
@@ -88,15 +74,9 @@ export default function Nav() {
           ))}
         </nav>
 
-        {signedIn ? (
-          <button type="button" className="nav__cta nav__cta--button" onClick={signOut}>
-            Sign Out
-          </button>
-        ) : (
-          <Link to="/signin" className="nav__cta">
-            Sign In
-          </Link>
-        )}
+        <Link to="/decisions" className="nav__cta">
+          Admin sign in
+        </Link>
 
         <button
           className={`nav__burger ${mobileOpen ? 'nav__burger--open' : ''}`}
@@ -128,22 +108,9 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
-            {signedIn ? (
-              <button
-                type="button"
-                className="nav__mobile-cta nav__mobile-cta--button"
-                onClick={() => {
-                  signOut()
-                  setMobileOpen(false)
-                }}
-              >
-                Sign Out
-              </button>
-            ) : (
-              <Link to="/signin" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
-                Sign In
-              </Link>
-            )}
+            <Link to="/decisions" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
+              Admin sign in
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
