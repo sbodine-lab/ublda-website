@@ -28,15 +28,13 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
   return (
     <main id="main-content" className="dc-auth-page">
-      <div className="dc-auth-header">
-        <a href="/" aria-label="UBLDA home" className="dc-logo-lockup">
+      {adapter.mode === "demo" && <span className="dc-preview-pill dc-auth-preview-pill">Local preview</span>}
+
+      <section className="dc-auth-panel" aria-labelledby="decision-sign-in-title">
+        <a href="/" aria-label="UBLDA home" className="dc-logo-lockup dc-auth-logo">
           <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </a>
-        {adapter.mode === "demo" && <span className="dc-preview-pill">Local preview</span>}
-      </div>
-
-      <section className="dc-auth-panel" aria-labelledby="decision-sign-in-title">
         <h1 id="decision-sign-in-title">A decision is waiting</h1>
         <p className="dc-auth-copy">
           Sign in with an approved account to see the question and respond. Decision details stay hidden until your identity is verified.
@@ -58,7 +56,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
             </Button>
           </div>
         ) : (
-          <Button className="dc-google-button dc-touch" size="lg" onClick={signIn} disabled={submitting || snapshot.auth.status === "loading"}>
+          <Button className="dc-google-button dc-auth-action dc-touch" size="lg" onClick={signIn} disabled={submitting || snapshot.auth.status === "loading"}>
             {submitting || snapshot.auth.status === "loading" ? <Spinner /> : <ShieldCheck aria-hidden="true" />}
             Continue to sign in
           </Button>
@@ -66,7 +64,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
         {error && <p className="dc-inline-error" role="alert">{error}</p>}
 
-        <Button variant="outline" size="lg" className="dc-open-browser-button dc-touch" asChild>
+        <Button variant="outline" size="lg" className="dc-open-browser-button dc-auth-action dc-touch" asChild>
           <a href={openHref} target="_blank" rel="noreferrer">
             Open in your browser <ArrowUpRight aria-hidden="true" />
           </a>
