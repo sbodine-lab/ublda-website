@@ -2402,18 +2402,18 @@
   }
 
   .dc-choice-list {
-    width: min(100%, 320px);
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
   }
 
   .dc-choice-button {
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 56px;
     border: 0;
     border-radius: 0;
     background: transparent;
-    padding: 12px 18px;
-    text-align: center;
+    padding: 12px 0;
+    text-align: left;
   }
 
   .dc-choice-button:hover {
