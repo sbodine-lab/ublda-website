@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
 import Team from './pages/Team'
+import Advisory from './pages/Advisory'
 import Join from './pages/Join'
 import Links from './pages/Links'
 import Brand from './pages/Brand'
@@ -38,7 +39,7 @@ import MemberAccess from './pages/member/MemberAccess'
  * moment a route has children: `/dashboard/recruiting` would render the
  * marketing nav on top of the admin shell (spec §2).
  */
-const STANDALONE_PREFIXES = ['/links', '/dashboard', '/members', '/housing-intelligence', '/housing', '/private/consulting']
+const STANDALONE_PREFIXES = ['/links', '/dashboard', '/members', '/housing-intelligence', '/housing', '/private/consulting', '/advisory']
 
 /** The two portal shells own their own chrome, including their own skip links. */
 const PORTAL_PREFIXES = ['/dashboard', '/members']
@@ -88,6 +89,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/events" element={<Events />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/advisory" element={<Advisory />} />
         <Route path="/join" element={<Join />} />
         <Route path="/apply" element={<InterviewBooking />} />
         <Route path="/portal" element={<InterviewBooking />} />
