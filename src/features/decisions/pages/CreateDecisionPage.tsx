@@ -62,7 +62,7 @@ export function CreateDecisionPage() {
   const [approvalThreshold, setApprovalThreshold] = useState("")
   const [outcomeRule, setOutcomeRule] = useState<DecisionOutcomeRule>("advisory")
   const [tieRule, setTieRule] = useState<TieRule>("manual")
-  const [resultsVisibility, setResultsVisibility] = useState<ResultsVisibility>("after-close")
+  const [resultsVisibility, setResultsVisibility] = useState<ResultsVisibility>("after-submit")
   const [allowResponseEdits, setAllowResponseEdits] = useState(true)
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [saving, setSaving] = useState<"draft" | "open">()
@@ -151,7 +151,7 @@ export function CreateDecisionPage() {
           <div className="dc-confirmation-icon"><Check /></div>
           <p className="dc-eyebrow">Decision open</p>
           <h1>Your link is ready.</h1>
-          <p>Drop it in the group chat. Each eligible member signs in and gets one response, regardless of how many approved emails they have.</p>
+          <p>Drop it in the group chat. Results update live after each member submits.</p>
           <label className="dc-copy-field">
             <span>Voting link</span>
             <Input readOnly value={createdLink} onFocus={(event) => event.currentTarget.select()} />
@@ -162,6 +162,7 @@ export function CreateDecisionPage() {
               setCopied(true)
             }}><Copy /> {copied ? "Copied" : "Copy link"}</Button>
             <Button variant="outline" className="dc-touch" onClick={() => navigate(new URL(createdLink).pathname)}>Preview ballot</Button>
+            <Button variant="ghost" className="dc-touch" onClick={() => navigate("/results", { state: { decisionSlug: new URL(createdLink).pathname.split("/").pop() } })}>View results</Button>
             <Button variant="ghost" className="dc-touch" onClick={() => navigate("/decisions")}>Done</Button>
           </div>
         </section>

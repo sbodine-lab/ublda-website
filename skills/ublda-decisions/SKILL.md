@@ -41,7 +41,6 @@ For a local or alternate deployment, set `UBLDA_DECISION_BASE_URL` or pass `--ba
 
 ## Return the result
 
-Return the script's `shareUrl` first so the user can paste it into the group chat. Briefly state whether the decision is `open` or `draft`. Do not expose the bearer token, gateway secret, member roster, or individual ballots.
+Return the script's `shareUrl` first so the user can paste it into the group chat. Also return `resultsUrl`; new decisions show live aggregate results there after each member submits. Briefly state whether the decision is `open` or `draft`. Do not expose the bearer token, gateway secret, member roster, or individual ballots.
 
 If publication fails after draft creation, report the draft ID and the error. Do not create a second draft automatically; reuse the original draft and a stable idempotency key on retry.
-

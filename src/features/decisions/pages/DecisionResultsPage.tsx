@@ -1,16 +1,12 @@
 import { useMemo, useState } from "react"
 import {
-  AlertCircle,
   CheckCircle2,
   ClipboardCheck,
-  Clock3,
   Copy,
   Lock,
-  MessageSquareText,
   RotateCcw,
-  Users,
 } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useLocation, useParams } from "react-router-dom"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,17 +30,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
 import { DecisionStatusBadge } from "../components/DecisionStatusBadge"
 import { useDecisionData } from "../decisionDataContext"
-import { formatDateTime, formatRelativeDate, initials, outcomeRuleLabels, tieRuleLabels } from "../format"
+import { formatDateTime, initials } from "../format"
 import { calculateDecisionResults, describeBallotAnswer } from "../results"
 
 export function DecisionResultsPage() {
   const { slug } = useParams()
+  const location = useLocation()
   const { adapter, snapshot, decisionBySlug, responseFor } = useDecisionData()
-  const decision = decisionBySlug(slug)
+  const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
+    ? String(location.state.decisionSlug)
+    : undefined
+  const decision = decisionBySlug(slug ?? stateSlug)
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
   const [outcome, setOutcome] = useState("")
   const [finalizationNote, setFinalizationNote] = useState("")
@@ -85,7 +84,6 @@ export function DecisionResultsPage() {
   const memberById = new Map(snapshot.members.map((member) => [member.id, member]))
   const missingMembers = results.missingMemberIds.map((memberId) => memberById.get(memberId)).filter(Boolean)
   const responseDetails = decisionResponses.map((response) => ({ response, member: memberById.get(response.memberId) }))
-  const activity = snapshot.activity.filter((item) => item.decisionId === decision.id).sort((a, b) => b.at.localeCompare(a.at))
   const turnoutReady = decision.rules.minimumTurnout === undefined || results.responseCount >= decision.rules.minimumTurnout
   const yesCount = results.tally.find((row) => row.label === "Yes")?.count ?? 0
   const yesPercentage = results.responseCount === 0 ? 0 : Math.round((yesCount / results.responseCount) * 100)
@@ -141,9 +139,8 @@ export function DecisionResultsPage() {
     <div className="dc-page dc-results-page">
       <header className="dc-results-header">
         <div>
-          <div className="dc-ballot-kicker"><DecisionStatusBadge status={decision.status} /><span>Results</span></div>
+          <div className="dc-ballot-kicker"><DecisionStatusBadge status={decision.status} /><span className="dc-live-label">live results</span></div>
           <h1>{decision.title}</h1>
-          <p>Exact response counts from the decision’s saved electorate.</p>
         </div>
         <div className="dc-results-header-actions">
           <Button variant="outline" className="dc-touch" onClick={copyLink}><Copy /> {copied ? "Copied" : "Copy voting link"}</Button>
@@ -155,42 +152,20 @@ export function DecisionResultsPage() {
         <Alert className="dc-outcome-alert"><ClipboardCheck /><AlertTitle>Recorded outcome</AlertTitle><AlertDescription>{decision.outcome}</AlertDescription></Alert>
       )}
 
-      <section className="dc-results-summary" aria-labelledby="participation-title">
-        <div className="dc-turnout-figure">
-          <p className="dc-eyebrow">Participation</p>
-          <strong>{results.responseCount}<span> / {results.eligibleCount}</span></strong>
-          <h2 id="participation-title">members responded</h2>
-          <Progress value={results.turnoutPercentage} aria-label={`${results.turnoutPercentage}% participation`} />
-          <p>{results.turnoutPercentage}% turnout</p>
-        </div>
-        <div className="dc-readiness-list">
-          <div>
-            <span className={turnoutReady ? "dc-rule-met" : "dc-rule-waiting"}>{turnoutReady ? <CheckCircle2 /> : <Clock3 />}</span>
-            <span><b>{decision.rules.minimumTurnout ? `Minimum turnout: ${decision.rules.minimumTurnout}` : "No minimum turnout set"}</b><small>{decision.rules.minimumTurnout ? `${results.responseCount} received` : "Participation is advisory"}</small></span>
-          </div>
-          <div>
-            <span className={thresholdReady ? "dc-rule-met" : "dc-rule-waiting"}>{thresholdReady ? <CheckCircle2 /> : <AlertCircle />}</span>
-            <span><b>{outcomeRuleLabels[decision.rules.outcomeRule]}</b><small>{decision.rules.outcomeRule === "approval-threshold" ? `${yesPercentage}% yes · ${decision.rules.approvalThreshold}% required` : "The counting method was saved before responses opened"}</small></span>
-          </div>
-          <div>
-            <span className="dc-rule-neutral"><Users /></span>
-            <span><b>Ties: {tieRuleLabels[decision.rules.tieRule]}</b><small>No tie action is run automatically.</small></span>
-          </div>
-        </div>
+      <section className="dc-live-results-count" aria-live="polite" aria-label={`${results.responseCount} of ${results.eligibleCount} responses received`}>
+        <strong>{results.responseCount}<span> of {results.eligibleCount}</span></strong>
+        <span>responses</span>
       </section>
 
       <section className="dc-results-section" aria-labelledby="tally-title">
         <div className="dc-results-section-heading">
-          <div><p className="dc-eyebrow">Counted responses</p><h2 id="tally-title">{results.tallyUnit === "points" ? "Borda point totals" : decision.ballotType === "ranked" ? "First-choice totals" : "Response totals"}</h2></div>
-          <span>{results.responseCount} submitted</span>
+          <h2 id="tally-title">{results.tallyUnit === "points" ? "Borda point totals" : decision.ballotType === "ranked" ? "First-choice totals" : "Results"}</h2>
         </div>
-        {decision.ballotType === "ranked" && <p className="dc-section-disclosure">{results.tallyUnit === "points" ? `Borda awards ${decision.options.length} points for first place through 1 point for last place.` : "These bars show exact first choices."} Full rankings are listed below for administrators; the board still records the outcome manually.</p>}
-        <div className="dc-tally-list">
+        <div className="dc-tally-list" aria-live="polite">
           {results.tally.map((row) => (
             <div className="dc-tally-row" key={row.id}>
               <div><span>{row.label}</span><strong>{row.count}</strong></div>
               <div className="dc-tally-track"><span style={{ width: `${row.percentage}%` }} /></div>
-              <small>{row.percentage}% of awarded {results.tallyUnit === "points" ? "points" : "responses"}</small>
             </div>
           ))}
         </div>
@@ -198,20 +173,20 @@ export function DecisionResultsPage() {
 
       {canManage && <div className="dc-results-columns">
         <section className="dc-results-section" aria-labelledby="missing-title">
-          <div className="dc-results-section-heading"><div><p className="dc-eyebrow">Follow-up</p><h2 id="missing-title">Still waiting on</h2></div><span>{missingMembers.length}</span></div>
+          <div className="dc-results-section-heading"><h2 id="missing-title">Still waiting on</h2><span>{missingMembers.length}</span></div>
           {missingMembers.length === 0 ? (
             <p className="dc-all-in"><CheckCircle2 /> Everyone in this electorate responded.</p>
           ) : (
             <ul className="dc-person-list">
               {missingMembers.map((member) => member && (
-                <li key={member.id}><Avatar><AvatarFallback>{initials(member.displayName)}</AvatarFallback></Avatar><span><b>{member.displayName}</b><small>Not submitted</small></span></li>
+                <li key={member.id}><Avatar><AvatarFallback>{initials(member.displayName)}</AvatarFallback></Avatar><span><b>{member.displayName}</b></span></li>
               ))}
             </ul>
           )}
         </section>
 
         <section className="dc-results-section" aria-labelledby="comments-title">
-          <div className="dc-results-section-heading"><div><p className="dc-eyebrow">Admin detail</p><h2 id="comments-title">Responses and context</h2></div><MessageSquareText /></div>
+          <div className="dc-results-section-heading"><h2 id="comments-title">Responses and context</h2></div>
           {responseDetails.length === 0 ? <p>{results.responseCount === 0 ? "No responses yet." : "Individual response detail is not available for this decision."}</p> : (
             <ul className="dc-response-detail-list">
               {responseDetails.map(({ response, member }) => (
@@ -226,18 +201,9 @@ export function DecisionResultsPage() {
         </section>
       </div>}
 
-      <section className="dc-results-section dc-activity-section" aria-labelledby="activity-title">
-        <div className="dc-results-section-heading"><div><p className="dc-eyebrow">Audit trail</p><h2 id="activity-title">Activity</h2></div><Clock3 /></div>
-        <ol className="dc-activity-list">
-          {activity.map((item) => (
-            <li key={item.id}><span className="dc-activity-dot" /><div><b>{item.detail}</b><small>{item.actorDisplayName ?? memberById.get(item.actorMemberId)?.displayName ?? "System"} · {formatRelativeDate(item.at)}</small></div></li>
-          ))}
-        </ol>
-      </section>
-
       {canManage && (
         <section className="dc-decision-controls" aria-labelledby="controls-title">
-          <div><p className="dc-eyebrow">Decision owner controls</p><h2 id="controls-title">Close and record the outcome</h2><p>Closing stops responses. Finalizing records what the board actually decided; it does not infer an outcome from the bars above.</p></div>
+          <div><h2 id="controls-title">Close or finalize</h2><p>Closing stops responses. Finalizing records the board’s decision.</p></div>
           <div>
             {decision.status === "open" && (
               <AlertDialog>

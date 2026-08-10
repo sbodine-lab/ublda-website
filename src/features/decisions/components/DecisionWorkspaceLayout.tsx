@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import { BarChart3, Bot, LogOut, Menu, Plus, Settings, Vote } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -18,23 +17,18 @@ import { initials } from "../format"
 
 const desktopLinks = [
   { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-  { to: "/decisions/new", label: "Create", icon: Plus },
-  { to: "/decisions/settings", label: "Members", icon: Settings },
-  { to: "/decisions/integrations", label: "Integrations", icon: Bot },
+  { to: "/decisions/new", label: "New", icon: Plus },
+  { to: "/results", label: "Results", icon: BarChart3 },
 ]
 
 export function DecisionWorkspaceLayout() {
   const { adapter, snapshot } = useDecisionData()
   const location = useLocation()
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
-  const latestResultsSlug = useMemo(() => snapshot.decisions
-    .filter((decision) => decision.status === "closed" || decision.status === "finalized")
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]?.slug, [snapshot.decisions])
-
   const mobileLinks = [
     { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-    { to: "/decisions/new", label: "Create", icon: Plus },
-    { to: latestResultsSlug ? `/decisions/${latestResultsSlug}/results` : "/decisions", label: "Results", icon: BarChart3 },
+    { to: "/decisions/new", label: "New", icon: Plus },
+    { to: "/results", label: "Results", icon: BarChart3 },
   ]
 
   return (
@@ -83,6 +77,8 @@ export function DecisionWorkspaceLayout() {
                       <Link to={to} className="dc-sheet-link"><Icon />{label}</Link>
                     </SheetClose>
                   ))}
+                  <SheetClose asChild><Link to="/decisions/settings" className="dc-sheet-link"><Settings />Members</Link></SheetClose>
+                  <SheetClose asChild><Link to="/decisions/integrations" className="dc-sheet-link"><Bot />Integrations</Link></SheetClose>
                 </nav>
                 <div className="dc-sheet-footer">
                   <Button variant="outline" className="dc-touch" onClick={() => void adapter.signOut()}>

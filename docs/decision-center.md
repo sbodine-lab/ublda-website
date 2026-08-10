@@ -251,7 +251,7 @@ curl -X POST "https://<your-ublda-host>/api/decision-agent/v1/decisions/drafts" 
     "autoClose": false,
     "minimumTurnout": 5,
     "approvalThreshold": 0.6,
-    "resultsVisibility": "after_close"
+    "resultsVisibility": "after_response"
   }'
 ```
 

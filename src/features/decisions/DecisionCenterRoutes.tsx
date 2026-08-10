@@ -21,6 +21,7 @@ export function DecisionCenterRoutes() {
       <Route element={<PrivateWorkspace />}>
         <Route path="/decisions" element={<DecisionsPage />} />
         <Route path="/decisions/new" element={<CreateDecisionPage />} />
+        <Route path="/results" element={<DecisionResultsPage />} />
         <Route path="/decisions/settings" element={<DecisionMembersPage />} />
         <Route path="/decisions/integrations" element={<DecisionIntegrationsPage />} />
         <Route path="/decisions/:slug/results" element={<DecisionResultsPage />} />

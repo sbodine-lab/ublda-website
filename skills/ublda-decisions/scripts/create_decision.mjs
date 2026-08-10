@@ -15,7 +15,7 @@ Optional:
   --time-zone <IANA zone>         Default: America/Detroit
   --minimum-turnout <integer>
   --approval-threshold <0..1>
-  --results-visibility <after_response|after_close|admins_only>
+  --results-visibility <after_response|after_close|admins_only> (default: after_response)
   --base-url <https://host>       Default: UBLDA_DECISION_BASE_URL or https://ublda.org
   --idempotency-key <safe-key>
   --draft-only
@@ -83,7 +83,7 @@ const body = {
   responseType,
   timeZone: values.get("time-zone") || "America/Detroit",
   autoClose: false,
-  resultsVisibility: values.get("results-visibility") || "after_close",
+  resultsVisibility: values.get("results-visibility") || "after_response",
 }
 
 if (options.length) body.options = options.map((label) => ({ label }))
@@ -134,5 +134,10 @@ if (!draftOnly) {
   status = String(published.status || "open")
 }
 
-process.stdout.write(`${JSON.stringify({ decisionId, slug, status, shareUrl: `${baseUrl}/d/${encodeURIComponent(slug)}` }, null, 2)}\n`)
-
+process.stdout.write(`${JSON.stringify({
+  decisionId,
+  slug,
+  status,
+  shareUrl: `${baseUrl}/d/${encodeURIComponent(slug)}`,
+  resultsUrl: `${baseUrl}/results`,
+}, null, 2)}\n`)

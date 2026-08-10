@@ -194,6 +194,9 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
       <section className="dc-confirmation dc-submit-confirmation" aria-live="polite">
         <div className={cn("dc-submit-check", justSubmitted && "dc-submit-check-animated")} aria-hidden="true"><Check /></div>
         <h2>submitted</h2>
+        {decision.rules.resultsVisibility === "after-submit" && (
+          <Button asChild className="dc-touch dc-live-results-button"><Link to="/results" state={{ decisionSlug: decision.slug }}>view live results</Link></Button>
+        )}
         {decision.status === "open" && decision.rules.allowResponseEdits && (
           <Button variant="outline" className="dc-touch dc-confirmation-edit" onClick={() => {
             setJustSubmitted(false)

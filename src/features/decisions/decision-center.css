@@ -315,7 +315,7 @@
 .dc-page-heading-actions {
   display: flex;
   max-width: none;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
 }
@@ -455,12 +455,11 @@
 .dc-list-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 20px;
   margin-bottom: 14px;
-  border-top: 1px solid var(--dc-border);
   border-bottom: 1px solid var(--dc-border);
-  padding: 10px 0;
+  padding: 0 0 12px;
 }
 
 .dc-filter-row {
@@ -474,8 +473,9 @@
 }
 
 .dc-filter-button-active {
-  background: var(--dc-navy) !important;
-  color: white !important;
+  background: transparent !important;
+  color: var(--dc-navy) !important;
+  box-shadow: inset 0 -2px 0 var(--dc-navy);
 }
 
 .dc-search-field {
@@ -503,7 +503,7 @@
 
 .dc-decision-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 210px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 42px;
   border-top: 1px solid var(--dc-border);
   padding: 28px 2px;
@@ -584,7 +584,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .dc-participation-summary {
@@ -1244,6 +1244,37 @@
   color: var(--dc-muted);
 }
 
+.dc-live-label {
+  color: var(--dc-teal-ink);
+}
+
+.dc-live-results-count {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 1px solid var(--dc-border);
+  padding: 28px 0 34px;
+}
+
+.dc-live-results-count strong {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3.6rem, 9vw, 5.4rem);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+.dc-live-results-count strong span {
+  color: #9a978f;
+  font-size: 0.48em;
+}
+
+.dc-live-results-count > span {
+  color: var(--dc-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .dc-results-header-actions {
   display: flex;
   flex: 0 0 auto;
@@ -1434,6 +1465,7 @@
   height: 100%;
   border-radius: inherit;
   background: var(--dc-teal);
+  transition: width 320ms ease;
 }
 
 .dc-tally-row small {
@@ -2144,8 +2176,11 @@
   }
 
   .dc-decision-row-side {
-    border-top: 1px dashed var(--dc-border);
-    padding-top: 15px;
+    align-items: flex-start;
+  }
+
+  .dc-decision-row-side [data-slot="button"] {
+    width: auto;
   }
 
   .dc-public-topbar {
@@ -2357,6 +2392,12 @@
 
 .dc-submit-confirmation h2 {
   margin-bottom: 20px;
+}
+
+.dc-live-results-button {
+  min-height: 46px;
+  margin-bottom: 10px;
+  border-radius: 999px !important;
 }
 
 @keyframes dc-check-pop {

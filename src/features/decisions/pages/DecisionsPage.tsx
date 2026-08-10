@@ -1,58 +1,41 @@
 import { useMemo, useState } from "react"
-import { ArrowRight, CalendarClock, CircleCheck, Plus, Search, Users } from "lucide-react"
+import { ArrowRight, CalendarClock, CircleCheck, Plus, Users } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import { useDecisionData } from "../decisionDataContext"
-import { ballotTypeLabels, formatDateTime } from "../format"
+import { formatDateTime } from "../format"
 import { calculateDecisionResults } from "../results"
-import type { DecisionStatus } from "../types"
 import { DecisionStatusBadge } from "../components/DecisionStatusBadge"
 
-type Filter = "active" | DecisionStatus | "all"
+type Filter = "open" | "draft" | "closed" | "all"
 
 const filters: Array<{ id: Filter; label: string }> = [
-  { id: "active", label: "Active" },
+  { id: "open", label: "Open" },
   { id: "draft", label: "Drafts" },
   { id: "closed", label: "Closed" },
-  { id: "finalized", label: "Finalized" },
   { id: "all", label: "All" },
 ]
 
 export function DecisionsPage() {
   const { snapshot, responseFor } = useDecisionData()
-  const [filter, setFilter] = useState<Filter>("active")
-  const [query, setQuery] = useState("")
+  const [filter, setFilter] = useState<Filter>("open")
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
 
   const decisions = useMemo(() => snapshot.decisions
     .filter((decision) => {
-      if (filter === "active") return decision.status === "open"
       if (filter === "all") return true
+      if (filter === "closed") return decision.status === "closed" || decision.status === "finalized"
       return decision.status === filter
     })
-    .filter((decision) => `${decision.title} ${decision.overview}`.toLowerCase().includes(query.trim().toLowerCase()))
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [filter, query, snapshot.decisions])
-
-  const awaitingCount = snapshot.decisions.filter((decision) => (
-    decision.status === "open"
-    && viewer
-    && (decision.isEligible ?? decision.electorateMemberIds.includes(viewer.memberId))
-    && !responseFor(decision.id, viewer.memberId)
-  )).length
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [filter, snapshot.decisions])
 
   return (
     <div className="dc-page dc-decisions-page">
       <header className="dc-page-heading dc-page-heading-actions">
-        <div>
-          <p className="dc-eyebrow">Board workspace</p>
-          <h1>Decisions</h1>
-          <p>{awaitingCount === 0 ? "You are caught up." : `${awaitingCount} ${awaitingCount === 1 ? "decision needs" : "decisions need"} your response.`}</p>
-        </div>
+        <h1>Decisions</h1>
         <Button asChild className="dc-touch dc-desktop-create-button">
-          <Link to="/decisions/new"><Plus /> New decision</Link>
+          <Link to="/decisions/new"><Plus /> New</Link>
         </Button>
       </header>
 
@@ -72,19 +55,13 @@ export function DecisionsPage() {
             </Button>
           ))}
         </div>
-        <label className="dc-search-field">
-          <span className="sr-only">Search decisions</span>
-          <Search aria-hidden="true" />
-          <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search decisions" />
-        </label>
       </section>
 
       {decisions.length === 0 ? (
         <section className="dc-empty-state">
           <CircleCheck aria-hidden="true" />
           <h2>No decisions here</h2>
-          <p>Try another filter, or create a decision when the board needs input.</p>
-          <Button asChild className="dc-touch"><Link to="/decisions/new">Create a decision</Link></Button>
+          <Button asChild className="dc-touch"><Link to="/decisions/new">Create one</Link></Button>
         </section>
       ) : (
         <div className="dc-decision-list">
@@ -112,21 +89,15 @@ export function DecisionsPage() {
                     )}
                   </div>
                   <h2><Link to={primaryHref}>{decision.title}</Link></h2>
-                  <p>{decision.overview}</p>
                   <div className="dc-decision-meta">
                     <span><Users /> {results.responseCount} of {results.eligibleCount} responses</span>
-                    <span><CalendarClock /> {decision.deadline ? `Due ${formatDateTime(decision.deadline, decision.timezone)}` : "No deadline"}</span>
-                    <span>{ballotTypeLabels[decision.ballotType]}</span>
+                    {decision.deadline && <span><CalendarClock /> {formatDateTime(decision.deadline, decision.timezone)}</span>}
                   </div>
                 </div>
                 <div className="dc-decision-row-side">
-                  <div className="dc-participation-summary" aria-label={`${results.turnoutPercentage}% participation`}>
-                    <span>Participation</span><b>{results.turnoutPercentage}%</b>
-                  </div>
-                  <Progress value={results.turnoutPercentage} />
                   <Button variant="outline" className="dc-touch" asChild>
                     <Link to={primaryHref}>
-                      {decision.status === "open" ? (response ? "Review response" : "Respond") : decision.status === "draft" ? "Preview" : "View results"}
+                      {decision.status === "open" ? (response ? "View" : "Respond") : decision.status === "draft" ? "Preview" : "Results"}
                       <ArrowRight />
                     </Link>
                   </Button>

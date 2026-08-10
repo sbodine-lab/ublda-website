@@ -103,7 +103,7 @@ const demoDecisions: DecisionRecord[] = [
       approvalThreshold: 60,
       outcomeRule: "approval-threshold",
       tieRule: "manual",
-      resultsVisibility: "after-close",
+      resultsVisibility: "after-submit",
       allowResponseEdits: true,
     },
   },

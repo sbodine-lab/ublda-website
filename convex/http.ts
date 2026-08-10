@@ -298,7 +298,7 @@ function createDraftInput(body: JsonRecord): JsonRecord {
   ) {
     throw new ConvexError({ code: "VALIDATION_ERROR", message: "approvalThreshold must be greater than 0 and no more than 1." });
   }
-  const visibility = body.resultsVisibility ?? "after_close";
+  const visibility = body.resultsVisibility ?? "after_response";
   const resultsVisibility = visibility === "after_response" ? "after_submit" : visibility;
   if (!["after_submit", "after_close", "admins_only"].includes(String(resultsVisibility))) {
     throw new ConvexError({ code: "VALIDATION_ERROR", message: "resultsVisibility is invalid." });

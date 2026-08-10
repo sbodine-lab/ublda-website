@@ -79,7 +79,7 @@ export const createDraftSchema = z.object({
   autoClose: z.boolean().default(false),
   minimumTurnout: z.number().int().min(1).max(100).optional(),
   approvalThreshold: z.number().positive().max(1).optional(),
-  resultsVisibility: z.enum(['after_response', 'after_close', 'admins_only']).default('after_close'),
+  resultsVisibility: z.enum(['after_response', 'after_close', 'admins_only']).default('after_response'),
 }).strict().superRefine((value, context) => {
   if (value.responseType === 'single_choice' || value.responseType === 'ranked_choice') {
     if (!value.options || value.options.length < 2) {

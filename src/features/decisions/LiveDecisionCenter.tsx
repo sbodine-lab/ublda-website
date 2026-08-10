@@ -179,12 +179,12 @@ function withoutUndefined<T>(value: T): T {
   return value
 }
 
-function pathSlug(pathname: string): { slug?: string; currentRoute: boolean; resultsRoute: boolean } {
-  const currentRoute = pathname === "/decision"
+function pathSlug(pathname: string, stateSlug?: string): { slug?: string; currentRoute: boolean; resultsRoute: boolean } {
+  const currentRoute = pathname === "/decision" || pathname === "/results"
   const ballotMatch = pathname.match(/^\/d\/([^/]+)$/)
   const resultMatch = pathname.match(/^\/decisions\/([^/]+)\/results$/)
-  const encoded = ballotMatch?.[1] ?? resultMatch?.[1]
-  if (!encoded) return { currentRoute, resultsRoute: false }
+  const encoded = ballotMatch?.[1] ?? resultMatch?.[1] ?? (pathname === "/results" ? stateSlug : undefined)
+  if (!encoded) return { currentRoute, resultsRoute: pathname === "/results" }
   try {
     return { slug: decodeURIComponent(encoded), currentRoute, resultsRoute: Boolean(resultMatch) }
   } catch {
@@ -223,7 +223,10 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   const clerkAuth = useClerkAuth()
   const convexAuth = useConvexAuth()
   const location = useLocation()
-  const route = pathSlug(location.pathname)
+  const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
+    ? String(location.state.decisionSlug)
+    : undefined
+  const route = pathSlug(location.pathname, stateSlug)
   const [membership, setMembership] = useState<MembershipState>({ status: "idle" })
   const attemptedRef = useRef(false)
   const attemptGenerationRef = useRef(0)
