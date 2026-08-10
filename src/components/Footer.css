@@ -94,32 +94,18 @@
 }
 
 .footer__brand-mark {
-  min-height: clamp(150px, 18vw, 250px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(var(--space-4), 3vw, var(--space-10));
-  margin: var(--space-10) 0 var(--space-6);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.footer__brand-mark img {
-  width: clamp(74px, 12vw, 180px);
-  height: auto;
-  opacity: 0.18;
-  filter: saturate(0.65);
-  flex: none;
+  margin: clamp(var(--space-16), 8vw, 108px) 0 var(--space-4);
+  overflow: visible;
 }
 
 .footer__brand-mark span {
+  display: block;
   font-family: var(--font-body);
-  font-size: clamp(72px, 19vw, 250px);
-  font-weight: 600;
-  line-height: 0.8;
-  letter-spacing: -0.065em;
-  color: rgba(255, 255, 255, 0.025);
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.11);
+  font-size: clamp(104px, 18.2vw, 242px);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  color: rgba(220, 238, 255, 0.12);
   white-space: nowrap;
 }
 
@@ -209,17 +195,11 @@
   }
 
   .footer__brand-mark {
-    min-height: 126px;
-    margin: var(--space-8) 0 var(--space-5);
-    gap: var(--space-3);
-  }
-
-  .footer__brand-mark img {
-    width: clamp(64px, 20vw, 82px);
+    margin: var(--space-12) 0 var(--space-4);
   }
 
   .footer__brand-mark span {
-    font-size: clamp(68px, 22vw, 88px);
+    font-size: clamp(72px, 24vw, 104px);
   }
 
   .footer__bottom {

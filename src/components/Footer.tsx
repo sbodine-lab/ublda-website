@@ -43,7 +43,6 @@ export default function Footer() {
         </div>
 
         <div className="footer__brand-mark" aria-hidden="true">
-          <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </div>
 

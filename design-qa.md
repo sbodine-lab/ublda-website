@@ -63,3 +63,56 @@ All ballot text now uses the reference family. Weight and size provide hierarchy
 - Primary interaction: response selection remains functional and reveals the conditional proposal field.
 
 final result: passed
+
+---
+
+# Footer Design QA
+
+- Source visual truth: `/Users/sambodine/.codex/visualizations/2026/08/10/019fed32-1ad2-7953-9b75-038089dd9afe/dayengine-footer-reference-desktop.png`
+- User-selected detail reference: `/var/folders/rv/2qmzhxy94tq79zlng86n211r0000gn/T/TemporaryItems/NSIRD_screencaptureui_v9PQ9h/Screenshot 2026-08-10 at 7.19.52 PM.png`
+- Implementation screenshot: `/Users/sambodine/.codex/visualizations/2026/08/10/019fed32-1ad2-7953-9b75-038089dd9afe/ublda-footer-dayengine-local-desktop.png`
+- Viewport: 1280 x 720 CSS px
+- Source pixels: 1280 x 720
+- Implementation pixels: 1280 x 720
+- Density normalization: same browser surface, viewport, and screenshot density; no scaling required
+- State: homepage footer at rest
+
+## Full-view comparison
+
+The Day Engine reference and UBLDA implementation were emitted together and reviewed in one comparison. The implementation preserves UBLDA's existing upper-footer content while matching the reference treatment below it: a single left-aligned filled wordmark, generous top space, low-contrast tonal color, medium sans weight, tight tracking, and a legal row directly below a divider.
+
+## Focused region comparison
+
+The large wordmark region was checked separately through computed layout evidence. Day Engine uses Plus Jakarta Sans at weight 500, 0.95 line-height, approximately -0.045em tracking, and a pale tonal fill. UBLDA uses the same font family, weight, line-height, and tracking, with the pale fill translated to an equivalent low-contrast tint over UBLDA navy. The previous icon and outline stroke are absent.
+
+## Required fidelity surfaces
+
+- Fonts and typography: passed. Plus Jakarta Sans, weight 500, 0.95 line-height, and tight negative tracking match the reference treatment.
+- Spacing and layout rhythm: passed. Wordmark starts at the container edge, has reference-like breathing room above it, and sits immediately above the legal divider.
+- Colors and visual tokens: passed. The white-page pale blue treatment is intentionally adapted to a low-contrast pale-blue tint over UBLDA navy.
+- Image quality and asset fidelity: passed. No footer image asset is required; the unwanted logo image was removed rather than approximated.
+- Copy and content: passed. `UBLDA` is exact and all existing footer links and organization copy remain unchanged.
+
+## Interaction and runtime checks
+
+- Page identity: passed (`http://127.0.0.1:5174/`).
+- Meaningful content / no blank page: passed.
+- Framework overlay: none visible.
+- Console warnings and errors: none.
+- Footer CTA: passed; `Join UBLDA` navigates to `/join` and browser back restores the homepage.
+- Responsive rule: the mobile wordmark uses a 24vw clamp with the icon removed; no source mobile reference was supplied for exact visual comparison.
+
+## Comparison history
+
+- Initial comparison: no actionable P0, P1, or P2 mismatch. The reference's white background is intentionally translated to UBLDA's existing navy surface rather than copied literally.
+- Fixes after comparison: none required.
+
+## Findings
+
+No actionable P0, P1, or P2 findings remain.
+
+## Follow-up polish
+
+No P3 follow-up is required for the selected treatment.
+
+final result: passed
