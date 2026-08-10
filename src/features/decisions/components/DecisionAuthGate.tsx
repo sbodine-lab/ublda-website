@@ -1,5 +1,5 @@
 import { useState, type PropsWithChildren } from "react"
-import { ArrowUpRight, LockKeyhole, ShieldCheck } from "lucide-react"
+import { ArrowUpRight, ShieldCheck } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -37,9 +37,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
       </div>
 
       <section className="dc-auth-panel" aria-labelledby="decision-sign-in-title">
-        <div className="dc-auth-icon" aria-hidden="true"><LockKeyhole /></div>
-        <p className="dc-eyebrow">Decision Center</p>
-        <h1 id="decision-sign-in-title">A private UBLDA decision is waiting.</h1>
+        <h1 id="decision-sign-in-title">A decision is waiting</h1>
         <p className="dc-auth-copy">
           Sign in with an approved account to see the question and respond. Decision details stay hidden until your identity is verified.
         </p>
@@ -68,18 +66,11 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
         {error && <p className="dc-inline-error" role="alert">{error}</p>}
 
-        <div className="dc-embedded-help">
-          <p>Opening this from Messages and sign-in is stuck?</p>
-          <Button variant="outline" className="dc-touch" asChild>
-            <a href={openHref} target="_blank" rel="noreferrer">
-              Open in your browser <ArrowUpRight />
-            </a>
-          </Button>
-        </div>
-
-        <p className="dc-privacy-note">
-          Access is tied to your board roster identity. UBLDA does not publish individual responses to other voters by default.
-        </p>
+        <Button variant="outline" size="lg" className="dc-open-browser-button dc-touch" asChild>
+          <a href={openHref} target="_blank" rel="noreferrer">
+            Open in your browser <ArrowUpRight aria-hidden="true" />
+          </a>
+        </Button>
       </section>
     </main>
   )

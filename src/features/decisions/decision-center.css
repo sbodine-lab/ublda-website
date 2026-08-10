@@ -129,7 +129,6 @@
   text-align: center;
 }
 
-.dc-auth-icon,
 .dc-confirmation-icon {
   display: grid;
   width: 52px;
@@ -141,7 +140,6 @@
   color: var(--dc-teal-ink, #0b5e58);
 }
 
-.dc-auth-icon svg,
 .dc-confirmation-icon svg {
   width: 25px;
   height: 25px;
@@ -182,24 +180,17 @@
   font-weight: 800;
 }
 
-.dc-embedded-help {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  margin-top: 26px;
-  padding-top: 24px;
-  border-top: 1px solid var(--dc-border, #d8d6d0);
+.dc-open-browser-button {
+  width: 100%;
+  margin-top: 12px;
+  border-color: color-mix(in srgb, var(--dc-teal, #27b7ad) 36%, transparent);
+  background: var(--dc-teal-wash, #e8f6f4);
+  color: var(--dc-navy, #0f3042);
 }
 
-.dc-embedded-help p,
-.dc-privacy-note {
-  color: var(--dc-muted, #6b6860);
-  font-size: 0.78rem;
-}
-
-.dc-privacy-note {
-  margin-top: 24px !important;
+.dc-open-browser-button:hover {
+  border-color: var(--dc-teal, #27b7ad);
+  background: color-mix(in srgb, var(--dc-teal-wash, #e8f6f4) 80%, white);
 }
 
 .dc-inline-error {
