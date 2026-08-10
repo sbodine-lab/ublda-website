@@ -1,34 +1,32 @@
-# Decision Center live-type-system QA
+# Decision Center navigation-font QA
 
 ## Comparison target
 
-- Source visual truth: `https://ublda.org/`, rendered in the in-app browser.
-- Source capture: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/ublda-live-home-mobile.png`
-- Browser implementation: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/iphone-live-type-system.png`
-- Combined comparison input: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/live-font-system-comparison.png`
+- Source visual truth: the supplied UBLDA desktop-navigation screenshot.
+- Browser implementation: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/iphone-plus-jakarta-final.png`.
 - Route and state: local mobile ballot, signed-in demo, no response selected.
-- Browser viewport: `390 x 844` CSS pixels; ballot client width `382` pixels.
-- Source pixels: `719 x 880`; implementation pixels: `382 x 827`.
-- Density normalization: the source capture was downsampled to `382px` width with Lanczos resampling before the side-by-side comparison. The comparison judges the typography system rather than identical page composition.
+- Browser viewport: `390 x 844` CSS pixels; captured ballot client width `347` pixels.
+- Reference pixels: `2048 x 198`; implementation capture: `347 x 783`.
+- The comparison judges font family, optical weight, tracking, and readability rather than identical composition.
 
 ## Full-view comparison evidence
 
-The live site uses a mixed brand system: Instrument Serif for headings and Plus Jakarta Sans for body and controls. The ballot now reproduces that same division, the same three visible sizes (`14px`, `17px`, `36px`), and the same regular optical weight. The font change creates no horizontal overflow (`382 / 382`).
+The screenshot's navigation and sign-in control use Plus Jakarta Sans. The form system now uses that same clean sans family everywhere, including headings. It retains exactly three visible sizes (`14px`, `17px`, `36px`) and creates no horizontal overflow (`347 / 347`).
 
 ## Focused-region comparison evidence
 
-Computed live-site values:
+Reference values verified from the live UBLDA navigation:
 
-- Body and navigation: Plus Jakarta Sans, `17px`, weight `400`, normal tracking.
-- Page headings: Instrument Serif, `36px`, weight `400`, `-1.08px` tracking.
-- Small navigation text: Plus Jakarta Sans, `14px`, weight `500`.
+- Navigation and controls: Plus Jakarta Sans, `17px`, weight `400`.
+- Small labels: Plus Jakarta Sans, `14px`, weight `500`.
+- Form display headings: Plus Jakarta Sans, `36px`, weight `500`.
 
-Computed ballot values match those family, size, weight, and tracking roles. Ballot section headings use Instrument Serif at the `17px` body tier to preserve the requested three-size limit.
+All ballot text now uses the reference family. Weight and size provide hierarchy without introducing a second typeface.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: exact live families are reused. Instrument Serif handles headings; Plus Jakarta Sans handles body, controls, metadata, and the logo lockup. Weights remain `400` and `500`.
-- Spacing and layout rhythm: the mixed system preserves the mobile layout and fits the viewport without clipping.
+- Fonts and typography: Plus Jakarta Sans handles headings, body, controls, metadata, and the logo lockup. Weights remain `400` and `500`.
+- Spacing and layout rhythm: the all-sans system preserves the mobile layout and fits the viewport without clipping.
 - Colors and visual tokens: navy text, cream background, teal accents, and muted supporting copy remain aligned with the live site.
 - Image quality and asset fidelity: the supplied UBLDA logo asset remains unchanged and sharp; no replacement drawing or generated asset was introduced.
 - Copy and content: ballot copy is unchanged. `UBLDA DECISIONS` remains the intentional product lockup.
@@ -48,8 +46,14 @@ Computed ballot values match those family, size, weight, and tracking roles. Bal
 ### Pass 3
 
 - Post-fix evidence: `live-font-system-comparison.png` and `iphone-live-type-system.png`.
+- The mixed system matched the complete live homepage at that point in the review.
+
+### Pass 4
+
+- Finding: the mixed serif/sans system was faithful to the complete live homepage, but the user selected the simpler navigation type as the form-system reference.
+- Fix: applied Plus Jakarta Sans across every Decision Center surface, including headings, while preserving the three-size scale.
+- Post-fix evidence: `iphone-plus-jakarta-final.png`.
 - No actionable P0, P1, or P2 typography differences remain.
-- P3 intentional deviation: ballot section headings use the serif family at `17px`; making every heading `36px` would break the requested three-tier hierarchy and increase mobile density.
 
 ## Functional verification
 
