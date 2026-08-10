@@ -199,11 +199,10 @@
   }
 }
 
-/* Advisory is the consulting sub-brand and leads to its own site chrome, so
-   it reads differently at rest — accent colour, heavier weight, and an
-   outbound arrow — and its hover moves differently from the rest of the nav:
-   letters tip forward and settle (vs. the plain rise), with the stagger
-   running right-to-left. */
+/* Advisory is the consulting sub-brand and leads to its own site chrome, so it
+   reads differently at rest — heavier weight and a static outbound arrow — but
+   it stays still on hover. The `animation: none` is load-bearing: this link is
+   also a `.nav__link`, so without it the generic letter-wave would apply. */
 .nav__link--advisory {
   color: var(--color-navy);
   font-weight: 600;
@@ -215,11 +214,14 @@
   font-size: 0.75em;
   margin-left: 3px;
   transform: translateY(-2px);
-  transition: transform 0.3s var(--ease-spring);
 }
 
-.nav__link--advisory:hover::after {
-  transform: translate(2px, -4px);
+.nav__link--advisory:hover .nav__letter {
+  animation: none;
+}
+
+.nav__link--advisory:hover {
+  color: var(--color-navy);
 }
 
 .nav__mobile-link--advisory {
@@ -227,25 +229,8 @@
   font-weight: 600;
 }
 
-@keyframes letter-tip {
-  0%   { transform: translateY(0) rotate(0deg); }
-  35%  { transform: translateY(-4px) rotate(6deg); }
-  70%  { transform: translateY(1px) rotate(-2deg); }
-  100% { transform: translateY(0) rotate(0deg); }
-}
-
-.nav__link--advisory:hover .nav__letter {
-  animation: letter-tip 0.5s var(--ease-spring) both;
-  animation-delay: calc((7 - var(--i, 0)) * 0.035s);
-}
-
-.nav__link--advisory:hover {
-  color: var(--color-navy);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .nav__link:hover .nav__letter,
-  .nav__link--advisory:hover .nav__letter {
+  .nav__link:hover .nav__letter {
     animation: none;
   }
 }
