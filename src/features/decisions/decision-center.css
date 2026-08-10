@@ -2361,8 +2361,8 @@
 }
 
 /* Decision Center typography
-   The brand's clean Plus Jakarta Sans, three visible sizes, and restrained
-   weights. Spacing, colour and rules carry hierarchy instead of dense type. */
+   Match ublda.org: Plus Jakarta Sans for body and UI, Instrument Serif for
+   headings, three visible sizes, and restrained weights. */
 :is(
   .dc-app-shell,
   .dc-ballot-page,
@@ -2454,14 +2454,36 @@
 ) :where(
   h1,
   h1 *,
+  h2,
+  h2 *,
+  h3,
+  h3 *,
+  .dc-turnout-figure strong,
+  .dc-turnout-figure strong *
+) {
+  font-family: var(--font-display, "Instrument Serif", Georgia, serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.025em !important;
+}
+
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) :where(
+  h1,
+  h1 *,
   .dc-confirmation h2,
   .dc-confirmation h2 *,
   .dc-turnout-figure strong,
   .dc-turnout-figure strong *
 ) {
   font-size: var(--dc-type-display) !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.035em !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.03em !important;
   line-height: 1.08;
 }
 

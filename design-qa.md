@@ -1,45 +1,55 @@
-# Decision Center font-reference QA
+# Decision Center live-type-system QA
 
 ## Comparison target
 
-- Source visual truth: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/font-reference.png`
-- Browser implementation: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/iphone-brand-sans.png`
-- Focused header crop: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/iphone-brand-sans-header.png`
-- Combined comparison input: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/font-reference-comparison.png`
+- Source visual truth: `https://ublda.org/`, rendered in the in-app browser.
+- Source capture: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/ublda-live-home-mobile.png`
+- Browser implementation: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/iphone-live-type-system.png`
+- Combined comparison input: `/Users/sambodine/.codex/visualizations/2026/08/10/019fe903-0592-75a0-be33-f4a9b2eacae5/decision-center-qa/live-font-system-comparison.png`
 - Route and state: local mobile ballot, signed-in demo, no response selected.
-- Browser viewport: `390 x 844` CSS pixels; document client width `382` pixels.
-- Source pixels: `326 x 68`.
-- Implementation pixels: full viewport `382 x 827`; focused crop `382 x 62`.
-- Density normalization: native-pixel focused comparison. The source is a wordmark crop rather than a full screen, so letterform, weight, tracking, color, and rendering were compared; absolute wordmark size and copy were not treated as fidelity requirements.
+- Browser viewport: `390 x 844` CSS pixels; ballot client width `382` pixels.
+- Source pixels: `719 x 880`; implementation pixels: `382 x 827`.
+- Density normalization: the source capture was downsampled to `382px` width with Lanczos resampling before the side-by-side comparison. The comparison judges the typography system rather than identical page composition.
 
 ## Full-view comparison evidence
 
-The reference supplies typography only. The browser capture confirms the selected family is applied consistently across the complete ballot without horizontal overflow or a layout regression. The visible type scale resolves to exactly `14px`, `17px`, and `36px` at the tested viewport.
+The live site uses a mixed brand system: Instrument Serif for headings and Plus Jakarta Sans for body and controls. The ballot now reproduces that same division, the same three visible sizes (`14px`, `17px`, `36px`), and the same regular optical weight. The font change creates no horizontal overflow (`382 / 382`).
 
 ## Focused-region comparison evidence
 
-The combined header comparison shows the implementation using the same geometric sans character as the reference: open counters, rounded `U` and `D`, restrained medium weight, navy color, and loose uppercase tracking. The implementation intentionally reads `UBLDA DECISIONS` rather than the source crop's `UBLDA` because it is the product lockup.
+Computed live-site values:
+
+- Body and navigation: Plus Jakarta Sans, `17px`, weight `400`, normal tracking.
+- Page headings: Instrument Serif, `36px`, weight `400`, `-1.08px` tracking.
+- Small navigation text: Plus Jakarta Sans, `14px`, weight `500`.
+
+Computed ballot values match those family, size, weight, and tracking roles. Ballot section headings use Instrument Serif at the `17px` body tier to preserve the requested three-size limit.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: Plus Jakarta Sans matches the reference and is already the UBLDA brand body family. Body uses weight 400; display and lockup use 500. The scale remains limited to three visible sizes.
-- Spacing and layout rhythm: the font swap preserves the ballot's spacing and creates no horizontal overflow (`382 / 382`).
-- Colors and visual tokens: navy text and cream background remain aligned with the source and existing brand tokens.
-- Image quality and asset fidelity: the existing supplied UBLDA logo asset remains sharp and unchanged; no replacement drawing or generated asset was introduced.
-- Copy and content: ballot copy is unchanged. `DECISIONS` is an intentional product-lockup addition.
+- Fonts and typography: exact live families are reused. Instrument Serif handles headings; Plus Jakarta Sans handles body, controls, metadata, and the logo lockup. Weights remain `400` and `500`.
+- Spacing and layout rhythm: the mixed system preserves the mobile layout and fits the viewport without clipping.
+- Colors and visual tokens: navy text, cream background, teal accents, and muted supporting copy remain aligned with the live site.
+- Image quality and asset fidelity: the supplied UBLDA logo asset remains unchanged and sharp; no replacement drawing or generated asset was introduced.
+- Copy and content: ballot copy is unchanged. `UBLDA DECISIONS` remains the intentional product lockup.
 
 ## Comparison history
 
 ### Pass 1
 
-- Finding: P1 typography mismatch. The implementation used Instrument Serif throughout, while the selected reference is a clean geometric sans.
-- Fix: changed the Decision Center family to Plus Jakarta Sans, restored medium emphasis for display text and the logo lockup, and retained the three-size system.
+- Finding: P1 mismatch. Applying Instrument Serif to every text element did not match the UBLDA system.
+- Fix: moved body and UI copy to Plus Jakarta Sans.
 
 ### Pass 2
 
-- Post-fix evidence: `font-reference-comparison.png` and `iphone-brand-sans.png`.
-- No actionable P0, P1, or P2 differences remain for the selected font target.
-- P3 intentional deviation: the app lockup is smaller and includes `DECISIONS`; the source is a cropped brand specimen, not a full app header specification.
+- Finding: P1 mismatch after checking the live site. The all-sans treatment matched the cropped wordmark but not the website's main heading system.
+- Fix: copied the live `ublda.org` roles directly: Instrument Serif headings plus Plus Jakarta Sans body and controls.
+
+### Pass 3
+
+- Post-fix evidence: `live-font-system-comparison.png` and `iphone-live-type-system.png`.
+- No actionable P0, P1, or P2 typography differences remain.
+- P3 intentional deviation: ballot section headings use the serif family at `17px`; making every heading `36px` would break the requested three-tier hierarchy and increase mobile density.
 
 ## Functional verification
 
