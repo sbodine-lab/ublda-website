@@ -9,3 +9,8 @@
 export function decisionPublicSlug(decisionId: string): string {
   return `d_${decisionId}`;
 }
+
+/** Keep private scheduling topics out of URLs, previews, logs, and history. */
+export function availabilityPublicSlug(pollId: string): string {
+  return `s_${pollId}`;
+}

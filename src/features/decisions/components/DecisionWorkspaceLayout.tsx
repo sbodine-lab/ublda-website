@@ -1,114 +1,63 @@
-import { BarChart3, Bot, LogOut, Menu, Plus, Settings, Vote } from "lucide-react"
+import { Bot, CalendarClock, CalendarDays, FolderKanban, Home, LogOut, Settings, Users, Vote } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
+import { useEffect } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
+  SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarProvider, SidebarRail, SidebarTrigger, useSidebar,
+} from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { useDecisionData } from "../decisionDataContext"
 import { initials } from "../format"
 
-const desktopLinks = [
-  { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-  { to: "/decisions/new", label: "New", icon: Plus },
-  { to: "/results", label: "Results", icon: BarChart3 },
+const primaryLinks = [
+  { to: "/workspace", label: "overview", icon: Home, end: true },
+  { to: "/decisions", label: "decisions", icon: Vote, end: true },
+  { to: "/scheduling", label: "scheduling", icon: CalendarClock },
+  { to: "/calendar", label: "calendar", icon: CalendarDays },
+  { to: "/projects", label: "projects", icon: FolderKanban },
+  { to: "/people", label: "people", icon: Users },
 ]
+
+const mobileLinks = primaryLinks.filter((link) => ["/workspace", "/decisions", "/calendar", "/projects"].includes(link.to))
+
+function WorkspaceNavigation({ pathname }: { pathname: string }) {
+  const { setOpenMobile } = useSidebar()
+  return <SidebarMenu>{primaryLinks.map(({ to, label, icon: Icon, end }) => <SidebarMenuItem key={to}><SidebarMenuButton asChild tooltip={label} isActive={end ? pathname === to : pathname.startsWith(to)}><NavLink to={to} end={end} onClick={() => setOpenMobile(false)}><Icon /><span>{label}</span></NavLink></SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu>
+}
 
 export function DecisionWorkspaceLayout() {
   const { adapter, snapshot } = useDecisionData()
   const location = useLocation()
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
-  const mobileLinks = [
-    { to: "/decisions", label: "Decisions", icon: Vote, end: true },
-    { to: "/decisions/new", label: "New", icon: Plus },
-    { to: "/results", label: "Results", icon: BarChart3 },
-  ]
-
+  useEffect(() => {
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }))
+  }, [location.pathname])
   return (
-    <div className="dc-app-shell">
-      <header className="dc-topbar">
-        <div className="dc-topbar-inner">
-          <Link to="/decisions" className="dc-logo-lockup" aria-label="UBLDA Decision Center">
-            <img src="/logo.png" alt="" />
-            <span className="dc-logo-full">UBLDA <b>Decisions</b></span>
-          </Link>
-
-          <nav className="dc-desktop-nav" aria-label="Decision Center">
-            {desktopLinks.map(({ to, label, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) => cn("dc-nav-link", isActive && "dc-nav-link-active")}
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="dc-topbar-actions">
-            {adapter.mode === "demo" && <Badge variant="outline">Local preview</Badge>}
-            {viewer && (
-              <Avatar className="dc-desktop-avatar">
-                <AvatarFallback>{initials(viewer.displayName)}</AvatarFallback>
-              </Avatar>
-            )}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon-lg" className="dc-touch" aria-label="Open account menu">
-                  <Menu />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="dc-account-sheet">
-                <SheetHeader>
-                  <SheetTitle>Decision Center</SheetTitle>
-                  <SheetDescription>{viewer?.displayName ?? "UBLDA member"}</SheetDescription>
-                </SheetHeader>
-                <nav aria-label="Account and settings" className="dc-sheet-nav">
-                  {desktopLinks.map(({ to, label, icon: Icon }) => (
-                    <SheetClose asChild key={to}>
-                      <Link to={to} className="dc-sheet-link"><Icon />{label}</Link>
-                    </SheetClose>
-                  ))}
-                  <SheetClose asChild><Link to="/decisions/settings" className="dc-sheet-link"><Settings />Members</Link></SheetClose>
-                  <SheetClose asChild><Link to="/decisions/integrations" className="dc-sheet-link"><Bot />Integrations</Link></SheetClose>
-                </nav>
-                <div className="dc-sheet-footer">
-                  <Button variant="outline" className="dc-touch" onClick={() => void adapter.signOut()}>
-                    <LogOut /> Sign out
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
-
-      <main id="main-content" className="dc-workspace-main" key={location.pathname}>
-        <Outlet />
-      </main>
-
-      <nav className="dc-mobile-nav" aria-label="Decision Center">
-        {mobileLinks.map(({ to, label, icon: Icon, end }) => (
-          <NavLink
-            key={`${to}-${label}`}
-            to={to}
-            end={end}
-            className={({ isActive }) => cn("dc-mobile-nav-link", isActive && "dc-mobile-nav-link-active")}
-          >
-            <Icon />
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
-    </div>
+    <TooltipProvider>
+      <SidebarProvider className="dc-app-shell ws-shell">
+        <Sidebar collapsible="icon" className="ws-sidebar">
+          <SidebarHeader className="ws-sidebar-header">
+            <Link to="/workspace" className="ws-brand" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /><span>UBLDA</span></Link>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarGroup><SidebarGroupContent><WorkspaceNavigation pathname={location.pathname} /></SidebarGroupContent></SidebarGroup>
+          </SidebarContent>
+          <SidebarFooter className="ws-sidebar-footer">
+            {viewer?.role === "admin" && <SidebarMenu><SidebarMenuItem><SidebarMenuButton asChild tooltip="members"><Link to="/decisions/settings"><Settings /><span>members + access</span></Link></SidebarMenuButton></SidebarMenuItem><SidebarMenuItem><SidebarMenuButton asChild tooltip="integrations"><Link to="/decisions/integrations"><Bot /><span>integrations</span></Link></SidebarMenuButton></SidebarMenuItem></SidebarMenu>}
+            <div className="ws-account-row"><Avatar><AvatarFallback>{initials(viewer?.displayName ?? "UBLDA")}</AvatarFallback></Avatar><div><strong>{viewer?.displayName ?? "UBLDA member"}</strong><span>{viewer?.role ?? "member"}</span></div><Button variant="ghost" size="icon-sm" onClick={() => void adapter.signOut()} aria-label="sign out"><LogOut /></Button></div>
+          </SidebarFooter>
+          <SidebarRail />
+        </Sidebar>
+        <SidebarInset className="ws-inset">
+          <header className="ws-mobile-header"><Link to="/workspace" className="ws-brand"><img src="/logo.png" alt="" /><span>UBLDA</span></Link><div><SidebarTrigger /></div></header>
+          <main id="main-content" className="dc-workspace-main ws-main" key={location.pathname}><Outlet /></main>
+          <nav className="dc-mobile-nav ws-mobile-nav" aria-label="workspace">{mobileLinks.map(({ to, label, icon: Icon, end }) => <NavLink key={to} to={to} end={end} className={({ isActive }) => cn("dc-mobile-nav-link", isActive && "dc-mobile-nav-link-active")}><Icon /><span>{label}</span></NavLink>)}</nav>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   )
 }

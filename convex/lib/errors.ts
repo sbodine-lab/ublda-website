@@ -8,6 +8,7 @@ export type ErrorCode =
   | "CONFLICT"
   | "VALIDATION_ERROR"
   | "DECISION_CLOSED"
+  | "POLL_CLOSED"
   | "RATE_LIMITED"
   | "IDEMPOTENCY_CONFLICT";
 

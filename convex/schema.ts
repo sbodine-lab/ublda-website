@@ -42,6 +42,48 @@ export const tieBreakRule = v.union(
   v.literal("runoff"),
   v.literal("creator_decides"),
 );
+export const availabilityPollStatus = v.union(
+  v.literal("open"),
+  v.literal("finalized"),
+);
+export const availabilityResultsVisibility = v.union(
+  v.literal("after_submit"),
+  v.literal("admins_only"),
+);
+export const clubEventType = v.union(
+  v.literal("meeting"),
+  v.literal("event"),
+  v.literal("deadline"),
+  v.literal("project"),
+);
+export const clubEventStatus = v.union(
+  v.literal("tentative"),
+  v.literal("confirmed"),
+  v.literal("cancelled"),
+);
+export const projectLane = v.union(
+  v.literal("community-career"),
+  v.literal("advisory"),
+  v.literal("catalyst"),
+  v.literal("operations"),
+);
+export const projectStatus = v.union(
+  v.literal("planned"),
+  v.literal("active"),
+  v.literal("blocked"),
+  v.literal("complete"),
+);
+export const projectTaskStatus = v.union(
+  v.literal("todo"),
+  v.literal("working"),
+  v.literal("blocked"),
+  v.literal("done"),
+);
+export const projectTaskPriority = v.union(
+  v.literal("low"),
+  v.literal("medium"),
+  v.literal("high"),
+);
 export const agentScope = v.union(
   v.literal("decisions:read"),
   v.literal("decisions:write"),
@@ -167,6 +209,114 @@ export default defineSchema({
     .index("by_decision", ["decisionId"])
     .index("by_member", ["memberId"])
     .index("by_decision_and_member", ["decisionId", "memberId"]),
+
+  availabilityPolls: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    note: v.string(),
+    durationMinutes: v.number(),
+    dateKeys: v.array(v.string()),
+    startMinutes: v.number(),
+    endMinutes: v.number(),
+    slotMinutes: v.number(),
+    timezone: v.string(),
+    status: availabilityPollStatus,
+    resultsVisibility: availabilityResultsVisibility,
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    deadlineAt: v.optional(v.number()),
+    finalizedDateKey: v.optional(v.string()),
+    finalizedStartMinutes: v.optional(v.number()),
+    finalizedAt: v.optional(v.number()),
+    finalizedByMemberId: v.optional(v.id("members")),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"])
+    .index("by_creator_and_status", ["createdByMemberId", "status"]),
+
+  availabilityElectorate: defineTable({
+    pollId: v.id("availabilityPolls"),
+    memberId: v.id("members"),
+    displayNameSnapshot: v.string(),
+    includedAt: v.number(),
+  })
+    .index("by_poll", ["pollId"])
+    .index("by_member", ["memberId"])
+    .index("by_poll_and_member", ["pollId", "memberId"]),
+
+  availabilityResponses: defineTable({
+    pollId: v.id("availabilityPolls"),
+    memberId: v.id("members"),
+    availableSlotKeys: v.array(v.string()),
+    submittedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_poll", ["pollId"])
+    .index("by_member", ["memberId"])
+    .index("by_poll_and_member", ["pollId", "memberId"]),
+
+  clubEvents: defineTable({
+    title: v.string(),
+    type: clubEventType,
+    startAt: v.number(),
+    endAt: v.optional(v.number()),
+    timezone: v.string(),
+    location: v.optional(v.string()),
+    ownerMemberId: v.optional(v.id("members")),
+    projectId: v.optional(v.id("projects")),
+    status: clubEventStatus,
+    notes: v.optional(v.string()),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_start", ["startAt"])
+    .index("by_project", ["projectId"]),
+
+  projects: defineTable({
+    name: v.string(),
+    lane: projectLane,
+    ownerMemberId: v.optional(v.id("members")),
+    status: projectStatus,
+    dueDate: v.optional(v.string()),
+    summary: v.optional(v.string()),
+    position: v.number(),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_lane_and_position", ["lane", "position"])
+    .index("by_status", ["status"]),
+
+  projectTasks: defineTable({
+    projectId: v.id("projects"),
+    title: v.string(),
+    ownerMemberId: v.optional(v.id("members")),
+    status: projectTaskStatus,
+    dueDate: v.optional(v.string()),
+    priority: projectTaskPriority,
+    completionSignal: v.optional(v.string()),
+    position: v.number(),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project_and_position", ["projectId", "position"])
+    .index("by_owner_and_status", ["ownerMemberId", "status"]),
+
+  directoryProfiles: defineTable({
+    memberId: v.id("members"),
+    clubRole: v.string(),
+    team: v.string(),
+    schoolYear: v.optional(v.string()),
+    major: v.optional(v.string()),
+    linkedinUrl: v.optional(v.string()),
+    isLeadership: v.boolean(),
+    updatedByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_member", ["memberId"]),
 
   agentKeys: defineTable({
     name: v.string(),

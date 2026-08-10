@@ -4,6 +4,16 @@ import { DecisionCenterRoutes } from "./DecisionCenterRoutes"
 import { DecisionDataProvider } from "./DecisionDataProvider"
 import { createUnavailableLiveDecisionAdapter, demoDecisionAdapter } from "./demoAdapter"
 import { LiveDecisionCenter } from "./LiveDecisionCenter"
+import {
+  AvailabilityDataProvider,
+  createUnavailableAvailabilityAdapter,
+  demoAvailabilityAdapter,
+} from "@/features/availability"
+import {
+  WorkspaceDataProvider,
+  createUnavailableWorkspaceAdapter,
+  demoWorkspaceAdapter,
+} from "@/features/workspace"
 
 function DecisionDocumentMeta() {
   useEffect(() => {
@@ -40,18 +50,32 @@ export function DecisionCenterEntry() {
   let content
   if (demoMode) {
     content = (
-      <DecisionDataProvider adapter={demoDecisionAdapter}>
-        <DecisionCenterRoutes />
-      </DecisionDataProvider>
+      <WorkspaceDataProvider adapter={demoWorkspaceAdapter}>
+        <AvailabilityDataProvider adapter={demoAvailabilityAdapter}>
+          <DecisionDataProvider adapter={demoDecisionAdapter}>
+            <DecisionCenterRoutes />
+          </DecisionDataProvider>
+        </AvailabilityDataProvider>
+      </WorkspaceDataProvider>
     )
   } else if (!clerkPublishableKey || !convexUrl) {
     const adapter = createUnavailableLiveDecisionAdapter(
       "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
     )
+    const availabilityAdapter = createUnavailableAvailabilityAdapter(
+      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+    )
+    const workspaceAdapter = createUnavailableWorkspaceAdapter(
+      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+    )
     content = (
-      <DecisionDataProvider adapter={adapter}>
-        <DecisionCenterRoutes />
-      </DecisionDataProvider>
+      <WorkspaceDataProvider adapter={workspaceAdapter}>
+        <AvailabilityDataProvider adapter={availabilityAdapter}>
+          <DecisionDataProvider adapter={adapter}>
+            <DecisionCenterRoutes />
+          </DecisionDataProvider>
+        </AvailabilityDataProvider>
+      </WorkspaceDataProvider>
     )
   } else {
     content = (

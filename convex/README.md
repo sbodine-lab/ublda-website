@@ -1,8 +1,14 @@
-# Decision Center backend
+# UBLDA workspace backend
 
 This folder is the Convex backend for UBLDA's private decision workspace. It is
 designed for Convex Free and Clerk's free authentication tier. No Convex or
 Clerk deployment is created by this code.
+
+The same authenticated roster also powers private scheduling polls. Scheduling
+polls use opaque links, a fixed 15-minute source grid, one replaceable response
+per member, live aggregate counts, duration-aware ranked windows, and an
+admin-recorded final time. Aggregate participant results contain counts only;
+named nonresponders remain admin-only.
 
 ## Identity and first-run setup
 
@@ -62,6 +68,12 @@ All public functions use the centralized Clerk-to-member authorization helpers.
 
 - `viewer.current({})`
 - `workspace.workspaceSnapshot({})`
+- `clubWorkspace.snapshot({})` — authenticated events, projects, tasks, and directory profiles
+- `clubWorkspace.createEvent({ input })` — administrator-only internal calendar event
+- `clubWorkspace.createProject({ input })` — administrator-only project creation
+- `clubWorkspace.createTask({ input })` — administrator-only task creation
+- `clubWorkspace.updateTaskStatus({ taskId, status })` — administrator or assigned owner
+- `clubWorkspace.updateProfile({ input })` — administrator-only directory profile update
 - `members.list({ includeInactive? })` (admin), `members.eligible({})`,
   `members.upsertMember({ memberId?, displayName, role, status?, approvedEmails? })`
 - `decisions.list({ status? })`, `decisions.getBySlug({ slug })`,
@@ -73,6 +85,10 @@ All public functions use the centralized Clerk-to-member authorization helpers.
 - `ballots.myResponse({ decisionId?, slug? })`,
   `ballots.submit({ decisionId, input: { selections, otherText?, responseText?, reasoning? } })`
 - `results.get({ decisionId?, slug? })`
+- `availability.list({})`, `availability.getBySlug({ slug })`
+- `availability.create({ input: { title, note?, dateKeys, startMinutes, endMinutes, durationMinutes, timezone, deadline?, resultsVisibility, electorateMemberIds? } })` (admin)
+- `availability.saveResponse({ pollId, availableSlotKeys })`
+- `availability.finalize({ pollId, dateKey, startMinutes })` (admin)
 - `agentKeys.createAgentKey({ name, scopes, expiresAt?, rateLimitPerMinute? })`,
   `agentKeys.list({})`, `agentKeys.revokeAgentKey({ agentKeyId })`
 
