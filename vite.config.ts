@@ -12,6 +12,7 @@ import { bookingEmailLaunchError, sendBookingConfirmationEmail } from './server/
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
 import { buildRecruitingExport, parseRecruitingExportType } from './server/recruitingExport.ts'
 import { housingApiPayloadForRoute } from './server/housingApi.ts'
+import { handleSpeakerOpsRequest } from './server/speakerOpsService.ts'
 
 const store = createLocalRecruitingStore()
 
@@ -50,6 +51,21 @@ const bookingStatusCode = (error: unknown) => {
 const devApiPlugin = () => ({
   name: 'ublda-dev-api',
   configureServer(server: import('vite').ViteDevServer) {
+    server.middlewares.use('/api/speaker-ops', async (req: IncomingMessage, res: ServerResponse) => {
+      if (req.method !== 'POST') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const body = await readJsonBody(req)
+      const forwarded = req.headers['x-forwarded-for']
+      const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(',')[0]?.trim()
+        || req.socket.remoteAddress
+        || 'local-preview'
+      const result = await handleSpeakerOpsRequest(body, ip)
+      sendJson(res, result.status, { ...result.body, localPreview: true })
+    })
+
     server.middlewares.use('/api', async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
       const url = new URL(req.url || '/', 'http://localhost')
       const housingPath = url.pathname

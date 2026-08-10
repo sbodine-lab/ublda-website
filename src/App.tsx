@@ -21,9 +21,16 @@ const DecisionCenterEntry = lazy(() => (
   }))
 ))
 
+const SpeakerOpsEntry = lazy(() => (
+  import('./features/speakers/SpeakerOpsEntry').then((module) => ({
+    default: module.SpeakerOpsEntry,
+  }))
+))
+
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
 const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory']
 const DECISION_PREFIXES = ['/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people']
+const SPEAKER_OPS_PREFIXES = ['/leadership/speakers', '/speaker-ops']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
   prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
@@ -42,6 +49,7 @@ export default function App() {
   const { pathname } = useLocation()
   const inStandalone = matchesPrefix(pathname, STANDALONE_PREFIXES)
   const inDecisionCenter = matchesPrefix(pathname, DECISION_PREFIXES)
+  const inSpeakerOps = matchesPrefix(pathname, SPEAKER_OPS_PREFIXES)
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
@@ -60,6 +68,24 @@ export default function App() {
           </main>
         )}>
           <DecisionCenterEntry />
+        </Suspense>
+      </>
+    )
+  }
+
+  if (inSpeakerOps) {
+    return (
+      <>
+        <a href="#main-content" className="skip-nav">
+          Skip to main content
+        </a>
+        <ScrollToTop enabled />
+        <Suspense fallback={(
+          <main id="main-content" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <p>Opening Speaker Ops…</p>
+          </main>
+        )}>
+          <SpeakerOpsEntry />
         </Suspense>
       </>
     )
