@@ -2361,8 +2361,8 @@
 }
 
 /* Decision Center typography
-   One quiet serif family and three visible sizes. Weight stays regular so
-   spacing, colour and rules carry the hierarchy instead of dense bold text. */
+   The brand's clean Plus Jakarta Sans, three visible sizes, and restrained
+   weights. Spacing, colour and rules carry hierarchy instead of dense type. */
 :is(
   .dc-app-shell,
   .dc-ballot-page,
@@ -2374,7 +2374,7 @@
   --dc-type-small: var(--type-sm, 0.875rem);
   --dc-type-body: var(--type-md, 1.0625rem);
   --dc-type-display: var(--type-lg, clamp(2.25rem, 4.2vw, 3.25rem));
-  font-family: var(--font-display, "Instrument Serif", Georgia, serif);
+  font-family: var(--font-body, "Plus Jakarta Sans", system-ui, sans-serif);
   font-size: var(--dc-type-body);
   font-weight: 400;
   line-height: 1.62;
@@ -2391,7 +2391,7 @@
   font-family: inherit !important;
   font-size: var(--dc-type-body) !important;
   font-weight: 400 !important;
-  letter-spacing: 0 !important;
+  letter-spacing: 0.005em !important;
 }
 
 :is(
@@ -2433,6 +2433,25 @@
   .dc-agent-key-dialog,
   .dc-finalize-dialog
 ) :where(
+  .dc-logo-lockup,
+  .dc-logo-lockup *,
+  [class*="eyebrow"],
+  [class*="eyebrow"] *,
+  [class*="pill"],
+  [class*="pill"] *
+) {
+  font-weight: 500 !important;
+  letter-spacing: 0.09em !important;
+}
+
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) :where(
   h1,
   h1 *,
   .dc-confirmation h2,
@@ -2441,7 +2460,9 @@
   .dc-turnout-figure strong *
 ) {
   font-size: var(--dc-type-display) !important;
-  line-height: 1.05;
+  font-weight: 500 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.08;
 }
 
 @media (max-width: 820px) {
