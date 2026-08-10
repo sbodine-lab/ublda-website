@@ -2359,3 +2359,102 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Decision Center typography
+   One quiet serif family and three visible sizes. Weight stays regular so
+   spacing, colour and rules carry the hierarchy instead of dense bold text. */
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) {
+  --dc-type-small: var(--type-sm, 0.875rem);
+  --dc-type-body: var(--type-md, 1.0625rem);
+  --dc-type-display: var(--type-lg, clamp(2.25rem, 4.2vw, 3.25rem));
+  font-family: var(--font-display, "Instrument Serif", Georgia, serif);
+  font-size: var(--dc-type-body);
+  font-weight: 400;
+  line-height: 1.62;
+}
+
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) :where(*) {
+  font-family: inherit !important;
+  font-size: var(--dc-type-body) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) :where(
+  small,
+  time,
+  [class*="eyebrow"],
+  [class*="eyebrow"] *,
+  [class*="meta"],
+  [class*="meta"] *,
+  [class*="caption"],
+  [class*="caption"] *,
+  [class*="hint"],
+  [class*="hint"] *,
+  [class*="help"],
+  [class*="help"] *,
+  [class*="status"],
+  [class*="status"] *,
+  [class*="pill"],
+  [class*="pill"] *,
+  [data-slot="badge"],
+  [data-slot="badge"] *
+) {
+  font-size: var(--dc-type-small) !important;
+  line-height: 1.4;
+}
+
+:is(
+  .dc-app-shell,
+  .dc-ballot-page,
+  .dc-auth-page,
+  .dc-member-dialog,
+  .dc-agent-key-dialog,
+  .dc-finalize-dialog
+) :where(
+  h1,
+  h1 *,
+  .dc-confirmation h2,
+  .dc-confirmation h2 *,
+  .dc-turnout-figure strong,
+  .dc-turnout-figure strong *
+) {
+  font-size: var(--dc-type-display) !important;
+  line-height: 1.05;
+}
+
+@media (max-width: 820px) {
+  .dc-logo-full {
+    font-size: 0 !important;
+  }
+
+  .dc-logo-full::after {
+    font-size: var(--dc-type-small) !important;
+  }
+
+  .dc-public-topbar > a + a,
+  .dc-public-topbar [data-slot="button"] {
+    font-size: 0 !important;
+  }
+}
