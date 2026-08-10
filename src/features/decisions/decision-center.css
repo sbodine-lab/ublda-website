@@ -2409,13 +2409,31 @@
   .dc-choice-button {
     justify-content: center;
     min-height: 56px;
-    border-radius: 999px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     padding: 12px 18px;
     text-align: center;
   }
 
+  .dc-choice-button:hover {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .dc-choice-button:focus-visible {
+    outline: none;
+  }
+
   .dc-choice-selected {
-    box-shadow: inset 0 0 0 1px var(--dc-teal);
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .dc-choice-selected .dc-choice-marker {
+    border-color: var(--dc-navy-hover);
+    background: var(--dc-navy-hover);
   }
 
   .dc-choice-button > span:last-child {
