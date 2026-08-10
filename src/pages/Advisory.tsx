@@ -22,47 +22,47 @@ const benefits = [
     desc: 'One in four American adults has a disability. Serve them well and you reach customers, donors, and members your competitors overlook.',
   },
   {
-    title: 'Ship accessible digital',
-    desc: 'We test your site and apps with screen readers, keyboard-only navigation, and low-vision tools, then measure the results against WCAG 2.2.',
+    title: 'Open up your digital front door',
+    desc: 'Your website and apps are where most people meet you. We work with your team on the parts that shut disabled visitors out.',
   },
   {
     title: 'Reach every reader',
-    desc: 'We rebuild PDFs, decks, and newsletters so a blind reader gets the same message a sighted one does.',
+    desc: 'Your PDFs, decks, and newsletters should land the same way for a blind reader as a sighted one. We help you get them there.',
   },
   {
-    title: 'Reduce legal risk',
-    desc: 'We help you fix barriers before they turn into an ADA complaint, and we document the work so you can show it.',
+    title: 'Get ahead of the problem',
+    desc: 'Barriers are cheaper to fix before someone has to complain about them. We help you find yours early.',
   },
   {
     title: 'Hire inclusively',
-    desc: 'We walk through your job postings, interviews, and onboarding the way a disabled candidate would, and flag what screens people out.',
+    desc: 'Job postings, interviews, and onboarding turn disabled candidates away in ways most teams never see. We help you spot yours.',
   },
   {
     title: 'Build lasting capability',
-    desc: 'We train your team to catch issues on their own, so the fixes outlast the engagement.',
+    desc: 'We would rather teach your team to catch issues than be the only ones who can. The fixes should outlast us.',
   },
 ]
 
 const services = [
   {
-    name: 'Digital Accessibility Audits',
-    desc: 'WCAG 2.2 evaluation of your website and apps, tested with screen readers and keyboard-only navigation.',
+    name: 'Websites & Apps',
+    desc: 'A structured review of where your digital experience breaks down for disabled visitors.',
   },
   {
     name: 'Documents & Communications',
-    desc: 'We remediate PDFs, presentations, and campaigns so they read cleanly with assistive technology.',
+    desc: 'PDFs, presentations, and campaigns, reworked so they hold up for the people receiving them.',
   },
   {
-    name: 'Accessible Events & Programs',
-    desc: 'Venue walkthroughs, accommodation planning, and materials review, from the invitation onward.',
+    name: 'Events & Programs',
+    desc: 'Venues, accommodation planning, and materials, thought through from the invitation onward.',
   },
   {
-    name: 'Inclusive Hiring & Workplace Practices',
-    desc: 'We audit recruiting and onboarding for the barriers that turn disabled candidates away.',
+    name: 'Hiring & Workplace Practices',
+    desc: 'A close look at recruiting and onboarding, and the barriers hiding inside them.',
   },
   {
     name: 'Training & Enablement',
-    desc: 'Workshops that teach your staff to build accessible work and catch issues before they ship.',
+    desc: 'Workshops that leave your staff able to build accessible work on their own.',
   },
 ]
 
@@ -256,11 +256,10 @@ export default function Advisory() {
           </h2>
           <p className="adv-lead">
             UBLDA Advisory is the accessibility consulting practice of UBLDA
-            at Michigan Ross. We find the barriers that keep disabled people
-            out of your website, your documents, your events, and your hiring
-            process, and we help you fix them. Our audits follow WCAG 2.2.
-            Our consultants test with the assistive technology they use in
-            their own lives.
+            at Michigan Ross. We work with organizations on the barriers that
+            keep disabled people out of their websites, their documents, their
+            events, and their hiring. Our consultants include disabled
+            students, which shapes what we notice and what we push on.
           </p>
         </section>
 
@@ -289,7 +288,7 @@ export default function Advisory() {
           </h2>
           <p className="adv-lead">
             We shape each engagement around where your organization stands,
-            from a first look to a full remediation roadmap.
+            and around what your team can realistically carry forward.
           </p>
           <ul className="adv-services">
             {services.map((s) => (
@@ -342,9 +341,9 @@ export default function Advisory() {
                 <h3 className="adv-client__name">Your organization</h3>
               </div>
               <p className="adv-client__note">
-                We take on a handful of engagements each semester. If you run
-                a nonprofit or community organization, we want to hear from
-                you.
+                We are taking on a small number of engagements for Fall 2026.
+                If you run a nonprofit or community organization, we want to
+                hear from you.
               </p>
               <a
                 href="mailto:sbodine@umich.edu?subject=UBLDA%20Advisory%20inquiry"
@@ -409,12 +408,12 @@ export default function Advisory() {
               <dd className="adv-fact__value">1 in 4 American adults lives with a disability</dd>
             </div>
             <div className="adv-fact">
-              <dt className="adv-fact__label">The standard</dt>
-              <dd className="adv-fact__value">WCAG 2.2 behind every audit we run</dd>
+              <dt className="adv-fact__label">Who we are</dt>
+              <dd className="adv-fact__value">A student-led practice at Michigan Ross</dd>
             </div>
             <div className="adv-fact">
               <dt className="adv-fact__label">Right now</dt>
-              <dd className="adv-fact__value">Fall 2026 cohort underway with The Arc of Colorado</dd>
+              <dd className="adv-fact__value">Our Fall 2026 cohort has begun with The Arc of Colorado</dd>
             </div>
           </dl>
           <Link to="/join" className="adv-pill adv-pill--wide">

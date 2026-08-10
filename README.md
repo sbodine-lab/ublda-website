@@ -1,5 +1,9 @@
 # UBLDA Website
 
+## Decision Center
+
+Local preview, Convex/Clerk configuration, governance rules, and agent API/MCP setup are documented in [Decision Center setup and operations](docs/decision-center.md).
+
 ## Interview launch checklist
 
 The interview signup flow can be opened without automated confirmation email. Candidates see their booked slot in the browser after submitting, and admins can send manual follow-up from the dashboard/export. Before opening the form publicly, configure these Vercel environment variables:
