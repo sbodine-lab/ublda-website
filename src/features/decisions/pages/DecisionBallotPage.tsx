@@ -59,7 +59,6 @@ function BallotChoices({
             <Textarea
               value={answer.otherText ?? ""}
               onChange={(event) => onChange({ ...answer, otherText: event.target.value })}
-              placeholder="Write the specific alternative the board should consider."
               rows={3}
               required
             />
@@ -155,14 +154,9 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
   const [savedResponse, setSavedResponse] = useState(existing)
   const [editing, setEditing] = useState(!existing || existing.confirmedRevision !== decision.revision)
   const [answer, setAnswer] = useState<BallotAnswer>(() => defaultAnswer(decision, existing))
-  const [rationale, setRationale] = useState(existing?.rationale ?? "")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
   const [justSubmitted, setJustSubmitted] = useState(false)
-
-  const showRationale = answer.type === "binary"
-    ? answer.choice === "other"
-    : answer.type === "single" && answer.otherText !== undefined
 
   const validationError = useMemo(() => {
     if (answer.type === "binary" && !answer.choice) return "Choose yes, no, or propose something else."
@@ -182,7 +176,7 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
     setSubmitting(true)
     setError(undefined)
     try {
-      const saved = await adapter.submitResponse(decision.id, answer, showRationale ? rationale : undefined)
+      const saved = await adapter.submitResponse(decision.id, answer)
       setSavedResponse(saved)
       setJustSubmitted(true)
       setEditing(false)
@@ -221,13 +215,6 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
           setError(undefined)
         }}
       />
-
-      {showRationale && (
-        <label className="dc-field-block dc-rationale-field">
-          <span>Why? <small>Optional</small></span>
-          <Textarea value={rationale} onChange={(event) => setRationale(event.target.value)} placeholder="Add useful context for the decision owner." rows={3} />
-        </label>
-      )}
 
       {existing && existing.confirmedRevision !== decision.revision && (
         <Alert>
