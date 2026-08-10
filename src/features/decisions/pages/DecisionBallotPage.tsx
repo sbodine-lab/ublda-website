@@ -3,25 +3,16 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
-  CalendarClock,
   Check,
-  CheckCircle2,
-  Copy,
   Pencil,
-  ShieldCheck,
-  Users,
 } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { DecisionAuthGate } from "../components/DecisionAuthGate"
-import { DecisionStatusBadge } from "../components/DecisionStatusBadge"
 import { useDecisionData } from "../decisionDataContext"
-import { ballotTypeLabels, formatDateTime } from "../format"
-import { describeBallotAnswer } from "../results"
 import type { BallotAnswer, DecisionRecord, DecisionResponse } from "../types"
 
 function defaultAnswer(decision: DecisionRecord, response?: DecisionResponse): BallotAnswer {
@@ -42,10 +33,10 @@ function BallotChoices({
   onChange(answer: BallotAnswer): void
 }) {
   if (answer.type === "binary") {
-    const choices: Array<{ value: "yes" | "no" | "other"; label: string; description: string }> = [
-      { value: "yes", label: "Yes", description: "Move forward with the proposal as written." },
-      { value: "no", label: "No", description: "Do not move forward with this proposal." },
-      ...(decision.allowOther ? [{ value: "other" as const, label: "Propose something else", description: "Suggest a specific change or alternative." }] : []),
+    const choices: Array<{ value: "yes" | "no" | "other"; label: string }> = [
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No" },
+      ...(decision.allowOther ? [{ value: "other" as const, label: "Propose something else" }] : []),
     ]
     return (
       <div className="dc-choice-list" role="radiogroup" aria-label="Your response">
@@ -59,7 +50,7 @@ function BallotChoices({
             onClick={() => onChange({ type: "binary", choice: choice.value, otherText: choice.value === "other" ? answer.otherText : undefined })}
           >
             <span className="dc-choice-marker" aria-hidden="true">{answer.choice === choice.value && <Check />}</span>
-            <span><b>{choice.label}</b><small>{choice.description}</small></span>
+            <span><b>{choice.label}</b></span>
           </button>
         ))}
         {answer.choice === "other" && (
@@ -91,7 +82,7 @@ function BallotChoices({
             onClick={() => onChange({ type: "single", optionId: option.id })}
           >
             <span className="dc-choice-marker" aria-hidden="true">{answer.optionId === option.id && !answer.otherText && <Check />}</span>
-            <span><b>{option.label}</b>{option.description && <small>{option.description}</small>}</span>
+            <span><b>{option.label}</b></span>
           </button>
         ))}
         {decision.allowOther && (
@@ -104,7 +95,7 @@ function BallotChoices({
               onClick={() => onChange({ type: "single", otherText: answer.otherText ?? "" })}
             >
               <span className="dc-choice-marker" aria-hidden="true">{answer.otherText !== undefined && <Check />}</span>
-              <span><b>Propose something else</b><small>Suggest a specific alternative.</small></span>
+              <span><b>Propose something else</b></span>
             </button>
             {answer.otherText !== undefined && (
               <label className="dc-field-block dc-other-field">
@@ -134,7 +125,7 @@ function BallotChoices({
           return (
             <li key={optionId}>
               <span className="dc-rank-number">{index + 1}</span>
-              <span className="dc-rank-label"><b>{option.label}</b>{option.description && <small>{option.description}</small>}</span>
+              <span className="dc-rank-label"><b>{option.label}</b></span>
               <span className="dc-rank-actions">
                 <Button type="button" variant="ghost" size="icon-lg" className="dc-touch" onClick={() => move(index, -1)} disabled={index === 0} aria-label={`Move ${option.label} up`}><ArrowUp /></Button>
                 <Button type="button" variant="ghost" size="icon-lg" className="dc-touch" onClick={() => move(index, 1)} disabled={index === answer.ranking.length - 1} aria-label={`Move ${option.label} down`}><ArrowDown /></Button>
@@ -167,7 +158,11 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
   const [rationale, setRationale] = useState(existing?.rationale ?? "")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
-  const [copied, setCopied] = useState(false)
+  const [justSubmitted, setJustSubmitted] = useState(false)
+
+  const showRationale = answer.type === "binary"
+    ? answer.choice === "other"
+    : answer.type === "single" && answer.otherText !== undefined
 
   const validationError = useMemo(() => {
     if (answer.type === "binary" && !answer.choice) return "Choose yes, no, or propose something else."
@@ -187,8 +182,9 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
     setSubmitting(true)
     setError(undefined)
     try {
-      const saved = await adapter.submitResponse(decision.id, answer, rationale)
+      const saved = await adapter.submitResponse(decision.id, answer, showRationale ? rationale : undefined)
       setSavedResponse(saved)
+      setJustSubmitted(true)
       setEditing(false)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Your response could not be saved.")
@@ -197,51 +193,26 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
     }
   }
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1800)
-    } catch {
-      setCopied(false)
-    }
-  }
-
   const receipt = savedResponse ?? existing
 
   if (!editing && receipt) {
     return (
-      <section className="dc-confirmation" aria-live="polite">
-        <div className="dc-confirmation-icon"><CheckCircle2 /></div>
-        <p className="dc-eyebrow">Response saved</p>
-        <h2>You’re all set.</h2>
-        <p>Your response is tied to your board identity, so you will not be counted twice if you use another approved email.</p>
-        <dl className="dc-response-receipt">
-          <div><dt>Your response</dt><dd>{describeBallotAnswer(decision, receipt.answer)}</dd></div>
-          {receipt.rationale && <div><dt>Context you added</dt><dd>{receipt.rationale}</dd></div>}
-          <div><dt>Saved</dt><dd>{formatDateTime(receipt.revisedAt ?? receipt.submittedAt, decision.timezone)}</dd></div>
-        </dl>
-        <div className="dc-confirmation-actions">
-          {decision.status === "open" && decision.rules.allowResponseEdits && (
-            <Button variant="outline" className="dc-touch" onClick={() => setEditing(true)}><Pencil /> Edit response</Button>
-          )}
-          <Button variant="outline" className="dc-touch" onClick={copyLink}><Copy /> {copied ? "Copied" : "Copy link"}</Button>
-          <Button asChild className="dc-touch"><Link to="/decisions">Back to decisions</Link></Button>
-        </div>
-        {decision.rules.resultsVisibility === "after-close" && decision.status === "open" && (
-          <p className="dc-results-hold"><ShieldCheck /> Results stay hidden until responses close, so everyone can answer independently.</p>
+      <section className="dc-confirmation dc-submit-confirmation" aria-live="polite">
+        <div className={cn("dc-submit-check", justSubmitted && "dc-submit-check-animated")} aria-hidden="true"><Check /></div>
+        <h2>submitted</h2>
+        {decision.status === "open" && decision.rules.allowResponseEdits && (
+          <Button variant="outline" className="dc-touch dc-confirmation-edit" onClick={() => {
+            setJustSubmitted(false)
+            setEditing(true)
+          }}><Pencil /> edit</Button>
         )}
       </section>
     )
   }
 
   return (
-    <section className="dc-ballot-form" aria-labelledby="your-response-title">
-      <div className="dc-section-heading">
-        <p className="dc-eyebrow">{ballotTypeLabels[decision.ballotType]}</p>
-        <h2 id="your-response-title">Your response</h2>
-        {decision.ballotType === "ranked" && <p>Use the arrows to put your strongest choice first.</p>}
-      </div>
+    <section className="dc-ballot-form" aria-label="your response">
+      {decision.ballotType === "ranked" && <p className="dc-ranking-instruction">Use the arrows to put your strongest choice first.</p>}
       <BallotChoices
         decision={decision}
         answer={answer}
@@ -251,10 +222,12 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
         }}
       />
 
-      <label className="dc-field-block dc-rationale-field">
-        <span>Why? <small>Optional</small></span>
-        <Textarea value={rationale} onChange={(event) => setRationale(event.target.value)} placeholder="Add useful context for the decision owner." rows={3} />
-      </label>
+      {showRationale && (
+        <label className="dc-field-block dc-rationale-field">
+          <span>Why? <small>Optional</small></span>
+          <Textarea value={rationale} onChange={(event) => setRationale(event.target.value)} placeholder="Add useful context for the decision owner." rows={3} />
+        </label>
+      )}
 
       {existing && existing.confirmedRevision !== decision.revision && (
         <Alert>
@@ -265,11 +238,10 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
       {error && <p className="dc-inline-error" role="alert">{error}</p>}
       <div className="dc-submit-bar">
         {existing && <Button type="button" variant="ghost" className="dc-touch" onClick={() => setEditing(false)}>Cancel</Button>}
-        <Button type="button" size="lg" className="dc-touch" onClick={submit} disabled={submitting}>
-          {submitting ? "Saving…" : existing ? "Update response" : "Submit response"}
+        <Button type="button" size="lg" className="dc-touch dc-submit-button" onClick={submit} disabled={submitting}>
+          {submitting ? "submitting…" : "submit"}
         </Button>
       </div>
-      <p className="dc-submit-note"><ShieldCheck /> One response per roster member, even if that member has multiple approved emails.</p>
     </section>
   )
 }
@@ -290,10 +262,6 @@ function SignedInBallot() {
   }
 
   const existing = viewer ? responseFor(decision.id, viewer.memberId) : undefined
-  const responseCount = decision.responseCount
-    ?? snapshot.responses.filter((response) => response.decisionId === decision.id).length
-  const eligibleCount = decision.eligibleCount ?? decision.electorateMemberIds.length
-  const turnout = eligibleCount === 0 ? 0 : Math.round((responseCount / eligibleCount) * 100)
   const isEligible = Boolean(
     viewer && (decision.isEligible ?? decision.electorateMemberIds.includes(viewer.memberId)),
   )
@@ -307,22 +275,9 @@ function SignedInBallot() {
 
       <article className="dc-ballot-document">
         <header className="dc-ballot-heading">
-          <div className="dc-ballot-kicker"><DecisionStatusBadge status={decision.status} /><span>Revision {decision.revision}</span></div>
           <h1>{decision.title}</h1>
           <p>{decision.overview}</p>
-          <div className="dc-ballot-meta">
-            <span><Users /> {responseCount} of {eligibleCount} responded</span>
-            <span><CalendarClock /> {decision.deadline ? `Due ${formatDateTime(decision.deadline, decision.timezone)}` : "No deadline"}</span>
-          </div>
-          <Progress value={turnout} aria-label={`${turnout}% participation`} />
         </header>
-
-        {decision.contextPoints.length > 0 && (
-          <section className="dc-context-section" aria-labelledby="context-heading">
-            <h2 id="context-heading">What to know</h2>
-            <ul>{decision.contextPoints.map((point) => <li key={point}>{point}</li>)}</ul>
-          </section>
-        )}
 
         {!isEligible ? (
           <Alert><AlertTitle>You can view this decision, but you are not in its electorate.</AlertTitle><AlertDescription>Ask a decision administrator if the roster snapshot is incorrect.</AlertDescription></Alert>
@@ -331,7 +286,7 @@ function SignedInBallot() {
         ) : decision.status !== "open" && !existing ? (
           <Alert><AlertTitle>Responses are closed.</AlertTitle><AlertDescription>This decision is no longer accepting responses.</AlertDescription></Alert>
         ) : (
-          <BallotForm key={`${decision.id}-${existing?.id ?? "new"}`} decision={decision} existing={existing} />
+          <BallotForm key={`${decision.id}-${decision.revision}`} decision={decision} existing={existing} />
         )}
       </article>
     </main>

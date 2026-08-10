@@ -2309,6 +2309,148 @@
   }
 }
 
+/* Centered mobile ballot flow */
+.dc-submit-button,
+.dc-confirmation-edit {
+  width: auto !important;
+  min-width: 148px;
+  min-height: 48px;
+  padding-inline: 26px;
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, rgb(15 43 60 / 88%), rgb(26 61 82 / 76%)) !important;
+  color: white !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 60%),
+    inset 0 -1px 0 rgb(15 43 60 / 10%),
+    0 10px 28px rgb(15 43 60 / 12%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.dc-submit-check {
+  display: inline-grid;
+  width: auto;
+  height: auto;
+  place-items: center;
+  margin: 0 auto 18px;
+  border: 0;
+  background: none;
+  color: var(--dc-navy);
+  box-shadow: none;
+}
+
+.dc-submit-check svg {
+  width: 44px;
+  height: 44px;
+}
+
+.dc-submit-check-animated {
+  animation: dc-check-pop 420ms cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+}
+
+.dc-submit-confirmation {
+  border-top: 0;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.dc-submit-confirmation h2 {
+  margin-bottom: 20px;
+}
+
+@keyframes dc-check-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .dc-public-topbar {
+    justify-content: center;
+    border-bottom: 0;
+  }
+
+  .dc-public-topbar > a + a,
+  .dc-public-topbar [data-slot="button"] {
+    display: none;
+  }
+
+  .dc-ballot-document {
+    width: min(100%, 420px);
+    padding: 54px 20px 72px;
+    text-align: left;
+  }
+
+  .dc-ballot-heading h1 {
+    max-width: 350px;
+    margin: 0 0 18px;
+    font-size: 2.25rem !important;
+    line-height: 1.08;
+  }
+
+  .dc-ballot-heading > p {
+    max-width: 340px;
+    margin: 0;
+    line-height: 1.58;
+  }
+
+  .dc-ballot-form,
+  .dc-confirmation {
+    margin-top: 34px;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .dc-choice-list {
+    width: min(100%, 320px);
+    margin: 0 auto;
+  }
+
+  .dc-choice-button {
+    justify-content: center;
+    min-height: 56px;
+    border-radius: 999px;
+    padding: 12px 18px;
+    text-align: center;
+  }
+
+  .dc-choice-selected {
+    box-shadow: inset 0 0 0 1px var(--dc-teal);
+  }
+
+  .dc-choice-button > span:last-child {
+    min-width: 0;
+  }
+
+  .dc-other-field,
+  .dc-rationale-field {
+    width: min(100%, 340px);
+    margin: 18px auto 0;
+    text-align: left;
+  }
+
+  .dc-field-block textarea {
+    text-align: left;
+  }
+
+  .dc-submit-bar {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin-top: 22px;
+  }
+
+  .dc-submit-bar > * {
+    width: auto;
+  }
+
+  .dc-submit-button,
+  .dc-confirmation-edit {
+    min-width: 148px;
+  }
+}
+
 @media (max-width: 480px) {
   .dc-auth-page {
     padding: 16px;
