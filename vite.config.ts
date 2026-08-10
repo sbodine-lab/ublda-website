@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import path from 'node:path'
 import { validateApplicantAccountPayload } from './src/lib/applicantAccount.ts'
 import { buildApplicationSubmission, validateApplicationPayload } from './src/lib/application.ts'
 import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
@@ -401,5 +403,10 @@ const devApiPlugin = () => ({
 })
 
 export default defineConfig({
-  plugins: [react(), devApiPlugin()],
+  plugins: [react(), tailwindcss(), devApiPlugin()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 })

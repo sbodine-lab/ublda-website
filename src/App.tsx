@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
@@ -14,8 +14,15 @@ import InterviewerAvailability from './pages/InterviewerAvailability'
 import InterviewBooking from './pages/InterviewBooking'
 import HousingIntelligence from './pages/HousingIntelligence'
 
+const DecisionCenterEntry = lazy(() => (
+  import('./features/decisions/DecisionCenterEntry').then((module) => ({
+    default: module.DecisionCenterEntry,
+  }))
+))
+
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
 const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing']
+const DECISION_PREFIXES = ['/decisions', '/d']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
   prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
@@ -33,10 +40,29 @@ function ScrollToTop({ enabled }: { enabled: boolean }) {
 export default function App() {
   const { pathname } = useLocation()
   const inStandalone = matchesPrefix(pathname, STANDALONE_PREFIXES)
+  const inDecisionCenter = matchesPrefix(pathname, DECISION_PREFIXES)
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
   useTabEasterEgg()
+
+  if (inDecisionCenter) {
+    return (
+      <>
+        <a href="#main-content" className="skip-nav">
+          Skip to main content
+        </a>
+        <ScrollToTop enabled />
+        <Suspense fallback={(
+          <main id="main-content" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
+            <p>Opening Decision Center…</p>
+          </main>
+        )}>
+          <DecisionCenterEntry />
+        </Suspense>
+      </>
+    )
+  }
 
   return (
     <>
