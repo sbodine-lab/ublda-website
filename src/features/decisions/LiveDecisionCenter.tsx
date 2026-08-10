@@ -179,15 +179,16 @@ function withoutUndefined<T>(value: T): T {
   return value
 }
 
-function pathSlug(pathname: string): { slug?: string; resultsRoute: boolean } {
+function pathSlug(pathname: string): { slug?: string; currentRoute: boolean; resultsRoute: boolean } {
+  const currentRoute = pathname === "/decision"
   const ballotMatch = pathname.match(/^\/d\/([^/]+)$/)
   const resultMatch = pathname.match(/^\/decisions\/([^/]+)\/results$/)
   const encoded = ballotMatch?.[1] ?? resultMatch?.[1]
-  if (!encoded) return { resultsRoute: false }
+  if (!encoded) return { currentRoute, resultsRoute: false }
   try {
-    return { slug: decodeURIComponent(encoded), resultsRoute: Boolean(resultMatch) }
+    return { slug: decodeURIComponent(encoded), currentRoute, resultsRoute: Boolean(resultMatch) }
   } catch {
-    return { resultsRoute: Boolean(resultMatch) }
+    return { currentRoute, resultsRoute: Boolean(resultMatch) }
   }
 }
 
@@ -283,9 +284,16 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
   const ready = membership.status === "ready"
   const workspaceState = useQueryState({ query: workspaceRef, args: ready ? {} : "skip" })
   const workspace = workspaceState.status === "success" ? workspaceState.data : undefined
+  const currentRouteSlug = route.currentRoute
+    ? [...(workspace?.decisions ?? [])]
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .find((decision) => decision.status === "open")?.slug
+      ?? [...(workspace?.decisions ?? [])].sort((a, b) => b.updatedAt - a.updatedAt)[0]?.slug
+    : undefined
+  const resolvedRouteSlug = route.slug ?? currentRouteSlug
   const detailState = useQueryState({
     query: detailRef,
-    args: ready && route.slug ? { slug: route.slug } : "skip",
+    args: ready && resolvedRouteSlug ? { slug: resolvedRouteSlug } : "skip",
   })
   const detail = detailState.status === "success" ? detailState.data : undefined
   const resultsAllowed = Boolean(
@@ -338,7 +346,7 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
     } else if (
       membership.status !== "ready"
       || workspaceState.status === "pending"
-      || route.slug && detailState.status === "pending"
+      || resolvedRouteSlug && detailState.status === "pending"
       || resultsAllowed && resultsState.status === "pending"
     ) {
       auth = { status: "loading" }
@@ -448,7 +456,7 @@ function LiveDecisionBridge({ adapter }: { adapter: MutableLiveDecisionAdapter }
     results,
     resultsAllowed,
     resultsState.status,
-    route.slug,
+    resolvedRouteSlug,
     workspace,
     workspaceState.status,
   ])

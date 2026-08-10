@@ -16,6 +16,7 @@ function PrivateWorkspace() {
 export function DecisionCenterRoutes() {
   return (
     <Routes>
+      <Route path="/decision" element={<DecisionBallotPage />} />
       <Route path="/d/:slug" element={<DecisionBallotPage />} />
       <Route element={<PrivateWorkspace />}>
         <Route path="/decisions" element={<DecisionsPage />} />

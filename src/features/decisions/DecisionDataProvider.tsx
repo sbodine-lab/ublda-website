@@ -5,7 +5,12 @@ import {
 } from "react"
 import { demoDecisionAdapter } from "./demoAdapter"
 import { DecisionDataContext, type DecisionDataContextValue } from "./decisionDataContext"
-import type { DecisionCenterAdapter } from "./types"
+import type { DecisionCenterAdapter, DecisionRecord } from "./types"
+
+function currentDecision(decisions: DecisionRecord[]) {
+  const newestFirst = [...decisions].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  return newestFirst.find((decision) => decision.status === "open") ?? newestFirst[0]
+}
 
 export function DecisionDataProvider({
   adapter = demoDecisionAdapter,
@@ -21,7 +26,9 @@ export function DecisionDataProvider({
     adapter,
     snapshot,
     decisionBySlug(slug) {
-      return snapshot.decisions.find((decision) => decision.slug === slug)
+      return slug
+        ? snapshot.decisions.find((decision) => decision.slug === slug)
+        : currentDecision(snapshot.decisions)
     },
     responseFor(decisionId, memberId) {
       const resolvedMemberId = memberId ?? (snapshot.auth.status === "signed-in"

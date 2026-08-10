@@ -1,6 +1,6 @@
 # Decision Center frontend
 
-`DecisionCenterRoutes` owns the standalone `/decisions/*` workspace and `/d/:slug` ballot routes. It expects to run inside the app's existing `BrowserRouter` and a `DecisionDataProvider`:
+`DecisionCenterRoutes` owns the standalone `/decisions/*` workspace, the clean `/decision` shortcut for the current open ballot, and the stable `/d/:slug` ballot routes. It expects to run inside the app's existing `BrowserRouter` and a `DecisionDataProvider`:
 
 ```tsx
 <DecisionDataProvider adapter={decisionAdapter}>
