@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import './Footer.css'
 
 export default function Footer() {
@@ -54,9 +55,15 @@ export default function Footer() {
             Committed to web accessibility. Questions or issues?{' '}
             <a href="mailto:sbodine@umich.edu,atchiang@umich.edu,cooperry@umich.edu" className="footer__a11y-link">Contact us</a>.
           </p>
-          <p className="footer__affiliation">
-            University of Michigan &middot; Stephen M. Ross School of Business
-          </p>
+          <div className="footer__utility">
+            <p className="footer__affiliation">
+              University of Michigan &middot; Stephen M. Ross School of Business
+            </p>
+            <Link to="/workspace" className="footer__leadership-link">
+              Leadership login
+              <ArrowRight aria-hidden="true" size={12} strokeWidth={1.5} />
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

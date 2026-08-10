@@ -53,6 +53,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-10);
+  margin-left: auto;
 }
 
 .nav__link {
@@ -88,25 +89,6 @@
 
 .nav__link--active {
   color: var(--color-navy);
-}
-
-.nav__cta {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-white);
-  background: var(--color-navy);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-full);
-  transition: all var(--duration-normal) var(--ease-out);
-  letter-spacing: var(--tracking-wide);
-}
-
-.nav__cta--button {
-  font-family: var(--font-body);
-}
-
-.nav__cta:hover {
-  background: var(--color-navy-light);
 }
 
 .nav__burger {
@@ -156,25 +138,8 @@
   color: var(--color-navy);
 }
 
-.nav__mobile-cta {
-  display: inline-flex;
-  align-self: flex-start;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-white);
-  background: var(--color-navy);
-  padding: var(--space-3) var(--space-8);
-  border-radius: var(--radius-full);
-  margin-top: var(--space-4);
-}
-
-.nav__mobile-cta--button {
-  width: fit-content;
-}
-
 @media (max-width: 768px) {
-  .nav__links,
-  .nav__cta {
+  .nav__links {
     display: none;
   }
 
@@ -191,12 +156,6 @@
     align-items: center;
   }
 
-  .nav__mobile-cta {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
 }
 
 /* Advisory is the consulting sub-brand and leads to its own site chrome, so it
