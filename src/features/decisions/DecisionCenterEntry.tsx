@@ -18,7 +18,7 @@ import {
 function DecisionDocumentMeta() {
   useEffect(() => {
     const previousTitle = document.title
-    document.title = "UBLDA Decision Center"
+    document.title = "UBLDA Leadership Workspace"
     const existing = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
     const robots = existing ?? document.createElement("meta")
     const previousContent = existing?.content

@@ -41,9 +41,9 @@ export function DecisionsPage() {
   return (
     <div className="dc-page dc-decisions-page">
       <header className="dc-page-heading dc-page-heading-actions">
-        <h1>Decisions</h1>
+        <h1>Questions</h1>
         <Button asChild className="dc-touch dc-desktop-create-button">
-          <Link to="/decisions/new"><Plus /> New</Link>
+          <Link to="/decisions/new"><Plus data-icon="inline-start" /> New question</Link>
         </Button>
       </header>
 
@@ -72,6 +72,13 @@ export function DecisionsPage() {
         </Empty>
       ) : (
         <div className="dc-decision-list">
+          <div className="dc-question-table-head" aria-hidden="true">
+            <span>Question</span>
+            <span>Status</span>
+            <span>Responses</span>
+            <span>Deadline</span>
+            <span />
+          </div>
           {decisions.map((decision) => {
             const results = calculateDecisionResults(decision, snapshot.responses)
             const response = viewer ? responseFor(decision.id, viewer.memberId) : undefined
@@ -86,7 +93,35 @@ export function DecisionsPage() {
 
             return (
               <article className="dc-decision-row" key={decision.id}>
-                <div className="dc-decision-row-main">
+                <div className="dc-question-cell">
+                  <h2><Link to={primaryHref}>{decision.title}</Link></h2>
+                  <span className="dc-question-updated">Updated {formatDateTime(decision.updatedAt, decision.timezone)}</span>
+                </div>
+                <div className="dc-question-status-stack">
+                  <DecisionStatusBadge status={decision.status} />
+                  {canRespond && (
+                    <span className={cn("dc-response-state", response && "dc-response-state-done")}>
+                      {response ? <><CircleCheck /> Responded</> : "Needs your response"}
+                    </span>
+                  )}
+                </div>
+                <div className="dc-question-meta-cell">
+                  <Users />
+                  <span>{results.responseCount} of {results.eligibleCount} responses</span>
+                </div>
+                <div className="dc-question-meta-cell">
+                  <CalendarClock />
+                  <span>{decision.deadline ? formatDateTime(decision.deadline, decision.timezone) : "No deadline"}</span>
+                </div>
+                <div className="dc-decision-row-side">
+                  <Button variant="outline" className="dc-touch" asChild>
+                    <Link to={primaryHref}>
+                      {decision.status === "open" ? (response ? "View" : "Respond") : decision.status === "draft" ? "Preview" : "Results"}
+                      <ArrowRight data-icon="inline-end" />
+                    </Link>
+                  </Button>
+                </div>
+                <div className="dc-decision-row-mobile-summary">
                   <div className="dc-decision-title-line">
                     <DecisionStatusBadge status={decision.status} />
                     {canRespond && (
@@ -95,19 +130,10 @@ export function DecisionsPage() {
                       </span>
                     )}
                   </div>
-                  <h2><Link to={primaryHref}>{decision.title}</Link></h2>
                   <div className="dc-decision-meta">
                     <span><Users /> {results.responseCount} of {results.eligibleCount} responses</span>
                     {decision.deadline && <span><CalendarClock /> {formatDateTime(decision.deadline, decision.timezone)}</span>}
                   </div>
-                </div>
-                <div className="dc-decision-row-side">
-                  <Button variant="outline" className="dc-touch" asChild>
-                    <Link to={primaryHref}>
-                      {decision.status === "open" ? (response ? "View" : "Respond") : decision.status === "draft" ? "Preview" : "Results"}
-                      <ArrowRight />
-                    </Link>
-                  </Button>
                 </div>
               </article>
             )

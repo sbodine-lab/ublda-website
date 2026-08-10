@@ -18,6 +18,7 @@ import { WorkspaceOverviewPage } from "@/features/workspace/pages/WorkspaceOverv
 import "@/features/availability/availability.css"
 import "./decision-center.css"
 import "@/features/workspace/workspace.css"
+import "@/styles/leadership-workspace.css"
 
 function PrivateWorkspace() {
   return <DecisionAuthGate><DecisionWorkspaceLayout /></DecisionAuthGate>

@@ -1,4 +1,4 @@
-import { Bot, CalendarClock, CalendarDays, FolderKanban, Home, LogOut, Settings, Users, Vote } from "lucide-react"
+import { Bot, CalendarClock, CalendarDays, FolderKanban, Home, LogOut, MessageCircleQuestion, MicVocal, Settings, Users } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import { useEffect } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -15,14 +15,15 @@ import { initials } from "../format"
 
 const primaryLinks = [
   { to: "/workspace", label: "overview", icon: Home, end: true },
-  { to: "/decisions", label: "decisions", icon: Vote, end: true },
+  { to: "/decisions", label: "questions", icon: MessageCircleQuestion, end: true },
   { to: "/scheduling", label: "scheduling", icon: CalendarClock },
+  { to: "/leadership/speakers", label: "speaker ops", icon: MicVocal },
   { to: "/calendar", label: "calendar", icon: CalendarDays },
   { to: "/projects", label: "projects", icon: FolderKanban },
   { to: "/people", label: "people", icon: Users },
 ]
 
-const mobileLinks = primaryLinks.filter((link) => ["/workspace", "/decisions", "/calendar", "/projects"].includes(link.to))
+const mobileLinks = primaryLinks.filter((link) => ["/decisions", "/scheduling", "/leadership/speakers", "/calendar"].includes(link.to))
 
 function WorkspaceNavigation({ pathname }: { pathname: string }) {
   const { setOpenMobile } = useSidebar()

@@ -81,7 +81,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
           <img src="/logo.png" alt="" />
           <span>UBLDA</span>
         </a>
-        <h1 id="decision-sign-in-title">{isWorkspaceSignIn ? "admin sign in" : isSchedulingLink ? "a scheduling poll is waiting" : "a decision is waiting"}</h1>
+        <h1 id="decision-sign-in-title">{isWorkspaceSignIn ? "Leadership sign in" : isSchedulingLink ? "A scheduling poll is waiting" : "A question is waiting"}</h1>
 
         {snapshot.auth.status === "misconfigured" ? (
           <Alert variant="destructive">

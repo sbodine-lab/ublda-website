@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ArrowUpRight,
+  CalendarClock,
   CalendarDays,
   CircleDot,
   DoorOpen,
+  FolderKanban,
+  Home,
   KeyRound,
   ListFilter,
   LogOut,
+  MessageCircleQuestion,
+  MicVocal,
   PanelLeft,
   Search,
   Settings2,
@@ -69,6 +75,20 @@ const navigation: Array<{ id: WorkspaceView; label: string; icon: typeof Users }
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'access', label: 'Access', icon: ShieldCheck },
 ]
+
+const leadershipNavigation = [
+  { to: '/workspace', label: 'Overview', icon: Home },
+  { to: '/decisions', label: 'Questions', icon: MessageCircleQuestion },
+  { to: '/scheduling', label: 'Scheduling', icon: CalendarClock },
+  { to: '/leadership/speakers', label: 'Speaker Ops', icon: MicVocal, current: true },
+  { to: '/calendar', label: 'Club calendar', icon: CalendarDays },
+  { to: '/projects', label: 'Projects', icon: FolderKanban },
+  { to: '/people', label: 'People', icon: Users },
+]
+
+const mobileLeadershipNavigation = leadershipNavigation.filter((item) => (
+  ['/decisions', '/scheduling', '/leadership/speakers', '/calendar'].includes(item.to)
+))
 
 const api = async (body: ApiRecord) => {
   const response = await fetch('/api/speaker-ops', {
@@ -758,8 +778,18 @@ function SpeakerWorkspace({
   return (
     <main id="main-content" className="speaker-ops">
       <aside className="speaker-sidebar">
-        <div className="speaker-wordmark"><span className="speaker-wordmark__mark">U</span><span>UBLDA</span></div>
-        <nav aria-label="Speaker Ops">
+        <Link to="/workspace" className="speaker-wordmark"><span className="speaker-wordmark__mark">U</span><span>UBLDA</span></Link>
+        <nav className="speaker-suite-nav" aria-label="Leadership workspace">
+          {leadershipNavigation.map(({ to, label, icon: Icon, current }) => (
+            <Link key={to} to={to} className="speaker-suite-link" data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
+              <Icon aria-hidden="true" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="speaker-sidebar__section">
+          <span className="speaker-nav-label">Speaker workflow</span>
+          <nav aria-label="Speaker Ops sections">
           {navigation.map((item) => {
             const Icon = item.icon
             return (
@@ -775,7 +805,8 @@ function SpeakerWorkspace({
               </Button>
             )
           })}
-        </nav>
+          </nav>
+        </div>
         <div className="speaker-sidebar__account">
           <div className="speaker-avatar" aria-hidden="true">{account.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div>
           <div><strong>{account.name}</strong><span>{account.title}</span></div>
@@ -825,6 +856,14 @@ function SpeakerWorkspace({
           {view === 'access' && <AccessView workspace={workspace} />}
         </div>
       </div>
+      <nav className="speaker-suite-mobile-nav" aria-label="Leadership workspace">
+        {mobileLeadershipNavigation.map(({ to, label, icon: Icon, current }) => (
+          <Link key={to} to={to} data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </nav>
       <LeadSheet lead={selectedLead} open={leadOpen} onOpenChange={setLeadOpen} onSave={saveLead} />
       <SlotSheet slot={selectedSlot} workspace={workspace} open={slotOpen} onOpenChange={setSlotOpen} onSave={saveSlot} />
     </main>
