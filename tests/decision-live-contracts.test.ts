@@ -218,6 +218,7 @@ test("mutable live adapter publishes snapshots and delegates operations", async 
 
   let signedOut = false
   adapter.replaceOperations({
+    async signInWithGoogle() {},
     async signIn() { return { status: "complete" } },
     async verifySignInCode() {},
     async signOut() { signedOut = true },

@@ -89,12 +89,12 @@ Keep `npx convex dev` running while developing against the live development data
 
 Create a dedicated Clerk application, then:
 
-1. Enable email address and password sign-in.
-2. Set the application to Clerk **Restricted** mode. Do not enable public sign-up. The UBLDA interface intentionally exposes only email, password, and the provider-required verification-code step; it has no create-account link.
+1. Enable email address and password sign-in, plus Google as a social connection.
+2. Set the application to Clerk **Restricted** mode. Do not enable public sign-up. The UBLDA interface intentionally exposes only Google, email/password, and the provider-required verification-code step; it has no create-account link.
 3. Pre-create each approved administrator/member in Clerk. Deliver initial passwords outside the repository and require secure password handling; never place a member password in source, an env file, a test, a screenshot, or deployment logs.
 4. Keep email verification code available for device-trust or second-factor challenges. It is not an account-creation path. The custom sign-in flow sends the code only after a correct password reaches a provider-required verification step.
-5. Leave Clerk **Organizations** disabled; the Decision Center's own roster remains the membership boundary. Disable Google, phone, and unused social connections so the live provider matches the sign-in-only interface.
-6. Add `http://localhost:5173` for local development and the final UBLDA host for production redirects/origins.
+5. Leave Clerk **Organizations** disabled; the Decision Center's own roster remains the membership boundary. Google sign-in does not require a Google Workspace organization. Keep phone and unused social connections disabled.
+6. For production Google sign-in, use a dedicated OAuth client with only the basic `openid`, email, and profile scopes. Configure Clerk's exact OAuth callback as the authorized redirect URI, keep Google email subaddress blocking enabled, and never commit or log the client secret.
 7. Copy the publishable key to `VITE_CLERK_PUBLISHABLE_KEY`.
 8. In Clerk's [**Convex integration** setup](https://clerk.com/docs/guides/development/integrations/databases/convex), activate the integration. It maps the required `aud: "convex"` session claim.
 9. In Clerk's **Sessions > Claims** editor, add the verified identity fields used by the roster linker without replacing the integration's audience claim:
