@@ -59,6 +59,10 @@ import type {
   AvailabilitySnapshot,
   CreateAvailabilityPollInput,
 } from "@/features/availability/types"
+import { WorkspaceDataProvider } from "@/features/workspace/WorkspaceDataProvider"
+import { createLiveWorkspaceAdapter, type MutableLiveWorkspaceAdapter } from "@/features/workspace/liveAdapter"
+import { mapClubWorkspace, type BackendClubWorkspaceSnapshot } from "@/features/workspace/liveContracts"
+import type { ClubWorkspaceSnapshot, CreateClubEventInput, CreateProjectInput, CreateProjectTaskInput, TaskStatus, UpdateDirectoryProfileInput } from "@/features/workspace/types"
 
 type EmptyArgs = Record<string, never>
 type BackendDraftInput = ReturnType<typeof decisionInputForBackend>
@@ -190,6 +194,12 @@ const finalizeAvailabilityRef = makeFunctionReference<
   { pollId: string; dateKey: string; startMinutes: number },
   unknown
 >("availability:finalize")
+const clubWorkspaceRef = makeFunctionReference<"query", EmptyArgs, BackendClubWorkspaceSnapshot>("clubWorkspace:snapshot")
+const createClubEventRef = makeFunctionReference<"mutation", { input: { title: string; type: "meeting" | "event" | "deadline" | "project"; startAt: number; endAt?: number; timezone: string; location?: string; ownerMemberId?: string; projectId?: string; status: "tentative" | "confirmed" | "cancelled"; notes?: string } }, string>("clubWorkspace:createEvent")
+const createProjectRef = makeFunctionReference<"mutation", { input: { name: string; lane: "community-career" | "advisory" | "catalyst" | "operations"; ownerMemberId?: string; status: "planned" | "active" | "blocked" | "complete"; dueDate?: string; summary?: string } }, string>("clubWorkspace:createProject")
+const createProjectTaskRef = makeFunctionReference<"mutation", { input: { projectId: string; title: string; ownerMemberId?: string; status: "todo" | "working" | "blocked" | "done"; dueDate?: string; priority: "low" | "medium" | "high"; completionSignal?: string } }, string>("clubWorkspace:createTask")
+const updateProjectTaskStatusRef = makeFunctionReference<"mutation", { taskId: string; status: "todo" | "working" | "blocked" | "done" }, null>("clubWorkspace:updateTaskStatus")
+const updateDirectoryProfileRef = makeFunctionReference<"mutation", { input: { memberId: string; clubRole: string; team: string; schoolYear?: string; major?: string; linkedinUrl?: string; isLeadership: boolean } }, null>("clubWorkspace:updateProfile")
 
 const convexClients = new Map<string, ConvexReactClient>()
 
@@ -285,9 +295,11 @@ type MembershipState =
 function LiveDecisionBridge({
   adapter,
   availabilityAdapter,
+  workspaceAdapter,
 }: {
   adapter: MutableLiveDecisionAdapter
   availabilityAdapter: MutableLiveAvailabilityAdapter
+  workspaceAdapter: MutableLiveWorkspaceAdapter
 }) {
   const clerk = useClerk()
   const clerkAuth = useClerkAuth()
@@ -317,6 +329,11 @@ function LiveDecisionBridge({
   const createAvailabilityMutation = useMutation(createAvailabilityRef)
   const saveAvailabilityMutation = useMutation(saveAvailabilityRef)
   const finalizeAvailabilityMutation = useMutation(finalizeAvailabilityRef)
+  const createClubEventMutation = useMutation(createClubEventRef)
+  const createProjectMutation = useMutation(createProjectRef)
+  const createProjectTaskMutation = useMutation(createProjectTaskRef)
+  const updateProjectTaskStatusMutation = useMutation(updateProjectTaskStatusRef)
+  const updateDirectoryProfileMutation = useMutation(updateDirectoryProfileRef)
 
   useEffect(() => {
     if (
@@ -420,6 +437,7 @@ function LiveDecisionBridge({
     query: availabilityDetailRef,
     args: ready && resolvedAvailabilitySlug ? { slug: resolvedAvailabilitySlug } : "skip",
   })
+  const clubWorkspaceState = useQueryState({ query: clubWorkspaceRef, args: ready ? {} : "skip" })
   const availabilityDetail = availabilityDetailState.status === "success"
     ? availabilityDetailState.data
     : undefined
@@ -586,6 +604,13 @@ function LiveDecisionBridge({
   useEffect(() => {
     availabilityAdapter.replaceSnapshot(availabilitySnapshot)
   }, [availabilityAdapter, availabilitySnapshot])
+
+  const clubWorkspaceSnapshot = useMemo<ClubWorkspaceSnapshot>(() => {
+    if (clubWorkspaceState.status === "success") return mapClubWorkspace(clubWorkspaceState.data)
+    return { events: [], projects: [], tasks: [], people: [], loading: clubWorkspaceState.status === "pending", error: clubWorkspaceState.status === "error" ? "Workspace could not be loaded." : undefined }
+  }, [clubWorkspaceState])
+
+  useEffect(() => { workspaceAdapter.replaceSnapshot(clubWorkspaceSnapshot) }, [clubWorkspaceSnapshot, workspaceAdapter])
 
   const operations = useMemo(() => ({
     async signIn(credentials: DecisionSignInCredentials) {
@@ -825,6 +850,29 @@ function LiveDecisionBridge({
     },
   }), [createAvailabilityMutation, finalizeAvailabilityMutation, saveAvailabilityMutation])
 
+  const workspaceOperations = useMemo(() => ({
+    async createEvent(input: CreateClubEventInput) {
+      try { return await createClubEventMutation(withoutUndefined({ input: { ...input, startAt: new Date(input.startAt).getTime(), endAt: input.endAt ? new Date(input.endAt).getTime() : undefined } })) }
+      catch (caught) { throw new Error(cleanConvexError(caught, "The event could not be added.")) }
+    },
+    async createProject(input: CreateProjectInput) {
+      try { return await createProjectMutation(withoutUndefined({ input })) }
+      catch (caught) { throw new Error(cleanConvexError(caught, "The project could not be added.")) }
+    },
+    async createTask(input: CreateProjectTaskInput) {
+      try { return await createProjectTaskMutation(withoutUndefined({ input })) }
+      catch (caught) { throw new Error(cleanConvexError(caught, "The task could not be added.")) }
+    },
+    async updateTaskStatus(taskId: string, status: TaskStatus) {
+      try { await updateProjectTaskStatusMutation({ taskId, status }) }
+      catch (caught) { throw new Error(cleanConvexError(caught, "The task could not be updated.")) }
+    },
+    async updateProfile(input: UpdateDirectoryProfileInput) {
+      try { await updateDirectoryProfileMutation(withoutUndefined({ input })) }
+      catch (caught) { throw new Error(cleanConvexError(caught, "The profile could not be updated.")) }
+    },
+  }), [createClubEventMutation, createProjectMutation, createProjectTaskMutation, updateDirectoryProfileMutation, updateProjectTaskStatusMutation])
+
   useEffect(() => {
     adapter.replaceOperations(operations)
   }, [adapter, operations])
@@ -833,24 +881,30 @@ function LiveDecisionBridge({
     availabilityAdapter.replaceOperations(availabilityOperations)
   }, [availabilityAdapter, availabilityOperations])
 
+  useEffect(() => { workspaceAdapter.replaceOperations(workspaceOperations) }, [workspaceAdapter, workspaceOperations])
+
   return (
-    <AvailabilityDataProvider adapter={availabilityAdapter}>
-      <DecisionDataProvider adapter={adapter}>
-        <DecisionCenterRoutes />
-      </DecisionDataProvider>
-    </AvailabilityDataProvider>
+    <WorkspaceDataProvider adapter={workspaceAdapter}>
+      <AvailabilityDataProvider adapter={availabilityAdapter}>
+        <DecisionDataProvider adapter={adapter}>
+          <DecisionCenterRoutes />
+        </DecisionDataProvider>
+      </AvailabilityDataProvider>
+    </WorkspaceDataProvider>
   )
 }
 
 function SessionScopedLiveDecisionBridge({
   adapter,
   availabilityAdapter,
+  workspaceAdapter,
 }: {
   adapter: MutableLiveDecisionAdapter
   availabilityAdapter: MutableLiveAvailabilityAdapter
+  workspaceAdapter: MutableLiveWorkspaceAdapter
 }) {
   const { sessionId } = useClerkAuth()
-  return <LiveDecisionBridge key={sessionId ?? "signed-out"} adapter={adapter} availabilityAdapter={availabilityAdapter} />
+  return <LiveDecisionBridge key={sessionId ?? "signed-out"} adapter={adapter} availabilityAdapter={availabilityAdapter} workspaceAdapter={workspaceAdapter} />
 }
 
 export function LiveDecisionCenter({
@@ -862,6 +916,7 @@ export function LiveDecisionCenter({
 }) {
   const adapter = useMemo(() => createLiveDecisionAdapter(), [])
   const availabilityAdapter = useMemo(() => createLiveAvailabilityAdapter(), [])
+  const workspaceAdapter = useMemo(() => createLiveWorkspaceAdapter(), [])
   const client = convexClientFor(convexUrl)
 
   return (
@@ -875,7 +930,7 @@ export function LiveDecisionCenter({
       }}
     >
       <ConvexProviderWithClerk client={client} useAuth={useClerkAuth}>
-        <SessionScopedLiveDecisionBridge adapter={adapter} availabilityAdapter={availabilityAdapter} />
+        <SessionScopedLiveDecisionBridge adapter={adapter} availabilityAdapter={availabilityAdapter} workspaceAdapter={workspaceAdapter} />
       </ConvexProviderWithClerk>
     </ClerkProvider>
   )

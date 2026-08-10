@@ -23,7 +23,11 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
 
   const openHref = typeof window === "undefined" ? "/decisions" : window.location.href
   const isSchedulingLink = location.pathname === "/schedule" || location.pathname.startsWith("/s/")
-  const isWorkspaceSignIn = location.pathname === "/decisions"
+  const isWorkspaceSignIn = location.pathname === "/workspace"
+    || location.pathname === "/calendar"
+    || location.pathname === "/projects"
+    || location.pathname === "/people"
+    || location.pathname === "/decisions"
     || location.pathname.startsWith("/decisions/")
     || location.pathname === "/results"
     || location.pathname === "/scheduling"

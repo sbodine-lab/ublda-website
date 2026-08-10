@@ -9,6 +9,11 @@ import {
   createUnavailableAvailabilityAdapter,
   demoAvailabilityAdapter,
 } from "@/features/availability"
+import {
+  WorkspaceDataProvider,
+  createUnavailableWorkspaceAdapter,
+  demoWorkspaceAdapter,
+} from "@/features/workspace"
 
 function DecisionDocumentMeta() {
   useEffect(() => {
@@ -45,11 +50,13 @@ export function DecisionCenterEntry() {
   let content
   if (demoMode) {
     content = (
-      <AvailabilityDataProvider adapter={demoAvailabilityAdapter}>
-        <DecisionDataProvider adapter={demoDecisionAdapter}>
-          <DecisionCenterRoutes />
-        </DecisionDataProvider>
-      </AvailabilityDataProvider>
+      <WorkspaceDataProvider adapter={demoWorkspaceAdapter}>
+        <AvailabilityDataProvider adapter={demoAvailabilityAdapter}>
+          <DecisionDataProvider adapter={demoDecisionAdapter}>
+            <DecisionCenterRoutes />
+          </DecisionDataProvider>
+        </AvailabilityDataProvider>
+      </WorkspaceDataProvider>
     )
   } else if (!clerkPublishableKey || !convexUrl) {
     const adapter = createUnavailableLiveDecisionAdapter(
@@ -58,12 +65,17 @@ export function DecisionCenterEntry() {
     const availabilityAdapter = createUnavailableAvailabilityAdapter(
       "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
     )
+    const workspaceAdapter = createUnavailableWorkspaceAdapter(
+      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+    )
     content = (
-      <AvailabilityDataProvider adapter={availabilityAdapter}>
-        <DecisionDataProvider adapter={adapter}>
-          <DecisionCenterRoutes />
-        </DecisionDataProvider>
-      </AvailabilityDataProvider>
+      <WorkspaceDataProvider adapter={workspaceAdapter}>
+        <AvailabilityDataProvider adapter={availabilityAdapter}>
+          <DecisionDataProvider adapter={adapter}>
+            <DecisionCenterRoutes />
+          </DecisionDataProvider>
+        </AvailabilityDataProvider>
+      </WorkspaceDataProvider>
     )
   } else {
     content = (

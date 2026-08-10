@@ -75,7 +75,7 @@ export default function Nav() {
           ))}
         </nav>
 
-        <Link to="/decisions" className="nav__cta">
+        <Link to="/workspace" className="nav__cta">
           Admin sign in
         </Link>
 
@@ -110,7 +110,7 @@ export default function Nav() {
                 {link.path === '/advisory' && <span aria-hidden="true"> ↗</span>}
               </Link>
             ))}
-            <Link to="/decisions" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
+            <Link to="/workspace" className="nav__mobile-cta" onClick={() => setMobileOpen(false)}>
               Admin sign in
             </Link>
           </motion.div>

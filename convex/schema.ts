@@ -50,6 +50,40 @@ export const availabilityResultsVisibility = v.union(
   v.literal("after_submit"),
   v.literal("admins_only"),
 );
+export const clubEventType = v.union(
+  v.literal("meeting"),
+  v.literal("event"),
+  v.literal("deadline"),
+  v.literal("project"),
+);
+export const clubEventStatus = v.union(
+  v.literal("tentative"),
+  v.literal("confirmed"),
+  v.literal("cancelled"),
+);
+export const projectLane = v.union(
+  v.literal("community-career"),
+  v.literal("advisory"),
+  v.literal("catalyst"),
+  v.literal("operations"),
+);
+export const projectStatus = v.union(
+  v.literal("planned"),
+  v.literal("active"),
+  v.literal("blocked"),
+  v.literal("complete"),
+);
+export const projectTaskStatus = v.union(
+  v.literal("todo"),
+  v.literal("working"),
+  v.literal("blocked"),
+  v.literal("done"),
+);
+export const projectTaskPriority = v.union(
+  v.literal("low"),
+  v.literal("medium"),
+  v.literal("high"),
+);
 export const agentScope = v.union(
   v.literal("decisions:read"),
   v.literal("decisions:write"),
@@ -221,6 +255,68 @@ export default defineSchema({
     .index("by_poll", ["pollId"])
     .index("by_member", ["memberId"])
     .index("by_poll_and_member", ["pollId", "memberId"]),
+
+  clubEvents: defineTable({
+    title: v.string(),
+    type: clubEventType,
+    startAt: v.number(),
+    endAt: v.optional(v.number()),
+    timezone: v.string(),
+    location: v.optional(v.string()),
+    ownerMemberId: v.optional(v.id("members")),
+    projectId: v.optional(v.id("projects")),
+    status: clubEventStatus,
+    notes: v.optional(v.string()),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_start", ["startAt"])
+    .index("by_project", ["projectId"]),
+
+  projects: defineTable({
+    name: v.string(),
+    lane: projectLane,
+    ownerMemberId: v.optional(v.id("members")),
+    status: projectStatus,
+    dueDate: v.optional(v.string()),
+    summary: v.optional(v.string()),
+    position: v.number(),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_lane_and_position", ["lane", "position"])
+    .index("by_status", ["status"]),
+
+  projectTasks: defineTable({
+    projectId: v.id("projects"),
+    title: v.string(),
+    ownerMemberId: v.optional(v.id("members")),
+    status: projectTaskStatus,
+    dueDate: v.optional(v.string()),
+    priority: projectTaskPriority,
+    completionSignal: v.optional(v.string()),
+    position: v.number(),
+    createdByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project_and_position", ["projectId", "position"])
+    .index("by_owner_and_status", ["ownerMemberId", "status"]),
+
+  directoryProfiles: defineTable({
+    memberId: v.id("members"),
+    clubRole: v.string(),
+    team: v.string(),
+    schoolYear: v.optional(v.string()),
+    major: v.optional(v.string()),
+    linkedinUrl: v.optional(v.string()),
+    isLeadership: v.boolean(),
+    updatedByMemberId: v.id("members"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_member", ["memberId"]),
 
   agentKeys: defineTable({
     name: v.string(),

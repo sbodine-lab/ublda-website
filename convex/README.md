@@ -68,6 +68,12 @@ All public functions use the centralized Clerk-to-member authorization helpers.
 
 - `viewer.current({})`
 - `workspace.workspaceSnapshot({})`
+- `clubWorkspace.snapshot({})` — authenticated events, projects, tasks, and directory profiles
+- `clubWorkspace.createEvent({ input })` — administrator-only internal calendar event
+- `clubWorkspace.createProject({ input })` — administrator-only project creation
+- `clubWorkspace.createTask({ input })` — administrator-only task creation
+- `clubWorkspace.updateTaskStatus({ taskId, status })` — administrator or assigned owner
+- `clubWorkspace.updateProfile({ input })` — administrator-only directory profile update
 - `members.list({ includeInactive? })` (admin), `members.eligible({})`,
   `members.upsertMember({ memberId?, displayName, role, status?, approvedEmails? })`
 - `decisions.list({ status? })`, `decisions.getBySlug({ slug })`,
