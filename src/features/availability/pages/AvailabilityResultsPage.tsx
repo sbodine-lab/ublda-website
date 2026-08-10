@@ -25,8 +25,8 @@ export function AvailabilityResultsPage({ workspace = false }: { workspace?: boo
   return (
     <main id="main-content" className="av-public-page av-public-results">
       <header className="av-public-topbar">
-        <Link to="/scheduling" className="av-logo-lockup" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /><span>UBLDA</span></Link>
         <Button variant="ghost" size="icon" asChild aria-label="back to poll"><Link to={poll ? `/s/${poll.slug}` : "/scheduling"}><ChevronLeft /></Link></Button>
+        <Link to="/scheduling" className="av-logo-lockup" aria-label="Scheduling"><img src="/logo.png" alt="" /></Link>
       </header>
       <article className="av-public-results-document">{content}</article>
     </main>

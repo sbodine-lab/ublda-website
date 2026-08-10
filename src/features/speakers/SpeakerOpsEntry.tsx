@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ArrowUpRight,
+  CalendarClock,
   CalendarDays,
   CircleDot,
   DoorOpen,
+  FolderKanban,
+  Home,
   KeyRound,
   ListFilter,
   LogOut,
+  MessageCircleQuestion,
+  MicVocal,
   PanelLeft,
   Search,
   Settings2,
@@ -33,6 +39,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 import {
   PROGRAM_SLOT_STATUS_LABELS,
   PROGRAM_TERM_LABELS,
@@ -68,6 +75,20 @@ const navigation: Array<{ id: WorkspaceView; label: string; icon: typeof Users }
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'access', label: 'Access', icon: ShieldCheck },
 ]
+
+const leadershipNavigation = [
+  { to: '/workspace', label: 'Overview', icon: Home },
+  { to: '/decisions', label: 'Questions', icon: MessageCircleQuestion },
+  { to: '/scheduling', label: 'Scheduling', icon: CalendarClock },
+  { to: '/leadership/speakers', label: 'Speaker Ops', icon: MicVocal, current: true },
+  { to: '/calendar', label: 'Club calendar', icon: CalendarDays },
+  { to: '/projects', label: 'Projects', icon: FolderKanban },
+  { to: '/people', label: 'People', icon: Users },
+]
+
+const mobileLeadershipNavigation = leadershipNavigation.filter((item) => (
+  ['/decisions', '/scheduling', '/leadership/speakers', '/calendar'].includes(item.to)
+))
 
 const api = async (body: ApiRecord) => {
   const response = await fetch('/api/speaker-ops', {
@@ -115,7 +136,7 @@ const slotTone = (status: ProgramSlotStatus) => {
 }
 
 function StatusBadge({ label, tone = 'outline' }: { label: string; tone?: string }) {
-  return <Badge variant="outline" className={`speaker-badge speaker-badge--${tone}`}>{label}</Badge>
+  return <Badge variant="outline" className={cn('speaker-badge', `speaker-badge--${tone}`)}>{label}</Badge>
 }
 
 function SignIn({ onSignedIn }: { onSignedIn: (account: SpeakerOpsAccount, token: string) => void }) {
@@ -144,10 +165,7 @@ function SignIn({ onSignedIn }: { onSignedIn: (account: SpeakerOpsAccount, token
   return (
     <main id="main-content" className="speaker-auth">
       <section className="speaker-auth__panel" aria-labelledby="speaker-signin-title">
-        <div className="speaker-wordmark" aria-label="UBLDA">
-          <span className="speaker-wordmark__mark">U</span>
-          <span>UBLDA</span>
-        </div>
+        <a href="/" className="speaker-auth__logo" aria-label="UBLDA home"><img src="/logo.png" alt="" /></a>
         <div className="speaker-auth__heading">
           <h1 id="speaker-signin-title">Speaker Ops</h1>
           <p>Leadership access only.</p>
@@ -757,17 +775,34 @@ function SpeakerWorkspace({
   return (
     <main id="main-content" className="speaker-ops">
       <aside className="speaker-sidebar">
-        <div className="speaker-wordmark"><span className="speaker-wordmark__mark">U</span><span>UBLDA</span></div>
-        <nav aria-label="Speaker Ops">
+        <nav className="speaker-suite-nav" aria-label="Leadership workspace">
+          {leadershipNavigation.map(({ to, label, icon: Icon, current }) => (
+            <Link key={to} to={to} className="speaker-suite-link" data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
+              <Icon aria-hidden="true" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="speaker-sidebar__section">
+          <span className="speaker-nav-label">Speaker workflow</span>
+          <nav aria-label="Speaker Ops sections">
           {navigation.map((item) => {
             const Icon = item.icon
             return (
-              <Button key={item.id} variant="ghost" size="sm" data-active={view === item.id} onClick={() => setView(item.id)}>
+              <Button
+                key={item.id}
+                variant="ghost"
+                size="sm"
+                data-active={view === item.id}
+                aria-current={view === item.id ? 'page' : undefined}
+                onClick={() => setView(item.id)}
+              >
                 <Icon data-icon="inline-start" />{item.label}
               </Button>
             )
           })}
-        </nav>
+          </nav>
+        </div>
         <div className="speaker-sidebar__account">
           <div className="speaker-avatar" aria-hidden="true">{account.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div>
           <div><strong>{account.name}</strong><span>{account.title}</span></div>
@@ -781,13 +816,25 @@ function SpeakerWorkspace({
             <div className="speaker-topbar__title"><PanelLeft aria-hidden="true" /><h1>Speaker Ops</h1><StatusBadge label="2026–27" /></div>
             <p>Plan one or two firesides. Do not offer a date until Ross confirms a room.</p>
           </div>
+          <Link to="/workspace" className="speaker-topbar__logo" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /></Link>
         </header>
 
         <div className="speaker-mobile-nav" aria-label="Speaker Ops sections">
-          {navigation.map((item) => <Button key={item.id} variant={view === item.id ? 'secondary' : 'ghost'} size="sm" onClick={() => setView(item.id)}>{item.label}</Button>)}
+          {navigation.map((item) => (
+            <Button
+              key={item.id}
+              variant="ghost"
+              size="sm"
+              data-active={view === item.id}
+              aria-current={view === item.id ? 'page' : undefined}
+              onClick={() => setView(item.id)}
+            >
+              {item.label}
+            </Button>
+          ))}
         </div>
 
-        <div className="speaker-content">
+        <div className="speaker-content" data-view={view}>
           {(view === 'pipeline' || view === 'slots') && (
             <ProgramSlots
               workspace={workspace}
@@ -806,6 +853,14 @@ function SpeakerWorkspace({
           {view === 'access' && <AccessView workspace={workspace} />}
         </div>
       </div>
+      <nav className="speaker-suite-mobile-nav" aria-label="Leadership workspace">
+        {mobileLeadershipNavigation.map(({ to, label, icon: Icon, current }) => (
+          <Link key={to} to={to} data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </nav>
       <LeadSheet lead={selectedLead} open={leadOpen} onOpenChange={setLeadOpen} onSave={saveLead} />
       <SlotSheet slot={selectedSlot} workspace={workspace} open={slotOpen} onOpenChange={setSlotOpen} onSave={saveSlot} />
     </main>

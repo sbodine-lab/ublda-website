@@ -76,7 +76,7 @@ export function CreateDecisionPage() {
   const validOptions = options.map((option) => ({ label: option.label.trim(), description: option.description.trim() || undefined })).filter((option) => option.label)
 
   const validationError = useMemo(() => {
-    if (!title.trim()) return "Give the decision a clear title."
+    if (!title.trim()) return "Give the question a clear title."
     if (!overview.trim()) return "Add a short overview so members know what is being decided."
     if (electorate.length === 0) return "Choose at least one eligible member."
     if ((ballotType === "single" || ballotType === "ranked") && validOptions.length < 2) return "Add at least two response options."
@@ -140,7 +140,7 @@ export function CreateDecisionPage() {
         }
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The decision could not be created.")
+      setError(caught instanceof Error ? caught.message : "The question could not be created.")
     } finally {
       setSaving(undefined)
     }
@@ -151,7 +151,7 @@ export function CreateDecisionPage() {
       <div className="dc-page dc-create-success">
         <section>
           <div className="dc-confirmation-icon"><Check /></div>
-          <p className="dc-eyebrow">Decision open</p>
+          <p className="dc-eyebrow">Question open</p>
           <h1>Your link is ready.</h1>
           <p>Drop it in the group chat. Results update live after each member submits.</p>
           <label className="dc-copy-field">
@@ -175,7 +175,7 @@ export function CreateDecisionPage() {
   return (
     <div className="dc-page dc-create-page">
       <header className="dc-page-heading">
-        <p className="dc-eyebrow">New decision</p>
+        <p className="dc-eyebrow">New question</p>
         <h1>Ask once. Get the whole board’s input.</h1>
         <p>Everything members need appears on one link. Drafts stay private until you open responses.</p>
       </header>
@@ -186,11 +186,11 @@ export function CreateDecisionPage() {
             <div className="dc-form-section-number">1</div>
             <div className="dc-form-section-content">
               <div className="dc-section-heading">
-                <h2 id="question-section-title">The decision</h2>
+                <h2 id="question-section-title">The question</h2>
                 <p>Write this so someone can respond without scrolling through the group chat.</p>
               </div>
               <label className="dc-field-block">
-                <span>Decision title</span>
+                <span>Question title</span>
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Should we…?" maxLength={140} />
                 <small>{title.length}/140</small>
               </label>
@@ -325,16 +325,16 @@ export function CreateDecisionPage() {
           </div>
         </form>
 
-        <aside className="dc-create-preview" aria-label="Decision preview">
+        <aside className="dc-create-preview" aria-label="Question preview">
           <p className="dc-eyebrow">Link preview</p>
-          <h2>{title.trim() || "Your decision title"}</h2>
+          <h2>{title.trim() || "Your question title"}</h2>
           <p>{overview.trim() || "The short overview will appear here, before anyone chooses a response."}</p>
           {contextPoints.length > 0 && <ul>{contextPoints.slice(0, 3).map((point) => <li key={point}>{point}</li>)}</ul>}
           <div className="dc-preview-rule"><span>Response</span><b>{ballotTypeLabels[ballotType]}</b></div>
           <div className="dc-preview-rule"><span>Eligible</span><b>{electorate.length} members</b></div>
           <div className="dc-preview-rule"><span>Deadline</span><b>{deadline ? "Set" : "None"}</b></div>
           <div className="dc-preview-rule"><span>Auto-close</span><b>{autoClose && deadline ? "On" : "Off"}</b></div>
-          <p className="dc-preview-note">Decision details remain hidden until the member signs in.</p>
+          <p className="dc-preview-note">Question details remain hidden until the member signs in.</p>
         </aside>
       </div>
     </div>

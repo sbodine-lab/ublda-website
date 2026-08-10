@@ -1,4 +1,4 @@
-import { Bot, CalendarClock, CalendarDays, FolderKanban, Home, LogOut, Settings, Users, Vote } from "lucide-react"
+import { Bot, CalendarClock, CalendarDays, FolderKanban, Home, LogOut, MessageCircleQuestion, MicVocal, Settings, Users } from "lucide-react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
 import { useEffect } from "react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -15,14 +15,15 @@ import { initials } from "../format"
 
 const primaryLinks = [
   { to: "/workspace", label: "overview", icon: Home, end: true },
-  { to: "/decisions", label: "decisions", icon: Vote, end: true },
+  { to: "/decisions", label: "questions", icon: MessageCircleQuestion, end: true },
   { to: "/scheduling", label: "scheduling", icon: CalendarClock },
+  { to: "/leadership/speakers", label: "speaker ops", icon: MicVocal },
   { to: "/calendar", label: "calendar", icon: CalendarDays },
   { to: "/projects", label: "projects", icon: FolderKanban },
   { to: "/people", label: "people", icon: Users },
 ]
 
-const mobileLinks = primaryLinks.filter((link) => ["/workspace", "/decisions", "/calendar", "/projects"].includes(link.to))
+const mobileLinks = primaryLinks.filter((link) => ["/decisions", "/scheduling", "/leadership/speakers", "/calendar"].includes(link.to))
 
 function WorkspaceNavigation({ pathname }: { pathname: string }) {
   const { setOpenMobile } = useSidebar()
@@ -40,9 +41,7 @@ export function DecisionWorkspaceLayout() {
     <TooltipProvider>
       <SidebarProvider className="dc-app-shell ws-shell">
         <Sidebar collapsible="icon" className="ws-sidebar">
-          <SidebarHeader className="ws-sidebar-header">
-            <Link to="/workspace" className="ws-brand" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /><span>UBLDA</span></Link>
-          </SidebarHeader>
+          <SidebarHeader className="ws-sidebar-header" aria-hidden="true" />
           <SidebarContent>
             <SidebarGroup><SidebarGroupContent><WorkspaceNavigation pathname={location.pathname} /></SidebarGroupContent></SidebarGroup>
           </SidebarContent>
@@ -53,7 +52,10 @@ export function DecisionWorkspaceLayout() {
           <SidebarRail />
         </Sidebar>
         <SidebarInset className="ws-inset">
-          <header className="ws-mobile-header"><Link to="/workspace" className="ws-brand"><img src="/logo.png" alt="" /><span>UBLDA</span></Link><div><SidebarTrigger /></div></header>
+          <header className="ws-app-header">
+            <div className="ws-app-header-controls"><SidebarTrigger /></div>
+            <Link to="/workspace" className="ws-corner-logo" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /></Link>
+          </header>
           <main id="main-content" className="dc-workspace-main ws-main" key={location.pathname}><Outlet /></main>
           <nav className="dc-mobile-nav ws-mobile-nav" aria-label="workspace">{mobileLinks.map(({ to, label, icon: Icon, end }) => <NavLink key={to} to={to} end={end} className={({ isActive }) => cn("dc-mobile-nav-link", isActive && "dc-mobile-nav-link-active")}><Icon /><span>{label}</span></NavLink>)}</nav>
         </SidebarInset>

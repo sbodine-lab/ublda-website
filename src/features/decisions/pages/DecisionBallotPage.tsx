@@ -258,8 +258,8 @@ function SignedInBallot() {
   if (!decision) {
     return (
       <main id="main-content" className="dc-ballot-page">
-        <div className="dc-public-topbar"><Link to="/decisions" className="dc-logo-lockup"><img src="/logo.png" alt="" /><span>UBLDA decisions</span></Link></div>
-        <section className="dc-not-found"><h1>Decision not found</h1><p>This link may be incomplete or the decision may have been removed.</p><Button asChild><Link to="/decisions">View decisions</Link></Button></section>
+        <div className="dc-public-topbar dc-public-topbar--logo-only"><Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link></div>
+        <section className="dc-not-found"><h1>Question not found</h1><p>This link may be incomplete or the question may have been removed.</p><Button asChild><Link to="/decisions">View questions</Link></Button></section>
       </main>
     )
   }
@@ -272,8 +272,8 @@ function SignedInBallot() {
   return (
     <main id="main-content" className="dc-ballot-page">
       <div className="dc-public-topbar">
-        <Link to="/decisions" className="dc-logo-lockup"><img src="/logo.png" alt="" /><span>UBLDA decisions</span></Link>
-        <Button variant="ghost" asChild className="dc-touch"><Link to="/decisions"><ArrowLeft /> All decisions</Link></Button>
+        <Button variant="ghost" asChild className="dc-touch"><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> All questions</Link></Button>
+        <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link>
       </div>
 
       <article className="dc-ballot-document">

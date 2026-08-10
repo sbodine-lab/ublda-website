@@ -120,13 +120,12 @@ function AvailabilityPollContent({ poll }: { poll: AvailabilityPollDetail }) {
   return (
     <main id="main-content" className="av-public-page">
       <header className="av-public-topbar">
-        <Link to="/scheduling" className="av-logo-lockup" aria-label="UBLDA workspace">
-          <img src="/logo.png" alt="" />
-          <span>UBLDA</span>
-        </Link>
         <Button variant="ghost" size="icon" asChild aria-label="back to scheduling">
           <Link to="/scheduling"><ChevronLeft /></Link>
         </Button>
+        <Link to="/scheduling" className="av-logo-lockup" aria-label="Scheduling">
+          <img src="/logo.png" alt="" />
+        </Link>
       </header>
 
       <article className="av-poll-document">
