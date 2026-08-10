@@ -238,7 +238,7 @@ function PasswordChange({
       >
         <DialogHeader>
           <DialogTitle>Set your password</DialogTitle>
-          <DialogDescription>Your temporary password works once. Use at least 12 characters.</DialogDescription>
+          <DialogDescription>Replace your temporary password before using Speaker Ops. Use at least 12 characters.</DialogDescription>
         </DialogHeader>
         {error && <p className="speaker-form-error" role="alert">{error}</p>}
         <form id="speaker-password-form" onSubmit={submit}>
