@@ -5,6 +5,7 @@ import type {
 
 type LiveOperations = Pick<
   DecisionCenterAdapter,
+  | "signInWithGoogle"
   | "signIn"
   | "verifySignInCode"
   | "signOut"
@@ -37,6 +38,7 @@ function notReady(): Promise<never> {
 }
 
 const unavailableOperations: LiveOperations = {
+  signInWithGoogle: notReady,
   signIn: notReady,
   verifySignInCode: notReady,
   signOut: notReady,
@@ -71,6 +73,7 @@ export function createLiveDecisionAdapter(): MutableLiveDecisionAdapter {
     replaceOperations(nextOperations) {
       operations = nextOperations
     },
+    signInWithGoogle: (...args) => operations.signInWithGoogle(...args),
     signIn: (...args) => operations.signIn(...args),
     verifySignInCode: (...args) => operations.verifySignInCode(...args),
     signOut: (...args) => operations.signOut(...args),

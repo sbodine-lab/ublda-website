@@ -613,6 +613,15 @@ function LiveDecisionBridge({
   useEffect(() => { workspaceAdapter.replaceSnapshot(clubWorkspaceSnapshot) }, [clubWorkspaceSnapshot, workspaceAdapter])
 
   const operations = useMemo(() => ({
+    async signInWithGoogle() {
+      const returnUrl = window.location.href
+      const { error } = await clerkSignIn.sso({
+        strategy: "oauth_google",
+        redirectCallbackUrl: returnUrl,
+        redirectUrl: returnUrl,
+      })
+      if (error) throw new Error("Google sign-in could not be started.")
+    },
     async signIn(credentials: DecisionSignInCredentials) {
       const { error } = await clerkSignIn.password({
         emailAddress: credentials.email.trim(),

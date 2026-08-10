@@ -321,6 +321,15 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
     getSnapshot() {
       return snapshot
     },
+    async signInWithGoogle() {
+      update({
+        ...snapshot,
+        auth: {
+          status: "signed-in",
+          viewer: { memberId: "member-preview-admin", displayName: "Preview Admin", role: "admin" },
+        },
+      })
+    },
     async signIn() {
       update({
         ...snapshot,
@@ -537,6 +546,7 @@ export function createUnavailableLiveDecisionAdapter(message: string): DecisionC
     mode: "live",
     subscribe: () => () => undefined,
     getSnapshot: () => snapshot,
+    signInWithGoogle: unavailable,
     signIn: unavailable,
     verifySignInCode: unavailable,
     signOut: unavailable,
