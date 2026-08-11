@@ -62,6 +62,7 @@ import { WorkspaceDataProvider } from "@/features/workspace/WorkspaceDataProvide
 import { createLiveWorkspaceAdapter, type MutableLiveWorkspaceAdapter } from "@/features/workspace/liveAdapter"
 import { mapClubWorkspace, type BackendClubWorkspaceSnapshot } from "@/features/workspace/liveContracts"
 import type { ClubWorkspaceSnapshot, CreateClubEventInput, CreateProjectInput, CreateProjectTaskInput, TaskStatus, UpdateDirectoryProfileInput } from "@/features/workspace/types"
+import { logtoIsLoadingForConvex } from "./logtoConvexAuth"
 
 type EmptyArgs = Record<string, never>
 type BackendDraftInput = ReturnType<typeof decisionInputForBackend>
@@ -892,6 +893,7 @@ function useLogtoConvexAuth() {
     isLoading,
   } = useLogto()
   const inFlightTokenRef = useRef<Promise<string | null> | null>(null)
+  const convexAuthIsLoading = logtoIsLoadingForConvex(isLoading, isAuthenticated)
 
   const fetchAccessToken = useCallback(async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
     if (!isAuthenticated) return null
@@ -939,15 +941,24 @@ function useLogtoConvexAuth() {
     inFlightTokenRef.current = pending
     try {
       return await pending
+    } catch (error) {
+      // Convex token fetchers must settle with null when authentication cannot
+      // be completed. A rejected promise leaves Convex in its initial loading
+      // state and turns a recoverable auth error into an endless spinner.
+      console.error(
+        'convex_auth_token_fetch_failed',
+        error instanceof Error ? error.message : 'Unknown error',
+      )
+      return null
     } finally {
       if (inFlightTokenRef.current === pending) inFlightTokenRef.current = null
     }
   }, [clearAccessToken, getAccessToken, getIdToken, isAuthenticated])
 
-  return useMemo(() => ({ isLoading, isAuthenticated, fetchAccessToken }), [
+  return useMemo(() => ({ isLoading: convexAuthIsLoading, isAuthenticated, fetchAccessToken }), [
+    convexAuthIsLoading,
     fetchAccessToken,
     isAuthenticated,
-    isLoading,
   ])
 }
 
