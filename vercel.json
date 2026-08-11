@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/convex-auth", "destination": "/api/decision-agent?decisionAgentPath=/convex-auth" },
     { "source": "/mcp", "destination": "/api/decision-agent?decisionAgentPath=/mcp" },
     { "source": "/api/decision-agent/:path*", "destination": "/api/decision-agent?decisionAgentPath=/:path*" },
     { "source": "/api/facilities", "destination": "/api/housing?housingPath=/facilities" },

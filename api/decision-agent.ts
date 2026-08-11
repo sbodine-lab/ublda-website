@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '../server/types.ts'
+import { convexAuthHandler } from '../server/convexAuthApi.ts'
 import { createDecisionAgentHandler } from '../server/decisionAgent/gateway.ts'
 
 /**
@@ -10,5 +11,8 @@ import { createDecisionAgentHandler } from '../server/decisionAgent/gateway.ts'
 const handler = createDecisionAgentHandler()
 
 export default function decisionAgentHandler(req: VercelRequest, res: VercelResponse) {
+  if (req.query?.decisionAgentPath === '/convex-auth') {
+    return convexAuthHandler(req, res)
+  }
   return handler(req, res)
 }
