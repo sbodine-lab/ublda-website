@@ -121,7 +121,10 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: rgba(250, 249, 246, 0.75);
+  height: calc(100dvh - var(--announcement-h, 0px) - 100%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-cream);
   backdrop-filter: blur(24px) saturate(1.6);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
