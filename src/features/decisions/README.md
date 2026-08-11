@@ -8,7 +8,7 @@
 </DecisionDataProvider>
 ```
 
-The default adapter is an in-memory, fictional preview. It is intentionally signed out on first load so the generic private gate can be tested without Clerk or Convex credentials. Production integration should explicitly pass a live adapter; if live configuration is incomplete, use `createUnavailableLiveDecisionAdapter(...)` so the feature fails closed instead of loading demo data.
+The default adapter is an in-memory, fictional preview. It is intentionally signed out on first load so the generic private gate can be tested without Logto or Convex credentials. Production integration should explicitly pass a live adapter; if live configuration is incomplete, use `createUnavailableLiveDecisionAdapter(...)` so the feature fails closed instead of loading demo data.
 
 ## Live adapter requirements
 

@@ -5,20 +5,18 @@ The authenticated UBLDA workspace contains two lightweight internal tools:
 - Decisions turns a board question into one private link, one roster-bound response per person, live aggregate results, and an explicit final outcome.
 - Scheduling turns a set of dates into one private availability link, autosaves each roster member's grid, ranks full-duration meeting windows live, and lets an admin choose the final time.
 
-Both tools use the same Clerk identity and Convex member roster. Adding Alexa, Cooper, or any other teammate happens once in **members** with an approved identity alias; access is never hardcoded into the application.
+Both tools use the same Logto identity and Convex member roster. Adding Alexa, Cooper, or any other teammate happens once in **members** with an approved identity alias; access is never hardcoded into the application.
 
 ## Current status
 
-The repository contains the responsive frontend, Convex schema/functions, and the consolidated REST/MCP gateway. It also contains a fictional local demo adapter for credential-free testing.
-
-No Convex project, Clerk application, Vercel environment, custom domain, or production deployment was created or verified as part of this build. The application is **not confirmed live**. Creating cloud projects, setting production credentials, or deploying requires a separate, explicit deployment authorization.
+The repository contains the responsive frontend, Convex schema/functions, consolidated REST/MCP gateway, and a fictional local demo adapter for credential-free testing. Live readiness still depends on the Logto, Convex, and Vercel configuration below; repository code alone is not production proof.
 
 ## Free-tier fit
 
 The expected nine-member usage is comfortably below the current technical allowances, but plan terms can change and should be rechecked before launch:
 
 - [Convex Free limits](https://docs.convex.dev/production/state/limits) currently include 0.5 GB of database storage and 1,000,000 function calls per month. The five-minute auto-close schedule is about 8,640 calls in a 30-day month before member activity.
-- [Clerk Hobby](https://clerk.com/pricing) currently includes 50,000 monthly retained users per application, far beyond this roster.
+- [Logto Cloud Free](https://logto.io/pricing) currently includes up to 50,000 monthly active users, 50,000 access tokens, and three applications, far beyond this roster's expected use. Logto is also [open source](https://github.com/logto-io/logto).
 - [Vercel Hobby](https://vercel.com/docs/plans/hobby) currently includes 1,000,000 function invocations per month, but its fair-use terms limit it to personal, non-commercial use. Confirm that the club's account and use qualify; usage capacity alone is not plan eligibility.
 
 No billing method is required or configured by this repository. Keep usage alerts enabled in each provider and do not upgrade or attach a payment method without approval.
@@ -56,15 +54,17 @@ Start from [`.env.decisions.example`](../.env.decisions.example). It is separate
 | Variable | Set in | Exposure | Purpose |
 | --- | --- | --- | --- |
 | `VITE_CONVEX_URL` | `.env.local` and Vercel | Browser-visible | Convex client URL ending in `.convex.cloud` |
-| `VITE_CLERK_PUBLISHABLE_KEY` | `.env.local` and Vercel | Browser-visible | Clerk publishable key |
+| `VITE_LOGTO_ENDPOINT` | `.env.local` and Vercel | Browser-visible | Logto tenant endpoint ending in `.logto.app` |
+| `VITE_LOGTO_APP_ID` | `.env.local` and Vercel | Browser-visible | Logto single-page application ID |
 | `VITE_DECISION_CENTER_MODE` | Local `.env.local` only | Browser-visible | Optional `demo` or `live` override; production defaults to live and fails closed |
 | `CONVEX_SITE_URL` | Vercel | Server-only | Convex HTTP Actions origin ending in `.convex.site` |
 | `DECISION_AGENT_GATEWAY_SECRET` | Vercel and Convex | Server-only | Identical high-entropy secret used to authenticate the gateway before Convex processes a bearer token |
 | `DECISION_AGENT_ALLOWED_ORIGINS` | Vercel | Server-only | Optional comma-separated browser origins for the agent API; same-origin remains allowed |
-| `CLERK_JWT_ISSUER_DOMAIN` | Convex deployment | Server-side deployment setting | Clerk issuer used by `convex/auth.config.ts` |
+| `LOGTO_ISSUER` | Convex deployment | Server-side deployment setting | Exact Logto OIDC issuer, normally the tenant endpoint plus `/oidc` |
+| `LOGTO_APP_ID` | Convex deployment | Server-side deployment setting | Same Logto application ID used as the ID-token audience |
 | `BOOTSTRAP_ADMIN_EMAILS` | Convex deployment | Server-side deployment setting | Comma-separated, normalized verified emails allowed to initialize an empty workspace |
 
-`VITE_*` values are intentionally readable by the browser. Never put a Clerk secret key, Convex deploy key, agent bearer token, or any other secret in a `VITE_*` variable or a committed env file.
+`VITE_*` values are intentionally readable by the browser. The Logto endpoint and SPA application ID are public identifiers. Never put a Logto Management API secret, Convex deploy key, agent bearer token, password, or any other secret in a `VITE_*` variable or a committed env file.
 
 ## Live setup
 
@@ -85,42 +85,27 @@ Record both deployment URLs:
 
 Keep `npx convex dev` running while developing against the live development database. Do not run `npx convex deploy` until a production deployment is explicitly authorized.
 
-### 2. Configure Clerk Hobby for pre-created accounts
+### 2. Configure Logto Cloud Free for pre-created accounts
 
-Create a dedicated Clerk application, then:
+Create a dedicated Logto tenant and **Single-page app**, then:
 
-1. Enable email address and password sign-in, plus Google as a social connection.
-2. Set the application to Clerk **Restricted** mode. Do not enable public sign-up. The UBLDA interface intentionally exposes only Google, email/password, one-time email-code sign-in, and the provider-required verification-code step; it has no create-account link.
-3. Pre-create each approved administrator/member in Clerk. Deliver initial passwords outside the repository and require secure password handling; never place a member password in source, an env file, a test, a screenshot, or deployment logs.
-4. Keep email verification code available for passwordless sign-in, device-trust, or second-factor challenges. It is not an account-creation path. The custom sign-in flow sends a code only after an approved user enters their email or a provider-required verification step is reached.
-5. Leave Clerk **Organizations** disabled; the Decision Center's own roster remains the membership boundary. Google sign-in does not require a Google Workspace organization. Keep phone and unused social connections disabled.
-6. For production Google sign-in, use a dedicated OAuth client with only the basic `openid`, email, and profile scopes. Configure Clerk's exact OAuth callback as the authorized redirect URI, keep Google email subaddress blocking enabled, and never commit or log the client secret.
-7. Copy the publishable key to `VITE_CLERK_PUBLISHABLE_KEY`.
-8. In Clerk's [**Convex integration** setup](https://clerk.com/docs/guides/development/integrations/databases/convex), activate the integration. It maps the required `aud: "convex"` session claim.
-9. In Clerk's **Sessions > Claims** editor, add the verified identity fields used by the roster linker without replacing the integration's audience claim:
+1. Use Logto's hosted sign-in page with email address and password enabled. Keep phone, username, social connectors, and other unused methods disabled.
+2. Disable public account registration in the sign-in experience. The UBLDA page exposes one redirect button and never collects or handles credentials itself.
+3. Pre-create each approved administrator/member in the Logto user console or Management API. Deliver initial passwords outside the repository; never place a member password in source, a committed env file, a test, a screenshot, shell history, or deployment logs.
+4. Register `http://localhost:5173/auth/callback` and `https://ublda.org/auth/callback` as redirect URIs. Register the matching `/workspace` URLs as post-sign-out redirect URIs. Add a preview host only while deliberately testing that preview.
+5. Copy the tenant endpoint to `VITE_LOGTO_ENDPOINT` and the SPA application ID to `VITE_LOGTO_APP_ID`.
+6. Copy the exact OIDC issuer from the tenant discovery metadata to `LOGTO_ISSUER` in Convex. It is normally `https://<tenant>.logto.app/oidc`. Set `LOGTO_APP_ID` in Convex to the same SPA app ID; Logto uses it as the ID-token audience.
+7. The React client requests Logto's email scope in addition to the default `openid`, `profile`, and `offline_access` scopes. Inspect one development ID token before bootstrap and confirm `aud` is the app ID, `email` is the signed-in primary address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
 
-   ```json
-   {
-     "aud": "convex",
-     "email": "{{user.primary_email_address}}",
-     "email_verified": "{{user.email_verified}}",
-     "name": "{{user.full_name}}"
-   }
-   ```
-
-10. Copy the integration's Frontend API/issuer URL, including `https://`, for `CLERK_JWT_ISSUER_DOMAIN`. It must match the `domain` in `convex/auth.config.ts`; `applicationID: "convex"` matches the integration audience.
-11. Inspect one development token before bootstrap and confirm `aud` is `convex`, `email` is the signed-in primary verified address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
-
-The installed Convex client also supports Clerk's older preconfigured `convex` JWT template. For a new setup, use Clerk's current Convex integration flow above rather than hand-building the audience claim.
-
-Authentication is one pre-created Clerk user per person, while authorization is one UBLDA member record. Approved `@umich.edu` and personal aliases can still resolve to the same roster member, and the database enforces one ballot per member rather than one ballot per email or device.
+Authentication is one pre-created Logto user per person, while authorization is one UBLDA member record in Convex. Disabling public registration is defense in depth: a valid Logto session still cannot access the workspace until its verified email is present in the Convex roster. Existing verified Clerk identity rows may migrate once to a matching verified Logto identity; arbitrary verified rows cannot be rebound.
 
 ### 3. Set Convex deployment variables
 
 Use placeholders below when rehearsing; substitute the approved values without committing them:
 
 ```sh
-npx convex env set CLERK_JWT_ISSUER_DOMAIN https://example.clerk.accounts.dev
+npx convex env set LOGTO_ISSUER https://example.logto.app/oidc
+npx convex env set LOGTO_APP_ID replace_with_logto_spa_app_id
 npx convex env set BOOTSTRAP_ADMIN_EMAILS first.admin@example.invalid
 ```
 
@@ -146,13 +131,14 @@ For the production deployment, reduce `BOOTSTRAP_ADMIN_EMAILS` to the smallest a
 Set these for each intended Vercel environment:
 
 - `VITE_CONVEX_URL`
-- `VITE_CLERK_PUBLISHABLE_KEY`
+- `VITE_LOGTO_ENDPOINT`
+- `VITE_LOGTO_APP_ID`
 - `CONVEX_SITE_URL`
 - `DECISION_AGENT_GATEWAY_SECRET` using a separately generated 32–512 character
   server-only value; set the exact same value in the matching Convex deployment
 - `DECISION_AGENT_ALLOWED_ORIGINS` only if a browser client on another approved origin needs the API
 
-`CLERK_JWT_ISSUER_DOMAIN` and `BOOTSTRAP_ADMIN_EMAILS` belong in Convex, not Vercel. Clerk redirect/origin settings must include the exact final Vercel/custom-domain host.
+`LOGTO_ISSUER`, `LOGTO_APP_ID`, and `BOOTSTRAP_ADMIN_EMAILS` belong in Convex, not Vercel. Logto redirect and post-sign-out settings must include the exact final Vercel/custom-domain host.
 
 The Convex HTTP Actions reject direct public traffic unless
 `X-UBLDA-Gateway-Secret` matches this shared value. Never put the secret in a
@@ -180,7 +166,7 @@ npm test
 npm run build
 ```
 
-Then verify the immutable deployment on desktop and a real iPhone, including the configured Clerk sign-in methods and recovery from an iMessage in-app browser. A successful local build or Vercel HTTP 200 is not production proof by itself.
+Then verify the immutable deployment on desktop and a real iPhone, including Logto email/password sign-in, sign-out, rejection of an unapproved identity, and recovery from an iMessage in-app browser. A successful local build or Vercel HTTP 200 is not production proof by itself.
 
 ## Governance model
 

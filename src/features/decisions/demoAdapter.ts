@@ -321,18 +321,6 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
     getSnapshot() {
       return snapshot
     },
-    async signInWithGoogle() {
-      update({
-        ...snapshot,
-        auth: {
-          status: "signed-in",
-          viewer: { memberId: "member-preview-admin", displayName: "Preview Admin", role: "admin" },
-        },
-      })
-    },
-    async signInWithEmailCode() {
-      return undefined
-    },
     async signIn() {
       update({
         ...snapshot,
@@ -341,10 +329,6 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           viewer: { memberId: "member-preview-admin", displayName: "Preview Admin", role: "admin" },
         },
       })
-      return { status: "complete" }
-    },
-    async verifySignInCode() {
-      return undefined
     },
     async signOut() {
       update({ ...snapshot, auth: { status: "signed-out" } })
@@ -549,10 +533,7 @@ export function createUnavailableLiveDecisionAdapter(message: string): DecisionC
     mode: "live",
     subscribe: () => () => undefined,
     getSnapshot: () => snapshot,
-    signInWithGoogle: unavailable,
-    signInWithEmailCode: unavailable,
     signIn: unavailable,
-    verifySignInCode: unavailable,
     signOut: unavailable,
     submitResponse: unavailable,
     createDecision: unavailable,

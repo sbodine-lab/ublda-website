@@ -15,6 +15,7 @@ import { ClubCalendarPage } from "@/features/workspace/pages/ClubCalendarPage"
 import { PeoplePage } from "@/features/workspace/pages/PeoplePage"
 import { ProjectsPage } from "@/features/workspace/pages/ProjectsPage"
 import { WorkspaceOverviewPage } from "@/features/workspace/pages/WorkspaceOverviewPage"
+import { LogtoAuthCallback } from "./LogtoAuthCallback"
 import "@/features/availability/availability.css"
 import "./decision-center.css"
 import "@/features/workspace/workspace.css"
@@ -24,9 +25,13 @@ function PrivateWorkspace() {
   return <DecisionAuthGate><DecisionWorkspaceLayout /></DecisionAuthGate>
 }
 
-export function DecisionCenterRoutes() {
+export function DecisionCenterRoutes({ logtoCallback = false }: { logtoCallback?: boolean }) {
   return (
     <Routes>
+      <Route
+        path="/auth/callback"
+        element={logtoCallback ? <LogtoAuthCallback /> : <Navigate to="/workspace" replace />}
+      />
       <Route path="/decision" element={<DecisionBallotPage />} />
       <Route path="/d/:slug" element={<DecisionBallotPage />} />
       <Route path="/schedule" element={<DecisionAuthGate><AvailabilityPollPage /></DecisionAuthGate>} />

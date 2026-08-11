@@ -107,7 +107,7 @@ export default defineSchema({
 
   memberIdentities: defineTable({
     memberId: v.id("members"),
-    provider: v.literal("clerk"),
+    provider: v.union(v.literal("clerk"), v.literal("logto")),
     tokenIdentifier: v.optional(v.string()),
     providerSubject: v.optional(v.string()),
     issuer: v.optional(v.string()),

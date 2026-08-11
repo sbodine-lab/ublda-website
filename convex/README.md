@@ -1,8 +1,8 @@
 # UBLDA workspace backend
 
 This folder is the Convex backend for UBLDA's private decision workspace. It is
-designed for Convex Free and Clerk's free authentication tier. No Convex or
-Clerk deployment is created by this code.
+designed for Convex Free and Logto Cloud's free authentication tier. No Convex
+or Logto deployment is created by this code.
 
 The same authenticated roster also powers private scheduling polls. Scheduling
 polls use opaque links, a fixed 15-minute source grid, one replaceable response
@@ -14,15 +14,16 @@ named nonresponders remain admin-only.
 
 Configure these as server-side Convex environment variables:
 
-- `CLERK_JWT_ISSUER_DOMAIN`: the Clerk issuer for the `convex` JWT template.
+- `LOGTO_ISSUER`: the Logto OIDC issuer, normally the tenant endpoint plus `/oidc`.
+- `LOGTO_APP_ID`: the Logto SPA app ID and expected ID-token audience.
 - `BOOTSTRAP_ADMIN_EMAILS`: comma-separated, verified email addresses allowed
   to initialize a completely empty workspace.
 - `DECISION_AGENT_GATEWAY_SECRET`: a high-entropy server-to-server secret
   shared only with the Vercel decision-agent gateway; use 32-512 visible ASCII
   characters with no surrounding whitespace.
 
-Enable Google sign-in and, if needed, Clerk's verified email-code fallback. The
-JWT template must include the verified email claim. The first allowlisted person calls
+Enable only the intended hosted Logto sign-in methods and disable public registration.
+The ID token must include a verified email claim. The first allowlisted person calls
 `members.bootstrapCurrentIdentity`; later members are created by an admin with
 one or more approved email aliases and bind an alias by calling
 `members.claimApprovedIdentity` after signing in. A ballot is unique by
@@ -64,7 +65,7 @@ separate team-safe data path.
 
 ## Browser function surface
 
-All public functions use the centralized Clerk-to-member authorization helpers.
+All public functions use the centralized Logto-to-member authorization helpers.
 
 - `viewer.current({})`
 - `workspace.workspaceSnapshot({})`
