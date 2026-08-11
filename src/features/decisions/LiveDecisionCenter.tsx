@@ -891,31 +891,57 @@ function useLogtoConvexAuth() {
     isAuthenticated,
     isLoading,
   } = useLogto()
+  const inFlightTokenRef = useRef<Promise<string | null> | null>(null)
 
   const fetchAccessToken = useCallback(async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
     if (!isAuthenticated) return null
-    if (forceRefreshToken) {
-      await clearAccessToken()
-      const refreshedAccessToken = await getAccessToken()
-      if (!refreshedAccessToken) return null
-    }
-    const idToken = await getIdToken()
-    if (!idToken) return null
+    if (inFlightTokenRef.current) return await inFlightTokenRef.current
 
-    const response = await fetch('/api/convex-auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken }),
-    })
-    const payload = await response.json().catch(() => null) as { token?: unknown; error?: unknown } | null
-    if (!response.ok || typeof payload?.token !== 'string') {
-      throw new Error(
-        typeof payload?.error === 'string'
-          ? payload.error
-          : 'The leadership sign-in session could not be verified.',
-      )
+    const pending = (async () => {
+      const exchange = async (idToken: string) => {
+        const response = await fetch('/api/convex-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        })
+        const payload = await response.json().catch(() => null) as { token?: unknown; error?: unknown } | null
+        return { response, payload }
+      }
+      const refreshLogtoSession = async () => {
+        await clearAccessToken()
+        return await getAccessToken()
+      }
+
+      if (forceRefreshToken && !await refreshLogtoSession()) return null
+      let idToken = await getIdToken()
+      if (!idToken) return null
+      let result = await exchange(idToken)
+
+      // Logto stores the ID token separately from the access token. Refreshing
+      // the access token also replaces an expired ID token, so retry once when
+      // the bridge rejects a stale browser session.
+      if (result.response.status === 401 && !forceRefreshToken) {
+        const refreshedAccessToken = await refreshLogtoSession()
+        idToken = await getIdToken()
+        if (!refreshedAccessToken || !idToken) return null
+        result = await exchange(idToken)
+      }
+
+      if (!result.response.ok || typeof result.payload?.token !== 'string') {
+        throw new Error(
+          typeof result.payload?.error === 'string'
+            ? result.payload.error
+            : 'The leadership sign-in session could not be verified.',
+        )
+      }
+      return result.payload.token
+    })()
+    inFlightTokenRef.current = pending
+    try {
+      return await pending
+    } finally {
+      if (inFlightTokenRef.current === pending) inFlightTokenRef.current = null
     }
-    return payload.token
   }, [clearAccessToken, getAccessToken, getIdToken, isAuthenticated])
 
   return useMemo(() => ({ isLoading, isAuthenticated, fetchAccessToken }), [
