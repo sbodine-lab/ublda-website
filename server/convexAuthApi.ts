@@ -1,13 +1,13 @@
-import type { VercelRequest, VercelResponse } from '../server/types.ts'
-import { bodyRecord, getString, headerValue, setApiSecurityHeaders } from '../server/apiUtils.ts'
+import type { VercelRequest, VercelResponse } from './types.ts'
+import { bodyRecord, getString, headerValue, setApiSecurityHeaders } from './apiUtils.ts'
 import {
   authBridgeConfig,
   exchangeLogtoIdToken,
-} from '../server/convexAuthBridge.ts'
+} from './convexAuthBridge.ts'
 
 const MAX_ID_TOKEN_LENGTH = 24_000
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export async function convexAuthHandler(req: VercelRequest, res: VercelResponse) {
   let config: ReturnType<typeof authBridgeConfig>
   try {
     config = authBridgeConfig()
