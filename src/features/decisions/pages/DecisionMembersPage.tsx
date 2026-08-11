@@ -20,6 +20,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { useDecisionData } from "../decisionDataContext"
 import { initials } from "../format"
+import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
 import type { DecisionMember, MemberRole, UpsertMemberInput } from "../types"
 
 function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?(): void }) {
@@ -91,11 +92,8 @@ export function DecisionMembersPage() {
   }
 
   return (
-    <div className="dc-page dc-members-page">
-      <header className="dc-page-heading dc-page-heading-actions">
-        <div><p className="dc-eyebrow">Settings</p><h1>Members and identities</h1><p>{activeCount} active members. Electorates are selected per decision, so the system never assumes a fixed board size.</p></div>
-        <MemberDialog />
-      </header>
+    <LeadershipPage className="dc-page dc-members-page" action={<MemberDialog />}>
+      <p className="leadership-context">{activeCount} active members. Electorates are selected per question, so the system never assumes a fixed board size.</p>
 
       <Alert className="dc-identity-alert"><CheckCircle2 /><AlertTitle>One person, one response</AlertTitle><AlertDescription>Approved email aliases resolve to the same roster member. A second email cannot create a second ballot.</AlertDescription></Alert>
 
@@ -114,6 +112,6 @@ export function DecisionMembersPage() {
       </section>
 
       <section className="dc-settings-note"><UserRound /><div><h2>Historical rosters stay intact</h2><p>Deactivating a member does not rewrite old decisions. Every decision keeps its own electorate snapshot and exact missing-responder list.</p></div></section>
-    </div>
+    </LeadershipPage>
   )
 }

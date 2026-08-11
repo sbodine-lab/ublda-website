@@ -1,13 +1,11 @@
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { BlobPreconditionFailedError, get, put } from '@vercel/blob'
-import bcrypt from 'bcryptjs'
 import {
   PROGRAM_SLOT_STATUS_LABELS,
   SPEAKER_FORMAT_LABELS,
   SPEAKER_OPS_MEMBERS,
-  SPEAKER_OPS_SESSION_DAYS,
   SPEAKER_STAGES,
   type ProgramSlot,
   type ProgramSlotStatus,
@@ -15,39 +13,30 @@ import {
   type RoomRequestStatus,
   type SpeakerFormat,
   type SpeakerLead,
-  type SpeakerOpsAccount,
   type SpeakerOpsActivity,
   type SpeakerOpsMemberEmail,
+  type SpeakerOpsViewer,
   type SpeakerOpsWorkspace,
   type SpeakerStage,
 } from '../src/lib/speakerOps.ts'
 
-type StoredAccount = SpeakerOpsAccount & {
-  passwordHash: string
-  createdAt: string
-  updatedAt: string
-}
-
-type StoredSession = {
-  email: SpeakerOpsMemberEmail
-  expiresAt: string
-  createdAt: string
-}
-
 type SpeakerOpsData = {
-  version: 1 | 2
-  accounts: Record<string, StoredAccount>
-  sessions: Record<string, StoredSession>
+  version: 3
   leads: Record<string, SpeakerLead>
   slots: Record<string, ProgramSlot>
   roomRequests: Record<string, RoomRequest>
   activity: SpeakerOpsActivity[]
 }
 
-export type SpeakerOpsSession = {
-  account: SpeakerOpsAccount
-  sessionToken: string
-  sessionExpiresAt: string
+type LegacySpeakerOpsData = Omit<SpeakerOpsData, 'version'> & {
+  version?: 1 | 2 | 3
+}
+
+export type SpeakerOpsActor = {
+  memberId: string
+  displayName: string
+  email: string
+  role: 'admin' | 'member'
 }
 
 export type SpeakerOpsWriteResult<T> =
@@ -59,21 +48,17 @@ type StoreOptions = {
 }
 
 const BLOB_PATH = 'speaker-ops/state.json'
-const SESSION_TTL_MS = SPEAKER_OPS_SESSION_DAYS * 24 * 60 * 60 * 1000
-const BCRYPT_COST = 12
 const WRITE_ATTEMPTS = 5
 const confirmers = new Set<SpeakerOpsMemberEmail>(['atchiang@umich.edu', 'sbodine@umich.edu'])
+const isConfirmer = (email: string) => confirmers.has(email as SpeakerOpsMemberEmail)
 const queues = new Map<string, Promise<unknown>>()
 
 const defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE
   ? path.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE)
   : path.join(process.cwd(), '.ublda-local-data', 'speaker-ops.json')
 const isoNow = () => new Date().toISOString()
-const cleanEmail = (email: string) => email.trim().toLowerCase() as SpeakerOpsMemberEmail
 const cleanText = (value: string, max = 500) => value.replace(/[<>]/g, '').trim().slice(0, max)
-const tokenHash = (token: string) => createHash('sha256').update(token).digest('base64url')
 const randomId = (prefix: string) => `${prefix}_${randomBytes(10).toString('base64url')}`
-const createSessionToken = () => randomBytes(32).toString('base64url')
 const canUseBlob = (forceLocal: boolean) => !forceLocal && Boolean(process.env.BLOB_READ_WRITE_TOKEN)
 
 const leadSeeds = (): SpeakerLead[] => {
@@ -309,9 +294,7 @@ const roomSeeds = (): RoomRequest[] => slotSeeds().map((slot) => ({
 }))
 
 const emptyData = (): SpeakerOpsData => ({
-  version: 2,
-  accounts: {},
-  sessions: {},
+  version: 3,
   leads: Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead])),
   slots: Object.fromEntries(slotSeeds().map((slot) => [slot.id, slot])),
   roomRequests: Object.fromEntries(roomSeeds().map((request) => [request.id, request])),
@@ -324,31 +307,31 @@ const emptyData = (): SpeakerOpsData => ({
   }],
 })
 
-const migrateData = (data: SpeakerOpsData) => {
-  if (data.version === 2) return data
+const migrateData = (raw: LegacySpeakerOpsData): SpeakerOpsData => {
+  const seeded = emptyData()
+  const leads = { ...seeded.leads, ...(raw.leads || {}) }
+  const activity = Array.isArray(raw.activity) ? [...raw.activity] : seeded.activity
 
-  const migratedSeeds = Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead]))
-  data.leads = { ...data.leads, ...migratedSeeds }
-  delete data.leads['grant-kessler']
-  data.version = 2
-  data.activity.unshift({
-    id: 'context_reconciled_2026_08_10',
-    actorEmail: 'system',
-    action: 'Pipeline reconciled',
-    detail: 'Corrected Grant Shelton and loaded the verified Brain, Gmail, and Drive pipeline under the two-event cap.',
-    createdAt: '2026-08-10T19:00:00.000Z',
-  })
-  return data
+  if (raw.version === 1) {
+    Object.assign(leads, Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead])))
+    delete leads['grant-kessler']
+    activity.unshift({
+      id: 'context_reconciled_2026_08_10',
+      actorEmail: 'system',
+      action: 'Pipeline reconciled',
+      detail: 'Corrected Grant Shelton and loaded the verified Brain, Gmail, and Drive pipeline under the two-event cap.',
+      createdAt: '2026-08-10T19:00:00.000Z',
+    })
+  }
+
+  return {
+    version: 3,
+    leads,
+    slots: { ...seeded.slots, ...(raw.slots || {}) },
+    roomRequests: { ...seeded.roomRequests, ...(raw.roomRequests || {}) },
+    activity,
+  }
 }
-
-const accountView = (account: StoredAccount): SpeakerOpsAccount => ({
-  name: account.name,
-  email: account.email,
-  title: account.title,
-  mustChangePassword: account.mustChangePassword,
-  canConfirmProgram: account.canConfirmProgram,
-  lastSignedInAt: account.lastSignedInAt,
-})
 
 const memberView = (email: SpeakerOpsMemberEmail) => {
   const member = SPEAKER_OPS_MEMBERS.find((candidate) => candidate.email === email)!
@@ -356,11 +339,9 @@ const memberView = (email: SpeakerOpsMemberEmail) => {
     name: member.name,
     email: member.email,
     title: member.title,
-    canConfirmProgram: confirmers.has(email),
+    canConfirmProgram: isConfirmer(email),
   }
 }
-
-const sessionExpiry = () => new Date(Date.now() + SESSION_TTL_MS).toISOString()
 
 const addBusinessDays = (iso: string, count: number) => {
   const date = new Date(iso)
@@ -376,11 +357,13 @@ const addBusinessDays = (iso: string, count: number) => {
 const isMemberEmail = (email: string): email is SpeakerOpsMemberEmail => (
   SPEAKER_OPS_MEMBERS.some((member) => member.email === email)
 )
-
-const safeEqual = (left: string, right: string) => {
-  const leftBuffer = Buffer.from(left)
-  const rightBuffer = Buffer.from(right)
-  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer)
+const memberForActor = (actor: SpeakerOpsActor) => {
+  const member = SPEAKER_OPS_MEMBERS.find((candidate) => candidate.email === actor.email)
+  return member || {
+    name: actor.displayName || actor.email,
+    email: actor.email,
+    title: 'Leadership Team',
+  }
 }
 
 export class SpeakerOpsStore {
@@ -398,7 +381,7 @@ export class SpeakerOpsStore {
 
   private async readLocal() {
     try {
-      return JSON.parse(await readFile(this.dataPath, 'utf8')) as SpeakerOpsData
+      return JSON.parse(await readFile(this.dataPath, 'utf8')) as LegacySpeakerOpsData
     } catch {
       return emptyData()
     }
@@ -415,7 +398,7 @@ export class SpeakerOpsStore {
     const blob = await get(BLOB_PATH, { access: 'private', useCache: false })
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null as string | null }
     const raw = await new Response(blob.stream).text()
-    return { data: JSON.parse(raw) as SpeakerOpsData, etag: blob.blob.etag?.replace(/^W\//, '') || null }
+    return { data: JSON.parse(raw) as LegacySpeakerOpsData, etag: blob.blob.etag?.replace(/^W\//, '') || null }
   }
 
   private async writeBlob(data: SpeakerOpsData, etag: string | null) {
@@ -426,11 +409,6 @@ export class SpeakerOpsStore {
       contentType: 'application/json',
       ...(etag ? { ifMatch: etag } : {}),
     })
-  }
-
-  private async readData() {
-    const data = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal()
-    return migrateData(data)
   }
 
   private async updateData<T>(mutation: (data: SpeakerOpsData) => Promise<T> | T): Promise<T> {
@@ -465,16 +443,9 @@ export class SpeakerOpsStore {
     }
   }
 
-  private activeSession(data: SpeakerOpsData, sessionToken: string) {
-    const session = data.sessions[tokenHash(sessionToken)]
-    if (!session || new Date(session.expiresAt).getTime() <= Date.now()) return null
-    const account = data.accounts[session.email]
-    return account ? { session, account } : null
-  }
-
   private appendActivity(
     data: SpeakerOpsData,
-    actorEmail: SpeakerOpsMemberEmail,
+    actorEmail: string,
     action: string,
     detail: string,
   ) {
@@ -488,107 +459,28 @@ export class SpeakerOpsStore {
     data.activity = data.activity.slice(0, 250)
   }
 
-  async provisionAccounts(passwords: Record<string, string>) {
-    return this.updateData(async (data) => {
-      const nextAccounts: Record<string, StoredAccount> = {}
-      const now = isoNow()
-      for (const member of SPEAKER_OPS_MEMBERS) {
-        const password = passwords[member.email]
-        if (!password || password.length < 16) throw new Error(`A 16-character temporary password is required for ${member.email}.`)
-        const existing = data.accounts[member.email]
-        nextAccounts[member.email] = {
-          name: member.name,
-          email: member.email,
-          title: member.title,
-          mustChangePassword: true,
-          canConfirmProgram: confirmers.has(member.email),
-          lastSignedInAt: existing?.lastSignedInAt || '',
-          passwordHash: await bcrypt.hash(password, BCRYPT_COST),
-          createdAt: existing?.createdAt || now,
-          updatedAt: now,
-        }
-      }
-      data.accounts = nextAccounts
-      data.sessions = {}
-      this.appendActivity(data, 'sbodine@umich.edu', 'Access provisioned', 'Nine leadership accounts provisioned; all sessions reset.')
-      return { count: Object.keys(nextAccounts).length }
-    })
-  }
-
-  async signIn(emailInput: string, password: string): Promise<SpeakerOpsSession | null> {
-    const email = cleanEmail(emailInput)
-    if (!isMemberEmail(email)) return null
-
-    return this.updateData(async (data) => {
-      const account = data.accounts[email]
-      if (!account || !(await bcrypt.compare(password, account.passwordHash))) return null
-
-      const sessionToken = createSessionToken()
-      const sessionExpiresAt = sessionExpiry()
-      data.sessions[tokenHash(sessionToken)] = { email, expiresAt: sessionExpiresAt, createdAt: isoNow() }
-      account.lastSignedInAt = isoNow()
-      account.updatedAt = account.lastSignedInAt
-      return { account: accountView(account), sessionToken, sessionExpiresAt }
-    })
-  }
-
-  async restoreSession(sessionToken: string): Promise<SpeakerOpsSession | null> {
-    if (!sessionToken) return null
-    const data = await this.readData()
-    const active = this.activeSession(data, sessionToken)
-    if (!active) return null
-    return {
-      account: accountView(active.account),
-      sessionToken,
-      sessionExpiresAt: active.session.expiresAt,
-    }
-  }
-
-  async logout(sessionToken: string) {
-    return this.updateData((data) => ({ deleted: Boolean(delete data.sessions[tokenHash(sessionToken)]) }))
-  }
-
-  async changePassword(sessionToken: string, currentPassword: string, nextPassword: string): Promise<SpeakerOpsWriteResult<SpeakerOpsSession>> {
-    if (nextPassword.length < 12) return { ok: false, error: 'Use at least 12 characters.' }
-    if (safeEqual(currentPassword, nextPassword)) return { ok: false, error: 'Choose a new password.' }
-
-    return this.updateData(async (data) => {
-      const active = this.activeSession(data, sessionToken)
-      if (!active || !(await bcrypt.compare(currentPassword, active.account.passwordHash))) {
-        return { ok: false, error: 'Current password is incorrect.' }
-      }
-      active.account.passwordHash = await bcrypt.hash(nextPassword, BCRYPT_COST)
-      active.account.mustChangePassword = false
-      active.account.updatedAt = isoNow()
-      this.appendActivity(data, active.account.email, 'Password changed', 'Completed first-login password change.')
-      return {
-        ok: true,
-        account: accountView(active.account),
-        sessionToken,
-        sessionExpiresAt: active.session.expiresAt,
-      }
-    })
-  }
-
-  async workspace(sessionToken: string): Promise<SpeakerOpsWorkspace | null> {
-    const data = await this.readData()
-    const active = this.activeSession(data, sessionToken)
-    if (!active) return null
-    return {
-      account: accountView(active.account),
-      members: SPEAKER_OPS_MEMBERS.map((member) => memberView(member.email)),
+  async workspace(actor: SpeakerOpsActor): Promise<SpeakerOpsWorkspace> {
+    const member = memberForActor(actor)
+    return this.updateData((data) => ({
+      viewer: {
+        memberId: actor.memberId,
+        name: actor.displayName || member.name,
+        email: member.email,
+        title: member.title,
+        role: actor.role,
+        canConfirmProgram: isConfirmer(member.email),
+      } satisfies SpeakerOpsViewer,
+      members: SPEAKER_OPS_MEMBERS.map((candidate) => memberView(candidate.email)),
       leads: Object.values(data.leads),
       slots: Object.values(data.slots),
       roomRequests: Object.values(data.roomRequests),
       activity: data.activity,
-      sessionExpiresAt: active.session.expiresAt,
-    }
+    }))
   }
 
-  async updateLead(sessionToken: string, leadInput: Partial<SpeakerLead> & { id: string }): Promise<SpeakerOpsWriteResult<{ lead: SpeakerLead }>> {
+  async updateLead(actor: SpeakerOpsActor, leadInput: Partial<SpeakerLead> & { id: string }): Promise<SpeakerOpsWriteResult<{ lead: SpeakerLead }>> {
+    const member = memberForActor(actor)
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken)
-      if (!active) return { ok: false, error: 'Session expired. Sign in again.' }
       const lead = data.leads[leadInput.id]
       if (!lead) return { ok: false, error: 'Speaker was not found.' }
 
@@ -600,15 +492,14 @@ export class SpeakerOpsStore {
       if (typeof leadInput.evidence === 'string') lead.evidence = cleanText(leadInput.evidence, 500)
       if (typeof leadInput.blocker === 'string') lead.blocker = cleanText(leadInput.blocker, 300)
       lead.updatedAt = isoNow()
-      this.appendActivity(data, active.account.email, 'Speaker updated', `${lead.name}: ${lead.nextAction || 'No next action'}`)
+      this.appendActivity(data, member.email, 'Speaker updated', `${lead.name}: ${lead.nextAction || 'No next action'}`)
       return { ok: true, lead: { ...lead } }
     })
   }
 
-  async updateRoomRequest(sessionToken: string, input: Partial<RoomRequest> & { id: string }): Promise<SpeakerOpsWriteResult<{ roomRequest: RoomRequest }>> {
+  async updateRoomRequest(actor: SpeakerOpsActor, input: Partial<RoomRequest> & { id: string }): Promise<SpeakerOpsWriteResult<{ roomRequest: RoomRequest }>> {
+    const member = memberForActor(actor)
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken)
-      if (!active) return { ok: false, error: 'Session expired. Sign in again.' }
       const request = data.roomRequests[input.id]
       if (!request) return { ok: false, error: 'Room request was not found.' }
 
@@ -640,15 +531,14 @@ export class SpeakerOpsStore {
         if (request.status === 'declined') slot.status = 'planning'
         slot.updatedAt = request.updatedAt
       }
-      this.appendActivity(data, active.account.email, 'Room request updated', `${request.slotId}: ${request.status}`)
+      this.appendActivity(data, member.email, 'Room request updated', `${request.slotId}: ${request.status}`)
       return { ok: true, roomRequest: { ...request } }
     })
   }
 
-  async updateSlot(sessionToken: string, input: Partial<ProgramSlot> & { id: ProgramSlot['id'] }): Promise<SpeakerOpsWriteResult<{ slot: ProgramSlot }>> {
+  async updateSlot(actor: SpeakerOpsActor, input: Partial<ProgramSlot> & { id: ProgramSlot['id'] }): Promise<SpeakerOpsWriteResult<{ slot: ProgramSlot }>> {
+    const member = memberForActor(actor)
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken)
-      if (!active) return { ok: false, error: 'Session expired. Sign in again.' }
       const slot = data.slots[input.id]
       if (!slot) return { ok: false, error: 'Program slot was not found.' }
 
@@ -658,7 +548,7 @@ export class SpeakerOpsStore {
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status as ProgramSlotStatus
         if (nextStatus === 'confirmed') {
-          if (!active.account.canConfirmProgram) return { ok: false, error: 'Only Sam or Alexa can confirm a programmed date.' }
+          if (!isConfirmer(member.email)) return { ok: false, error: 'Only Sam or Alexa can confirm a programmed date.' }
           const request = data.roomRequests[slot.roomRequestId]
           if (request?.status !== 'approved') return { ok: false, error: 'Ross must approve the room before the fireside can be confirmed.' }
           if (!slot.leadId) return { ok: false, error: 'Choose a speaker before confirming the fireside.' }
@@ -666,7 +556,7 @@ export class SpeakerOpsStore {
         slot.status = nextStatus
       }
       slot.updatedAt = isoNow()
-      this.appendActivity(data, active.account.email, 'Program slot updated', `${slot.label}: ${slot.status}`)
+      this.appendActivity(data, member.email, 'Program slot updated', `${slot.label}: ${slot.status}`)
       return { ok: true, slot: { ...slot } }
     })
   }

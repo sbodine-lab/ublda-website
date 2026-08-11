@@ -13,6 +13,7 @@ import {
 import {
   authBridgeConfig,
   exchangeLogtoIdToken,
+  exchangeLogtoIdTokenWithIdentity,
   verifiedLogtoIdentity,
   type AuthBridgeConfig,
 } from '../server/convexAuthBridge.ts'
@@ -87,6 +88,37 @@ test('rejects identities without a verified email', () => {
     () => verifiedLogtoIdentity({ sub: 'user', email: 'member@example.org', email_verified: false }),
     /verified email address/,
   )
+})
+
+test('can return the verified Logto identity with the bridge exchange', async () => {
+  const setup = await fixture()
+  const idToken = await new SignJWT({
+    email: 'SBodine@umich.edu',
+    email_verified: true,
+    name: 'Sam Bodine',
+  })
+    .setProtectedHeader({ alg: 'ES384', kid: setup.logtoKid })
+    .setIssuer(setup.config.logtoIssuer)
+    .setAudience(setup.config.logtoAppId)
+    .setSubject('logto-user-id')
+    .setIssuedAt()
+    .setExpirationTime('5m')
+    .sign(setup.logtoKeys.privateKey)
+
+  const exchanged = await exchangeLogtoIdTokenWithIdentity(
+    idToken,
+    setup.config,
+    createLocalJWKSet(setup.logtoJwks),
+  )
+  assert.deepEqual(exchanged.identity, {
+    subject: 'logto-user-id',
+    email: 'sbodine@umich.edu',
+    emailVerified: true,
+    name: 'Sam Bodine',
+    picture: undefined,
+  })
+  assert.equal(exchanged.expiresIn, 300)
+  assert.ok(exchanged.token)
 })
 
 test('rejects an ID token issued for a different Logto application', async () => {

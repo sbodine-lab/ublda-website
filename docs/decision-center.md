@@ -1,11 +1,12 @@
 # UBLDA workspace setup and operations
 
-The authenticated UBLDA workspace contains two lightweight internal tools:
+The authenticated UBLDA workspace contains three lightweight internal tools:
 
 - Decisions turns a board question into one private link, one roster-bound response per person, live aggregate results, and an explicit final outcome.
 - Scheduling turns a set of dates into one private availability link, autosaves each roster member's grid, ranks full-duration meeting windows live, and lets an admin choose the final time.
+- Speaker Ops tracks the outreach pipeline, two program slots, Ross room requests, and calendar constraints without a separate password or session.
 
-Both tools use the same Logto identity and Convex member roster. Adding Alexa, Cooper, or any other teammate happens once in **members** with an approved identity alias; access is never hardcoded into the application.
+All leadership tools use the same Logto identity and Convex member roster. Moving between workspace routes never asks for a second set of credentials. Adding Alexa, Cooper, or any other teammate happens once in **members** with an approved identity alias.
 
 ## Current status
 
@@ -43,6 +44,7 @@ Useful demo checks:
 - `/scheduling` — scheduling dashboard and live poll results
 - `/scheduling/new` — create a scheduling poll and copy its private link
 - `/s/s_preview_fall_kickoff` — phone-first availability grid
+- `/leadership/speakers` — Speaker Ops pipeline, program slots, room requests, and calendar
 - `/s/s_preview_fall_kickoff/results` — live ranked meeting windows
 
 Do not silently fall back to the demo in a production build. If live configuration is incomplete, use the fail-closed adapter so private routes show a setup error instead of fictional data.

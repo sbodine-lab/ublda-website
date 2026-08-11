@@ -1,60 +1,44 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { createSpeakerOpsStore } from '../server/speakerOpsStore.ts'
-import { SPEAKER_OPS_MEMBERS, SPEAKER_OPS_SESSION_DAYS } from '../src/lib/speakerOps.ts'
+import {
+  createSpeakerOpsStore,
+  type SpeakerOpsActor,
+} from '../server/speakerOpsStore.ts'
+import { SPEAKER_OPS_MEMBERS } from '../src/lib/speakerOps.ts'
+
+const sam: SpeakerOpsActor = {
+  memberId: 'member-sam',
+  displayName: 'Sam Bodine',
+  email: 'sbodine@umich.edu',
+  role: 'admin',
+}
+
+const alex: SpeakerOpsActor = {
+  memberId: 'member-alex',
+  displayName: 'Alex Forstner',
+  email: 'alexfors@umich.edu',
+  role: 'member',
+}
 
 const buildStore = async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'ublda-speaker-ops-'))
-  const store = createSpeakerOpsStore(path.join(directory, 'speaker-ops.json'), { forceLocal: true })
-  const passwords = Object.fromEntries(SPEAKER_OPS_MEMBERS.map((member) => [member.email, `Temp-${member.email}-2026!`]))
-  await store.provisionAccounts(passwords)
-  return { directory, store, passwords }
+  const dataPath = path.join(directory, 'speaker-ops.json')
+  const store = createSpeakerOpsStore(dataPath, { forceLocal: true })
+  return { directory, dataPath, store }
 }
 
-test('provisions only the nine allowlisted leadership accounts', async (t) => {
-  const { directory, store, passwords } = await buildStore()
+test('loads the reconciled pipeline for an authenticated Convex member', async (t) => {
+  const { directory, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
 
-  assert.equal(await store.signIn('outsider@umich.edu', 'anything'), null)
-  for (const member of SPEAKER_OPS_MEMBERS) {
-    const session = await store.signIn(member.email, passwords[member.email])
-    assert.equal(session?.account.email, member.email)
-    assert.equal(session?.account.mustChangePassword, true)
-  }
-})
-
-test('uses a 180-day session and requires a first-login password change', async (t) => {
-  const { directory, store, passwords } = await buildStore()
-  t.after(() => rm(directory, { recursive: true, force: true }))
-
-  const session = await store.signIn('andsack@umich.edu', passwords['andsack@umich.edu'])
-  assert.ok(session)
-  const durationDays = (new Date(session.sessionExpiresAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000)
-  assert.ok(durationDays > SPEAKER_OPS_SESSION_DAYS - 0.01)
-  assert.ok(durationDays <= SPEAKER_OPS_SESSION_DAYS)
-
-  const changed = await store.changePassword(
-    session.sessionToken,
-    passwords['andsack@umich.edu'],
-    'A-new-private-password-2026!',
-  )
-  assert.equal(changed.ok, true)
-  if (changed.ok) assert.equal(changed.account.mustChangePassword, false)
-  assert.equal(await store.signIn('andsack@umich.edu', passwords['andsack@umich.edu']), null)
-  assert.ok(await store.signIn('andsack@umich.edu', 'A-new-private-password-2026!'))
-})
-
-test('loads the reconciled pipeline under the two-event cap', async (t) => {
-  const { directory, store, passwords } = await buildStore()
-  t.after(() => rm(directory, { recursive: true, force: true }))
-  const session = await store.signIn('sbodine@umich.edu', passwords['sbodine@umich.edu'])
-  assert.ok(session)
-
-  const workspace = await store.workspace(session.sessionToken)
-  assert.ok(workspace)
+  const workspace = await store.workspace(sam)
+  assert.equal(workspace.viewer.email, sam.email)
+  assert.equal(workspace.viewer.role, 'admin')
+  assert.equal(workspace.viewer.canConfirmProgram, true)
+  assert.equal(workspace.members.length, SPEAKER_OPS_MEMBERS.length)
   assert.deepEqual(workspace.slots.map((slot) => slot.id).sort(), ['fall-2026', 'winter-2027'])
   assert.equal(workspace.leads.some((lead) => lead.name === 'Grant Kessler'), false)
   assert.partialDeepStrictEqual(workspace.leads.find((lead) => lead.id === 'grant-shelton'), {
@@ -68,33 +52,52 @@ test('loads the reconciled pipeline under the two-event cap', async (t) => {
   }
 })
 
-test('rejects confirmation until Ross approves a named room', async (t) => {
-  const { directory, store, passwords } = await buildStore()
+test('supports approved Convex members outside the business owner list', async (t) => {
+  const { directory, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
-  const sam = await store.signIn('sbodine@umich.edu', passwords['sbodine@umich.edu'])
-  assert.ok(sam)
 
-  const blocked = await store.updateSlot(sam.sessionToken, {
+  const newMember: SpeakerOpsActor = {
+    memberId: 'member-new',
+    displayName: 'New Leader',
+    email: 'newleader@umich.edu',
+    role: 'member',
+  }
+  const workspace = await store.workspace(newMember)
+  assert.deepEqual(workspace.viewer, {
+    memberId: 'member-new',
+    name: 'New Leader',
+    email: 'newleader@umich.edu',
+    title: 'Leadership Team',
+    role: 'member',
+    canConfirmProgram: false,
+  })
+})
+
+test('rejects confirmation until Ross approves a named room', async (t) => {
+  const { directory, store } = await buildStore()
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  const blocked = await store.updateSlot(sam, {
     id: 'fall-2026',
     leadId: 'deb-ruh',
     status: 'confirmed',
   })
   assert.deepEqual(blocked, { ok: false, error: 'Ross must approve the room before the fireside can be confirmed.' })
 
-  const unnamedApproval = await store.updateRoomRequest(sam.sessionToken, {
+  const unnamedApproval = await store.updateRoomRequest(sam, {
     id: 'room-fall-2026',
     status: 'approved',
   })
   assert.deepEqual(unnamedApproval, { ok: false, error: 'Enter the Ross room before marking the request approved.' })
 
-  const room = await store.updateRoomRequest(sam.sessionToken, {
+  const room = await store.updateRoomRequest(sam, {
     id: 'room-fall-2026',
     status: 'approved',
     roomName: 'R1230',
   })
   assert.equal(room.ok, true)
 
-  const confirmed = await store.updateSlot(sam.sessionToken, {
+  const confirmed = await store.updateSlot(sam, {
     id: 'fall-2026',
     leadId: 'deb-ruh',
     status: 'confirmed',
@@ -103,18 +106,41 @@ test('rejects confirmation until Ross approves a named room', async (t) => {
 })
 
 test('only Sam or Alexa can confirm a programmed date', async (t) => {
-  const { directory, store, passwords } = await buildStore()
+  const { directory, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
-  const sam = await store.signIn('sbodine@umich.edu', passwords['sbodine@umich.edu'])
-  const alex = await store.signIn('alexfors@umich.edu', passwords['alexfors@umich.edu'])
-  assert.ok(sam && alex)
 
-  await store.updateRoomRequest(sam.sessionToken, {
+  await store.updateRoomRequest(sam, {
     id: 'room-winter-2027',
     status: 'approved',
     roomName: 'R0320',
   })
-  await store.updateSlot(alex.sessionToken, { id: 'winter-2027', leadId: 'rich-donovan' })
-  const result = await store.updateSlot(alex.sessionToken, { id: 'winter-2027', status: 'confirmed' })
+  await store.updateSlot(alex, { id: 'winter-2027', leadId: 'rich-donovan' })
+  const result = await store.updateSlot(alex, { id: 'winter-2027', status: 'confirmed' })
   assert.deepEqual(result, { ok: false, error: 'Only Sam or Alexa can confirm a programmed date.' })
+})
+
+test('migrates legacy state without retaining password or session data', async (t) => {
+  const { directory, dataPath, store } = await buildStore()
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  await store.workspace(sam)
+  const current = JSON.parse(await readFile(dataPath, 'utf8')) as Record<string, unknown>
+  const leads = current.leads as Record<string, Record<string, unknown>>
+  leads['deb-ruh'].nextAction = 'Preserve this business update.'
+  await writeFile(dataPath, `${JSON.stringify({
+    ...current,
+    version: 2,
+    accounts: { 'sbodine@umich.edu': { passwordHash: 'legacy-secret-hash' } },
+    sessions: { 'legacy-session-hash': { email: 'sbodine@umich.edu' } },
+  }, null, 2)}\n`)
+
+  const workspace = await store.workspace(sam)
+  assert.equal(workspace.leads.find((lead) => lead.id === 'deb-ruh')?.nextAction, 'Preserve this business update.')
+
+  const migrated = JSON.parse(await readFile(dataPath, 'utf8')) as Record<string, unknown>
+  assert.equal(migrated.version, 3)
+  assert.equal('accounts' in migrated, false)
+  assert.equal('sessions' in migrated, false)
+  assert.equal(JSON.stringify(migrated).includes('legacy-secret-hash'), false)
+  assert.equal(JSON.stringify(migrated).includes('legacy-session-hash'), false)
 })

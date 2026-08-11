@@ -14,6 +14,19 @@ import {
   createUnavailableWorkspaceAdapter,
   demoWorkspaceAdapter,
 } from "@/features/workspace"
+import {
+  LeadershipIdentityProvider,
+  LOCAL_LEADERSHIP_PREVIEW_TOKEN,
+  type LeadershipIdentity,
+} from "./leadershipIdentityContext"
+
+const previewLeadershipIdentity: LeadershipIdentity = {
+  getIdToken: async () => LOCAL_LEADERSHIP_PREVIEW_TOKEN,
+}
+
+const unavailableLeadershipIdentity: LeadershipIdentity = {
+  getIdToken: async () => null,
+}
 
 function DecisionDocumentMeta() {
   useEffect(() => {
@@ -51,13 +64,15 @@ export function DecisionCenterEntry() {
   let content
   if (demoMode) {
     content = (
-      <WorkspaceDataProvider adapter={demoWorkspaceAdapter}>
-        <AvailabilityDataProvider adapter={demoAvailabilityAdapter}>
-          <DecisionDataProvider adapter={demoDecisionAdapter}>
-            <DecisionCenterRoutes />
-          </DecisionDataProvider>
-        </AvailabilityDataProvider>
-      </WorkspaceDataProvider>
+      <LeadershipIdentityProvider identity={previewLeadershipIdentity}>
+        <WorkspaceDataProvider adapter={demoWorkspaceAdapter}>
+          <AvailabilityDataProvider adapter={demoAvailabilityAdapter}>
+            <DecisionDataProvider adapter={demoDecisionAdapter}>
+              <DecisionCenterRoutes />
+            </DecisionDataProvider>
+          </AvailabilityDataProvider>
+        </WorkspaceDataProvider>
+      </LeadershipIdentityProvider>
     )
   } else if (!convexUrl || !logtoAppId || !logtoEndpoint) {
     const adapter = createUnavailableLiveDecisionAdapter(
@@ -70,13 +85,15 @@ export function DecisionCenterEntry() {
       "Add VITE_CONVEX_URL, VITE_LOGTO_APP_ID, and VITE_LOGTO_ENDPOINT, or explicitly select local demo mode.",
     )
     content = (
-      <WorkspaceDataProvider adapter={workspaceAdapter}>
-        <AvailabilityDataProvider adapter={availabilityAdapter}>
-          <DecisionDataProvider adapter={adapter}>
-            <DecisionCenterRoutes />
-          </DecisionDataProvider>
-        </AvailabilityDataProvider>
-      </WorkspaceDataProvider>
+      <LeadershipIdentityProvider identity={unavailableLeadershipIdentity}>
+        <WorkspaceDataProvider adapter={workspaceAdapter}>
+          <AvailabilityDataProvider adapter={availabilityAdapter}>
+            <DecisionDataProvider adapter={adapter}>
+              <DecisionCenterRoutes />
+            </DecisionDataProvider>
+          </AvailabilityDataProvider>
+        </WorkspaceDataProvider>
+      </LeadershipIdentityProvider>
     )
   } else {
     content = (

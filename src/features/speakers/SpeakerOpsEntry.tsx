@@ -1,29 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ArrowUpRight,
-  CalendarClock,
   CalendarDays,
   CircleDot,
   DoorOpen,
-  FolderKanban,
-  Home,
-  KeyRound,
   ListFilter,
-  LogOut,
-  MessageCircleQuestion,
-  MicVocal,
-  PanelLeft,
   Search,
   Settings2,
-  ShieldCheck,
   Users,
 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -46,7 +34,6 @@ import {
   ROOM_REQUEST_STATUS_LABELS,
   SPEAKER_FORMAT_LABELS,
   SPEAKER_OPS_MEMBERS,
-  SPEAKER_OPS_SESSION_DAYS,
   SPEAKER_STAGE_LABELS,
   type ProgramSlot,
   type ProgramSlotStatus,
@@ -55,16 +42,15 @@ import {
   type RoomRequestStatus,
   type SpeakerFormat,
   type SpeakerLead,
-  type SpeakerOpsAccount,
   type SpeakerOpsWorkspace,
   type SpeakerStage,
 } from '@/lib/speakerOps'
+import { useLeadershipIdentity } from '@/features/decisions/leadershipIdentityContext'
 import './speaker-ops.css'
 
-type WorkspaceView = 'pipeline' | 'slots' | 'rooms' | 'calendar' | 'access'
+type WorkspaceView = 'pipeline' | 'slots' | 'rooms' | 'calendar'
 type ApiRecord = Record<string, unknown>
 
-const SESSION_KEY = 'ublda-speaker-ops-session'
 const ROSS_ROOM_URL = 'https://rossweb.bus.umich.edu/ross-operations/event-form-instructions/'
 const ROSS_CALENDAR_URL = 'https://rossweb.bus.umich.edu/academics/studentresources/ross-academic-calendar/'
 
@@ -73,31 +59,28 @@ const navigation: Array<{ id: WorkspaceView; label: string; icon: typeof Users }
   { id: 'slots', label: 'Program slots', icon: CircleDot },
   { id: 'rooms', label: 'Room requests', icon: DoorOpen },
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
-  { id: 'access', label: 'Access', icon: ShieldCheck },
 ]
 
-const leadershipNavigation = [
-  { to: '/workspace', label: 'Overview', icon: Home },
-  { to: '/decisions', label: 'Questions', icon: MessageCircleQuestion },
-  { to: '/scheduling', label: 'Scheduling', icon: CalendarClock },
-  { to: '/leadership/speakers', label: 'Speaker Ops', icon: MicVocal, current: true },
-  { to: '/calendar', label: 'Club calendar', icon: CalendarDays },
-  { to: '/projects', label: 'Projects', icon: FolderKanban },
-  { to: '/people', label: 'People', icon: Users },
-]
+class SpeakerOpsApiError extends Error {
+  readonly status: number
 
-const mobileLeadershipNavigation = leadershipNavigation.filter((item) => (
-  ['/decisions', '/scheduling', '/leadership/speakers', '/calendar'].includes(item.to)
-))
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
+  }
+}
 
-const api = async (body: ApiRecord) => {
+const api = async (body: ApiRecord, idToken: string) => {
   const response = await fetch('/api/speaker-ops', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, idToken }),
   })
   const payload = await response.json().catch(() => ({ error: 'Speaker Ops returned an invalid response.' })) as ApiRecord
-  if (!response.ok) throw new Error(typeof payload.error === 'string' ? payload.error : 'Speaker Ops is unavailable.')
+  if (!response.ok) throw new SpeakerOpsApiError(
+    typeof payload.error === 'string' ? payload.error : 'Speaker Ops is unavailable.',
+    response.status,
+  )
   return payload
 }
 
@@ -137,153 +120,6 @@ const slotTone = (status: ProgramSlotStatus) => {
 
 function StatusBadge({ label, tone = 'outline' }: { label: string; tone?: string }) {
   return <Badge variant="outline" className={cn('speaker-badge', `speaker-badge--${tone}`)}>{label}</Badge>
-}
-
-function SignIn({ onSignedIn }: { onSignedIn: (account: SpeakerOpsAccount, token: string) => void }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault()
-    setBusy(true)
-    setError('')
-    try {
-      const result = await api({ action: 'signIn', email, password })
-      const account = result.account as SpeakerOpsAccount
-      const token = String(result.sessionToken || '')
-      localStorage.setItem(SESSION_KEY, token)
-      onSignedIn(account, token)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not sign in.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <main id="main-content" className="speaker-auth">
-      <section className="speaker-auth__panel" aria-labelledby="speaker-signin-title">
-        <a href="/" className="speaker-auth__logo" aria-label="UBLDA home"><img src="/logo.png" alt="" /></a>
-        <div className="speaker-auth__heading">
-          <h1 id="speaker-signin-title">Speaker Ops</h1>
-          <p>Leadership access only.</p>
-        </div>
-        {error && (
-          <Alert variant="destructive">
-            <AlertTitle>Sign-in failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        <form onSubmit={submit}>
-          <FieldGroup className="gap-4">
-            <Field>
-              <FieldLabel htmlFor="speaker-email">Michigan email</FieldLabel>
-              <Input
-                id="speaker-email"
-                type="email"
-                autoComplete="username"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="uniqname@umich.edu"
-                required
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="speaker-password">Password</FieldLabel>
-              <Input
-                id="speaker-password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </Field>
-            <Button type="submit" size="sm" disabled={busy} className="w-full">
-              {busy && <Spinner data-icon="inline-start" />}
-              Sign in
-            </Button>
-          </FieldGroup>
-        </form>
-        <p className="speaker-auth__footnote">Only the nine current leadership accounts can sign in. New accounts cannot be created here.</p>
-      </section>
-    </main>
-  )
-}
-
-function PasswordChange({
-  open,
-  token,
-  onChanged,
-}: {
-  open: boolean
-  token: string
-  onChanged: (account: SpeakerOpsAccount) => void
-}) {
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [nextPassword, setNextPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  const submit = async (event: FormEvent) => {
-    event.preventDefault()
-    setError('')
-    if (nextPassword !== confirmPassword) {
-      setError('New passwords do not match.')
-      return
-    }
-    setBusy(true)
-    try {
-      const result = await api({ action: 'changePassword', sessionToken: token, currentPassword, nextPassword })
-      onChanged(result.account as SpeakerOpsAccount)
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not change the password.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <Dialog open={open}>
-      <DialogContent
-        className="speaker-password-dialog"
-        showCloseButton={false}
-        onEscapeKeyDown={(event) => event.preventDefault()}
-        onPointerDownOutside={(event) => event.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle>Set your password</DialogTitle>
-          <DialogDescription>Replace your temporary password before using Speaker Ops. Use at least 12 characters.</DialogDescription>
-        </DialogHeader>
-        {error && <p className="speaker-form-error" role="alert">{error}</p>}
-        <form id="speaker-password-form" onSubmit={submit}>
-          <FieldGroup className="gap-4">
-            <Field>
-              <FieldLabel htmlFor="current-password">Temporary password</FieldLabel>
-              <Input id="current-password" type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="new-password">New password</FieldLabel>
-              <Input id="new-password" type="password" autoComplete="new-password" minLength={12} value={nextPassword} onChange={(event) => setNextPassword(event.target.value)} required />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirm-password">Confirm new password</FieldLabel>
-              <Input id="confirm-password" type="password" autoComplete="new-password" minLength={12} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required />
-            </Field>
-          </FieldGroup>
-        </form>
-        <DialogFooter>
-          <Button form="speaker-password-form" type="submit" size="sm" disabled={busy}>
-            {busy && <Spinner data-icon="inline-start" />}
-            Save password
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 function ProgramSlots({
@@ -712,41 +548,14 @@ function CalendarView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
   )
 }
 
-function AccessView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
-  return (
-    <section className="speaker-section" aria-labelledby="access-title">
-      <div className="speaker-section__heading"><div><h2 id="access-title">Access</h2><p>Nine fixed accounts. No public registration.</p></div></div>
-      <Alert className="speaker-access-note">
-        <KeyRound />
-        <AlertTitle>Long session</AlertTitle>
-        <AlertDescription>Sessions last {SPEAKER_OPS_SESSION_DAYS} days. Temporary passwords must be changed on first login.</AlertDescription>
-      </Alert>
-      <div className="speaker-access-list">
-        {workspace.members.map((member) => (
-          <div className="speaker-access-row" key={member.email}>
-            <div className="speaker-avatar" aria-hidden="true">{member.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div>
-            <div><strong>{member.name}</strong><span>{member.email}</span></div>
-            <span>{member.title}</span>
-            {member.canConfirmProgram ? <StatusBadge label="Can confirm dates" tone="blue" /> : <span className="speaker-muted">Pipeline access</span>}
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 function SpeakerWorkspace({
-  account,
-  token,
   workspace,
   onWorkspaceChange,
-  onLogout,
+  callApi,
 }: {
-  account: SpeakerOpsAccount
-  token: string
   workspace: SpeakerOpsWorkspace
   onWorkspaceChange: (workspace: SpeakerOpsWorkspace) => void
-  onLogout: () => void
+  callApi: (body: ApiRecord) => Promise<ApiRecord>
 }) {
   const [view, setView] = useState<WorkspaceView>('pipeline')
   const [selectedLead, setSelectedLead] = useState<SpeakerLead | null>(null)
@@ -755,72 +564,29 @@ function SpeakerWorkspace({
   const [slotOpen, setSlotOpen] = useState(false)
 
   const refresh = async () => {
-    const result = await api({ action: 'workspace', sessionToken: token })
+    const result = await callApi({ action: 'workspace' })
     onWorkspaceChange(result.workspace as SpeakerOpsWorkspace)
   }
 
   const saveLead = async (lead: SpeakerLead) => {
-    await api({ action: 'updateLead', sessionToken: token, lead })
+    await callApi({ action: 'updateLead', lead })
     await refresh()
   }
   const saveSlot = async (slot: ProgramSlot) => {
-    await api({ action: 'updateSlot', sessionToken: token, slot })
+    await callApi({ action: 'updateSlot', slot })
     await refresh()
   }
   const saveRoom = async (roomRequest: RoomRequest) => {
-    await api({ action: 'updateRoomRequest', sessionToken: token, roomRequest })
+    await callApi({ action: 'updateRoomRequest', roomRequest })
     await refresh()
   }
 
   return (
-    <main id="main-content" className="speaker-ops">
-      <aside className="speaker-sidebar">
-        <nav className="speaker-suite-nav" aria-label="Leadership workspace">
-          {leadershipNavigation.map(({ to, label, icon: Icon, current }) => (
-            <Link key={to} to={to} className="speaker-suite-link" data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
-              <Icon aria-hidden="true" />
-              <span>{label}</span>
-            </Link>
-          ))}
-        </nav>
-        <div className="speaker-sidebar__section">
-          <span className="speaker-nav-label">Speaker workflow</span>
-          <nav aria-label="Speaker Ops sections">
-          {navigation.map((item) => {
-            const Icon = item.icon
-            return (
-              <Button
-                key={item.id}
-                variant="ghost"
-                size="sm"
-                data-active={view === item.id}
-                aria-current={view === item.id ? 'page' : undefined}
-                onClick={() => setView(item.id)}
-              >
-                <Icon data-icon="inline-start" />{item.label}
-              </Button>
-            )
-          })}
-          </nav>
-        </div>
-        <div className="speaker-sidebar__account">
-          <div className="speaker-avatar" aria-hidden="true">{account.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div>
-          <div><strong>{account.name}</strong><span>{account.title}</span></div>
-          <Button variant="ghost" size="icon-sm" onClick={onLogout} aria-label="Sign out"><LogOut /></Button>
-        </div>
-      </aside>
-
-      <div className="speaker-workspace">
-        <header className="speaker-topbar">
-          <div>
-            <div className="speaker-topbar__title"><PanelLeft aria-hidden="true" /><h1>Speaker Ops</h1><StatusBadge label="2026–27" /></div>
-            <p>Plan one or two firesides. Do not offer a date until Ross confirms a room.</p>
-          </div>
-          <Link to="/workspace" className="speaker-topbar__logo" aria-label="UBLDA workspace"><img src="/logo.png" alt="" /></Link>
-        </header>
-
-        <div className="speaker-mobile-nav" aria-label="Speaker Ops sections">
-          {navigation.map((item) => (
+    <div className="speaker-ops speaker-page">
+      <nav className="speaker-workflow-tabs" aria-label="Speaker Ops sections">
+        {navigation.map((item) => {
+          const Icon = item.icon
+          return (
             <Button
               key={item.id}
               variant="ghost"
@@ -829,93 +595,91 @@ function SpeakerWorkspace({
               aria-current={view === item.id ? 'page' : undefined}
               onClick={() => setView(item.id)}
             >
-              {item.label}
+              <Icon data-icon="inline-start" />{item.label}
             </Button>
-          ))}
-        </div>
-
-        <div className="speaker-content" data-view={view}>
-          {(view === 'pipeline' || view === 'slots') && (
-            <ProgramSlots
-              workspace={workspace}
-              onEdit={(slot) => { setSelectedSlot(slot); setSlotOpen(true) }}
-            />
-          )}
-          {view === 'pipeline' && (
-            <Pipeline
-              workspace={workspace}
-              selectedLead={selectedLead}
-              onSelect={(lead) => { setSelectedLead(lead); setLeadOpen(true) }}
-            />
-          )}
-          {view === 'rooms' && <RoomRequests workspace={workspace} onSave={saveRoom} />}
-          {view === 'calendar' && <CalendarView workspace={workspace} />}
-          {view === 'access' && <AccessView workspace={workspace} />}
-        </div>
-      </div>
-      <nav className="speaker-suite-mobile-nav" aria-label="Leadership workspace">
-        {mobileLeadershipNavigation.map(({ to, label, icon: Icon, current }) => (
-          <Link key={to} to={to} data-active={current ? 'true' : undefined} aria-current={current ? 'page' : undefined}>
-            <Icon aria-hidden="true" />
-            <span>{label}</span>
-          </Link>
-        ))}
+          )
+        })}
       </nav>
+      <div className="speaker-content" data-view={view}>
+        {(view === 'pipeline' || view === 'slots') && (
+          <ProgramSlots
+            workspace={workspace}
+            onEdit={(slot) => { setSelectedSlot(slot); setSlotOpen(true) }}
+          />
+        )}
+        {view === 'pipeline' && (
+          <Pipeline
+            workspace={workspace}
+            selectedLead={selectedLead}
+            onSelect={(lead) => { setSelectedLead(lead); setLeadOpen(true) }}
+          />
+        )}
+        {view === 'rooms' && <RoomRequests workspace={workspace} onSave={saveRoom} />}
+        {view === 'calendar' && <CalendarView workspace={workspace} />}
+      </div>
       <LeadSheet lead={selectedLead} open={leadOpen} onOpenChange={setLeadOpen} onSave={saveLead} />
       <SlotSheet slot={selectedSlot} workspace={workspace} open={slotOpen} onOpenChange={setSlotOpen} onSave={saveSlot} />
-    </main>
+    </div>
   )
 }
 
 export function SpeakerOpsEntry() {
-  const [token, setToken] = useState(() => localStorage.getItem(SESSION_KEY) || '')
-  const [account, setAccount] = useState<SpeakerOpsAccount | null>(null)
+  const identity = useLeadershipIdentity()
   const [workspace, setWorkspace] = useState<SpeakerOpsWorkspace | null>(null)
-  const [loading, setLoading] = useState(Boolean(token))
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!token) return
+    localStorage.removeItem('ublda-speaker-ops-session')
+  }, [])
+
+  const callApi = useCallback(async (body: ApiRecord) => {
+    let idToken = await identity.getIdToken()
+    if (!idToken) throw new Error('Your leadership session could not be verified.')
+    try {
+      return await api(body, idToken)
+    } catch (caught) {
+      if (!(caught instanceof SpeakerOpsApiError) || caught.status !== 401) throw caught
+      idToken = await identity.getIdToken(true)
+      if (!idToken) throw caught
+      return await api(body, idToken)
+    }
+  }, [identity])
+
+  useEffect(() => {
     let active = true
-    api({ action: 'workspace', sessionToken: token })
+    callApi({ action: 'workspace' })
       .then((result) => {
         if (!active) return
-        const nextWorkspace = result.workspace as SpeakerOpsWorkspace
-        setWorkspace(nextWorkspace)
-        setAccount(nextWorkspace.account)
+        setWorkspace(result.workspace as SpeakerOpsWorkspace)
       })
-      .catch(() => {
+      .catch((caught) => {
         if (!active) return
-        localStorage.removeItem(SESSION_KEY)
-        setToken('')
+        setError(caught instanceof Error ? caught.message : 'Speaker Ops could not be loaded.')
       })
       .finally(() => active && setLoading(false))
     return () => { active = false }
-  }, [token])
-
-  const signedIn = async (nextAccount: SpeakerOpsAccount, nextToken: string) => {
-    setToken(nextToken)
-    setAccount(nextAccount)
-    const result = await api({ action: 'workspace', sessionToken: nextToken })
-    setWorkspace(result.workspace as SpeakerOpsWorkspace)
-  }
-
-  const logout = async () => {
-    await api({ action: 'logout', sessionToken: token }).catch(() => undefined)
-    localStorage.removeItem(SESSION_KEY)
-    setToken('')
-    setAccount(null)
-    setWorkspace(null)
-  }
+  }, [callApi])
 
   if (loading) {
-    return <main id="main-content" className="speaker-loading"><Spinner /><span>Opening Speaker Ops</span></main>
+    return <div className="speaker-loading speaker-loading--embedded" aria-live="polite"><Spinner /><span>Opening Speaker Ops</span></div>
   }
-  if (!account || !token || !workspace) return <SignIn onSignedIn={signedIn} />
+  if (error || !workspace) {
+    return (
+      <div className="speaker-ops speaker-page speaker-page--error">
+        <Alert variant="destructive">
+          <AlertTitle>Speaker Ops could not be opened</AlertTitle>
+          <AlertDescription>{error || 'Try refreshing the leadership workspace.'}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <SpeakerWorkspace account={account} token={token} workspace={workspace} onWorkspaceChange={(next) => { setWorkspace(next); setAccount(next.account) }} onLogout={logout} />
-      <PasswordChange open={account.mustChangePassword} token={token} onChanged={(nextAccount) => { setAccount(nextAccount); setWorkspace({ ...workspace, account: nextAccount }) }} />
-    </>
+    <SpeakerWorkspace
+      workspace={workspace}
+      onWorkspaceChange={setWorkspace}
+      callApi={callApi}
+    />
   )
 }

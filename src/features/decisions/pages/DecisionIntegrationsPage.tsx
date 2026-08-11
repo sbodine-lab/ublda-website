@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime } from "../format"
+import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
 import type { AgentScope, CreatedAgentKey } from "../types"
 
 const scopeLabels: Record<AgentScope, { label: string; description: string }> = {
@@ -112,11 +113,7 @@ export function DecisionIntegrationsPage() {
   }
 
   return (
-    <div className="dc-page dc-integrations-page">
-      <header className="dc-page-heading dc-page-heading-actions">
-        <div><p className="dc-eyebrow">Integrations</p><h1>Let your agent make the form.</h1><p>Every active member can connect Codex, Claude, or another MCP client with a personal, scoped key.</p></div>
-        <CreateAgentKeyDialog onCreated={setCreatedKey} />
-      </header>
+    <LeadershipPage className="dc-page dc-integrations-page" action={<CreateAgentKeyDialog onCreated={setCreatedKey} />}>
 
       <Alert className="dc-integration-boundary"><ShieldCheck /><AlertTitle>Your key, your access</AlertTitle><AlertDescription>Keys belong to the member who created them and can reach only their selected Decision Center scopes. They do not expose owner-local strategy, transcripts, or other private Brain data.</AlertDescription></Alert>
 
@@ -169,6 +166,6 @@ export function DecisionIntegrationsPage() {
           </div>
         )}
       </section>
-    </div>
+    </LeadershipPage>
   )
 }

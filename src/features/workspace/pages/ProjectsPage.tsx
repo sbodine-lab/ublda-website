@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
+import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useWorkspaceData } from "../workspaceDataContext"
 import { formatDueDate, laneLabels, projectStatusLabels, taskStatusLabels } from "../format"
 import type { ProjectLane, TaskStatus } from "../types"
@@ -36,14 +37,38 @@ export function ProjectsPage() {
     try { await adapter.updateTaskStatus(taskId, status) } catch (caught) { toast.error(caught instanceof Error ? caught.message : "task could not be updated") }
   }
   const personName = (id?: string) => people.find((person) => person.memberId === id)?.displayName ?? "unassigned"
+
+  const newProjectDialog = isAdmin ? (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild><Button className="ws-primary-action"><Plus data-icon="inline-start" /> new project</Button></DialogTrigger>
+      <DialogContent className="ws-dialog">
+        <DialogHeader><DialogTitle>new project</DialogTitle></DialogHeader>
+        <form onSubmit={createProject}>
+          <FieldGroup>
+            <Field><FieldLabel htmlFor="project-name">name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field>
+            <Field><FieldLabel htmlFor="project-summary">one-line outcome</FieldLabel><Input id="project-summary" name="summary" /></Field>
+            <div className="ws-form-grid"><Field><FieldLabel>lane</FieldLabel><Select value={lane} onValueChange={(value) => setLane(value as ProjectLane)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{lanes.map((value) => <SelectItem key={value} value={value}>{laneLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div>
+            <Field><FieldLabel htmlFor="project-due">due</FieldLabel><Input id="project-due" name="due" type="date" /></Field>
+          </FieldGroup>
+          <DialogFooter className="ws-dialog-footer"><Button type="submit">create project</Button></DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  ) : null
+
   return (
-    <div className="ws-page ws-projects-page">
-      <header className="ws-page-header ws-page-header-row"><div><p className="ws-kicker">project tracker</p><h1>projects</h1></div>{isAdmin && <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button className="ws-primary-action"><Plus /> new project</Button></DialogTrigger><DialogContent className="ws-dialog"><DialogHeader><DialogTitle>new project</DialogTitle></DialogHeader><form onSubmit={createProject}><FieldGroup><Field><FieldLabel htmlFor="project-name">name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field><Field><FieldLabel htmlFor="project-summary">one-line outcome</FieldLabel><Input id="project-summary" name="summary" /></Field><div className="ws-form-grid"><Field><FieldLabel>lane</FieldLabel><Select value={lane} onValueChange={(value) => setLane(value as ProjectLane)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{lanes.map((value) => <SelectItem key={value} value={value}>{laneLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div><Field><FieldLabel htmlFor="project-due">due</FieldLabel><Input id="project-due" name="due" type="date" /></Field></FieldGroup><DialogFooter className="ws-dialog-footer"><Button type="submit">create project</Button></DialogFooter></form></DialogContent></Dialog>}</header>
+    <LeadershipPage className="ws-projects-page" action={newProjectDialog}>
       {!projects.length ? <Empty className="ws-empty ws-page-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no projects yet</EmptyTitle><EmptyDescription>Projects organize owners, tasks, due dates, and progress in one place.</EmptyDescription></EmptyHeader></Empty> : null}
       {lanes.map((currentLane) => {
         const laneProjects = projects.filter((project) => project.lane === currentLane)
         if (!laneProjects.length) return null
-        return <section className="ws-project-group" key={currentLane}><header><ChevronDown /><h2>{laneLabels[currentLane]}</h2><span>{laneProjects.length}</span></header><div className="ws-project-mobile">{laneProjects.map((project) => {
+        return <LeadershipSection
+          className="ws-project-group"
+          key={currentLane}
+          title={<span className="leadership-section-title-row"><ChevronDown />{laneLabels[currentLane]}</span>}
+          action={<span className="leadership-section-count">{laneProjects.length}</span>}
+          flush
+        ><div className="ws-project-mobile">{laneProjects.map((project) => {
           const projectTasks = tasks.filter((task) => task.projectId === project.id)
           const done = projectTasks.filter((task) => task.status === "done").length
           const progress = projectTasks.length ? Math.round(done / projectTasks.length * 100) : 0
@@ -53,8 +78,8 @@ export function ProjectsPage() {
           const done = projectTasks.filter((task) => task.status === "done").length
           const progress = projectTasks.length ? Math.round(done / projectTasks.length * 100) : 0
           return [<TableRow className="ws-project-parent" key={project.id}><TableCell><strong>{project.name}</strong>{project.summary && <small>{project.summary}</small>}</TableCell><TableCell>{personName(project.ownerMemberId)}</TableCell><TableCell><span className={`ws-status ws-status-${project.status}`}>{projectStatusLabels[project.status]}</span></TableCell><TableCell>{formatDueDate(project.dueDate)}</TableCell><TableCell><div className="ws-table-progress"><Progress value={progress} /><span>{progress}%</span></div></TableCell></TableRow>, ...projectTasks.map((task) => <TableRow className="ws-task-row" key={task.id}><TableCell><span className="ws-task-indent">{task.title}</span></TableCell><TableCell>{personName(task.ownerMemberId)}</TableCell><TableCell><Select value={task.status} onValueChange={(value) => void changeTask(task.id, value as TaskStatus)} disabled={!isAdmin && task.ownerMemberId !== viewer?.memberId}><SelectTrigger size="sm" className="ws-status-select"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(taskStatusLabels).map(([value, label]) => <SelectItem value={value} key={value}>{label}</SelectItem>)}</SelectContent></Select></TableCell><TableCell>{formatDueDate(task.dueDate)}</TableCell><TableCell>{task.completionSignal ?? "—"}</TableCell></TableRow>), isAdmin ? <TableRow className="ws-add-task-row" key={`${project.id}-add`}><TableCell colSpan={5}><button type="button" onClick={() => void createTask(project.id)}><Plus /> add task</button></TableCell></TableRow> : null].filter(Boolean) as React.ReactElement[]
-        })}</TableBody></Table></div></section>
+        })}</TableBody></Table></div></LeadershipSection>
       })}
-    </div>
+    </LeadershipPage>
   )
 }

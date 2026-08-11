@@ -12,9 +12,24 @@ import { bookingEmailLaunchError, sendBookingConfirmationEmail } from './server/
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
 import { buildRecruitingExport, parseRecruitingExportType } from './server/recruitingExport.ts'
 import { housingApiPayloadForRoute } from './server/housingApi.ts'
-import { handleSpeakerOpsRequest } from './server/speakerOpsService.ts'
+import {
+  handleSpeakerOpsRequest,
+  type SpeakerOpsIdentityVerifier,
+} from './server/speakerOpsService.ts'
 
 const store = createLocalRecruitingStore()
+const LOCAL_LEADERSHIP_PREVIEW_TOKEN = 'ublda-local-leadership-preview'
+const verifyLocalSpeakerOpsIdentity: SpeakerOpsIdentityVerifier = async (idToken) => {
+  if (idToken !== LOCAL_LEADERSHIP_PREVIEW_TOKEN) {
+    throw new Error('Invalid local leadership preview token.')
+  }
+  return {
+    memberId: 'local-preview-member',
+    displayName: 'Sam Bodine',
+    email: 'sbodine@umich.edu',
+    role: 'admin',
+  }
+}
 
 const readJsonBody = (req: IncomingMessage) =>
   new Promise<Record<string, unknown>>((resolve) => {
@@ -62,7 +77,9 @@ const devApiPlugin = () => ({
       const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(',')[0]?.trim()
         || req.socket.remoteAddress
         || 'local-preview'
-      const result = await handleSpeakerOpsRequest(body, ip)
+      const result = await handleSpeakerOpsRequest(body, ip, {
+        verifyIdentity: verifyLocalSpeakerOpsIdentity,
+      })
       sendJson(res, result.status, { ...result.body, localPreview: true })
     })
 

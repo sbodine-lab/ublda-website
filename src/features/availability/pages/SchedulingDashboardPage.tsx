@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
+import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
 import { dateLabel } from "../format"
 import { AvailabilityResultsPanel } from "../components/AvailabilityResultsPanel"
@@ -13,11 +14,10 @@ export function SchedulingDashboardPage() {
   const viewer = decisionSnapshot.auth.status === "signed-in" ? decisionSnapshot.auth.viewer : undefined
 
   return (
-    <div className="ws-page av-dashboard-page">
-      <header className="ws-page-header ws-page-header-row">
-        <div><p className="ws-kicker">coordination</p><h1>scheduling</h1></div>
-        {viewer?.role === "admin" ? <Button asChild className="ws-primary-action"><Link to="/scheduling/new"><Plus data-icon="inline-start" /> new poll</Link></Button> : null}
-      </header>
+    <LeadershipPage
+      className="av-dashboard-page"
+      action={viewer?.role === "admin" ? <Button asChild className="ws-primary-action"><Link to="/scheduling/new"><Plus data-icon="inline-start" /> new poll</Link></Button> : null}
+    >
 
       <div className="av-dashboard">
         <section className="av-poll-list-pane" aria-label="scheduling polls">
@@ -50,6 +50,6 @@ export function SchedulingDashboardPage() {
           ) : snapshot.loading ? <p className="av-dashboard-loading">loading…</p> : <Empty className="av-detail-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>choose a poll</EmptyTitle><EmptyDescription>Poll details and response coverage will appear here.</EmptyDescription></EmptyHeader></Empty>}
         </section>
       </div>
-    </div>
+    </LeadershipPage>
   )
 }

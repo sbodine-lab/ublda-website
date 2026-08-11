@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/empty"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
+import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime } from "../format"
 import { calculateDecisionResults } from "../results"
@@ -39,13 +40,14 @@ export function DecisionsPage() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [filter, snapshot.decisions])
 
   return (
-    <div className="dc-page dc-decisions-page">
-      <header className="dc-page-heading dc-page-heading-actions">
-        <div><p className="dc-eyebrow">decision center</p><h1>questions</h1></div>
+    <LeadershipPage
+      className="dc-page dc-decisions-page"
+      action={(
         <Button asChild className="dc-touch dc-desktop-create-button">
           <Link to="/decisions/new"><Plus data-icon="inline-start" /> new question</Link>
         </Button>
-      </header>
+      )}
+    >
 
       <Tabs className="dc-list-toolbar" value={filter} onValueChange={(value) => setFilter(value as Filter)}>
         <TabsList variant="line" aria-label="Decision status">
@@ -140,6 +142,6 @@ export function DecisionsPage() {
           })}
         </div>
       )}
-    </div>
+    </LeadershipPage>
   )
 }

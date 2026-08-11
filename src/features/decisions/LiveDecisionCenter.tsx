@@ -63,6 +63,7 @@ import { createLiveWorkspaceAdapter, type MutableLiveWorkspaceAdapter } from "@/
 import { mapClubWorkspace, type BackendClubWorkspaceSnapshot } from "@/features/workspace/liveContracts"
 import type { ClubWorkspaceSnapshot, CreateClubEventInput, CreateProjectInput, CreateProjectTaskInput, TaskStatus, UpdateDirectoryProfileInput } from "@/features/workspace/types"
 import { logtoIsLoadingForConvex } from "./logtoConvexAuth"
+import { LeadershipIdentityProvider } from "./leadershipIdentityContext"
 
 type EmptyArgs = Record<string, never>
 type BackendDraftInput = ReturnType<typeof decisionInputForBackend>
@@ -302,6 +303,21 @@ function LiveDecisionBridge({
   workspaceAdapter: MutableLiveWorkspaceAdapter
 }) {
   const logtoAuth = useLogto()
+  const {
+    clearAccessToken: clearLeadershipAccessToken,
+    getAccessToken: getLeadershipAccessToken,
+    getIdToken: getLeadershipIdTokenFromLogto,
+    isAuthenticated: leadershipIsAuthenticated,
+  } = logtoAuth
+  const getLeadershipIdToken = useCallback(async (forceRefresh = false) => {
+    if (!leadershipIsAuthenticated) return null
+    if (forceRefresh) {
+      await clearLeadershipAccessToken()
+      if (!await getLeadershipAccessToken()) return null
+    }
+    return await getLeadershipIdTokenFromLogto() ?? null
+  }, [clearLeadershipAccessToken, getLeadershipAccessToken, getLeadershipIdTokenFromLogto, leadershipIsAuthenticated])
+  const leadershipIdentity = useMemo(() => ({ getIdToken: getLeadershipIdToken }), [getLeadershipIdToken])
   const convexAuth = useConvexAuth()
   const location = useLocation()
   const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
@@ -874,13 +890,15 @@ function LiveDecisionBridge({
   useEffect(() => { workspaceAdapter.replaceOperations(workspaceOperations) }, [workspaceAdapter, workspaceOperations])
 
   return (
-    <WorkspaceDataProvider adapter={workspaceAdapter}>
-      <AvailabilityDataProvider adapter={availabilityAdapter}>
-        <DecisionDataProvider adapter={adapter}>
-          <DecisionCenterRoutes logtoCallback />
-        </DecisionDataProvider>
-      </AvailabilityDataProvider>
-    </WorkspaceDataProvider>
+    <LeadershipIdentityProvider identity={leadershipIdentity}>
+      <WorkspaceDataProvider adapter={workspaceAdapter}>
+        <AvailabilityDataProvider adapter={availabilityAdapter}>
+          <DecisionDataProvider adapter={adapter}>
+            <DecisionCenterRoutes logtoCallback />
+          </DecisionDataProvider>
+        </AvailabilityDataProvider>
+      </WorkspaceDataProvider>
+    </LeadershipIdentityProvider>
   )
 }
 
