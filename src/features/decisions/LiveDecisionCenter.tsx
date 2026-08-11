@@ -899,7 +899,23 @@ function useLogtoConvexAuth() {
       const refreshedAccessToken = await getAccessToken()
       if (!refreshedAccessToken) return null
     }
-    return await getIdToken() ?? null
+    const idToken = await getIdToken()
+    if (!idToken) return null
+
+    const response = await fetch('/api/convex-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    })
+    const payload = await response.json().catch(() => null) as { token?: unknown; error?: unknown } | null
+    if (!response.ok || typeof payload?.token !== 'string') {
+      throw new Error(
+        typeof payload?.error === 'string'
+          ? payload.error
+          : 'The leadership sign-in session could not be verified.',
+      )
+    }
+    return payload.token
   }, [clearAccessToken, getAccessToken, getIdToken, isAuthenticated])
 
   return useMemo(() => ({ isLoading, isAuthenticated, fetchAccessToken }), [

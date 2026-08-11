@@ -60,8 +60,14 @@ Start from [`.env.decisions.example`](../.env.decisions.example). It is separate
 | `CONVEX_SITE_URL` | Vercel | Server-only | Convex HTTP Actions origin ending in `.convex.site` |
 | `DECISION_AGENT_GATEWAY_SECRET` | Vercel and Convex | Server-only | Identical high-entropy secret used to authenticate the gateway before Convex processes a bearer token |
 | `DECISION_AGENT_ALLOWED_ORIGINS` | Vercel | Server-only | Optional comma-separated browser origins for the agent API; same-origin remains allowed |
-| `LOGTO_ISSUER` | Convex deployment | Server-side deployment setting | Exact Logto OIDC issuer, normally the tenant endpoint plus `/oidc` |
-| `LOGTO_APP_ID` | Convex deployment | Server-side deployment setting | Same Logto application ID used as the ID-token audience |
+| `LOGTO_ISSUER` | Vercel | Server-only | Exact Logto OIDC issuer used to verify the hosted-login ID token |
+| `LOGTO_APP_ID` | Vercel | Server-only | Same Logto SPA application ID used as the ID-token audience |
+| `CONVEX_AUTH_ISSUER` | Vercel and Convex | Server-only | Canonical same-origin auth-bridge URL, for example `https://ublda.org/api/convex-auth` |
+| `CONVEX_AUTH_APP_ID` | Vercel and Convex | Server-only | Dedicated audience for five-minute Convex tokens |
+| `CONVEX_AUTH_JWKS` | Convex | Server-side deployment setting | Public JWKS URL; use the same auth-bridge URL |
+| `CONVEX_AUTH_SIGNING_PRIVATE_KEY` | Vercel | Secret | PKCS8 RSA private key used only by the auth bridge |
+| `CONVEX_AUTH_PUBLIC_JWKS` | Vercel | Server-only | One matching RS256 public signing key, including a stable `kid` |
+| `CONVEX_AUTH_ALLOWED_ORIGINS` | Vercel | Server-only | Comma-separated production origins allowed to exchange a Logto ID token |
 | `BOOTSTRAP_ADMIN_EMAILS` | Convex deployment | Server-side deployment setting | Comma-separated, normalized verified emails allowed to initialize an empty workspace |
 
 `VITE_*` values are intentionally readable by the browser. The Logto endpoint and SPA application ID are public identifiers. Never put a Logto Management API secret, Convex deploy key, agent bearer token, password, or any other secret in a `VITE_*` variable or a committed env file.
@@ -94,7 +100,7 @@ Create a dedicated Logto tenant and **Single-page app**, then:
 3. Pre-create each approved administrator/member in the Logto user console or Management API. Deliver initial passwords outside the repository; never place a member password in source, a committed env file, a test, a screenshot, shell history, or deployment logs.
 4. Register `http://localhost:5173/auth/callback` and `https://ublda.org/auth/callback` as redirect URIs. Register the matching `/workspace` URLs as post-sign-out redirect URIs. Add a preview host only while deliberately testing that preview.
 5. Copy the tenant endpoint to `VITE_LOGTO_ENDPOINT` and the SPA application ID to `VITE_LOGTO_APP_ID`.
-6. Copy the exact OIDC issuer from the tenant discovery metadata to `LOGTO_ISSUER` in Convex. It is normally `https://<tenant>.logto.app/oidc`. Set `LOGTO_APP_ID` in Convex to the same SPA app ID; Logto uses it as the ID-token audience.
+6. Copy the exact OIDC issuer from tenant discovery metadata to Vercel's server-only `LOGTO_ISSUER`. It is normally `https://<tenant>.logto.app/oidc`. Set Vercel's server-only `LOGTO_APP_ID` to the same SPA app ID; Logto uses it as the ID-token audience.
 7. The React client requests Logto's email scope in addition to the default `openid`, `profile`, and `offline_access` scopes. Inspect one development ID token before bootstrap and confirm `aud` is the app ID, `email` is the signed-in primary address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
 
 Authentication is one pre-created Logto user per person, while authorization is one UBLDA member record in Convex. Disabling public registration is defense in depth: a valid Logto session still cannot access the workspace until its verified email is present in the Convex roster. Existing verified Clerk identity rows may migrate once to a matching verified Logto identity; arbitrary verified rows cannot be rebound.
@@ -104,8 +110,9 @@ Authentication is one pre-created Logto user per person, while authorization is 
 Use placeholders below when rehearsing; substitute the approved values without committing them:
 
 ```sh
-npx convex env set LOGTO_ISSUER https://example.logto.app/oidc
-npx convex env set LOGTO_APP_ID replace_with_logto_spa_app_id
+npx convex env set CONVEX_AUTH_ISSUER https://example.org/api/convex-auth
+npx convex env set CONVEX_AUTH_APP_ID ublda-convex
+npx convex env set CONVEX_AUTH_JWKS https://example.org/api/convex-auth
 npx convex env set BOOTSTRAP_ADMIN_EMAILS first.admin@example.invalid
 ```
 
@@ -133,12 +140,19 @@ Set these for each intended Vercel environment:
 - `VITE_CONVEX_URL`
 - `VITE_LOGTO_ENDPOINT`
 - `VITE_LOGTO_APP_ID`
+- `LOGTO_ISSUER`
+- `LOGTO_APP_ID`
+- `CONVEX_AUTH_ISSUER`
+- `CONVEX_AUTH_APP_ID`
+- `CONVEX_AUTH_SIGNING_PRIVATE_KEY`
+- `CONVEX_AUTH_PUBLIC_JWKS`
+- `CONVEX_AUTH_ALLOWED_ORIGINS`
 - `CONVEX_SITE_URL`
 - `DECISION_AGENT_GATEWAY_SECRET` using a separately generated 32–512 character
   server-only value; set the exact same value in the matching Convex deployment
 - `DECISION_AGENT_ALLOWED_ORIGINS` only if a browser client on another approved origin needs the API
 
-`LOGTO_ISSUER`, `LOGTO_APP_ID`, and `BOOTSTRAP_ADMIN_EMAILS` belong in Convex, not Vercel. Logto redirect and post-sign-out settings must include the exact final Vercel/custom-domain host.
+`CONVEX_AUTH_ISSUER` and `CONVEX_AUTH_APP_ID` must match in Vercel and Convex. Set `CONVEX_AUTH_JWKS` and `BOOTSTRAP_ADMIN_EMAILS` only in Convex. The bridge verifies each Logto token against Logto's remote JWKS and issues an RS256 token valid for five minutes; it never receives or stores a member password. Logto redirect and post-sign-out settings must include the exact final Vercel/custom-domain host.
 
 The Convex HTTP Actions reject direct public traffic unless
 `X-UBLDA-Gateway-Secret` matches this shared value. Never put the secret in a
