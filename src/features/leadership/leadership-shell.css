@@ -335,6 +335,105 @@
   background: transparent !important;
 }
 
+/* The public-site reset intentionally clears all margin and padding after
+   Tailwind's layer. Restore the shadcn component insets inside the leadership
+   app so text and controls keep their designed breathing room. */
+.dc-app-shell.leadership-shell [data-slot="card"]:not(.leadership-section__card):not(.leadership-surface) {
+  gap: 16px;
+  padding-block: 16px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="card"][data-size="sm"]:not(.leadership-section__card):not(.leadership-surface) {
+  gap: 12px;
+  padding-block: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="card"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-header"],
+.dc-app-shell.leadership-shell [data-slot="card"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-content"] {
+  padding-inline: 16px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="card"][data-size="sm"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-header"],
+.dc-app-shell.leadership-shell [data-slot="card"][data-size="sm"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-content"] {
+  padding-inline: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="card"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-footer"] {
+  padding: 16px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="card"][data-size="sm"]:not(.leadership-section__card):not(.leadership-surface) > [data-slot="card-footer"] {
+  padding: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="button"][data-size="default"] {
+  padding-inline: 16px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="button"][data-size="xs"] {
+  padding-inline: 8px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="button"][data-size="sm"] {
+  padding-inline: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="button"][data-size="lg"] {
+  padding-inline: 20px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="input"] {
+  padding: 4px 10px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="textarea"] {
+  padding: 8px 10px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="tabs-list"] {
+  padding: 3px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="tabs-trigger"] {
+  padding: 2px 8px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="select-trigger"] {
+  padding: 8px 8px 8px 10px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="table-head"] {
+  padding-inline: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="table-cell"] {
+  padding: 12px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="empty"] {
+  padding: 28px 24px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="badge"] {
+  padding: 2px 8px;
+}
+
+.dc-app-shell.leadership-shell [data-slot="alert"] {
+  padding: 16px;
+}
+
+.dc-app-shell.leadership-shell .ws-search [data-slot="input"] {
+  padding-left: 34px;
+}
+
+body:has(.dc-app-shell.leadership-shell) [data-slot="select-group"] {
+  padding: 4px;
+}
+
+body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
+  padding: 4px 32px 4px 8px;
+}
+
 .dc-app-shell.leadership-shell .leadership-main > .ws-page,
 .dc-app-shell.leadership-shell .leadership-main > .dc-page,
 .dc-app-shell.leadership-shell .leadership-main > .av-create-page,
@@ -420,7 +519,7 @@
 .leadership-section__header {
   min-height: 54px;
   align-items: center;
-  padding-block: 12px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--leadership-hairline);
   border-radius: 12px 12px 0 0;
 }
@@ -441,7 +540,7 @@
 
 .leadership-section__content,
 .leadership-surface__content {
-  padding-block: 18px;
+  padding: 18px 20px;
 }
 
 .leadership-section__content--flush,
