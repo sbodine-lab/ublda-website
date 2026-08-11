@@ -622,6 +622,12 @@ function LiveDecisionBridge({
       })
       if (error) throw new Error("Google sign-in could not be started.")
     },
+    async signInWithEmailCode(email: string) {
+      const { error } = await clerkSignIn.emailCode.sendCode({
+        emailAddress: email.trim(),
+      })
+      if (error) throw new Error("A sign-in code could not be sent. Check the email address or use Google.")
+    },
     async signIn(credentials: DecisionSignInCredentials) {
       const { error } = await clerkSignIn.password({
         emailAddress: credentials.email.trim(),
@@ -646,7 +652,10 @@ function LiveDecisionBridge({
       throw new Error("Sign-in could not be completed.")
     },
     async verifySignInCode(code: string) {
-      const { error } = await clerkSignIn.mfa.verifyEmailCode({ code: code.trim() })
+      const verification = clerkSignIn.status === "needs_first_factor"
+        ? await clerkSignIn.emailCode.verifyCode({ code: code.trim() })
+        : await clerkSignIn.mfa.verifyEmailCode({ code: code.trim() })
+      const { error } = verification
       if (error) throw new Error("That verification code is incorrect.")
       if (clerkSignIn.status !== "complete") throw new Error("Sign-in could not be completed.")
       const { error: finalizeError } = await clerkSignIn.finalize()

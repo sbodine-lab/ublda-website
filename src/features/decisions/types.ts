@@ -195,6 +195,7 @@ export interface DecisionCenterAdapter {
   subscribe(listener: () => void): () => void
   getSnapshot(): DecisionCenterSnapshot
   signInWithGoogle(): Promise<void>
+  signInWithEmailCode(email: string): Promise<void>
   signIn(credentials: DecisionSignInCredentials): Promise<DecisionSignInResult>
   verifySignInCode(code: string): Promise<void>
   signOut(): Promise<void>

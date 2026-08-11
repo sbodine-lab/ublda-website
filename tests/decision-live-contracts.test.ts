@@ -217,8 +217,10 @@ test("mutable live adapter publishes snapshots and delegates operations", async 
   assert.equal(notified, 1)
 
   let signedOut = false
+  let emailCodeAddress = ""
   adapter.replaceOperations({
     async signInWithGoogle() {},
+    async signInWithEmailCode(email) { emailCodeAddress = email },
     async signIn() { return { status: "complete" } },
     async verifySignInCode() {},
     async signOut() { signedOut = true },
@@ -231,6 +233,8 @@ test("mutable live adapter publishes snapshots and delegates operations", async 
     async createAgentKey() { throw new Error("unused") },
     async revokeAgentKey() {},
   })
+  await adapter.signInWithEmailCode("leader@umich.edu")
+  assert.equal(emailCodeAddress, "leader@umich.edu")
   await adapter.signOut()
   assert.equal(signedOut, true)
 })
