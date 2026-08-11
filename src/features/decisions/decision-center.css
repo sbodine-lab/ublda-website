@@ -168,6 +168,15 @@
   min-height: 48px;
 }
 
+.dc-auth-guidance,
+.dc-auth-code-sent {
+  margin: 0 0 16px;
+  color: var(--dc-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .dc-auth-google {
   width: 100%;
   background: var(--dc-paper);

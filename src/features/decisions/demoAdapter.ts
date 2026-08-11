@@ -330,6 +330,9 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
         },
       })
     },
+    async signInWithEmailCode() {
+      return undefined
+    },
     async signIn() {
       update({
         ...snapshot,
@@ -547,6 +550,7 @@ export function createUnavailableLiveDecisionAdapter(message: string): DecisionC
     subscribe: () => () => undefined,
     getSnapshot: () => snapshot,
     signInWithGoogle: unavailable,
+    signInWithEmailCode: unavailable,
     signIn: unavailable,
     verifySignInCode: unavailable,
     signOut: unavailable,

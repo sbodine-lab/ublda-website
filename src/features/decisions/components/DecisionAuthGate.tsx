@@ -59,6 +59,19 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
     }
   }
 
+  const signInWithEmailCode = async () => {
+    setSubmitting(true)
+    setError(undefined)
+    try {
+      await adapter.signInWithEmailCode(email)
+      setNeedsVerification(true)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "A sign-in code could not be sent.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const verify = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitting(true)
@@ -100,6 +113,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
         ) : (
           needsVerification ? (
             <form className="dc-auth-form" onSubmit={verify}>
+              <p className="dc-auth-code-sent">Check your email for a one-time sign-in code.</p>
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="decision-verification-code">verification code</FieldLabel>
@@ -122,6 +136,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
             </form>
           ) : (
             <div className="dc-auth-form">
+              <p className="dc-auth-guidance">Use your U-M Google account, a one-time email code, or your Leadership Workspace password.</p>
               <Button
                 type="button"
                 variant="outline"
@@ -174,6 +189,17 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
                   <Button type="submit" size="lg" className="dc-touch" disabled={submitting || snapshot.auth.status === "loading" || !email.trim() || !password}>
                     {submitting || snapshot.auth.status === "loading" ? <Spinner data-icon="inline-start" /> : null}
                     sign in
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    className="dc-touch"
+                    disabled={submitting || snapshot.auth.status === "loading" || !email.trim()}
+                    onClick={() => void signInWithEmailCode()}
+                  >
+                    {submitting || snapshot.auth.status === "loading" ? <Spinner data-icon="inline-start" /> : null}
+                    email me a sign-in code
                   </Button>
                 </FieldGroup>
               </form>
