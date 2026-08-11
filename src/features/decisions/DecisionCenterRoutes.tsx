@@ -15,6 +15,7 @@ import { ClubCalendarPage } from "@/features/workspace/pages/ClubCalendarPage"
 import { PeoplePage } from "@/features/workspace/pages/PeoplePage"
 import { ProjectsPage } from "@/features/workspace/pages/ProjectsPage"
 import { WorkspaceOverviewPage } from "@/features/workspace/pages/WorkspaceOverviewPage"
+import { SpeakerOpsEntry } from "@/features/speakers/SpeakerOpsEntry"
 import { LogtoAuthCallback } from "./LogtoAuthCallback"
 import "@/features/availability/availability.css"
 import "./decision-center.css"
@@ -37,6 +38,9 @@ export function DecisionCenterRoutes({ logtoCallback = false }: { logtoCallback?
       <Route path="/schedule" element={<DecisionAuthGate><AvailabilityPollPage /></DecisionAuthGate>} />
       <Route path="/s/:slug" element={<DecisionAuthGate><AvailabilityPollPage /></DecisionAuthGate>} />
       <Route path="/s/:slug/results" element={<DecisionAuthGate><AvailabilityResultsPage /></DecisionAuthGate>} />
+      <Route path="/signin" element={<Navigate to="/workspace" replace />} />
+      <Route path="/dashboard" element={<Navigate to="/workspace" replace />} />
+      <Route path="/members" element={<Navigate to="/workspace" replace />} />
       <Route element={<PrivateWorkspace />}>
         <Route path="/workspace" element={<WorkspaceOverviewPage />} />
         <Route path="/decisions" element={<DecisionsPage />} />
@@ -51,6 +55,8 @@ export function DecisionCenterRoutes({ logtoCallback = false }: { logtoCallback?
         <Route path="/calendar" element={<ClubCalendarPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/people" element={<PeoplePage />} />
+        <Route path="/leadership/speakers" element={<SpeakerOpsEntry />} />
+        <Route path="/speaker-ops" element={<Navigate to="/leadership/speakers" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/workspace" replace />} />
     </Routes>

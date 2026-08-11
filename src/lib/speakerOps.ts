@@ -1,5 +1,3 @@
-export const SPEAKER_OPS_SESSION_DAYS = 180
-
 export const SPEAKER_OPS_MEMBERS = [
   { name: 'Alex Forstner', email: 'alexfors@umich.edu', title: 'VP Education' },
   { name: 'Alexa Chiang', email: 'atchiang@umich.edu', title: 'Co-President' },
@@ -78,29 +76,28 @@ export type RoomRequest = {
 
 export type SpeakerOpsActivity = {
   id: string
-  actorEmail: SpeakerOpsMemberEmail | 'system'
+  actorEmail: string
   action: string
   detail: string
   createdAt: string
 }
 
-export type SpeakerOpsAccount = {
+export type SpeakerOpsViewer = {
+  memberId: string
   name: string
-  email: SpeakerOpsMemberEmail
+  email: string
   title: string
-  mustChangePassword: boolean
+  role: 'admin' | 'member'
   canConfirmProgram: boolean
-  lastSignedInAt: string
 }
 
 export type SpeakerOpsWorkspace = {
-  account: SpeakerOpsAccount
-  members: Array<Omit<SpeakerOpsAccount, 'mustChangePassword' | 'lastSignedInAt'>>
+  viewer: SpeakerOpsViewer
+  members: Array<Pick<SpeakerOpsViewer, 'name' | 'email' | 'title' | 'canConfirmProgram'>>
   leads: SpeakerLead[]
   slots: ProgramSlot[]
   roomRequests: RoomRequest[]
   activity: SpeakerOpsActivity[]
-  sessionExpiresAt: string
 }
 
 export const SPEAKER_STAGE_LABELS: Record<SpeakerStage, string> = {

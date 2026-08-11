@@ -115,7 +115,7 @@ const signingKey = async (privateKey: string) => {
   return cachedPrivateKey
 }
 
-export const exchangeLogtoIdToken = async (
+export const exchangeLogtoIdTokenWithIdentity = async (
   idToken: string,
   config: AuthBridgeConfig,
   keySet: Parameters<typeof jwtVerify>[1] = remoteKeySet(config.logtoJwksUrl),
@@ -144,7 +144,24 @@ export const exchangeLogtoIdToken = async (
     .sign(await signingKey(config.signingPrivateKey))
 
   return {
+    identity,
     token,
     expiresIn: CONVEX_TOKEN_TTL_SECONDS,
+  }
+}
+
+export const exchangeLogtoIdToken = async (
+  idToken: string,
+  config: AuthBridgeConfig,
+  keySet: Parameters<typeof jwtVerify>[1] = remoteKeySet(config.logtoJwksUrl),
+) => {
+  const exchange = await exchangeLogtoIdTokenWithIdentity(
+    idToken,
+    config,
+    keySet,
+  )
+  return {
+    token: exchange.token,
+    expiresIn: exchange.expiresIn,
   }
 }

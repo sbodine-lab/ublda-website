@@ -5,6 +5,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Progress } from "@/components/ui/progress"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
 import { useAvailabilityData } from "@/features/availability/availabilityDataContext"
+import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useWorkspaceData } from "../workspaceDataContext"
 import { formatDueDate, formatEventDate, formatEventTime, laneLabels } from "../format"
 
@@ -24,20 +25,17 @@ export function WorkspaceOverviewPage() {
   const firstName = viewer?.displayName.split(/\s+/)[0]?.toLowerCase() ?? "there"
 
   return (
-    <div className="ws-page ws-overview-page">
-      <header className="ws-page-header">
-        <p className="ws-kicker">workspace</p>
-        <h1>good morning, {firstName}</h1>
-      </header>
+    <LeadershipPage className="ws-overview-page" eyebrow="workspace" title={`good morning, ${firstName}`}>
 
       {workspace.error && <p className="ws-error" role="alert">{workspace.error}</p>}
 
-      <div className="ws-overview-grid">
-        <section className="ws-section" aria-labelledby="agenda-title">
-          <div className="ws-section-heading">
-            <h2 id="agenda-title">upcoming agenda</h2>
-            <Button variant="ghost" size="sm" asChild><Link to="/calendar">calendar <ArrowRight /></Link></Button>
-          </div>
+      <div className="ws-overview-grid leadership-overview-grid">
+        <LeadershipSection
+          title="upcoming agenda"
+          titleId="agenda-title"
+          flush
+          action={<Button variant="ghost" size="sm" asChild><Link to="/calendar">calendar <ArrowRight data-icon="inline-end" /></Link></Button>}
+        >
           {upcoming.length ? (
             <div className="ws-agenda-list">
               {upcoming.map((event) => (
@@ -51,13 +49,14 @@ export function WorkspaceOverviewPage() {
           ) : (
             <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarDays /></EmptyMedia><EmptyTitle>nothing scheduled</EmptyTitle><EmptyDescription>add the next board meeting or deadline.</EmptyDescription></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/calendar">open calendar</Link></Button></EmptyContent></Empty>
           )}
-        </section>
+        </LeadershipSection>
 
-        <section className="ws-section" aria-labelledby="active-work-title">
-          <div className="ws-section-heading">
-            <h2 id="active-work-title">active work</h2>
-            <Button variant="ghost" size="sm" asChild><Link to="/projects">projects <ArrowRight /></Link></Button>
-          </div>
+        <LeadershipSection
+          title="active work"
+          titleId="active-work-title"
+          flush
+          action={<Button variant="ghost" size="sm" asChild><Link to="/projects">projects <ArrowRight data-icon="inline-end" /></Link></Button>}
+        >
           {activeProjects.length ? <div className="ws-project-list">
             {activeProjects.map((project) => {
               const projectTasks = workspace.tasks.filter((task) => task.projectId === project.id)
@@ -73,18 +72,17 @@ export function WorkspaceOverviewPage() {
               )
             })}
           </div> : <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no active projects</EmptyTitle><EmptyDescription>New work will appear here once a project is started.</EmptyDescription></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/projects">open projects</Link></Button></EmptyContent></Empty>}
-        </section>
+        </LeadershipSection>
       </div>
 
-      <section className="ws-section ws-waiting" aria-labelledby="waiting-title">
-        <div className="ws-section-heading"><h2 id="waiting-title">waiting on you</h2></div>
+      <LeadershipSection className="leadership-waiting-section" title="waiting on you" titleId="waiting-title" flush>
         {[...waitingDecisions.map((decision) => ({ id: decision.id, label: decision.title, type: "decision", to: `/d/${decision.slug}` })),
           ...waitingPolls.map((poll) => ({ id: poll.id, label: poll.title, type: "scheduling", to: `/s/${poll.slug}` })),
           ...waitingTasks.map((task) => ({ id: task.id, label: task.title, type: "task", to: "/projects" }))]
           .slice(0, 6)
           .map((item) => <Link className="ws-waiting-row" to={item.to} key={`${item.type}-${item.id}`}><CheckCircle2 /><strong>{item.label}</strong><span>{item.type}</span><ArrowRight /></Link>)}
         {!waitingDecisions.length && !waitingPolls.length && !waitingTasks.length && <p className="ws-all-clear"><CheckCircle2 /> you’re caught up</p>}
-      </section>
-    </div>
+      </LeadershipSection>
+    </LeadershipPage>
   )
 }

@@ -11,7 +11,6 @@
     "lint": "eslint .",
     "typecheck:convex": "tsc -p convex/tsconfig.json --noEmit",
     "check:decisions": "npm run typecheck:convex && node --experimental-strip-types --test tests/decision-*.test.ts",
-    "provision:speaker-ops": "npm run build:store && node --experimental-strip-types scripts/provision-speaker-ops.mjs",
     "pretest": "npm run build:store",
     "test": "node --experimental-strip-types --test tests/**/*.test.ts",
     "preview": "vite preview"

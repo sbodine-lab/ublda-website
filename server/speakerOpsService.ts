@@ -1,95 +1,168 @@
-import { createSpeakerOpsStore } from './speakerOpsStore.js'
+import { ConvexHttpClient } from 'convex/browser'
+import { makeFunctionReference } from 'convex/server'
+import { ConvexError } from 'convex/values'
+import {
+  authBridgeConfig,
+  exchangeLogtoIdTokenWithIdentity,
+  type VerifiedLogtoIdentity,
+} from './convexAuthBridge.ts'
+import {
+  createSpeakerOpsStore,
+  type SpeakerOpsActor,
+  type SpeakerOpsStore,
+} from './speakerOpsStore.js'
 import type { ProgramSlot, RoomRequest, SpeakerLead } from '../src/lib/speakerOps.ts'
 
 type RequestBody = Record<string, unknown>
 type ServiceResponse = { status: number; body: Record<string, unknown> }
+type Environment = Record<string, string | undefined>
 
-const store = createSpeakerOpsStore()
-const attempts = new Map<string, { count: number; resetAt: number }>()
-const RATE_WINDOW_MS = 15 * 60 * 1000
-const RATE_MAX = 8
+type ConvexViewer = {
+  memberId: string
+  displayName: string
+  role: 'admin' | 'member'
+  status: 'active' | 'inactive'
+  avatarUrl: string | null
+}
+
+type IdentityExchange = {
+  identity: VerifiedLogtoIdentity
+  token: string
+  expiresIn: number
+}
+
+type IdentityVerifierDependencies = {
+  environment?: Environment
+  exchange?: (idToken: string) => Promise<IdentityExchange>
+  queryViewer?: (convexToken: string, convexUrl: string) => Promise<ConvexViewer>
+}
+
+export type SpeakerOpsIdentityVerifier = (idToken: string) => Promise<SpeakerOpsActor>
+
+export type SpeakerOpsServiceOptions = {
+  store?: SpeakerOpsStore
+  verifyIdentity?: SpeakerOpsIdentityVerifier
+}
+
+const defaultStore = createSpeakerOpsStore()
+const allowedActions = new Set(['workspace', 'updateLead', 'updateRoomRequest', 'updateSlot'])
+const MAX_ID_TOKEN_LENGTH = 24_000
+
+const viewerReference = makeFunctionReference<
+  'query',
+  Record<string, never>,
+  ConvexViewer
+>('viewer:current')
+
+class SpeakerOpsAuthError extends Error {
+  readonly status: 401 | 403 | 503
+
+  constructor(status: 401 | 403 | 503, message: string) {
+    super(message)
+    this.name = 'SpeakerOpsAuthError'
+    this.status = status
+  }
+}
 
 const textValue = (body: RequestBody, key: string) => (
   typeof body[key] === 'string' ? body[key].trim() : ''
 )
 
-const sessionToken = (body: RequestBody) => textValue(body, 'sessionToken')
+const defaultViewerQuery = async (convexToken: string, convexUrl: string) => {
+  const client = new ConvexHttpClient(convexUrl, { auth: convexToken, logger: false })
+  return client.query(viewerReference, {})
+}
 
-const failureKey = (ip: string, email: string) => `${ip}:${email.trim().toLowerCase()}`
-
-const rateLimited = (key: string) => {
-  const now = Date.now()
-  const current = attempts.get(key)
-  if (!current || current.resetAt <= now) {
-    attempts.delete(key)
-    return false
+export const verifySpeakerOpsIdentity = async (
+  idToken: string,
+  dependencies: IdentityVerifierDependencies = {},
+): Promise<SpeakerOpsActor> => {
+  if (!idToken || idToken.length > MAX_ID_TOKEN_LENGTH) {
+    throw new SpeakerOpsAuthError(401, 'Sign in with your UBLDA leadership account.')
   }
-  return current.count >= RATE_MAX
+
+  const environment = dependencies.environment || process.env
+  const convexUrl = environment.CONVEX_URL?.trim() || environment.VITE_CONVEX_URL?.trim()
+  if (!convexUrl) throw new SpeakerOpsAuthError(503, 'Leadership authentication is not configured.')
+
+  let exchange: IdentityExchange
+  try {
+    if (dependencies.exchange) {
+      exchange = await dependencies.exchange(idToken)
+    } else {
+      const config = authBridgeConfig(environment)
+      exchange = await exchangeLogtoIdTokenWithIdentity(idToken, config)
+    }
+  } catch (error) {
+    if (error instanceof SpeakerOpsAuthError) throw error
+    if (!dependencies.exchange && error instanceof Error && error.message.startsWith('Missing ')) {
+      throw new SpeakerOpsAuthError(503, 'Leadership authentication is not configured.')
+    }
+    throw new SpeakerOpsAuthError(401, 'Your leadership sign-in is invalid or expired.')
+  }
+
+  let viewer: ConvexViewer
+  try {
+    viewer = await (dependencies.queryViewer || defaultViewerQuery)(exchange.token, convexUrl)
+  } catch (error) {
+    if (error instanceof ConvexError) {
+      throw new SpeakerOpsAuthError(403, 'This account is not approved for the UBLDA leadership workspace.')
+    }
+    throw new SpeakerOpsAuthError(503, 'Leadership membership could not be verified.')
+  }
+
+  if (!viewer || viewer.status !== 'active') {
+    throw new SpeakerOpsAuthError(403, 'This account is not an active UBLDA leadership member.')
+  }
+
+  return {
+    memberId: viewer.memberId,
+    displayName: viewer.displayName || exchange.identity.name || exchange.identity.email,
+    email: exchange.identity.email,
+    role: viewer.role,
+  }
 }
 
-const recordFailure = (key: string) => {
-  const now = Date.now()
-  const current = attempts.get(key)
-  attempts.set(key, !current || current.resetAt <= now
-    ? { count: 1, resetAt: now + RATE_WINDOW_MS }
-    : { count: current.count + 1, resetAt: current.resetAt })
-}
-
-export const handleSpeakerOpsRequest = async (rawBody: unknown, ip = 'unknown'): Promise<ServiceResponse> => {
+export const handleSpeakerOpsRequest = async (
+  rawBody: unknown,
+  _ip = 'unknown',
+  options: SpeakerOpsServiceOptions = {},
+): Promise<ServiceResponse> => {
+  void _ip
   const body = rawBody && typeof rawBody === 'object' ? rawBody as RequestBody : {}
   const action = textValue(body, 'action')
 
+  if (!allowedActions.has(action)) {
+    return { status: 400, body: { error: 'Unknown Speaker Ops action.' } }
+  }
+
+  const store = options.store || defaultStore
+  const verifyIdentity = options.verifyIdentity || verifySpeakerOpsIdentity
+
   try {
-    if (action === 'signIn') {
-      const email = textValue(body, 'email')
-      const key = failureKey(ip, email)
-      if (rateLimited(key)) return { status: 429, body: { error: 'Too many sign-in attempts. Try again in a few minutes.' } }
-      const session = await store.signIn(email, textValue(body, 'password'))
-      if (!session) {
-        recordFailure(key)
-        return { status: 401, body: { error: 'Invalid email or password.' } }
+    let actor: SpeakerOpsActor
+    try {
+      actor = await verifyIdentity(textValue(body, 'idToken'))
+    } catch (error) {
+      if (error instanceof SpeakerOpsAuthError) throw error
+      if (options.verifyIdentity) {
+        throw new SpeakerOpsAuthError(401, 'Your leadership sign-in is invalid or expired.')
       }
-      attempts.delete(key)
-      return { status: 200, body: { success: true, ...session } }
-    }
-
-    if (action === 'session') {
-      const session = await store.restoreSession(sessionToken(body))
-      return session
-        ? { status: 200, body: { success: true, ...session } }
-        : { status: 401, body: { error: 'Session expired. Sign in again.' } }
-    }
-
-    if (action === 'logout') {
-      await store.logout(sessionToken(body))
-      return { status: 200, body: { success: true } }
-    }
-
-    if (action === 'changePassword') {
-      const result = await store.changePassword(
-        sessionToken(body),
-        textValue(body, 'currentPassword'),
-        textValue(body, 'nextPassword'),
-      )
-      return result.ok
-        ? { status: 200, body: { success: true, ...result } }
-        : { status: result.error.startsWith('Session') ? 401 : 400, body: { error: result.error } }
+      throw error
     }
 
     if (action === 'workspace') {
-      const workspace = await store.workspace(sessionToken(body))
-      return workspace
-        ? { status: 200, body: { success: true, workspace } }
-        : { status: 401, body: { error: 'Session expired. Sign in again.' } }
+      const workspace = await store.workspace(actor)
+      return { status: 200, body: { success: true, workspace } }
     }
 
     if (action === 'updateLead') {
       const lead = body.lead && typeof body.lead === 'object' ? body.lead as Partial<SpeakerLead> & { id: string } : null
       if (!lead?.id) return { status: 400, body: { error: 'Speaker is required.' } }
-      const result = await store.updateLead(sessionToken(body), lead)
+      const result = await store.updateLead(actor, lead)
       return result.ok
         ? { status: 200, body: { success: true, ...result } }
-        : { status: result.error.startsWith('Session') ? 401 : 400, body: { error: result.error } }
+        : { status: 400, body: { error: result.error } }
     }
 
     if (action === 'updateRoomRequest') {
@@ -97,25 +170,24 @@ export const handleSpeakerOpsRequest = async (rawBody: unknown, ip = 'unknown'):
         ? body.roomRequest as Partial<RoomRequest> & { id: string }
         : null
       if (!roomRequest?.id) return { status: 400, body: { error: 'Room request is required.' } }
-      const result = await store.updateRoomRequest(sessionToken(body), roomRequest)
+      const result = await store.updateRoomRequest(actor, roomRequest)
       return result.ok
         ? { status: 200, body: { success: true, ...result } }
-        : { status: result.error.startsWith('Session') ? 401 : 400, body: { error: result.error } }
+        : { status: 400, body: { error: result.error } }
     }
 
-    if (action === 'updateSlot') {
-      const slot = body.slot && typeof body.slot === 'object'
-        ? body.slot as Partial<ProgramSlot> & { id: ProgramSlot['id'] }
-        : null
-      if (!slot?.id) return { status: 400, body: { error: 'Program slot is required.' } }
-      const result = await store.updateSlot(sessionToken(body), slot)
-      return result.ok
-        ? { status: 200, body: { success: true, ...result } }
-        : { status: result.error.startsWith('Session') ? 401 : 400, body: { error: result.error } }
-    }
-
-    return { status: 400, body: { error: 'Unknown Speaker Ops action.' } }
+    const slot = body.slot && typeof body.slot === 'object'
+      ? body.slot as Partial<ProgramSlot> & { id: ProgramSlot['id'] }
+      : null
+    if (!slot?.id) return { status: 400, body: { error: 'Program slot is required.' } }
+    const result = await store.updateSlot(actor, slot)
+    return result.ok
+      ? { status: 200, body: { success: true, ...result } }
+      : { status: 400, body: { error: result.error } }
   } catch (error) {
+    if (error instanceof SpeakerOpsAuthError) {
+      return { status: error.status, body: { error: error.message } }
+    }
     console.error('speaker_ops_request_failed', error instanceof Error ? error.name : 'UnknownError')
     return { status: 500, body: { error: 'Speaker Ops is temporarily unavailable.' } }
   }

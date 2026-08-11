@@ -2,7 +2,7 @@
 
 ## Decision Center
 
-Local preview, Convex/Clerk configuration, governance rules, and agent API/MCP setup are documented in [Decision Center setup and operations](docs/decision-center.md).
+Local preview, Logto/Convex configuration, governance rules, and agent API/MCP setup are documented in [Decision Center setup and operations](docs/decision-center.md).
 
 ## Interview launch checklist
 

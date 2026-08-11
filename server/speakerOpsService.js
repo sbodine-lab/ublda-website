@@ -1,10 +1,105 @@
+// server/speakerOpsService.ts
+import { ConvexHttpClient } from "convex/browser";
+import { makeFunctionReference } from "convex/server";
+import { ConvexError } from "convex/values";
+
+// server/convexAuthBridge.ts
+import {
+  SignJWT,
+  createRemoteJWKSet,
+  importPKCS8,
+  jwtVerify
+} from "jose";
+var CONVEX_TOKEN_TTL_SECONDS = 5 * 60;
+var acceptedLogtoAlgorithms = ["ES384", "RS256"];
+var required = (environment, name) => {
+  const value = environment[name]?.trim();
+  if (!value) throw new Error(`Missing ${name}.`);
+  return value;
+};
+var parsePublicJwks = (raw) => {
+  const parsed = JSON.parse(raw);
+  const keys = Array.isArray(parsed.keys) ? parsed.keys : [];
+  const valid = keys.length === 1 && keys[0]?.kty === "RSA" && keys[0]?.alg === "RS256" && keys[0]?.use === "sig" && typeof keys[0]?.kid === "string" && Boolean(keys[0].kid) && typeof keys[0]?.n === "string" && typeof keys[0]?.e === "string";
+  if (!valid) throw new Error("CONVEX_AUTH_PUBLIC_JWKS must contain one RS256 signing key.");
+  return { keys };
+};
+var authBridgeConfig = (environment = process.env) => {
+  const logtoIssuer = required(environment, "LOGTO_ISSUER").replace(/\/$/, "");
+  return {
+    logtoIssuer,
+    logtoAppId: required(environment, "LOGTO_APP_ID"),
+    logtoJwksUrl: `${logtoIssuer}/jwks`,
+    bridgeIssuer: required(environment, "CONVEX_AUTH_ISSUER").replace(/\/$/, ""),
+    bridgeAppId: required(environment, "CONVEX_AUTH_APP_ID"),
+    signingPrivateKey: required(environment, "CONVEX_AUTH_SIGNING_PRIVATE_KEY"),
+    publicJwks: parsePublicJwks(required(environment, "CONVEX_AUTH_PUBLIC_JWKS")),
+    allowedOrigins: new Set(
+      required(environment, "CONVEX_AUTH_ALLOWED_ORIGINS").split(",").map((origin) => origin.trim().replace(/\/$/, "")).filter(Boolean)
+    )
+  };
+};
+var stringClaim = (payload, name) => {
+  const value = payload[name];
+  return typeof value === "string" && value.trim() ? value.trim() : void 0;
+};
+var verifiedLogtoIdentity = (payload) => {
+  const subject = stringClaim(payload, "sub");
+  const email = stringClaim(payload, "email")?.toLowerCase();
+  if (!subject || !email || payload.email_verified !== true) {
+    throw new Error("The Logto identity must contain a verified email address.");
+  }
+  return {
+    subject,
+    email,
+    emailVerified: true,
+    name: stringClaim(payload, "name"),
+    picture: stringClaim(payload, "picture")
+  };
+};
+var remoteKeySets = /* @__PURE__ */ new Map();
+var remoteKeySet = (url) => {
+  const existing = remoteKeySets.get(url);
+  if (existing) return existing;
+  const created = createRemoteJWKSet(new URL(url));
+  remoteKeySets.set(url, created);
+  return created;
+};
+var cachedPrivateKeySource = "";
+var cachedPrivateKey = null;
+var signingKey = async (privateKey) => {
+  if (cachedPrivateKey && cachedPrivateKeySource === privateKey) return cachedPrivateKey;
+  cachedPrivateKey = await importPKCS8(privateKey, "RS256");
+  cachedPrivateKeySource = privateKey;
+  return cachedPrivateKey;
+};
+var exchangeLogtoIdTokenWithIdentity = async (idToken, config, keySet = remoteKeySet(config.logtoJwksUrl)) => {
+  const { payload } = await jwtVerify(idToken, keySet, {
+    issuer: config.logtoIssuer,
+    audience: config.logtoAppId,
+    algorithms: [...acceptedLogtoAlgorithms]
+  });
+  const identity = verifiedLogtoIdentity(payload);
+  const kid = config.publicJwks.keys[0]?.kid;
+  if (!kid) throw new Error("The auth bridge signing key ID is missing.");
+  const token = await new SignJWT({
+    email: identity.email,
+    email_verified: identity.emailVerified,
+    ...identity.name ? { name: identity.name } : {},
+    ...identity.picture ? { picture: identity.picture } : {}
+  }).setProtectedHeader({ alg: "RS256", kid, typ: "JWT" }).setIssuer(config.bridgeIssuer).setAudience(config.bridgeAppId).setSubject(identity.subject).setIssuedAt().setExpirationTime(`${CONVEX_TOKEN_TTL_SECONDS}s`).sign(await signingKey(config.signingPrivateKey));
+  return {
+    identity,
+    token,
+    expiresIn: CONVEX_TOKEN_TTL_SECONDS
+  };
+};
+
 // server/speakerOpsStore.js
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
-import bcrypt from "bcryptjs";
-var SPEAKER_OPS_SESSION_DAYS = 180;
 var SPEAKER_OPS_MEMBERS = [
   { name: "Alex Forstner", email: "alexfors@umich.edu", title: "VP Education" },
   { name: "Alexa Chiang", email: "atchiang@umich.edu", title: "Co-President" },
@@ -38,18 +133,14 @@ var PROGRAM_SLOT_STATUS_LABELS = {
   confirmed: "Confirmed"
 };
 var BLOB_PATH = "speaker-ops/state.json";
-var SESSION_TTL_MS = SPEAKER_OPS_SESSION_DAYS * 24 * 60 * 60 * 1e3;
-var BCRYPT_COST = 12;
 var WRITE_ATTEMPTS = 5;
 var confirmers = /* @__PURE__ */ new Set(["atchiang@umich.edu", "sbodine@umich.edu"]);
+var isConfirmer = (email) => confirmers.has(email);
 var queues = /* @__PURE__ */ new Map();
 var defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE ? path.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE) : path.join(process.cwd(), ".ublda-local-data", "speaker-ops.json");
 var isoNow = () => (/* @__PURE__ */ new Date()).toISOString();
-var cleanEmail = (email) => email.trim().toLowerCase();
 var cleanText = (value, max = 500) => value.replace(/[<>]/g, "").trim().slice(0, max);
-var tokenHash = (token) => createHash("sha256").update(token).digest("base64url");
 var randomId = (prefix) => `${prefix}_${randomBytes(10).toString("base64url")}`;
-var createSessionToken = () => randomBytes(32).toString("base64url");
 var canUseBlob = (forceLocal) => !forceLocal && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 var leadSeeds = () => {
   const updatedAt = "2026-08-10T19:00:00.000Z";
@@ -281,9 +372,7 @@ var roomSeeds = () => slotSeeds().map((slot) => ({
   updatedAt: "2026-08-10T16:00:00.000Z"
 }));
 var emptyData = () => ({
-  version: 2,
-  accounts: {},
-  sessions: {},
+  version: 3,
   leads: Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead])),
   slots: Object.fromEntries(slotSeeds().map((slot) => [slot.id, slot])),
   roomRequests: Object.fromEntries(roomSeeds().map((request) => [request.id, request])),
@@ -295,39 +384,38 @@ var emptyData = () => ({
     createdAt: "2026-08-10T19:00:00.000Z"
   }]
 });
-var migrateData = (data) => {
-  if (data.version === 2) return data;
-  const migratedSeeds = Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead]));
-  data.leads = { ...data.leads, ...migratedSeeds };
-  delete data.leads["grant-kessler"];
-  data.version = 2;
-  data.activity.unshift({
-    id: "context_reconciled_2026_08_10",
-    actorEmail: "system",
-    action: "Pipeline reconciled",
-    detail: "Corrected Grant Shelton and loaded the verified Brain, Gmail, and Drive pipeline under the two-event cap.",
-    createdAt: "2026-08-10T19:00:00.000Z"
-  });
-  return data;
+var migrateData = (raw) => {
+  const seeded = emptyData();
+  const leads = { ...seeded.leads, ...raw.leads || {} };
+  const activity = Array.isArray(raw.activity) ? [...raw.activity] : seeded.activity;
+  if (raw.version === 1) {
+    Object.assign(leads, Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead])));
+    delete leads["grant-kessler"];
+    activity.unshift({
+      id: "context_reconciled_2026_08_10",
+      actorEmail: "system",
+      action: "Pipeline reconciled",
+      detail: "Corrected Grant Shelton and loaded the verified Brain, Gmail, and Drive pipeline under the two-event cap.",
+      createdAt: "2026-08-10T19:00:00.000Z"
+    });
+  }
+  return {
+    version: 3,
+    leads,
+    slots: { ...seeded.slots, ...raw.slots || {} },
+    roomRequests: { ...seeded.roomRequests, ...raw.roomRequests || {} },
+    activity
+  };
 };
-var accountView = (account) => ({
-  name: account.name,
-  email: account.email,
-  title: account.title,
-  mustChangePassword: account.mustChangePassword,
-  canConfirmProgram: account.canConfirmProgram,
-  lastSignedInAt: account.lastSignedInAt
-});
 var memberView = (email) => {
   const member = SPEAKER_OPS_MEMBERS.find((candidate) => candidate.email === email);
   return {
     name: member.name,
     email: member.email,
     title: member.title,
-    canConfirmProgram: confirmers.has(email)
+    canConfirmProgram: isConfirmer(email)
   };
 };
-var sessionExpiry = () => new Date(Date.now() + SESSION_TTL_MS).toISOString();
 var addBusinessDays = (iso, count) => {
   const date = new Date(iso);
   let added = 0;
@@ -339,10 +427,13 @@ var addBusinessDays = (iso, count) => {
   return date.toISOString();
 };
 var isMemberEmail = (email) => SPEAKER_OPS_MEMBERS.some((member) => member.email === email);
-var safeEqual = (left, right) => {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
+var memberForActor = (actor) => {
+  const member = SPEAKER_OPS_MEMBERS.find((candidate) => candidate.email === actor.email);
+  return member || {
+    name: actor.displayName || actor.email,
+    email: actor.email,
+    title: "Leadership Team"
+  };
 };
 var SpeakerOpsStore = class {
   dataPath;
@@ -384,10 +475,6 @@ var SpeakerOpsStore = class {
       ...etag ? { ifMatch: etag } : {}
     });
   }
-  async readData() {
-    const data = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
-    return migrateData(data);
-  }
   async updateData(mutation) {
     const key = this.storageKey();
     const previous = queues.get(key) || Promise.resolve();
@@ -418,12 +505,6 @@ var SpeakerOpsStore = class {
       if (queues.get(key) === task) queues.delete(key);
     }
   }
-  activeSession(data, sessionToken2) {
-    const session = data.sessions[tokenHash(sessionToken2)];
-    if (!session || new Date(session.expiresAt).getTime() <= Date.now()) return null;
-    const account = data.accounts[session.email];
-    return account ? { session, account } : null;
-  }
   appendActivity(data, actorEmail, action, detail) {
     data.activity.unshift({
       id: randomId("activity"),
@@ -434,98 +515,27 @@ var SpeakerOpsStore = class {
     });
     data.activity = data.activity.slice(0, 250);
   }
-  async provisionAccounts(passwords) {
-    return this.updateData(async (data) => {
-      const nextAccounts = {};
-      const now = isoNow();
-      for (const member of SPEAKER_OPS_MEMBERS) {
-        const password = passwords[member.email];
-        if (!password || password.length < 16) throw new Error(`A 16-character temporary password is required for ${member.email}.`);
-        const existing = data.accounts[member.email];
-        nextAccounts[member.email] = {
-          name: member.name,
-          email: member.email,
-          title: member.title,
-          mustChangePassword: true,
-          canConfirmProgram: confirmers.has(member.email),
-          lastSignedInAt: existing?.lastSignedInAt || "",
-          passwordHash: await bcrypt.hash(password, BCRYPT_COST),
-          createdAt: existing?.createdAt || now,
-          updatedAt: now
-        };
-      }
-      data.accounts = nextAccounts;
-      data.sessions = {};
-      this.appendActivity(data, "sbodine@umich.edu", "Access provisioned", "Nine leadership accounts provisioned; all sessions reset.");
-      return { count: Object.keys(nextAccounts).length };
-    });
-  }
-  async signIn(emailInput, password) {
-    const email = cleanEmail(emailInput);
-    if (!isMemberEmail(email)) return null;
-    return this.updateData(async (data) => {
-      const account = data.accounts[email];
-      if (!account || !await bcrypt.compare(password, account.passwordHash)) return null;
-      const sessionToken2 = createSessionToken();
-      const sessionExpiresAt = sessionExpiry();
-      data.sessions[tokenHash(sessionToken2)] = { email, expiresAt: sessionExpiresAt, createdAt: isoNow() };
-      account.lastSignedInAt = isoNow();
-      account.updatedAt = account.lastSignedInAt;
-      return { account: accountView(account), sessionToken: sessionToken2, sessionExpiresAt };
-    });
-  }
-  async restoreSession(sessionToken2) {
-    if (!sessionToken2) return null;
-    const data = await this.readData();
-    const active = this.activeSession(data, sessionToken2);
-    if (!active) return null;
-    return {
-      account: accountView(active.account),
-      sessionToken: sessionToken2,
-      sessionExpiresAt: active.session.expiresAt
-    };
-  }
-  async logout(sessionToken2) {
-    return this.updateData((data) => ({ deleted: Boolean(delete data.sessions[tokenHash(sessionToken2)]) }));
-  }
-  async changePassword(sessionToken2, currentPassword, nextPassword) {
-    if (nextPassword.length < 12) return { ok: false, error: "Use at least 12 characters." };
-    if (safeEqual(currentPassword, nextPassword)) return { ok: false, error: "Choose a new password." };
-    return this.updateData(async (data) => {
-      const active = this.activeSession(data, sessionToken2);
-      if (!active || !await bcrypt.compare(currentPassword, active.account.passwordHash)) {
-        return { ok: false, error: "Current password is incorrect." };
-      }
-      active.account.passwordHash = await bcrypt.hash(nextPassword, BCRYPT_COST);
-      active.account.mustChangePassword = false;
-      active.account.updatedAt = isoNow();
-      this.appendActivity(data, active.account.email, "Password changed", "Completed first-login password change.");
-      return {
-        ok: true,
-        account: accountView(active.account),
-        sessionToken: sessionToken2,
-        sessionExpiresAt: active.session.expiresAt
-      };
-    });
-  }
-  async workspace(sessionToken2) {
-    const data = await this.readData();
-    const active = this.activeSession(data, sessionToken2);
-    if (!active) return null;
-    return {
-      account: accountView(active.account),
-      members: SPEAKER_OPS_MEMBERS.map((member) => memberView(member.email)),
+  async workspace(actor) {
+    const member = memberForActor(actor);
+    return this.updateData((data) => ({
+      viewer: {
+        memberId: actor.memberId,
+        name: actor.displayName || member.name,
+        email: member.email,
+        title: member.title,
+        role: actor.role,
+        canConfirmProgram: isConfirmer(member.email)
+      },
+      members: SPEAKER_OPS_MEMBERS.map((candidate) => memberView(candidate.email)),
       leads: Object.values(data.leads),
       slots: Object.values(data.slots),
       roomRequests: Object.values(data.roomRequests),
-      activity: data.activity,
-      sessionExpiresAt: active.session.expiresAt
-    };
+      activity: data.activity
+    }));
   }
-  async updateLead(sessionToken2, leadInput) {
+  async updateLead(actor, leadInput) {
+    const member = memberForActor(actor);
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken2);
-      if (!active) return { ok: false, error: "Session expired. Sign in again." };
       const lead = data.leads[leadInput.id];
       if (!lead) return { ok: false, error: "Speaker was not found." };
       if (leadInput.stage && SPEAKER_STAGES.includes(leadInput.stage)) lead.stage = leadInput.stage;
@@ -536,14 +546,13 @@ var SpeakerOpsStore = class {
       if (typeof leadInput.evidence === "string") lead.evidence = cleanText(leadInput.evidence, 500);
       if (typeof leadInput.blocker === "string") lead.blocker = cleanText(leadInput.blocker, 300);
       lead.updatedAt = isoNow();
-      this.appendActivity(data, active.account.email, "Speaker updated", `${lead.name}: ${lead.nextAction || "No next action"}`);
+      this.appendActivity(data, member.email, "Speaker updated", `${lead.name}: ${lead.nextAction || "No next action"}`);
       return { ok: true, lead: { ...lead } };
     });
   }
-  async updateRoomRequest(sessionToken2, input) {
+  async updateRoomRequest(actor, input) {
+    const member = memberForActor(actor);
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken2);
-      if (!active) return { ok: false, error: "Session expired. Sign in again." };
       const request = data.roomRequests[input.id];
       if (!request) return { ok: false, error: "Room request was not found." };
       const status = input.status;
@@ -573,14 +582,13 @@ var SpeakerOpsStore = class {
         if (request.status === "declined") slot.status = "planning";
         slot.updatedAt = request.updatedAt;
       }
-      this.appendActivity(data, active.account.email, "Room request updated", `${request.slotId}: ${request.status}`);
+      this.appendActivity(data, member.email, "Room request updated", `${request.slotId}: ${request.status}`);
       return { ok: true, roomRequest: { ...request } };
     });
   }
-  async updateSlot(sessionToken2, input) {
+  async updateSlot(actor, input) {
+    const member = memberForActor(actor);
     return this.updateData((data) => {
-      const active = this.activeSession(data, sessionToken2);
-      if (!active) return { ok: false, error: "Session expired. Sign in again." };
       const slot = data.slots[input.id];
       if (!slot) return { ok: false, error: "Program slot was not found." };
       if (typeof input.leadId === "string" && (!input.leadId || data.leads[input.leadId])) slot.leadId = input.leadId;
@@ -589,7 +597,7 @@ var SpeakerOpsStore = class {
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status;
         if (nextStatus === "confirmed") {
-          if (!active.account.canConfirmProgram) return { ok: false, error: "Only Sam or Alexa can confirm a programmed date." };
+          if (!isConfirmer(member.email)) return { ok: false, error: "Only Sam or Alexa can confirm a programmed date." };
           const request = data.roomRequests[slot.roomRequestId];
           if (request?.status !== "approved") return { ok: false, error: "Ross must approve the room before the fireside can be confirmed." };
           if (!slot.leadId) return { ok: false, error: "Choose a speaker before confirming the fireside." };
@@ -597,7 +605,7 @@ var SpeakerOpsStore = class {
         slot.status = nextStatus;
       }
       slot.updatedAt = isoNow();
-      this.appendActivity(data, active.account.email, "Program slot updated", `${slot.label}: ${slot.status}`);
+      this.appendActivity(data, member.email, "Program slot updated", `${slot.label}: ${slot.status}`);
       return { ok: true, slot: { ...slot } };
     });
   }
@@ -605,87 +613,113 @@ var SpeakerOpsStore = class {
 var createSpeakerOpsStore = (dataPath, options) => new SpeakerOpsStore(dataPath, options);
 
 // server/speakerOpsService.ts
-var store = createSpeakerOpsStore();
-var attempts = /* @__PURE__ */ new Map();
-var RATE_WINDOW_MS = 15 * 60 * 1e3;
-var RATE_MAX = 8;
-var textValue = (body, key) => typeof body[key] === "string" ? body[key].trim() : "";
-var sessionToken = (body) => textValue(body, "sessionToken");
-var failureKey = (ip, email) => `${ip}:${email.trim().toLowerCase()}`;
-var rateLimited = (key) => {
-  const now = Date.now();
-  const current = attempts.get(key);
-  if (!current || current.resetAt <= now) {
-    attempts.delete(key);
-    return false;
+var defaultStore = createSpeakerOpsStore();
+var allowedActions = /* @__PURE__ */ new Set(["workspace", "updateLead", "updateRoomRequest", "updateSlot"]);
+var MAX_ID_TOKEN_LENGTH = 24e3;
+var viewerReference = makeFunctionReference("viewer:current");
+var SpeakerOpsAuthError = class extends Error {
+  status;
+  constructor(status, message) {
+    super(message);
+    this.name = "SpeakerOpsAuthError";
+    this.status = status;
   }
-  return current.count >= RATE_MAX;
 };
-var recordFailure = (key) => {
-  const now = Date.now();
-  const current = attempts.get(key);
-  attempts.set(key, !current || current.resetAt <= now ? { count: 1, resetAt: now + RATE_WINDOW_MS } : { count: current.count + 1, resetAt: current.resetAt });
+var textValue = (body, key) => typeof body[key] === "string" ? body[key].trim() : "";
+var defaultViewerQuery = async (convexToken, convexUrl) => {
+  const client = new ConvexHttpClient(convexUrl, { auth: convexToken, logger: false });
+  return client.query(viewerReference, {});
 };
-var handleSpeakerOpsRequest = async (rawBody, ip = "unknown") => {
+var verifySpeakerOpsIdentity = async (idToken, dependencies = {}) => {
+  if (!idToken || idToken.length > MAX_ID_TOKEN_LENGTH) {
+    throw new SpeakerOpsAuthError(401, "Sign in with your UBLDA leadership account.");
+  }
+  const environment = dependencies.environment || process.env;
+  const convexUrl = environment.CONVEX_URL?.trim() || environment.VITE_CONVEX_URL?.trim();
+  if (!convexUrl) throw new SpeakerOpsAuthError(503, "Leadership authentication is not configured.");
+  let exchange;
+  try {
+    if (dependencies.exchange) {
+      exchange = await dependencies.exchange(idToken);
+    } else {
+      const config = authBridgeConfig(environment);
+      exchange = await exchangeLogtoIdTokenWithIdentity(idToken, config);
+    }
+  } catch (error) {
+    if (error instanceof SpeakerOpsAuthError) throw error;
+    if (!dependencies.exchange && error instanceof Error && error.message.startsWith("Missing ")) {
+      throw new SpeakerOpsAuthError(503, "Leadership authentication is not configured.");
+    }
+    throw new SpeakerOpsAuthError(401, "Your leadership sign-in is invalid or expired.");
+  }
+  let viewer;
+  try {
+    viewer = await (dependencies.queryViewer || defaultViewerQuery)(exchange.token, convexUrl);
+  } catch (error) {
+    if (error instanceof ConvexError) {
+      throw new SpeakerOpsAuthError(403, "This account is not approved for the UBLDA leadership workspace.");
+    }
+    throw new SpeakerOpsAuthError(503, "Leadership membership could not be verified.");
+  }
+  if (!viewer || viewer.status !== "active") {
+    throw new SpeakerOpsAuthError(403, "This account is not an active UBLDA leadership member.");
+  }
+  return {
+    memberId: viewer.memberId,
+    displayName: viewer.displayName || exchange.identity.name || exchange.identity.email,
+    email: exchange.identity.email,
+    role: viewer.role
+  };
+};
+var handleSpeakerOpsRequest = async (rawBody, _ip = "unknown", options = {}) => {
+  void _ip;
   const body = rawBody && typeof rawBody === "object" ? rawBody : {};
   const action = textValue(body, "action");
+  if (!allowedActions.has(action)) {
+    return { status: 400, body: { error: "Unknown Speaker Ops action." } };
+  }
+  const store = options.store || defaultStore;
+  const verifyIdentity = options.verifyIdentity || verifySpeakerOpsIdentity;
   try {
-    if (action === "signIn") {
-      const email = textValue(body, "email");
-      const key = failureKey(ip, email);
-      if (rateLimited(key)) return { status: 429, body: { error: "Too many sign-in attempts. Try again in a few minutes." } };
-      const session = await store.signIn(email, textValue(body, "password"));
-      if (!session) {
-        recordFailure(key);
-        return { status: 401, body: { error: "Invalid email or password." } };
+    let actor;
+    try {
+      actor = await verifyIdentity(textValue(body, "idToken"));
+    } catch (error) {
+      if (error instanceof SpeakerOpsAuthError) throw error;
+      if (options.verifyIdentity) {
+        throw new SpeakerOpsAuthError(401, "Your leadership sign-in is invalid or expired.");
       }
-      attempts.delete(key);
-      return { status: 200, body: { success: true, ...session } };
-    }
-    if (action === "session") {
-      const session = await store.restoreSession(sessionToken(body));
-      return session ? { status: 200, body: { success: true, ...session } } : { status: 401, body: { error: "Session expired. Sign in again." } };
-    }
-    if (action === "logout") {
-      await store.logout(sessionToken(body));
-      return { status: 200, body: { success: true } };
-    }
-    if (action === "changePassword") {
-      const result = await store.changePassword(
-        sessionToken(body),
-        textValue(body, "currentPassword"),
-        textValue(body, "nextPassword")
-      );
-      return result.ok ? { status: 200, body: { success: true, ...result } } : { status: result.error.startsWith("Session") ? 401 : 400, body: { error: result.error } };
+      throw error;
     }
     if (action === "workspace") {
-      const workspace = await store.workspace(sessionToken(body));
-      return workspace ? { status: 200, body: { success: true, workspace } } : { status: 401, body: { error: "Session expired. Sign in again." } };
+      const workspace = await store.workspace(actor);
+      return { status: 200, body: { success: true, workspace } };
     }
     if (action === "updateLead") {
       const lead = body.lead && typeof body.lead === "object" ? body.lead : null;
       if (!lead?.id) return { status: 400, body: { error: "Speaker is required." } };
-      const result = await store.updateLead(sessionToken(body), lead);
-      return result.ok ? { status: 200, body: { success: true, ...result } } : { status: result.error.startsWith("Session") ? 401 : 400, body: { error: result.error } };
+      const result2 = await store.updateLead(actor, lead);
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: 400, body: { error: result2.error } };
     }
     if (action === "updateRoomRequest") {
       const roomRequest = body.roomRequest && typeof body.roomRequest === "object" ? body.roomRequest : null;
       if (!roomRequest?.id) return { status: 400, body: { error: "Room request is required." } };
-      const result = await store.updateRoomRequest(sessionToken(body), roomRequest);
-      return result.ok ? { status: 200, body: { success: true, ...result } } : { status: result.error.startsWith("Session") ? 401 : 400, body: { error: result.error } };
+      const result2 = await store.updateRoomRequest(actor, roomRequest);
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: 400, body: { error: result2.error } };
     }
-    if (action === "updateSlot") {
-      const slot = body.slot && typeof body.slot === "object" ? body.slot : null;
-      if (!slot?.id) return { status: 400, body: { error: "Program slot is required." } };
-      const result = await store.updateSlot(sessionToken(body), slot);
-      return result.ok ? { status: 200, body: { success: true, ...result } } : { status: result.error.startsWith("Session") ? 401 : 400, body: { error: result.error } };
-    }
-    return { status: 400, body: { error: "Unknown Speaker Ops action." } };
+    const slot = body.slot && typeof body.slot === "object" ? body.slot : null;
+    if (!slot?.id) return { status: 400, body: { error: "Program slot is required." } };
+    const result = await store.updateSlot(actor, slot);
+    return result.ok ? { status: 200, body: { success: true, ...result } } : { status: 400, body: { error: result.error } };
   } catch (error) {
+    if (error instanceof SpeakerOpsAuthError) {
+      return { status: error.status, body: { error: error.message } };
+    }
     console.error("speaker_ops_request_failed", error instanceof Error ? error.name : "UnknownError");
     return { status: 500, body: { error: "Speaker Ops is temporarily unavailable." } };
   }
 };
 export {
-  handleSpeakerOpsRequest
+  handleSpeakerOpsRequest,
+  verifySpeakerOpsIdentity
 };

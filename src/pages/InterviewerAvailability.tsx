@@ -96,8 +96,8 @@ export default function InterviewerAvailability() {
                 <p className="apply-form__success-desc">
                   Thanks. Your slots are saved for interview matching.
                 </p>
-                <Link to="/dashboard" className="btn btn--ghost">
-                  Back to Dashboard
+                <Link to="/workspace" className="btn btn--ghost">
+                  Open leadership workspace
                 </Link>
               </div>
             </Reveal>
