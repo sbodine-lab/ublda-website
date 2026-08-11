@@ -1,12 +1,15 @@
 import type { AuthConfig } from "convex/server";
 
-// Set these in the Convex deployment, not in a browser-visible environment file.
-// LOGTO_ISSUER is the exact OIDC issuer (normally https://<tenant>.logto.app/oidc).
+// Logto handles the hosted sign-in. The same-origin bridge verifies Logto's ID
+// token and issues a short-lived RS256 token that Convex can verify.
 export default {
   providers: [
     {
-      domain: process.env.LOGTO_ISSUER!,
-      applicationID: process.env.LOGTO_APP_ID!,
+      type: "customJwt",
+      issuer: process.env.CONVEX_AUTH_ISSUER!,
+      applicationID: process.env.CONVEX_AUTH_APP_ID!,
+      jwks: process.env.CONVEX_AUTH_JWKS!,
+      algorithm: "RS256",
     },
   ],
 } satisfies AuthConfig;
