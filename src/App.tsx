@@ -29,7 +29,7 @@ const SpeakerOpsEntry = lazy(() => (
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
 const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory']
-const DECISION_PREFIXES = ['/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people']
+const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people']
 const SPEAKER_OPS_PREFIXES = ['/leadership/speakers', '/speaker-ops']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (

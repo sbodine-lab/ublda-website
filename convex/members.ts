@@ -137,7 +137,7 @@ export const bootstrapCurrentIdentity = mutation({
     });
     await ctx.db.insert("memberIdentities", {
       memberId,
-      provider: "clerk",
+      provider: "logto",
       tokenIdentifier: identity.tokenIdentifier,
       providerSubject: identity.subject,
       issuer: identity.issuer,
@@ -188,7 +188,10 @@ export const claimApprovedIdentity = mutation({
       .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
       .unique();
     assert(
-      approved && approved.status === "pending",
+      approved && (
+        approved.status === "pending"
+        || approved.status === "verified" && approved.provider === "clerk"
+      ),
       "IDENTITY_NOT_APPROVED",
       "This account has not been approved for the UBLDA workspace.",
     );
@@ -198,7 +201,7 @@ export const claimApprovedIdentity = mutation({
     const subjectCollision = await ctx.db
       .query("memberIdentities")
       .withIndex("by_provider_subject", (q) =>
-        q.eq("provider", "clerk").eq("providerSubject", identity.subject),
+        q.eq("provider", "logto").eq("providerSubject", identity.subject),
       )
       .unique();
     assert(
@@ -209,6 +212,7 @@ export const claimApprovedIdentity = mutation({
 
     const now = Date.now();
     await ctx.db.patch("memberIdentities", approved._id, {
+      provider: "logto",
       tokenIdentifier: identity.tokenIdentifier,
       providerSubject: identity.subject,
       issuer: identity.issuer,
@@ -386,7 +390,7 @@ export const upsertMember = mutation({
     for (const email of aliasPlan.add) {
       await ctx.db.insert("memberIdentities", {
         memberId,
-        provider: "clerk",
+        provider: "logto",
         normalizedEmail: email,
         status: "pending",
         createdAt: now,
@@ -446,7 +450,7 @@ export const create = mutation({
     for (const email of emails) {
       await ctx.db.insert("memberIdentities", {
         memberId,
-        provider: "clerk",
+        provider: "logto",
         normalizedEmail: email,
         status: "pending",
         createdAt: now,
@@ -483,7 +487,7 @@ export const addApprovedIdentity = mutation({
     const now = Date.now();
     const identityId = await ctx.db.insert("memberIdentities", {
       memberId: member._id,
-      provider: "clerk",
+      provider: "logto",
       normalizedEmail: email,
       status: "pending",
       createdAt: now,

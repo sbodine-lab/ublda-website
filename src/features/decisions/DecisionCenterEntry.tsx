@@ -39,12 +39,13 @@ function DecisionDocumentMeta() {
 
 export function DecisionCenterEntry() {
   const mode = import.meta.env.VITE_DECISION_CENTER_MODE
-  const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.trim()
   const convexUrl = import.meta.env.VITE_CONVEX_URL?.trim()
+  const logtoAppId = import.meta.env.VITE_LOGTO_APP_ID?.trim()
+  const logtoEndpoint = import.meta.env.VITE_LOGTO_ENDPOINT?.trim()
   const demoMode = mode === "demo" || (
     import.meta.env.DEV
     && mode !== "live"
-    && (!clerkPublishableKey || !convexUrl)
+    && (!convexUrl || !logtoAppId || !logtoEndpoint)
   )
 
   let content
@@ -58,15 +59,15 @@ export function DecisionCenterEntry() {
         </AvailabilityDataProvider>
       </WorkspaceDataProvider>
     )
-  } else if (!clerkPublishableKey || !convexUrl) {
+  } else if (!convexUrl || !logtoAppId || !logtoEndpoint) {
     const adapter = createUnavailableLiveDecisionAdapter(
-      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+      "Add VITE_CONVEX_URL, VITE_LOGTO_APP_ID, and VITE_LOGTO_ENDPOINT, or explicitly select local demo mode.",
     )
     const availabilityAdapter = createUnavailableAvailabilityAdapter(
-      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+      "Add VITE_CONVEX_URL, VITE_LOGTO_APP_ID, and VITE_LOGTO_ENDPOINT, or explicitly select local demo mode.",
     )
     const workspaceAdapter = createUnavailableWorkspaceAdapter(
-      "Add VITE_CLERK_PUBLISHABLE_KEY and VITE_CONVEX_URL, or explicitly select local demo mode.",
+      "Add VITE_CONVEX_URL, VITE_LOGTO_APP_ID, and VITE_LOGTO_ENDPOINT, or explicitly select local demo mode.",
     )
     content = (
       <WorkspaceDataProvider adapter={workspaceAdapter}>
@@ -80,8 +81,9 @@ export function DecisionCenterEntry() {
   } else {
     content = (
       <LiveDecisionCenter
-        clerkPublishableKey={clerkPublishableKey}
         convexUrl={convexUrl}
+        logtoAppId={logtoAppId}
+        logtoEndpoint={logtoEndpoint}
       />
     )
   }

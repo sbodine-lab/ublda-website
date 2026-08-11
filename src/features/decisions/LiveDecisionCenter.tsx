@@ -1,14 +1,14 @@
-import { ClerkProvider, useAuth as useClerkAuth, useClerk, useSignIn } from "@clerk/react"
+import { LogtoProvider, UserScope, useLogto, type LogtoConfig } from "@logto/react"
 import {
+  ConvexProviderWithAuth,
   ConvexReactClient,
   useAction,
   useConvexAuth,
   useMutation,
   useQuery_experimental as useQueryState,
 } from "convex/react"
-import { ConvexProviderWithClerk } from "convex/react-clerk"
 import { makeFunctionReference } from "convex/server"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { DecisionCenterRoutes } from "./DecisionCenterRoutes"
 import { DecisionDataProvider } from "./DecisionDataProvider"
@@ -42,7 +42,6 @@ import type {
   DecisionActivity,
   DecisionCenterSnapshot,
   DecisionRecord,
-  DecisionSignInCredentials,
 } from "./types"
 import { AvailabilityDataProvider } from "@/features/availability/AvailabilityDataProvider"
 import {
@@ -301,9 +300,7 @@ function LiveDecisionBridge({
   availabilityAdapter: MutableLiveAvailabilityAdapter
   workspaceAdapter: MutableLiveWorkspaceAdapter
 }) {
-  const clerk = useClerk()
-  const clerkAuth = useClerkAuth()
-  const { signIn: clerkSignIn } = useSignIn()
+  const logtoAuth = useLogto()
   const convexAuth = useConvexAuth()
   const location = useLocation()
   const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
@@ -336,9 +333,20 @@ function LiveDecisionBridge({
   const updateDirectoryProfileMutation = useMutation(updateDirectoryProfileRef)
 
   useEffect(() => {
+    if (logtoAuth.isAuthenticated) return
+    attemptedRef.current = false
+    attemptGenerationRef.current += 1
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setMembership({ status: "idle" })
+    })
+    return () => { cancelled = true }
+  }, [logtoAuth.isAuthenticated])
+
+  useEffect(() => {
     if (
-      !clerkAuth.isLoaded
-      || !clerkAuth.isSignedIn
+      logtoAuth.isLoading
+      || !logtoAuth.isAuthenticated
       || convexAuth.isLoading
       || !convexAuth.isAuthenticated
       || attemptedRef.current
@@ -370,10 +378,10 @@ function LiveDecisionBridge({
   }, [
     bootstrapIdentity,
     claimIdentity,
-    clerkAuth.isLoaded,
-    clerkAuth.isSignedIn,
     convexAuth.isAuthenticated,
     convexAuth.isLoading,
+    logtoAuth.isAuthenticated,
+    logtoAuth.isLoading,
   ])
 
   const ready = membership.status === "ready"
@@ -444,9 +452,14 @@ function LiveDecisionBridge({
 
   const snapshot = useMemo<DecisionCenterSnapshot>(() => {
     let auth: DecisionCenterSnapshot["auth"]
-    if (!clerkAuth.isLoaded || convexAuth.isLoading) {
+    if (logtoAuth.error) {
+      auth = {
+        status: "misconfigured",
+        message: "The secure sign-in service could not be reached. Try again, then ask an administrator to check the Logto setup if the problem continues.",
+      }
+    } else if (logtoAuth.isLoading || convexAuth.isLoading) {
       auth = { status: "loading" }
-    } else if (!clerkAuth.isSignedIn) {
+    } else if (!logtoAuth.isAuthenticated) {
       auth = { status: "signed-out" }
     } else if (!convexAuth.isAuthenticated) {
       auth = {
@@ -468,7 +481,7 @@ function LiveDecisionBridge({
     ) {
       auth = {
         status: "misconfigured",
-        message: "The private Decision Center data service could not be loaded. Ask an administrator to check the Clerk and Convex setup.",
+        message: "The private Decision Center data service could not be loaded. Ask an administrator to check the Logto and Convex setup.",
       }
     } else if (workspace) {
       auth = { status: "signed-in", viewer: workspace.viewer }
@@ -556,8 +569,6 @@ function LiveDecisionBridge({
   }, [
     activityState,
     adminMembersState,
-    clerkAuth.isLoaded,
-    clerkAuth.isSignedIn,
     convexAuth.isAuthenticated,
     convexAuth.isLoading,
     detail,
@@ -565,6 +576,9 @@ function LiveDecisionBridge({
     eligibleMembersState,
     agentKeysState,
     membership,
+    logtoAuth.error,
+    logtoAuth.isAuthenticated,
+    logtoAuth.isLoading,
     results,
     resultsAllowed,
     resultsState.status,
@@ -613,56 +627,14 @@ function LiveDecisionBridge({
   useEffect(() => { workspaceAdapter.replaceSnapshot(clubWorkspaceSnapshot) }, [clubWorkspaceSnapshot, workspaceAdapter])
 
   const operations = useMemo(() => ({
-    async signInWithGoogle() {
-      const returnUrl = window.location.href
-      const { error } = await clerkSignIn.sso({
-        strategy: "oauth_google",
-        redirectCallbackUrl: returnUrl,
-        redirectUrl: returnUrl,
+    async signIn() {
+      await logtoAuth.signIn({
+        redirectUri: `${window.location.origin}/auth/callback`,
+        postRedirectUri: window.location.href,
       })
-      if (error) throw new Error("Google sign-in could not be started.")
-    },
-    async signInWithEmailCode(email: string) {
-      const { error } = await clerkSignIn.emailCode.sendCode({
-        emailAddress: email.trim(),
-      })
-      if (error) throw new Error("A sign-in code could not be sent. Check the email address or use Google.")
-    },
-    async signIn(credentials: DecisionSignInCredentials) {
-      const { error } = await clerkSignIn.password({
-        emailAddress: credentials.email.trim(),
-        password: credentials.password,
-      })
-      if (error) throw new Error("The email or password is incorrect.")
-
-      if (clerkSignIn.status === "complete") {
-        const { error: finalizeError } = await clerkSignIn.finalize()
-        if (finalizeError) throw new Error("Sign-in could not be completed.")
-        return { status: "complete" as const }
-      }
-
-      if (clerkSignIn.status === "needs_second_factor" || clerkSignIn.status === "needs_client_trust") {
-        const emailFactor = clerkSignIn.supportedSecondFactors.find((factor) => factor.strategy === "email_code")
-        if (!emailFactor) throw new Error("This account requires a sign-in method that is not available here.")
-        const { error: codeError } = await clerkSignIn.mfa.sendEmailCode()
-        if (codeError) throw new Error("A verification code could not be sent.")
-        return { status: "needs-verification" as const }
-      }
-
-      throw new Error("Sign-in could not be completed.")
-    },
-    async verifySignInCode(code: string) {
-      const verification = clerkSignIn.status === "needs_first_factor"
-        ? await clerkSignIn.emailCode.verifyCode({ code: code.trim() })
-        : await clerkSignIn.mfa.verifyEmailCode({ code: code.trim() })
-      const { error } = verification
-      if (error) throw new Error("That verification code is incorrect.")
-      if (clerkSignIn.status !== "complete") throw new Error("Sign-in could not be completed.")
-      const { error: finalizeError } = await clerkSignIn.finalize()
-      if (finalizeError) throw new Error("Sign-in could not be completed.")
     },
     async signOut() {
-      await clerk.signOut({ redirectUrl: window.location.href })
+      await logtoAuth.signOut(`${window.location.origin}/workspace`)
     },
     async submitResponse(decisionId: string, answer: BallotAnswer, rationale?: string) {
       const current = adapter.getSnapshot()
@@ -817,12 +789,11 @@ function LiveDecisionBridge({
     },
   }), [
     adapter,
-    clerk,
-    clerkSignIn,
     closeDecisionMutation,
     createAgentKeyAction,
     createDecisionMutation,
     finalizeDecisionMutation,
+    logtoAuth,
     publishDecisionMutation,
     reopenDecisionMutation,
     revokeAgentKeyMutation,
@@ -905,51 +876,63 @@ function LiveDecisionBridge({
     <WorkspaceDataProvider adapter={workspaceAdapter}>
       <AvailabilityDataProvider adapter={availabilityAdapter}>
         <DecisionDataProvider adapter={adapter}>
-          <DecisionCenterRoutes />
+          <DecisionCenterRoutes logtoCallback />
         </DecisionDataProvider>
       </AvailabilityDataProvider>
     </WorkspaceDataProvider>
   )
 }
 
-function SessionScopedLiveDecisionBridge({
-  adapter,
-  availabilityAdapter,
-  workspaceAdapter,
-}: {
-  adapter: MutableLiveDecisionAdapter
-  availabilityAdapter: MutableLiveAvailabilityAdapter
-  workspaceAdapter: MutableLiveWorkspaceAdapter
-}) {
-  const { sessionId } = useClerkAuth()
-  return <LiveDecisionBridge key={sessionId ?? "signed-out"} adapter={adapter} availabilityAdapter={availabilityAdapter} workspaceAdapter={workspaceAdapter} />
+function useLogtoConvexAuth() {
+  const {
+    clearAccessToken,
+    getAccessToken,
+    getIdToken,
+    isAuthenticated,
+    isLoading,
+  } = useLogto()
+
+  const fetchAccessToken = useCallback(async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
+    if (!isAuthenticated) return null
+    if (forceRefreshToken) {
+      await clearAccessToken()
+      const refreshedAccessToken = await getAccessToken()
+      if (!refreshedAccessToken) return null
+    }
+    return await getIdToken() ?? null
+  }, [clearAccessToken, getAccessToken, getIdToken, isAuthenticated])
+
+  return useMemo(() => ({ isLoading, isAuthenticated, fetchAccessToken }), [
+    fetchAccessToken,
+    isAuthenticated,
+    isLoading,
+  ])
 }
 
 export function LiveDecisionCenter({
-  clerkPublishableKey,
   convexUrl,
+  logtoAppId,
+  logtoEndpoint,
 }: {
-  clerkPublishableKey: string
   convexUrl: string
+  logtoAppId: string
+  logtoEndpoint: string
 }) {
   const adapter = useMemo(() => createLiveDecisionAdapter(), [])
   const availabilityAdapter = useMemo(() => createLiveAvailabilityAdapter(), [])
   const workspaceAdapter = useMemo(() => createLiveWorkspaceAdapter(), [])
   const client = convexClientFor(convexUrl)
+  const logtoConfig = useMemo<LogtoConfig>(() => ({
+    appId: logtoAppId,
+    endpoint: logtoEndpoint,
+    scopes: [UserScope.Email],
+  }), [logtoAppId, logtoEndpoint])
 
   return (
-    <ClerkProvider
-      publishableKey={clerkPublishableKey}
-      appearance={{
-        variables: {
-          colorPrimary: "#0F2B3C",
-          borderRadius: "8px",
-        },
-      }}
-    >
-      <ConvexProviderWithClerk client={client} useAuth={useClerkAuth}>
-        <SessionScopedLiveDecisionBridge adapter={adapter} availabilityAdapter={availabilityAdapter} workspaceAdapter={workspaceAdapter} />
-      </ConvexProviderWithClerk>
-    </ClerkProvider>
+    <LogtoProvider config={logtoConfig}>
+      <ConvexProviderWithAuth client={client} useAuth={useLogtoConvexAuth}>
+        <LiveDecisionBridge adapter={adapter} availabilityAdapter={availabilityAdapter} workspaceAdapter={workspaceAdapter} />
+      </ConvexProviderWithAuth>
+    </LogtoProvider>
   )
 }
