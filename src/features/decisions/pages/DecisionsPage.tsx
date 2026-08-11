@@ -41,9 +41,9 @@ export function DecisionsPage() {
   return (
     <div className="dc-page dc-decisions-page">
       <header className="dc-page-heading dc-page-heading-actions">
-        <h1>Questions</h1>
+        <div><p className="dc-eyebrow">decision center</p><h1>questions</h1></div>
         <Button asChild className="dc-touch dc-desktop-create-button">
-          <Link to="/decisions/new"><Plus data-icon="inline-start" /> New question</Link>
+          <Link to="/decisions/new"><Plus data-icon="inline-start" /> new question</Link>
         </Button>
       </header>
 
