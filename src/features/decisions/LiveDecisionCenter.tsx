@@ -937,19 +937,18 @@ function useLogtoConvexAuth() {
         )
       }
       return result.payload.token
-    })()
-    inFlightTokenRef.current = pending
-    try {
-      return await pending
-    } catch (error) {
-      // Convex token fetchers must settle with null when authentication cannot
-      // be completed. A rejected promise leaves Convex in its initial loading
-      // state and turns a recoverable auth error into an endless spinner.
+    })().catch((error) => {
+      // Convex token fetchers must settle with null on failure. Store that
+      // settled promise so concurrent callers cannot keep auth loading either.
       console.error(
         'convex_auth_token_fetch_failed',
         error instanceof Error ? error.message : 'Unknown error',
       )
       return null
+    })
+    inFlightTokenRef.current = pending
+    try {
+      return await pending
     } finally {
       if (inFlightTokenRef.current === pending) inFlightTokenRef.current = null
     }
