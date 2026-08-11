@@ -41,12 +41,17 @@ export function DecisionWorkspaceLayout() {
     <TooltipProvider>
       <SidebarProvider className="dc-app-shell ws-shell">
         <Sidebar collapsible="icon" className="ws-sidebar">
-          <SidebarHeader className="ws-sidebar-header" aria-hidden="true" />
+          <SidebarHeader className="ws-sidebar-header">
+            <Link to="/workspace" className="ws-brand" aria-label="UBLDA workspace">
+              <img src="/logo.png" alt="" />
+              <span>UBLDA</span>
+            </Link>
+          </SidebarHeader>
           <SidebarContent>
             <SidebarGroup><SidebarGroupContent><WorkspaceNavigation pathname={location.pathname} /></SidebarGroupContent></SidebarGroup>
           </SidebarContent>
           <SidebarFooter className="ws-sidebar-footer">
-            {viewer?.role === "admin" && <SidebarMenu><SidebarMenuItem><SidebarMenuButton asChild tooltip="members"><Link to="/decisions/settings"><Settings /><span>members + access</span></Link></SidebarMenuButton></SidebarMenuItem><SidebarMenuItem><SidebarMenuButton asChild tooltip="integrations"><Link to="/decisions/integrations"><Bot /><span>integrations</span></Link></SidebarMenuButton></SidebarMenuItem></SidebarMenu>}
+            {viewer?.role === "admin" && <SidebarMenu><SidebarMenuItem><SidebarMenuButton asChild tooltip="members" isActive={location.pathname === "/decisions/settings"}><NavLink to="/decisions/settings"><Settings /><span>members + access</span></NavLink></SidebarMenuButton></SidebarMenuItem><SidebarMenuItem><SidebarMenuButton asChild tooltip="integrations" isActive={location.pathname === "/decisions/integrations"}><NavLink to="/decisions/integrations"><Bot /><span>integrations</span></NavLink></SidebarMenuButton></SidebarMenuItem></SidebarMenu>}
             <div className="ws-account-row"><Avatar><AvatarFallback>{initials(viewer?.displayName ?? "UBLDA")}</AvatarFallback></Avatar><div><strong>{viewer?.displayName ?? "UBLDA member"}</strong><span>{viewer?.role ?? "member"}</span></div><Button variant="ghost" size="icon-sm" onClick={() => void adapter.signOut()} aria-label="sign out"><LogOut /></Button></div>
           </SidebarFooter>
           <SidebarRail />

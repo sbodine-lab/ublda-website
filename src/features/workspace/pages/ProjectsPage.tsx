@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react"
-import { ChevronDown, Plus } from "lucide-react"
+import { ChevronDown, FolderKanban, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
@@ -38,6 +39,7 @@ export function ProjectsPage() {
   return (
     <div className="ws-page ws-projects-page">
       <header className="ws-page-header ws-page-header-row"><div><p className="ws-kicker">project tracker</p><h1>projects</h1></div>{isAdmin && <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button className="ws-primary-action"><Plus /> new project</Button></DialogTrigger><DialogContent className="ws-dialog"><DialogHeader><DialogTitle>new project</DialogTitle></DialogHeader><form onSubmit={createProject}><FieldGroup><Field><FieldLabel htmlFor="project-name">name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field><Field><FieldLabel htmlFor="project-summary">one-line outcome</FieldLabel><Input id="project-summary" name="summary" /></Field><div className="ws-form-grid"><Field><FieldLabel>lane</FieldLabel><Select value={lane} onValueChange={(value) => setLane(value as ProjectLane)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{lanes.map((value) => <SelectItem key={value} value={value}>{laneLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div><Field><FieldLabel htmlFor="project-due">due</FieldLabel><Input id="project-due" name="due" type="date" /></Field></FieldGroup><DialogFooter className="ws-dialog-footer"><Button type="submit">create project</Button></DialogFooter></form></DialogContent></Dialog>}</header>
+      {!projects.length ? <Empty className="ws-empty ws-page-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no projects yet</EmptyTitle><EmptyDescription>Projects organize owners, tasks, due dates, and progress in one place.</EmptyDescription></EmptyHeader></Empty> : null}
       {lanes.map((currentLane) => {
         const laneProjects = projects.filter((project) => project.lane === currentLane)
         if (!laneProjects.length) return null
