@@ -21,12 +21,12 @@
 }
 
 .ws-shell :where(h1, h2, h3) { color: #0f2b3c; }
-.ws-shell h1 { font-size: clamp(2.15rem, 4vw, 3rem) !important; font-weight: 550 !important; letter-spacing: -.04em !important; line-height: 1.05; }
-.ws-shell h2 { font-size: 1.05rem !important; font-weight: 650 !important; letter-spacing: -.015em !important; }
-.ws-shell h3 { font-size: .95rem !important; font-weight: 650 !important; }
-.ws-shell :where(p, span, strong, button, a, input, textarea, select, th, td) { font-size: .9rem !important; }
-.ws-shell :where(small, .ws-kicker, .ws-status) { font-size: .72rem !important; }
-.ws-shell strong { font-weight: 600 !important; }
+.ws-shell:not(.leadership-shell) h1 { font-size: clamp(2.15rem, 4vw, 3rem) !important; font-weight: 550 !important; letter-spacing: -.04em !important; line-height: 1.05; }
+.ws-shell:not(.leadership-shell) h2 { font-size: 1.05rem !important; font-weight: 650 !important; letter-spacing: -.015em !important; }
+.ws-shell:not(.leadership-shell) h3 { font-size: .95rem !important; font-weight: 650 !important; }
+.ws-shell:not(.leadership-shell) :where(p, span, strong, button, a, input, textarea, select, th, td) { font-size: .9rem !important; }
+.ws-shell:not(.leadership-shell) :where(small, .ws-kicker, .ws-status) { font-size: .72rem !important; }
+.ws-shell:not(.leadership-shell) strong { font-weight: 600 !important; }
 
 .ws-sidebar { background: #fff; }
 .ws-sidebar [data-sidebar="sidebar"] { background: #fff; }
