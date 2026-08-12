@@ -65,10 +65,7 @@ export function LeadershipShell({
     <div className="dc-app-shell ws-shell leadership-shell">
       <aside className="leadership-sidebar">
         <Link to="/workspace" className="leadership-brand" aria-label="UBLDA workspace">
-          <span className="leadership-brand__mark" aria-hidden="true">
-            <img src="/logo.png" alt="" />
-          </span>
-          <span className="leadership-brand__wordmark">UBLDA</span>
+          <img className="leadership-brand__logo" src="/logo.png" alt="" />
         </Link>
 
         <nav className="leadership-suite-nav" aria-label="Leadership workspace">
@@ -106,8 +103,7 @@ export function LeadershipShell({
       <div className="leadership-workspace">
         <header className="leadership-topbar">
           <Link to="/workspace" className="leadership-mobile-brand" aria-label="UBLDA workspace">
-            <img src="/logo.png" alt="" />
-            <span>UBLDA</span>
+            <img className="leadership-brand__logo" src="/logo.png" alt="" />
           </Link>
           <div className="leadership-topbar__copy">
             <div className="leadership-topbar__title">

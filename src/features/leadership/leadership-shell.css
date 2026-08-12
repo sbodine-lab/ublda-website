@@ -85,40 +85,22 @@
   min-height: 46px;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 8px 12px;
-  color: var(--leadership-blue-strong);
+  width: fit-content;
+  padding: 2px 8px 10px;
   text-decoration: none;
 }
 
-.leadership-brand__mark {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.84);
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 8px 20px rgba(20, 43, 74, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.96);
-  transition: transform 280ms var(--leadership-ease), box-shadow 280ms var(--leadership-ease);
-}
-
-.leadership-brand:hover .leadership-brand__mark {
-  transform: translateY(-1px) rotate(-1deg);
-  box-shadow: 0 12px 26px rgba(20, 43, 74, 0.11), inset 0 1px 0 #fff;
-}
-
-.leadership-brand__mark img {
-  width: 28px;
-  height: 28px;
+.leadership-brand__logo {
+  width: 40px;
+  height: 40px;
   object-fit: contain;
+  transition: transform 240ms var(--leadership-ease), opacity 180ms ease;
 }
 
-.leadership-brand__wordmark {
-  font-size: 14px;
-  font-weight: 750;
-  letter-spacing: 0.18em;
+.leadership-brand:hover .leadership-brand__logo,
+.leadership-mobile-brand:hover .leadership-brand__logo {
+  opacity: 0.88;
+  transform: translateY(-1px);
 }
 
 .leadership-suite-nav,
@@ -810,18 +792,12 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
     z-index: 1;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
     flex: 0 0 auto;
-    color: var(--leadership-blue-strong);
-    font-size: 11px;
-    font-weight: 750;
-    letter-spacing: 0.14em;
   }
 
-  .leadership-mobile-brand img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
+  .leadership-mobile-brand .leadership-brand__logo {
+    width: 34px;
+    height: 34px;
   }
 
   .leadership-topbar__copy {
