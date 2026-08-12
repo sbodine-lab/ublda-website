@@ -91,9 +91,10 @@
 }
 
 .leadership-brand__logo {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(15, 43, 60, 0.13));
   transition: transform 240ms var(--leadership-ease), opacity 180ms ease;
 }
 
@@ -796,8 +797,8 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
   }
 
   .leadership-mobile-brand .leadership-brand__logo {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
   }
 
   .leadership-topbar__copy {

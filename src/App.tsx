@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
-import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -45,8 +44,6 @@ export default function App() {
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
-  useTabEasterEgg()
-
   if (inDecisionCenter) {
     return (
       <>

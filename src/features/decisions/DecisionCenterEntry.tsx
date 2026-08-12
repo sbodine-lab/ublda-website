@@ -31,7 +31,7 @@ const unavailableLeadershipIdentity: LeadershipIdentity = {
 function DecisionDocumentMeta() {
   useEffect(() => {
     const previousTitle = document.title
-    document.title = "UBLDA Leadership Workspace"
+    document.title = "UBLDA"
     const existing = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
     const robots = existing ?? document.createElement("meta")
     const previousContent = existing?.content
