@@ -6,10 +6,11 @@ Local preview, Logto/Convex configuration, governance rules, and agent API/MCP s
 
 ## Interview launch checklist
 
-The interview signup flow can be opened without automated confirmation email. Candidates see their booked slot in the browser after submitting, and admins can send manual follow-up from the dashboard/export. Before opening the form publicly, configure these Vercel environment variables:
+The interview signup flow can be opened without automated confirmation email. Candidates see their booked slot in the browser after submitting. Before opening the form publicly, configure these Vercel environment variables:
 
 - `BLOB_READ_WRITE_TOKEN` for private recruiting data, slot locks, and resume uploads.
-- `UBLDA_SUPER_ADMIN_PASSWORD` for signed fallback admin sessions.
+
+Leadership administration uses the Logto + Convex member roster described in the Decision Center operations guide. The former shared-password, applicant-account, Apps Script session, dashboard, resume, health, and CSV-export authorization paths are retired. Public applications, interview booking, and interviewer availability remain available without that second auth plane.
 
 Optional automated confirmation email:
 
@@ -17,8 +18,6 @@ Optional automated confirmation email:
 - `UBLDA_EMAIL_FROM`, normally `UBLDA Interviews <interviews@ublda.org>`.
 - `UBLDA_EMAIL_DOMAIN_VERIFIED=true` only after the sender domain passes SPF/DKIM verification in Resend.
 - `UBLDA_REQUIRE_BOOKING_EMAIL=true` only if the form should fail closed when automated confirmation email is unavailable.
-
-Admins can check the dashboard Settings > Backend panel for live launch readiness. Candidate and interviewer CSV exports are available from the Recruiting and E-board admin tabs.
 
 ## Local development
 

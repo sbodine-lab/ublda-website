@@ -35,6 +35,7 @@ type IdentityVerifierDependencies = {
   environment?: Environment
   exchange?: (idToken: string) => Promise<IdentityExchange>
   queryViewer?: (convexToken: string, convexUrl: string) => Promise<ConvexViewer>
+  viewerTimeoutMs?: number
 }
 
 export type SpeakerOpsIdentityVerifier = (idToken: string) => Promise<SpeakerOpsActor>
@@ -47,6 +48,7 @@ export type SpeakerOpsServiceOptions = {
 const defaultStore = createSpeakerOpsStore()
 const allowedActions = new Set(['workspace', 'updateLead', 'updateRoomRequest', 'updateSlot'])
 const MAX_ID_TOKEN_LENGTH = 24_000
+const CONVEX_VIEWER_TIMEOUT_MS = 8_000
 
 const viewerReference = makeFunctionReference<
   'query',
@@ -68,9 +70,37 @@ const textValue = (body: RequestBody, key: string) => (
   typeof body[key] === 'string' ? body[key].trim() : ''
 )
 
-const defaultViewerQuery = async (convexToken: string, convexUrl: string) => {
-  const client = new ConvexHttpClient(convexUrl, { auth: convexToken, logger: false })
+const defaultViewerQuery = async (
+  convexToken: string,
+  convexUrl: string,
+  timeoutMs = CONVEX_VIEWER_TIMEOUT_MS,
+) => {
+  const fetchWithTimeout: typeof fetch = (input, init) => fetch(input, {
+    ...init,
+    signal: AbortSignal.timeout(timeoutMs),
+  })
+  const client = new ConvexHttpClient(convexUrl, {
+    auth: convexToken,
+    logger: false,
+    fetch: fetchWithTimeout,
+  })
   return client.query(viewerReference, {})
+}
+
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<T>((_resolve, reject) => {
+    timeout = setTimeout(() => {
+      const error = new Error('Leadership membership verification timed out.')
+      error.name = 'TimeoutError'
+      reject(error)
+    }, timeoutMs)
+  })
+  try {
+    return await Promise.race([promise, deadline])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
 }
 
 export const verifySpeakerOpsIdentity = async (
@@ -103,7 +133,11 @@ export const verifySpeakerOpsIdentity = async (
 
   let viewer: ConvexViewer
   try {
-    viewer = await (dependencies.queryViewer || defaultViewerQuery)(exchange.token, convexUrl)
+    const timeoutMs = dependencies.viewerTimeoutMs ?? CONVEX_VIEWER_TIMEOUT_MS
+    const viewerPromise = dependencies.queryViewer
+      ? dependencies.queryViewer(exchange.token, convexUrl)
+      : defaultViewerQuery(exchange.token, convexUrl, timeoutMs)
+    viewer = await withTimeout(viewerPromise, timeoutMs)
   } catch (error) {
     if (error instanceof ConvexError) {
       throw new SpeakerOpsAuthError(403, 'This account is not approved for the UBLDA leadership workspace.')

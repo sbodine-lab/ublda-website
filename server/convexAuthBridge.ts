@@ -1,6 +1,7 @@
 import {
   SignJWT,
   createRemoteJWKSet,
+  exportJWK,
   importPKCS8,
   jwtVerify,
   type JSONWebKeySet,
@@ -8,6 +9,12 @@ import {
 } from 'jose'
 
 const CONVEX_TOKEN_TTL_SECONDS = 5 * 60
+const LOGTO_CLOCK_TOLERANCE_SECONDS = 10
+const LOGTO_MAX_TOKEN_AGE_SECONDS = 2 * 60 * 60
+const LOGTO_JWKS_TIMEOUT_MS = 5_000
+const LOGTO_JWKS_COOLDOWN_MS = 30_000
+const LOGTO_JWKS_CACHE_MAX_AGE_MS = 10 * 60 * 1_000
+const MAX_CONVEX_PUBLIC_KEYS = 3
 const acceptedLogtoAlgorithms = ['ES384', 'RS256'] as const
 
 type Environment = Record<string, string | undefined>
@@ -31,26 +38,83 @@ export type VerifiedLogtoIdentity = {
   picture?: string
 }
 
+export class AuthBridgeTokenError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'AuthBridgeTokenError'
+  }
+}
+
 const required = (environment: Environment, name: string) => {
   const value = environment[name]?.trim()
   if (!value) throw new Error(`Missing ${name}.`)
   return value
 }
 
+const privateJwkParameters = ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k'] as const
+
 const parsePublicJwks = (raw: string): JSONWebKeySet => {
   const parsed = JSON.parse(raw) as JSONWebKeySet
   const keys = Array.isArray(parsed.keys) ? parsed.keys : []
-  const valid = keys.length === 1
-    && keys[0]?.kty === 'RSA'
-    && keys[0]?.alg === 'RS256'
-    && keys[0]?.use === 'sig'
-    && typeof keys[0]?.kid === 'string'
-    && Boolean(keys[0].kid)
-    && typeof keys[0]?.n === 'string'
-    && typeof keys[0]?.e === 'string'
+  if (keys.length < 1 || keys.length > MAX_CONVEX_PUBLIC_KEYS) {
+    throw new Error(`CONVEX_AUTH_PUBLIC_JWKS must contain 1-${MAX_CONVEX_PUBLIC_KEYS} public RS256 signing keys.`)
+  }
 
-  if (!valid) throw new Error('CONVEX_AUTH_PUBLIC_JWKS must contain one RS256 signing key.')
-  return { keys }
+  const publicKeys = keys.map((key) => {
+    const valid = key?.kty === 'RSA'
+      && key?.alg === 'RS256'
+      && key?.use === 'sig'
+      && typeof key?.kid === 'string'
+      && Boolean(key.kid.trim())
+      && typeof key?.n === 'string'
+      && Boolean(key.n)
+      && typeof key?.e === 'string'
+      && Boolean(key.e)
+      && privateJwkParameters.every((parameter) => !(parameter in key))
+    if (!valid) {
+      throw new Error('CONVEX_AUTH_PUBLIC_JWKS contains an invalid or private signing key.')
+    }
+
+    return {
+      kty: 'RSA',
+      use: 'sig',
+      alg: 'RS256',
+      kid: String(key.kid).trim(),
+      n: String(key.n),
+      e: String(key.e),
+    }
+  })
+  if (new Set(publicKeys.map(({ kid }) => kid)).size !== publicKeys.length) {
+    throw new Error('CONVEX_AUTH_PUBLIC_JWKS signing key IDs must be unique.')
+  }
+
+  // Only publish the public RSA fields Convex needs. This prevents a harmless
+  // metadata addition (or, more importantly, private key material) from being
+  // reflected by the public JWKS endpoint.
+  return { keys: publicKeys }
+}
+
+const normalizedAllowedOrigin = (raw: string): string => {
+  let url: URL
+  try {
+    url = new URL(raw.trim())
+  } catch {
+    throw new Error('CONVEX_AUTH_ALLOWED_ORIGINS contains an invalid origin.')
+  }
+
+  const localHttp = url.protocol === 'http:'
+    && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+  if (
+    (url.protocol !== 'https:' && !localHttp)
+    || url.username
+    || url.password
+    || (url.pathname !== '/' && url.pathname !== '')
+    || url.search
+    || url.hash
+  ) {
+    throw new Error('CONVEX_AUTH_ALLOWED_ORIGINS must contain exact HTTPS origins.')
+  }
+  return url.origin
 }
 
 export const authBridgeConfig = (
@@ -68,8 +132,9 @@ export const authBridgeConfig = (
     allowedOrigins: new Set(
       required(environment, 'CONVEX_AUTH_ALLOWED_ORIGINS')
         .split(',')
-        .map((origin) => origin.trim().replace(/\/$/, ''))
-        .filter(Boolean),
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+        .map(normalizedAllowedOrigin),
     ),
   }
 }
@@ -83,7 +148,7 @@ export const verifiedLogtoIdentity = (payload: JWTPayload): VerifiedLogtoIdentit
   const subject = stringClaim(payload, 'sub')
   const email = stringClaim(payload, 'email')?.toLowerCase()
   if (!subject || !email || payload.email_verified !== true) {
-    throw new Error('The Logto identity must contain a verified email address.')
+    throw new AuthBridgeTokenError('The Logto identity must contain a verified email address.')
   }
 
   return {
@@ -100,19 +165,74 @@ const remoteKeySets = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
 const remoteKeySet = (url: string) => {
   const existing = remoteKeySets.get(url)
   if (existing) return existing
-  const created = createRemoteJWKSet(new URL(url))
+  const created = createRemoteJWKSet(new URL(url), {
+    timeoutDuration: LOGTO_JWKS_TIMEOUT_MS,
+    cooldownDuration: LOGTO_JWKS_COOLDOWN_MS,
+    cacheMaxAge: LOGTO_JWKS_CACHE_MAX_AGE_MS,
+  })
   remoteKeySets.set(url, created)
   return created
 }
 
+const validateLogtoTokenClaims = (payload: JWTPayload, logtoAppId: string) => {
+  const audiences = Array.isArray(payload.aud)
+    ? payload.aud
+    : typeof payload.aud === 'string'
+      ? [payload.aud]
+      : []
+  const authorizedParty = stringClaim(payload, 'azp')
+  if (audiences.length > 1 && !authorizedParty) {
+    throw new AuthBridgeTokenError('A multi-audience Logto ID token must identify its authorized party.')
+  }
+  if (authorizedParty && authorizedParty !== logtoAppId) {
+    throw new AuthBridgeTokenError('The Logto ID token authorized party does not match this application.')
+  }
+
+  if (
+    typeof payload.iat !== 'number'
+    || typeof payload.exp !== 'number'
+    || payload.exp <= payload.iat
+    || payload.exp - payload.iat > LOGTO_MAX_TOKEN_AGE_SECONDS
+  ) {
+    throw new AuthBridgeTokenError('The Logto ID token has an invalid validity window.')
+  }
+}
+
 let cachedPrivateKeySource = ''
 let cachedPrivateKey: Awaited<ReturnType<typeof importPKCS8>> | null = null
+let cachedPublicKeyFingerprint = ''
+let cachedSigningKeyMatch: Promise<{
+  key: Awaited<ReturnType<typeof importPKCS8>>
+  kid: string
+}> | null = null
 
-const signingKey = async (privateKey: string) => {
-  if (cachedPrivateKey && cachedPrivateKeySource === privateKey) return cachedPrivateKey
-  cachedPrivateKey = await importPKCS8(privateKey, 'RS256')
-  cachedPrivateKeySource = privateKey
-  return cachedPrivateKey
+const signingKey = async (privateKey: string, publicJwks: JSONWebKeySet) => {
+  const publicKeyFingerprint = publicJwks.keys
+    .map((key) => `${key.kid || ''}:${key.n || ''}:${key.e || ''}`)
+    .join('|')
+  if (!cachedPrivateKey || cachedPrivateKeySource !== privateKey) {
+    cachedPrivateKey = await importPKCS8(privateKey, 'RS256', { extractable: true })
+    cachedPrivateKeySource = privateKey
+    cachedSigningKeyMatch = null
+  }
+  if (cachedPublicKeyFingerprint !== publicKeyFingerprint) {
+    cachedPublicKeyFingerprint = publicKeyFingerprint
+    cachedSigningKeyMatch = null
+  }
+
+  cachedSigningKeyMatch ||= (async () => {
+    const derived = await exportJWK(cachedPrivateKey!)
+    const matches = publicJwks.keys.filter((published) => (
+      derived.kty === 'RSA'
+      && derived.n === published.n
+      && derived.e === published.e
+    ))
+    if (matches.length !== 1 || !matches[0]?.kid) {
+      throw new Error('The auth bridge signing key must match exactly one public JWKS key.')
+    }
+    return { key: cachedPrivateKey!, kid: matches[0].kid }
+  })()
+  return await cachedSigningKeyMatch
 }
 
 export const exchangeLogtoIdTokenWithIdentity = async (
@@ -124,10 +244,13 @@ export const exchangeLogtoIdTokenWithIdentity = async (
     issuer: config.logtoIssuer,
     audience: config.logtoAppId,
     algorithms: [...acceptedLogtoAlgorithms],
+    requiredClaims: ['sub', 'iat', 'exp'],
+    clockTolerance: LOGTO_CLOCK_TOLERANCE_SECONDS,
+    maxTokenAge: LOGTO_MAX_TOKEN_AGE_SECONDS,
   })
+  validateLogtoTokenClaims(payload, config.logtoAppId)
   const identity = verifiedLogtoIdentity(payload)
-  const kid = config.publicJwks.keys[0]?.kid
-  if (!kid) throw new Error('The auth bridge signing key ID is missing.')
+  const activeSigningKey = await signingKey(config.signingPrivateKey, config.publicJwks)
 
   const token = await new SignJWT({
     email: identity.email,
@@ -135,13 +258,13 @@ export const exchangeLogtoIdTokenWithIdentity = async (
     ...(identity.name ? { name: identity.name } : {}),
     ...(identity.picture ? { picture: identity.picture } : {}),
   })
-    .setProtectedHeader({ alg: 'RS256', kid, typ: 'JWT' })
+    .setProtectedHeader({ alg: 'RS256', kid: activeSigningKey.kid, typ: 'JWT' })
     .setIssuer(config.bridgeIssuer)
     .setAudience(config.bridgeAppId)
     .setSubject(identity.subject)
     .setIssuedAt()
     .setExpirationTime(`${CONVEX_TOKEN_TTL_SECONDS}s`)
-    .sign(await signingKey(config.signingPrivateKey))
+    .sign(activeSigningKey.key)
 
   return {
     identity,

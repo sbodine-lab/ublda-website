@@ -3,14 +3,12 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import path from 'node:path'
-import { validateApplicantAccountPayload } from './src/lib/applicantAccount.ts'
 import { buildApplicationSubmission, validateApplicationPayload } from './src/lib/application.ts'
-import { buildInterviewAssignmentSubmission, validateInterviewAssignmentPayload } from './src/lib/interviewAssignment.ts'
 import { buildInterviewBookingSubmission, validateInterviewBookingPayload } from './src/lib/interviewBooking.ts'
 import { buildInterviewerAvailabilitySubmission, validateInterviewerAvailabilityPayload } from './src/lib/interviewerAvailability.ts'
 import { bookingEmailLaunchError, sendBookingConfirmationEmail } from './server/bookingEmail.ts'
 import { createLocalRecruitingStore } from './server/localRecruitingStore.js'
-import { buildRecruitingExport, parseRecruitingExportType } from './server/recruitingExport.ts'
+import { parseRecruitingExportType } from './server/recruitingExport.ts'
 import { housingApiPayloadForRoute } from './server/housingApi.ts'
 import {
   handleSpeakerOpsRequest,
@@ -119,79 +117,10 @@ const devApiPlugin = () => ({
         return
       }
 
-      const body = await readJsonBody(req)
-      const result = validateApplicantAccountPayload(body)
-
-      if (!result.success) {
-        sendJson(res, 400, { error: result.errors[0], errors: result.errors })
-        return
-      }
-
-      if (result.data.action === 'session') {
-        const session = await store.restoreSession(result.data.sessionToken)
-
-        if (!session) {
-          sendJson(res, 401, { success: false, error: 'Local preview session expired. Sign in again.' })
-          return
-        }
-
-        sendJson(res, 200, { success: true, ...session })
-        return
-      }
-
-      if (result.data.action === 'requestMagicLink') {
-        const session = await store.restoreSession('local-preview-session-token')
-        sendJson(res, 200, {
-          success: true,
-          magicLinkSent: Boolean(session),
-          ...(session || {}),
-        })
-        return
-      }
-
-      if (result.data.action === 'googleSignIn') {
-        const profile = result.data.profile
-        const fallbackEmail = profile?.email || 'preview.member@umich.edu'
-        const uniqname = fallbackEmail.replace(/@.*$/, '')
-        // Mirror the production handler: Google is a verified provider, so an officer's
-        // account resolves to their roster role. Without this, dev can never reach /dashboard.
-        const session = await store.upsertAccount({
-          firstName: profile?.firstName || 'Preview',
-          lastName: profile?.lastName || 'Member',
-          uniqname,
-          email: fallbackEmail,
-          verifiedVia: 'google',
-        })
-
-        sendJson(res, 200, { success: true, ...session, localPreview: true })
-        return
-      }
-
-      if (result.data.action === 'signIn') {
-        const session = await store.signIn(result.data.email, result.data.password)
-
-        if (!session) {
-          sendJson(res, 401, { success: false, error: 'Invalid uniqname or password.' })
-          return
-        }
-
-        sendJson(res, 200, { success: true, ...session })
-        return
-      }
-
-      if (result.data.action === 'logout') {
-        await store.deleteSession(result.data.sessionToken)
-        sendJson(res, 200, { success: true })
-        return
-      }
-
-      if (result.data.action === 'create') {
-        const session = await store.upsertAccount(result.data.account, result.data.password)
-        sendJson(res, 200, { success: true, ...session })
-        return
-      }
-
-      sendJson(res, 400, { error: 'Applicant account action is invalid.' })
+      sendJson(res, 410, {
+        success: false,
+        error: 'Applicant account authentication is retired. Public application and interview booking remain available.',
+      })
     })
 
     server.middlewares.use('/api/apply', async (req, res) => {
@@ -260,20 +189,8 @@ const devApiPlugin = () => ({
         return
       }
 
-      const body = await readJsonBody(req)
-      const result = validateInterviewAssignmentPayload(body)
-
-      if (!result.success) {
-        sendJson(res, 400, { error: result.errors[0], errors: result.errors })
-        return
-      }
-
-      const submission = buildInterviewAssignmentSubmission(result.data, req.headers['user-agent'] || '')
-      const saved = await store.saveInterviewAssignment(submission)
-      sendJson(res, 200, {
-        success: true,
-        updatedCandidate: saved.updatedCandidate,
-        localPreview: true,
+      sendJson(res, 401, {
+        error: 'Legacy recruiting administration is retired. Use the leadership workspace.',
       })
     })
 
@@ -346,33 +263,13 @@ const devApiPlugin = () => ({
 
       const url = new URL(req.url || '/', 'http://localhost')
       const candidateEmail = (url.searchParams.get('candidate') || '').trim().toLowerCase()
-      const sessionToken = (url.searchParams.get('sessionToken') || '').trim()
 
       if (!candidateEmail) {
         sendJson(res, 400, { error: 'Candidate email is required.' })
         return
       }
 
-      if (sessionToken !== 'local-preview-session-token') {
-        const dashboard = await store.dashboardData(sessionToken)
-        if (dashboard?.role !== 'super-admin' && dashboard?.role !== 'exec') {
-          sendJson(res, 401, { error: 'A recruiting admin session is required.' })
-          return
-        }
-      }
-
-      const resume = await store.readCandidateResume(candidateEmail)
-      if (!resume) {
-        sendJson(res, 404, { error: 'Resume was not found.' })
-        return
-      }
-
-      res.statusCode = 200
-      res.setHeader('Content-Type', resume.mimeType || 'application/octet-stream')
-      res.setHeader('Content-Disposition', `inline; filename="${resume.fileName.replace(/["\r\n]/g, '') || 'resume.pdf'}"`)
-      res.setHeader('Content-Length', String(resume.content.length))
-      res.setHeader('Cache-Control', 'no-store, max-age=0')
-      res.end(resume.content)
+      sendJson(res, 401, { error: 'Legacy recruiting administration is retired. Use the leadership workspace.' })
     })
 
     server.middlewares.use('/api/recruiting-export', async (req, res) => {
@@ -382,7 +279,6 @@ const devApiPlugin = () => ({
       }
 
       const url = new URL(req.url || '/', 'http://localhost')
-      const sessionToken = (url.searchParams.get('sessionToken') || '').trim()
       const exportType = parseRecruitingExportType((url.searchParams.get('type') || '').trim())
 
       if (!exportType) {
@@ -390,20 +286,7 @@ const devApiPlugin = () => ({
         return
       }
 
-      if (sessionToken !== 'local-preview-session-token') {
-        const dashboard = await store.dashboardData(sessionToken)
-        if (dashboard?.role !== 'super-admin' && dashboard?.role !== 'exec') {
-          sendJson(res, 401, { error: 'A recruiting admin session is required.' })
-          return
-        }
-      }
-
-      const csv = buildRecruitingExport(exportType, await store.leadershipDashboardData())
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-      res.setHeader('Content-Disposition', `attachment; filename="${csv.fileName}"`)
-      res.setHeader('Cache-Control', 'no-store, max-age=0')
-      res.end(csv.content)
+      sendJson(res, 401, { error: 'Legacy recruiting administration is retired. Use the leadership workspace.' })
     })
 
     server.middlewares.use('/api/dashboard-data', async (req, res) => {
@@ -412,25 +295,10 @@ const devApiPlugin = () => ({
         return
       }
 
-      const body = await readJsonBody(req)
-      const sessionToken = typeof body.sessionToken === 'string' ? body.sessionToken.trim() : ''
-      if (sessionToken === 'local-preview-session-token') {
-        sendJson(res, 200, {
-          success: true,
-          dashboardData: await store.leadershipDashboardData(),
-          localPreview: true,
-        })
-        return
-      }
-
-      const dashboard = await store.dashboardData(sessionToken)
-
-      if (!dashboard) {
-        sendJson(res, 401, { error: 'A valid local preview member session is required.' })
-        return
-      }
-
-      sendJson(res, 200, { success: true, ...dashboard })
+      sendJson(res, 410, {
+        success: false,
+        error: 'Legacy dashboard authentication is retired. Use the leadership workspace.',
+      })
     })
   },
 })

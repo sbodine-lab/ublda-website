@@ -41,8 +41,6 @@ var PROGRAM_SLOT_STATUS_LABELS = {
 // server/speakerOpsStore.ts
 var BLOB_PATH = "speaker-ops/state.json";
 var WRITE_ATTEMPTS = 5;
-var confirmers = /* @__PURE__ */ new Set(["atchiang@umich.edu", "sbodine@umich.edu"]);
-var isConfirmer = (email) => confirmers.has(email);
 var queues = /* @__PURE__ */ new Map();
 var defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE ? path.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE) : path.join(process.cwd(), ".ublda-local-data", "speaker-ops.json");
 var isoNow = () => (/* @__PURE__ */ new Date()).toISOString();
@@ -320,7 +318,7 @@ var memberView = (email) => {
     name: member.name,
     email: member.email,
     title: member.title,
-    canConfirmProgram: isConfirmer(email)
+    canConfirmProgram: false
   };
 };
 var addBusinessDays = (iso, count) => {
@@ -370,7 +368,7 @@ var SpeakerOpsStore = class {
     const blob = await get(BLOB_PATH, { access: "private", useCache: false });
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null };
     const raw = await new Response(blob.stream).text();
-    return { data: JSON.parse(raw), etag: blob.blob.etag?.replace(/^W\//, "") || null };
+    return { data: JSON.parse(raw), etag: blob.blob.etag || null };
   }
   async writeBlob(data, etag) {
     await put(BLOB_PATH, `${JSON.stringify(data, null, 2)}
@@ -424,21 +422,28 @@ var SpeakerOpsStore = class {
   }
   async workspace(actor) {
     const member = memberForActor(actor);
-    return this.updateData((data) => ({
+    const rawData = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
+    const data = migrateData(rawData);
+    if (rawData.version !== 3) {
+      await this.updateData((stored) => {
+        Object.assign(stored, data);
+      });
+    }
+    return {
       viewer: {
         memberId: actor.memberId,
         name: actor.displayName || member.name,
         email: member.email,
         title: member.title,
         role: actor.role,
-        canConfirmProgram: isConfirmer(member.email)
+        canConfirmProgram: actor.role === "admin"
       },
       members: SPEAKER_OPS_MEMBERS.map((candidate) => memberView(candidate.email)),
       leads: Object.values(data.leads),
       slots: Object.values(data.slots),
       roomRequests: Object.values(data.roomRequests),
       activity: data.activity
-    }));
+    };
   }
   async updateLead(actor, leadInput) {
     const member = memberForActor(actor);
@@ -504,7 +509,7 @@ var SpeakerOpsStore = class {
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status;
         if (nextStatus === "confirmed") {
-          if (!isConfirmer(member.email)) return { ok: false, error: "Only Sam or Alexa can confirm a programmed date." };
+          if (actor.role !== "admin") return { ok: false, error: "Only a workspace administrator can confirm a programmed date." };
           const request = data.roomRequests[slot.roomRequestId];
           if (request?.status !== "approved") return { ok: false, error: "Ross must approve the room before the fireside can be confirmed." };
           if (!slot.leadId) return { ok: false, error: "Choose a speaker before confirming the fireside." };

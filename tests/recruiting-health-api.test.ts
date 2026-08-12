@@ -36,7 +36,7 @@ const createResponse = () => {
   }
 }
 
-test('recruiting health summarizes candidates, coverage, and stored resumes for admins', async () => {
+test('recruiting health rejects previously issued local recruiting-admin sessions', async () => {
   const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
   const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
   const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
@@ -103,20 +103,8 @@ test('recruiting health summarizes candidates, coverage, and stored resumes for 
       headers: {},
     }, authorized.res)
 
-    assert.equal(authorized.result().statusCode, 200)
-    const payload = authorized.result().payload as {
-      counts: Record<string, number>
-      candidates: Array<Record<string, unknown>>
-      interviewers: Array<Record<string, unknown>>
-    }
-    assert.equal(payload.counts.candidates, 1)
-    assert.equal(payload.counts.interviewers, 1)
-    assert.equal(payload.counts.resumes, 1)
-    assert.equal(payload.counts.coveredSlots, 1)
-    assert.equal(payload.candidates[0].email, 'andsack@umich.edu')
-    assert.equal(payload.candidates[0].resumePresent, true)
-    assert.equal(payload.candidates[0].resumeFileName, 'andrew-resume.pdf')
-    assert.equal(payload.interviewers[0].email, 'atchiang@umich.edu')
+    assert.equal(authorized.result().statusCode, 401)
+    assert.match(String((authorized.result().payload as Record<string, unknown>).error), /admin session/i)
   } finally {
     if (originalDataFile === undefined) {
       delete process.env.UBLDA_LOCAL_DATA_FILE

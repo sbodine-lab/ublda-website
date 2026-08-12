@@ -46,6 +46,7 @@ import {
   type SpeakerStage,
 } from '@/lib/speakerOps'
 import { useLeadershipIdentity } from '@/features/decisions/leadershipIdentityContext'
+import { withLeadershipRequestTimeout } from '@/features/decisions/logtoConvexAuth'
 import './speaker-ops.css'
 
 type WorkspaceView = 'pipeline' | 'slots' | 'rooms' | 'calendar'
@@ -71,11 +72,14 @@ class SpeakerOpsApiError extends Error {
 }
 
 const api = async (body: ApiRecord, idToken: string) => {
-  const response = await fetch('/api/speaker-ops', {
+  const response = await withLeadershipRequestTimeout((signal) => fetch('/api/speaker-ops', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...body, idToken }),
-  })
+    cache: 'no-store',
+    credentials: 'same-origin',
+    signal,
+  }))
   const payload = await response.json().catch(() => ({ error: 'Speaker Ops returned an invalid response.' })) as ApiRecord
   if (!response.ok) throw new SpeakerOpsApiError(
     typeof payload.error === 'string' ? payload.error : 'Speaker Ops is unavailable.',
@@ -406,7 +410,7 @@ function SlotSheet({
                 <SelectTrigger className="w-full" aria-label="Status"><SelectValue /></SelectTrigger>
                 <SelectContent><SelectGroup>{Object.entries(PROGRAM_SLOT_STATUS_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
               </Select>
-              <FieldDescription>Only Sam or Alexa can confirm. The server checks Ross approval.</FieldDescription>
+              <FieldDescription>Only a workspace admin can confirm. The server checks Ross approval.</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="preferred-start">Preferred date and time</FieldLabel>
@@ -628,19 +632,20 @@ export function SpeakerOpsEntry() {
   const [workspace, setWorkspace] = useState<SpeakerOpsWorkspace | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [loadAttempt, setLoadAttempt] = useState(0)
 
   useEffect(() => {
     localStorage.removeItem('ublda-speaker-ops-session')
   }, [])
 
   const callApi = useCallback(async (body: ApiRecord) => {
-    let idToken = await identity.getIdToken()
+    let idToken = await withLeadershipRequestTimeout(() => identity.getIdToken())
     if (!idToken) throw new Error('Your leadership session could not be verified.')
     try {
       return await api(body, idToken)
     } catch (caught) {
       if (!(caught instanceof SpeakerOpsApiError) || caught.status !== 401) throw caught
-      idToken = await identity.getIdToken(true)
+      idToken = await withLeadershipRequestTimeout(() => identity.getIdToken(true))
       if (!idToken) throw caught
       return await api(body, idToken)
     }
@@ -659,7 +664,13 @@ export function SpeakerOpsEntry() {
       })
       .finally(() => active && setLoading(false))
     return () => { active = false }
-  }, [callApi])
+  }, [callApi, loadAttempt])
+
+  const retryLoad = () => {
+    setError('')
+    setLoading(true)
+    setLoadAttempt((attempt) => attempt + 1)
+  }
 
   if (loading) {
     return <div className="speaker-loading speaker-loading--embedded" aria-live="polite"><Spinner /><span>Opening Speaker Ops</span></div>
@@ -671,6 +682,7 @@ export function SpeakerOpsEntry() {
           <AlertTitle>Speaker Ops could not be opened</AlertTitle>
           <AlertDescription>{error || 'Try refreshing the leadership workspace.'}</AlertDescription>
         </Alert>
+        <Button type="button" variant="outline" onClick={retryLoad}>try again</Button>
       </div>
     )
   }

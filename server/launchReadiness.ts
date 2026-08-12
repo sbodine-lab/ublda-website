@@ -13,11 +13,6 @@ export type LaunchReadiness = {
   checks: LaunchReadinessCheck[]
 }
 
-const hasAnyAdminSecret = () => Boolean(
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD ||
-  process.env.SAM_BODINE_PASSWORD,
-)
-
 const overallStatus = (checks: LaunchReadinessCheck[]): LaunchReadiness['overall'] => {
   if (checks.some((check) => check.status === 'fail')) return 'fail'
   if (checks.some((check) => check.status === 'warn')) return 'warn'
@@ -52,14 +47,6 @@ export const buildLaunchReadiness = (): LaunchReadiness => {
       detail: process.env.BLOB_READ_WRITE_TOKEN
         ? 'Uploaded resumes are stored privately in Vercel Blob and served only to recruiting admins.'
         : 'Resume uploads work locally, but production should use private Vercel Blob.',
-    },
-    {
-      id: 'admin-secret',
-      label: 'Admin session secret',
-      status: hasAnyAdminSecret() ? 'pass' : 'warn',
-      detail: hasAnyAdminSecret()
-        ? 'Super-admin fallback sessions are signed with a configured secret.'
-        : 'No super-admin fallback secret is configured. Password accounts can still work, but recovery is harder.',
     },
   ]
 

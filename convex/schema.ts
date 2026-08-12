@@ -113,6 +113,7 @@ export default defineSchema({
     issuer: v.optional(v.string()),
     normalizedEmail: v.string(),
     status: identityStatus,
+    approvalExpiresAt: v.optional(v.number()),
     verifiedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),

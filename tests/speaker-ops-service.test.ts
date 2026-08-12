@@ -144,3 +144,25 @@ test('denies identities that Convex has not approved', async () => {
     /not approved/i,
   )
 })
+
+test('bounds a stalled Convex membership lookup and returns a retryable service error', async () => {
+  const startedAt = Date.now()
+  await assert.rejects(
+    verifySpeakerOpsIdentity('signed-logto-token', {
+      environment: { VITE_CONVEX_URL: 'https://fallback.convex.cloud' },
+      exchange: async () => ({
+        identity: {
+          subject: 'logto-member',
+          email: 'member@umich.edu',
+          emailVerified: true,
+        },
+        token: 'short-lived-convex-token',
+        expiresIn: 300,
+      }),
+      queryViewer: async () => await new Promise(() => undefined),
+      viewerTimeoutMs: 15,
+    }),
+    /membership could not be verified/i,
+  )
+  assert.ok(Date.now() - startedAt < 500)
+})

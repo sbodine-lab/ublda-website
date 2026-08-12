@@ -7,22 +7,67 @@ import { ConvexError } from "convex/values";
 import {
   SignJWT,
   createRemoteJWKSet,
+  exportJWK,
   importPKCS8,
   jwtVerify
 } from "jose";
 var CONVEX_TOKEN_TTL_SECONDS = 5 * 60;
+var LOGTO_CLOCK_TOLERANCE_SECONDS = 10;
+var LOGTO_MAX_TOKEN_AGE_SECONDS = 2 * 60 * 60;
+var LOGTO_JWKS_TIMEOUT_MS = 5e3;
+var LOGTO_JWKS_COOLDOWN_MS = 3e4;
+var LOGTO_JWKS_CACHE_MAX_AGE_MS = 10 * 60 * 1e3;
+var MAX_CONVEX_PUBLIC_KEYS = 3;
 var acceptedLogtoAlgorithms = ["ES384", "RS256"];
+var AuthBridgeTokenError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthBridgeTokenError";
+  }
+};
 var required = (environment, name) => {
   const value = environment[name]?.trim();
   if (!value) throw new Error(`Missing ${name}.`);
   return value;
 };
+var privateJwkParameters = ["d", "p", "q", "dp", "dq", "qi", "oth", "k"];
 var parsePublicJwks = (raw) => {
   const parsed = JSON.parse(raw);
   const keys = Array.isArray(parsed.keys) ? parsed.keys : [];
-  const valid = keys.length === 1 && keys[0]?.kty === "RSA" && keys[0]?.alg === "RS256" && keys[0]?.use === "sig" && typeof keys[0]?.kid === "string" && Boolean(keys[0].kid) && typeof keys[0]?.n === "string" && typeof keys[0]?.e === "string";
-  if (!valid) throw new Error("CONVEX_AUTH_PUBLIC_JWKS must contain one RS256 signing key.");
-  return { keys };
+  if (keys.length < 1 || keys.length > MAX_CONVEX_PUBLIC_KEYS) {
+    throw new Error(`CONVEX_AUTH_PUBLIC_JWKS must contain 1-${MAX_CONVEX_PUBLIC_KEYS} public RS256 signing keys.`);
+  }
+  const publicKeys = keys.map((key) => {
+    const valid = key?.kty === "RSA" && key?.alg === "RS256" && key?.use === "sig" && typeof key?.kid === "string" && Boolean(key.kid.trim()) && typeof key?.n === "string" && Boolean(key.n) && typeof key?.e === "string" && Boolean(key.e) && privateJwkParameters.every((parameter) => !(parameter in key));
+    if (!valid) {
+      throw new Error("CONVEX_AUTH_PUBLIC_JWKS contains an invalid or private signing key.");
+    }
+    return {
+      kty: "RSA",
+      use: "sig",
+      alg: "RS256",
+      kid: String(key.kid).trim(),
+      n: String(key.n),
+      e: String(key.e)
+    };
+  });
+  if (new Set(publicKeys.map(({ kid }) => kid)).size !== publicKeys.length) {
+    throw new Error("CONVEX_AUTH_PUBLIC_JWKS signing key IDs must be unique.");
+  }
+  return { keys: publicKeys };
+};
+var normalizedAllowedOrigin = (raw) => {
+  let url;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    throw new Error("CONVEX_AUTH_ALLOWED_ORIGINS contains an invalid origin.");
+  }
+  const localHttp = url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  if (url.protocol !== "https:" && !localHttp || url.username || url.password || url.pathname !== "/" && url.pathname !== "" || url.search || url.hash) {
+    throw new Error("CONVEX_AUTH_ALLOWED_ORIGINS must contain exact HTTPS origins.");
+  }
+  return url.origin;
 };
 var authBridgeConfig = (environment = process.env) => {
   const logtoIssuer = required(environment, "LOGTO_ISSUER").replace(/\/$/, "");
@@ -35,7 +80,7 @@ var authBridgeConfig = (environment = process.env) => {
     signingPrivateKey: required(environment, "CONVEX_AUTH_SIGNING_PRIVATE_KEY"),
     publicJwks: parsePublicJwks(required(environment, "CONVEX_AUTH_PUBLIC_JWKS")),
     allowedOrigins: new Set(
-      required(environment, "CONVEX_AUTH_ALLOWED_ORIGINS").split(",").map((origin) => origin.trim().replace(/\/$/, "")).filter(Boolean)
+      required(environment, "CONVEX_AUTH_ALLOWED_ORIGINS").split(",").map((origin) => origin.trim()).filter(Boolean).map(normalizedAllowedOrigin)
     )
   };
 };
@@ -47,7 +92,7 @@ var verifiedLogtoIdentity = (payload) => {
   const subject = stringClaim(payload, "sub");
   const email = stringClaim(payload, "email")?.toLowerCase();
   if (!subject || !email || payload.email_verified !== true) {
-    throw new Error("The Logto identity must contain a verified email address.");
+    throw new AuthBridgeTokenError("The Logto identity must contain a verified email address.");
   }
   return {
     subject,
@@ -61,33 +106,70 @@ var remoteKeySets = /* @__PURE__ */ new Map();
 var remoteKeySet = (url) => {
   const existing = remoteKeySets.get(url);
   if (existing) return existing;
-  const created = createRemoteJWKSet(new URL(url));
+  const created = createRemoteJWKSet(new URL(url), {
+    timeoutDuration: LOGTO_JWKS_TIMEOUT_MS,
+    cooldownDuration: LOGTO_JWKS_COOLDOWN_MS,
+    cacheMaxAge: LOGTO_JWKS_CACHE_MAX_AGE_MS
+  });
   remoteKeySets.set(url, created);
   return created;
 };
+var validateLogtoTokenClaims = (payload, logtoAppId) => {
+  const audiences = Array.isArray(payload.aud) ? payload.aud : typeof payload.aud === "string" ? [payload.aud] : [];
+  const authorizedParty = stringClaim(payload, "azp");
+  if (audiences.length > 1 && !authorizedParty) {
+    throw new AuthBridgeTokenError("A multi-audience Logto ID token must identify its authorized party.");
+  }
+  if (authorizedParty && authorizedParty !== logtoAppId) {
+    throw new AuthBridgeTokenError("The Logto ID token authorized party does not match this application.");
+  }
+  if (typeof payload.iat !== "number" || typeof payload.exp !== "number" || payload.exp <= payload.iat || payload.exp - payload.iat > LOGTO_MAX_TOKEN_AGE_SECONDS) {
+    throw new AuthBridgeTokenError("The Logto ID token has an invalid validity window.");
+  }
+};
 var cachedPrivateKeySource = "";
 var cachedPrivateKey = null;
-var signingKey = async (privateKey) => {
-  if (cachedPrivateKey && cachedPrivateKeySource === privateKey) return cachedPrivateKey;
-  cachedPrivateKey = await importPKCS8(privateKey, "RS256");
-  cachedPrivateKeySource = privateKey;
-  return cachedPrivateKey;
+var cachedPublicKeyFingerprint = "";
+var cachedSigningKeyMatch = null;
+var signingKey = async (privateKey, publicJwks) => {
+  const publicKeyFingerprint = publicJwks.keys.map((key) => `${key.kid || ""}:${key.n || ""}:${key.e || ""}`).join("|");
+  if (!cachedPrivateKey || cachedPrivateKeySource !== privateKey) {
+    cachedPrivateKey = await importPKCS8(privateKey, "RS256", { extractable: true });
+    cachedPrivateKeySource = privateKey;
+    cachedSigningKeyMatch = null;
+  }
+  if (cachedPublicKeyFingerprint !== publicKeyFingerprint) {
+    cachedPublicKeyFingerprint = publicKeyFingerprint;
+    cachedSigningKeyMatch = null;
+  }
+  cachedSigningKeyMatch ||= (async () => {
+    const derived = await exportJWK(cachedPrivateKey);
+    const matches = publicJwks.keys.filter((published) => derived.kty === "RSA" && derived.n === published.n && derived.e === published.e);
+    if (matches.length !== 1 || !matches[0]?.kid) {
+      throw new Error("The auth bridge signing key must match exactly one public JWKS key.");
+    }
+    return { key: cachedPrivateKey, kid: matches[0].kid };
+  })();
+  return await cachedSigningKeyMatch;
 };
 var exchangeLogtoIdTokenWithIdentity = async (idToken, config, keySet = remoteKeySet(config.logtoJwksUrl)) => {
   const { payload } = await jwtVerify(idToken, keySet, {
     issuer: config.logtoIssuer,
     audience: config.logtoAppId,
-    algorithms: [...acceptedLogtoAlgorithms]
+    algorithms: [...acceptedLogtoAlgorithms],
+    requiredClaims: ["sub", "iat", "exp"],
+    clockTolerance: LOGTO_CLOCK_TOLERANCE_SECONDS,
+    maxTokenAge: LOGTO_MAX_TOKEN_AGE_SECONDS
   });
+  validateLogtoTokenClaims(payload, config.logtoAppId);
   const identity = verifiedLogtoIdentity(payload);
-  const kid = config.publicJwks.keys[0]?.kid;
-  if (!kid) throw new Error("The auth bridge signing key ID is missing.");
+  const activeSigningKey = await signingKey(config.signingPrivateKey, config.publicJwks);
   const token = await new SignJWT({
     email: identity.email,
     email_verified: identity.emailVerified,
     ...identity.name ? { name: identity.name } : {},
     ...identity.picture ? { picture: identity.picture } : {}
-  }).setProtectedHeader({ alg: "RS256", kid, typ: "JWT" }).setIssuer(config.bridgeIssuer).setAudience(config.bridgeAppId).setSubject(identity.subject).setIssuedAt().setExpirationTime(`${CONVEX_TOKEN_TTL_SECONDS}s`).sign(await signingKey(config.signingPrivateKey));
+  }).setProtectedHeader({ alg: "RS256", kid: activeSigningKey.kid, typ: "JWT" }).setIssuer(config.bridgeIssuer).setAudience(config.bridgeAppId).setSubject(identity.subject).setIssuedAt().setExpirationTime(`${CONVEX_TOKEN_TTL_SECONDS}s`).sign(activeSigningKey.key);
   return {
     identity,
     token,
@@ -134,8 +216,6 @@ var PROGRAM_SLOT_STATUS_LABELS = {
 };
 var BLOB_PATH = "speaker-ops/state.json";
 var WRITE_ATTEMPTS = 5;
-var confirmers = /* @__PURE__ */ new Set(["atchiang@umich.edu", "sbodine@umich.edu"]);
-var isConfirmer = (email) => confirmers.has(email);
 var queues = /* @__PURE__ */ new Map();
 var defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE ? path.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE) : path.join(process.cwd(), ".ublda-local-data", "speaker-ops.json");
 var isoNow = () => (/* @__PURE__ */ new Date()).toISOString();
@@ -413,7 +493,7 @@ var memberView = (email) => {
     name: member.name,
     email: member.email,
     title: member.title,
-    canConfirmProgram: isConfirmer(email)
+    canConfirmProgram: false
   };
 };
 var addBusinessDays = (iso, count) => {
@@ -463,7 +543,7 @@ var SpeakerOpsStore = class {
     const blob = await get(BLOB_PATH, { access: "private", useCache: false });
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null };
     const raw = await new Response(blob.stream).text();
-    return { data: JSON.parse(raw), etag: blob.blob.etag?.replace(/^W\//, "") || null };
+    return { data: JSON.parse(raw), etag: blob.blob.etag || null };
   }
   async writeBlob(data, etag) {
     await put(BLOB_PATH, `${JSON.stringify(data, null, 2)}
@@ -517,21 +597,28 @@ var SpeakerOpsStore = class {
   }
   async workspace(actor) {
     const member = memberForActor(actor);
-    return this.updateData((data) => ({
+    const rawData = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
+    const data = migrateData(rawData);
+    if (rawData.version !== 3) {
+      await this.updateData((stored) => {
+        Object.assign(stored, data);
+      });
+    }
+    return {
       viewer: {
         memberId: actor.memberId,
         name: actor.displayName || member.name,
         email: member.email,
         title: member.title,
         role: actor.role,
-        canConfirmProgram: isConfirmer(member.email)
+        canConfirmProgram: actor.role === "admin"
       },
       members: SPEAKER_OPS_MEMBERS.map((candidate) => memberView(candidate.email)),
       leads: Object.values(data.leads),
       slots: Object.values(data.slots),
       roomRequests: Object.values(data.roomRequests),
       activity: data.activity
-    }));
+    };
   }
   async updateLead(actor, leadInput) {
     const member = memberForActor(actor);
@@ -597,7 +684,7 @@ var SpeakerOpsStore = class {
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status;
         if (nextStatus === "confirmed") {
-          if (!isConfirmer(member.email)) return { ok: false, error: "Only Sam or Alexa can confirm a programmed date." };
+          if (actor.role !== "admin") return { ok: false, error: "Only a workspace administrator can confirm a programmed date." };
           const request = data.roomRequests[slot.roomRequestId];
           if (request?.status !== "approved") return { ok: false, error: "Ross must approve the room before the fireside can be confirmed." };
           if (!slot.leadId) return { ok: false, error: "Choose a speaker before confirming the fireside." };
@@ -616,6 +703,7 @@ var createSpeakerOpsStore = (dataPath, options) => new SpeakerOpsStore(dataPath,
 var defaultStore = createSpeakerOpsStore();
 var allowedActions = /* @__PURE__ */ new Set(["workspace", "updateLead", "updateRoomRequest", "updateSlot"]);
 var MAX_ID_TOKEN_LENGTH = 24e3;
+var CONVEX_VIEWER_TIMEOUT_MS = 8e3;
 var viewerReference = makeFunctionReference("viewer:current");
 var SpeakerOpsAuthError = class extends Error {
   status;
@@ -626,9 +714,32 @@ var SpeakerOpsAuthError = class extends Error {
   }
 };
 var textValue = (body, key) => typeof body[key] === "string" ? body[key].trim() : "";
-var defaultViewerQuery = async (convexToken, convexUrl) => {
-  const client = new ConvexHttpClient(convexUrl, { auth: convexToken, logger: false });
+var defaultViewerQuery = async (convexToken, convexUrl, timeoutMs = CONVEX_VIEWER_TIMEOUT_MS) => {
+  const fetchWithTimeout = (input, init) => fetch(input, {
+    ...init,
+    signal: AbortSignal.timeout(timeoutMs)
+  });
+  const client = new ConvexHttpClient(convexUrl, {
+    auth: convexToken,
+    logger: false,
+    fetch: fetchWithTimeout
+  });
   return client.query(viewerReference, {});
+};
+var withTimeout = async (promise, timeoutMs) => {
+  let timeout;
+  const deadline = new Promise((_resolve, reject) => {
+    timeout = setTimeout(() => {
+      const error = new Error("Leadership membership verification timed out.");
+      error.name = "TimeoutError";
+      reject(error);
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([promise, deadline]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
 };
 var verifySpeakerOpsIdentity = async (idToken, dependencies = {}) => {
   if (!idToken || idToken.length > MAX_ID_TOKEN_LENGTH) {
@@ -654,7 +765,9 @@ var verifySpeakerOpsIdentity = async (idToken, dependencies = {}) => {
   }
   let viewer;
   try {
-    viewer = await (dependencies.queryViewer || defaultViewerQuery)(exchange.token, convexUrl);
+    const timeoutMs = dependencies.viewerTimeoutMs ?? CONVEX_VIEWER_TIMEOUT_MS;
+    const viewerPromise = dependencies.queryViewer ? dependencies.queryViewer(exchange.token, convexUrl) : defaultViewerQuery(exchange.token, convexUrl, timeoutMs);
+    viewer = await withTimeout(viewerPromise, timeoutMs);
   } catch (error) {
     if (error instanceof ConvexError) {
       throw new SpeakerOpsAuthError(403, "This account is not approved for the UBLDA leadership workspace.");

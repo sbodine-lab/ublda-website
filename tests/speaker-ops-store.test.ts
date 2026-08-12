@@ -52,6 +52,22 @@ test('loads the reconciled pipeline for an authenticated Convex member', async (
   }
 })
 
+test('reading the workspace does not rewrite persisted Speaker Ops state', async (t) => {
+  const { directory, dataPath, store } = await buildStore()
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  await writeFile(dataPath, `${JSON.stringify({
+    version: 3,
+    leads: {},
+    slots: {},
+    roomRequests: {},
+    activity: [],
+  })}\n`)
+  const before = await readFile(dataPath, 'utf8')
+  await store.workspace(sam)
+  assert.equal(await readFile(dataPath, 'utf8'), before)
+})
+
 test('supports approved Convex members outside the business owner list', async (t) => {
   const { directory, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
@@ -105,7 +121,7 @@ test('rejects confirmation until Ross approves a named room', async (t) => {
   assert.equal(confirmed.ok, true)
 })
 
-test('only Sam or Alexa can confirm a programmed date', async (t) => {
+test('only a stable Convex admin member can confirm a programmed date', async (t) => {
   const { directory, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
 
@@ -116,20 +132,41 @@ test('only Sam or Alexa can confirm a programmed date', async (t) => {
   })
   await store.updateSlot(alex, { id: 'winter-2027', leadId: 'rich-donovan' })
   const result = await store.updateSlot(alex, { id: 'winter-2027', status: 'confirmed' })
-  assert.deepEqual(result, { ok: false, error: 'Only Sam or Alexa can confirm a programmed date.' })
+  assert.deepEqual(result, { ok: false, error: 'Only a workspace administrator can confirm a programmed date.' })
+})
+
+test('program confirmation follows the member role rather than the current email alias', async (t) => {
+  const { directory, store } = await buildStore()
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  const adminAlias: SpeakerOpsActor = {
+    ...sam,
+    email: 'alternate-admin@umich.edu',
+  }
+  await store.updateRoomRequest(adminAlias, {
+    id: 'room-winter-2027',
+    status: 'approved',
+    roomName: 'R0320',
+  })
+  await store.updateSlot(adminAlias, { id: 'winter-2027', leadId: 'rich-donovan' })
+  const result = await store.updateSlot(adminAlias, { id: 'winter-2027', status: 'confirmed' })
+  assert.equal(result.ok, true)
+  assert.equal((await store.workspace(adminAlias)).viewer.canConfirmProgram, true)
 })
 
 test('migrates legacy state without retaining password or session data', async (t) => {
   const { directory, dataPath, store } = await buildStore()
   t.after(() => rm(directory, { recursive: true, force: true }))
 
-  await store.workspace(sam)
-  const current = JSON.parse(await readFile(dataPath, 'utf8')) as Record<string, unknown>
-  const leads = current.leads as Record<string, Record<string, unknown>>
+  const seeded = await store.workspace(sam)
+  const leads = Object.fromEntries(seeded.leads.map((lead) => [lead.id, { ...lead }]))
   leads['deb-ruh'].nextAction = 'Preserve this business update.'
   await writeFile(dataPath, `${JSON.stringify({
-    ...current,
     version: 2,
+    leads,
+    slots: Object.fromEntries(seeded.slots.map((slot) => [slot.id, slot])),
+    roomRequests: Object.fromEntries(seeded.roomRequests.map((request) => [request.id, request])),
+    activity: seeded.activity,
     accounts: { 'sbodine@umich.edu': { passwordHash: 'legacy-secret-hash' } },
     sessions: { 'legacy-session-hash': { email: 'sbodine@umich.edu' } },
   }, null, 2)}\n`)

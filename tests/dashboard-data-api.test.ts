@@ -1,13 +1,6 @@
 import assert from 'node:assert/strict'
-import { createHmac } from 'node:crypto'
-import { mkdtemp, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import path from 'node:path'
 import { test } from 'node:test'
 import handler from '../api/dashboard-data.ts'
-import { createLocalRecruitingStore } from '../server/localRecruitingStore.js'
-import { buildApplicationSubmission, validateApplicationPayload } from '../src/lib/application.ts'
-import { INTERVIEW_SLOTS } from '../src/lib/interviews.ts'
 
 const createResponse = () => {
   let statusCode = 0
@@ -15,6 +8,9 @@ const createResponse = () => {
 
   return {
     res: {
+      setHeader() {
+        return this
+      },
       status(code: number) {
         statusCode = code
         return this
@@ -30,362 +26,30 @@ const createResponse = () => {
   }
 }
 
-const createLocalAdminToken = (secret: string) => {
-  const payload = Buffer.from(JSON.stringify({
-    email: 'sbodine@umich.edu',
-    exp: Date.now() + 1000 * 60 * 60,
-  })).toString('base64url')
-  const signature = createHmac('sha256', secret).update(payload).digest('base64url')
-
-  return `ublda_admin.${payload}.${signature}`
-}
-
-test('loads dashboard data through the configured account backend', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalFetch = globalThis.fetch
-  let forwardedBody: Record<string, unknown> | null = null
-
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-  globalThis.fetch = async (_url, init) => {
-    forwardedBody = JSON.parse(String(init?.body || '{}'))
-    return new Response(JSON.stringify({
-      success: true,
-      role: 'super-admin',
-      dashboardData: {
-        backendStatus: {
-          source: 'sheets',
-          message: 'Loaded from Google Sheets',
-          updatedAt: '2026-05-04T00:00:00.000Z',
-        },
-      },
-    }), { status: 200 })
-  }
-
-  try {
-    const { res, result } = createResponse()
-
+test('hard-retires legacy dashboard authentication for every old session format', async () => {
+  for (const sessionToken of [
+    'ublda_admin.retired-payload.retired-signature',
+    'local_existing-admin-session-token-that-was-already-issued',
+    'apps-script-admin-session-token-apps-script-admin-session',
+    '',
+  ]) {
+    const response = createResponse()
     await handler({
       method: 'POST',
       headers: {},
-      body: { sessionToken: 'session-token-session-token-session' },
-    }, res)
+      body: { sessionToken },
+    }, response.res)
 
-    assert.equal(result().statusCode, 200)
-    assert.equal((result().payload as Record<string, unknown>).success, true)
-    assert.equal(forwardedBody?.formType, 'applicantAccount')
-    assert.equal(forwardedBody?.action, 'dashboardData')
-    assert.equal(forwardedBody?.sessionToken, 'session-token-session-token-session')
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    globalThis.fetch = originalFetch
-  }
-})
-
-test('rejects dashboard data requests without a session', async () => {
-  const { res, result } = createResponse()
-
-  await handler({
-    method: 'POST',
-    headers: {},
-    body: { sessionToken: 'short' },
-  }, res)
-
-  assert.equal(result().statusCode, 401)
-})
-
-test('does not merge recruiting data into member dashboard responses', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
-  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
-  const originalFetch = globalThis.fetch
-  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
-
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-  delete process.env.BLOB_READ_WRITE_TOKEN
-  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
-  globalThis.fetch = async () => new Response(JSON.stringify({
-    success: true,
-    account: {
-      firstName: 'Regular',
-      lastName: 'Member',
-      uniqname: 'regular',
-      email: 'regular@example.com',
-      role: 'member',
-    },
-    role: 'member',
-    dashboardData: {
-      memberSignups: [{ id: 'regular@example.com', email: 'regular@example.com' }],
-      backendStatus: { source: 'sheets', message: 'Loaded member dashboard', updatedAt: '2026-05-04T00:00:00.000Z' },
-    },
-  }), { status: 200 })
-
-  try {
-    const application = validateApplicationPayload({
-      firstName: 'Candidate',
-      lastName: 'Student',
-      uniqname: 'candidate',
-      year: 'Sophomore',
-      expectedGraduation: 'May 2028',
-      college: 'Ross BBA',
-      rossStatus: 'ross-bba',
-      interestType: 'leadership-interview',
-      rolePreferences: ['Events and Programming', 'Marketing and Social Media', 'Outreach and Partnerships'],
-      availability: [INTERVIEW_SLOTS[0].value],
-      resumeFile: {
-        name: 'candidate-resume.pdf',
-        mimeType: 'application/pdf',
-        size: 1024,
-        contentBase64: 'cmVzdW1l',
-      },
-      weeklyCommitment: '2-3 hours/week',
-      notes: '',
-    })
-    assert.equal(application.success, true)
-    await createLocalRecruitingStore().saveApplication(buildApplicationSubmission(application.data!, 'dashboard-leak-test'))
-
-    const { res, result } = createResponse()
-
-    await handler({
-      method: 'POST',
-      headers: {},
-      body: { sessionToken: 'member-session-token-member-session' },
-    }, res)
-
-    assert.equal(result().statusCode, 200)
-    const dashboardData = (result().payload as Record<string, unknown>).dashboardData as Record<string, unknown>
-    assert.equal(dashboardData.candidates, undefined)
-    assert.equal(dashboardData.interviewerAvailability, undefined)
-    assert.equal(dashboardData.adminAccounts, undefined)
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    if (originalDataFile === undefined) {
-      delete process.env.UBLDA_LOCAL_DATA_FILE
-    } else {
-      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
-    }
-    if (originalBlobToken === undefined) {
-      delete process.env.BLOB_READ_WRITE_TOKEN
-    } else {
-      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
-    }
-    globalThis.fetch = originalFetch
-    await rm(dir, { recursive: true, force: true })
-  }
-})
-
-test('loads dashboard data for local member sessions without exposing admin collections', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
-  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
-  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
-
-  delete process.env.GOOGLE_SCRIPT_URL
-  delete process.env.BLOB_READ_WRITE_TOKEN
-  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
-
-  try {
-    const account = await createLocalRecruitingStore().upsertAccount({
-      firstName: 'Regular',
-      lastName: 'Member',
-      uniqname: 'regular.member',
-      email: 'regular.member@example.com',
-    }, 'regular-password')
-    const { res, result } = createResponse()
-
-    await handler({
-      method: 'POST',
-      headers: {},
-      body: { sessionToken: account.sessionToken },
-    }, res)
-
-    assert.equal(result().statusCode, 200)
-    const payload = result().payload as Record<string, unknown>
-    assert.equal(payload.role, 'member')
-    const dashboardData = payload.dashboardData as Record<string, unknown>
-    assert.equal(dashboardData.candidates, undefined)
-    assert.equal(dashboardData.interviewerAvailability, undefined)
-    assert.equal(Array.isArray(dashboardData.memberSignups), true)
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    if (originalDataFile === undefined) {
-      delete process.env.UBLDA_LOCAL_DATA_FILE
-    } else {
-      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
-    }
-    if (originalBlobToken === undefined) {
-      delete process.env.BLOB_READ_WRITE_TOKEN
-    } else {
-      process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
-    }
-    await rm(dir, { recursive: true, force: true })
-  }
-})
-
-test('loads the explicitly enabled Vercel fallback dashboard for Sam', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
-  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
-  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
-
-  delete process.env.GOOGLE_SCRIPT_URL
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
-  process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
-  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
-
-  try {
-    const { res, result } = createResponse()
-
-    await handler({
-      method: 'POST',
-      headers: {},
-      body: { sessionToken: createLocalAdminToken('secure-password') },
-    }, res)
-
-    assert.equal(result().statusCode, 200)
-    const payload = result().payload as Record<string, unknown>
-    assert.equal(payload.success, true)
-    const dashboardData = payload.dashboardData as Record<string, unknown>
-    assert.deepEqual(dashboardData.candidates, [])
-    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'vercel')
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    if (originalPassword === undefined) {
-      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
-    } else {
-      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
-    }
-    if (originalFallback === undefined) {
-      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-    } else {
-      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
-    }
-    if (originalDataFile === undefined) {
-      delete process.env.UBLDA_LOCAL_DATA_FILE
-    } else {
-      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
-    }
-  }
-})
-
-test('keeps an enabled Vercel fallback Sam dashboard off the legacy script backend', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
-  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-  const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
-  const originalFetch = globalThis.fetch
-  const dir = await mkdtemp(path.join(tmpdir(), 'ublda-dashboard-api-'))
-  let fetchCalled = false
-
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
-  process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = 'true'
-  process.env.UBLDA_LOCAL_DATA_FILE = path.join(dir, 'recruiting.json')
-  globalThis.fetch = async () => {
-    fetchCalled = true
-    return new Response(JSON.stringify({ success: false }), { status: 500 })
-  }
-
-  try {
-    const { res, result } = createResponse()
-
-    await handler({
-      method: 'POST',
-      headers: {},
-      body: { sessionToken: createLocalAdminToken('secure-password') },
-    }, res)
-
-    assert.equal(result().statusCode, 200)
-    const payload = result().payload as Record<string, unknown>
-    const dashboardData = payload.dashboardData as Record<string, unknown>
-    assert.equal((dashboardData.backendStatus as Record<string, unknown>).source, 'vercel')
-    assert.equal(fetchCalled, false)
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    if (originalPassword === undefined) {
-      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
-    } else {
-      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
-    }
-    if (originalFallback === undefined) {
-      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-    } else {
-      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
-    }
-    if (originalDataFile === undefined) {
-      delete process.env.UBLDA_LOCAL_DATA_FILE
-    } else {
-      process.env.UBLDA_LOCAL_DATA_FILE = originalDataFile
-    }
-    globalThis.fetch = originalFetch
-  }
-})
-
-test('does not accept a Vercel fallback dashboard token when fallback is disabled', async () => {
-  const originalScriptUrl = process.env.GOOGLE_SCRIPT_URL
-  const originalPassword = process.env.UBLDA_SUPER_ADMIN_PASSWORD
-  const originalFallback = process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-  const originalFetch = globalThis.fetch
-  let forwarded = false
-
-  process.env.GOOGLE_SCRIPT_URL = 'https://script.example.test/exec'
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD = 'secure-password'
-  delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-  globalThis.fetch = async () => {
-    forwarded = true
-    return new Response(JSON.stringify({
+    assert.equal(response.result().statusCode, 410)
+    assert.deepEqual(response.result().payload, {
       success: false,
-      error: 'A valid member session is required.',
-    }), { status: 200 })
+      error: 'Legacy dashboard authentication is retired. Sign in through the leadership workspace.',
+    })
   }
+})
 
-  try {
-    const { res, result } = createResponse()
-
-    await handler({
-      method: 'POST',
-      headers: {},
-      body: { sessionToken: createLocalAdminToken('secure-password') },
-    }, res)
-
-    assert.equal(result().statusCode, 401)
-    assert.equal(forwarded, true)
-  } finally {
-    if (originalScriptUrl === undefined) {
-      delete process.env.GOOGLE_SCRIPT_URL
-    } else {
-      process.env.GOOGLE_SCRIPT_URL = originalScriptUrl
-    }
-    if (originalPassword === undefined) {
-      delete process.env.UBLDA_SUPER_ADMIN_PASSWORD
-    } else {
-      process.env.UBLDA_SUPER_ADMIN_PASSWORD = originalPassword
-    }
-    if (originalFallback === undefined) {
-      delete process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK
-    } else {
-      process.env.UBLDA_ENABLE_LOCAL_ADMIN_FALLBACK = originalFallback
-    }
-    globalThis.fetch = originalFetch
-  }
+test('rejects non-POST requests to the retired dashboard endpoint', async () => {
+  const response = createResponse()
+  await handler({ method: 'GET', headers: {} }, response.res)
+  assert.equal(response.result().statusCode, 405)
 })

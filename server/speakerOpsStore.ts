@@ -49,8 +49,6 @@ type StoreOptions = {
 
 const BLOB_PATH = 'speaker-ops/state.json'
 const WRITE_ATTEMPTS = 5
-const confirmers = new Set<SpeakerOpsMemberEmail>(['atchiang@umich.edu', 'sbodine@umich.edu'])
-const isConfirmer = (email: string) => confirmers.has(email as SpeakerOpsMemberEmail)
 const queues = new Map<string, Promise<unknown>>()
 
 const defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE
@@ -339,7 +337,7 @@ const memberView = (email: SpeakerOpsMemberEmail) => {
     name: member.name,
     email: member.email,
     title: member.title,
-    canConfirmProgram: isConfirmer(email),
+    canConfirmProgram: false,
   }
 }
 
@@ -398,7 +396,10 @@ export class SpeakerOpsStore {
     const blob = await get(BLOB_PATH, { access: 'private', useCache: false })
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null as string | null }
     const raw = await new Response(blob.stream).text()
-    return { data: JSON.parse(raw) as LegacySpeakerOpsData, etag: blob.blob.etag?.replace(/^W\//, '') || null }
+    // Vercel Blob returns weak ETags (for example `W/<opaque>`). `ifMatch`
+    // expects that exact validator; stripping the prefix makes every
+    // conditional write fail even when no concurrent writer exists.
+    return { data: JSON.parse(raw) as LegacySpeakerOpsData, etag: blob.blob.etag || null }
   }
 
   private async writeBlob(data: SpeakerOpsData, etag: string | null) {
@@ -461,21 +462,32 @@ export class SpeakerOpsStore {
 
   async workspace(actor: SpeakerOpsActor): Promise<SpeakerOpsWorkspace> {
     const member = memberForActor(actor)
-    return this.updateData((data) => ({
+    const rawData = canUseBlob(this.forceLocal)
+      ? (await this.readBlob()).data
+      : await this.readLocal()
+    const data = migrateData(rawData)
+    if (rawData.version !== 3) {
+      // Migration is the only read path allowed to persist. Current v3
+      // workspace reads remain side-effect-free.
+      await this.updateData((stored) => {
+        Object.assign(stored, data)
+      })
+    }
+    return {
       viewer: {
         memberId: actor.memberId,
         name: actor.displayName || member.name,
         email: member.email,
         title: member.title,
         role: actor.role,
-        canConfirmProgram: isConfirmer(member.email),
+        canConfirmProgram: actor.role === 'admin',
       } satisfies SpeakerOpsViewer,
       members: SPEAKER_OPS_MEMBERS.map((candidate) => memberView(candidate.email)),
       leads: Object.values(data.leads),
       slots: Object.values(data.slots),
       roomRequests: Object.values(data.roomRequests),
       activity: data.activity,
-    }))
+    }
   }
 
   async updateLead(actor: SpeakerOpsActor, leadInput: Partial<SpeakerLead> & { id: string }): Promise<SpeakerOpsWriteResult<{ lead: SpeakerLead }>> {
@@ -548,7 +560,7 @@ export class SpeakerOpsStore {
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status as ProgramSlotStatus
         if (nextStatus === 'confirmed') {
-          if (!isConfirmer(member.email)) return { ok: false, error: 'Only Sam or Alexa can confirm a programmed date.' }
+          if (actor.role !== 'admin') return { ok: false, error: 'Only a workspace administrator can confirm a programmed date.' }
           const request = data.roomRequests[slot.roomRequestId]
           if (request?.status !== 'approved') return { ok: false, error: 'Ross must approve the room before the fireside can be confirmed.' }
           if (!slot.leadId) return { ok: false, error: 'Choose a speaker before confirming the fireside.' }

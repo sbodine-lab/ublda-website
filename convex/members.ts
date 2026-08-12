@@ -11,7 +11,14 @@ import {
 } from "./lib/auth";
 import { assert, fail } from "./lib/errors";
 import { writeAuditEvent } from "./lib/audit";
-import { planIdentityAliasSync } from "./lib/identityPolicy";
+import {
+  identityApprovalExpiresAt,
+  hasUsableAdminContinuity,
+  isUsableLeadershipIdentity,
+  isValidApprovedEmail,
+  pendingIdentityIsClaimable,
+  planIdentityAliasSync,
+} from "./lib/identityPolicy";
 
 function bootstrapAllowlist(): Set<string> {
   return new Set(
@@ -45,6 +52,28 @@ async function ensureAdminContinuity(
     activeAdmins.some((admin) => admin._id !== member._id),
     "VALIDATION_ERROR",
     "Keep at least one other active administrator before changing this account.",
+  );
+}
+
+async function assertUsableAdminContinuity(ctx: MutationCtx): Promise<void> {
+  const activeAdmins = await ctx.db
+    .query("members")
+    .withIndex("by_role_and_status", (q) =>
+      q.eq("role", "admin").eq("status", "active"),
+    )
+    .collect();
+  const candidates = await Promise.all(activeAdmins.map(async (admin) => ({
+    role: admin.role,
+    status: admin.status,
+    identities: await ctx.db
+      .query("memberIdentities")
+      .withIndex("by_member", (q) => q.eq("memberId", admin._id))
+      .collect(),
+  })));
+  if (hasUsableAdminContinuity(candidates)) return;
+  fail(
+    "VALIDATION_ERROR",
+    "Keep at least one active administrator with a verified Logto identity.",
   );
 }
 
@@ -187,13 +216,11 @@ export const claimApprovedIdentity = mutation({
       .query("memberIdentities")
       .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
       .unique();
+    const now = Date.now();
     assert(
-      approved && (
-        approved.status === "pending"
-        || approved.status === "verified" && approved.provider === "clerk"
-      ),
+      approved && pendingIdentityIsClaimable(approved, now),
       "IDENTITY_NOT_APPROVED",
-      "This account has not been approved for the UBLDA workspace.",
+      "This account does not have a current invitation. Ask an administrator to approve it again.",
     );
     const member = await ctx.db.get("members", approved.memberId);
     assert(member?.status === "active", "FORBIDDEN", "This member is inactive.");
@@ -210,13 +237,13 @@ export const claimApprovedIdentity = mutation({
       "That identity is already linked to another member.",
     );
 
-    const now = Date.now();
     await ctx.db.patch("memberIdentities", approved._id, {
       provider: "logto",
       tokenIdentifier: identity.tokenIdentifier,
       providerSubject: identity.subject,
       issuer: identity.issuer,
       status: "verified",
+      approvalExpiresAt: undefined,
       verifiedAt: now,
       updatedAt: now,
     });
@@ -251,10 +278,11 @@ export const list = query({
           .collect();
         return {
           ...member,
-          identities: identities.map(({ _id, normalizedEmail, status, verifiedAt }) => ({
+          identities: identities.map(({ _id, normalizedEmail, status, approvalExpiresAt, verifiedAt }) => ({
             _id,
             normalizedEmail,
             status,
+            approvalExpiresAt,
             verifiedAt,
           })),
         };
@@ -300,7 +328,7 @@ export const upsertMember = mutation({
     ];
     assert(emails.length <= 10, "VALIDATION_ERROR", "Use 10 approved emails or fewer per member.");
     for (const email of emails) {
-      assert(email.includes("@"), "VALIDATION_ERROR", `Invalid email: ${email}`);
+      assert(isValidApprovedEmail(email), "VALIDATION_ERROR", `Invalid email: ${email}`);
       const existing = await ctx.db
         .query("memberIdentities")
         .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
@@ -347,11 +375,12 @@ export const upsertMember = mutation({
       .withIndex("by_member", (q) => q.eq("memberId", memberId!))
       .collect();
     const aliasPlan = args.approvedEmails === undefined
-      ? { add: [], reenable: [], disable: [], selfLockout: false }
+      ? { add: [], reenable: [], renew: [], migrate: [], disable: [], selfLockout: false }
       : planIdentityAliasSync(
           currentIdentities.map((identity) => ({
             email: identity.normalizedEmail,
             status: identity.status,
+            provider: identity.provider,
           })),
           emails,
           memberId === actor._id,
@@ -369,6 +398,7 @@ export const upsertMember = mutation({
       if (!identity) continue;
       await ctx.db.patch("memberIdentities", identity._id, {
         status: "disabled",
+        approvalExpiresAt: undefined,
         tokenIdentifier: undefined,
         providerSubject: undefined,
         issuer: undefined,
@@ -380,6 +410,29 @@ export const upsertMember = mutation({
       if (!identity) continue;
       await ctx.db.patch("memberIdentities", identity._id, {
         status: "pending",
+        approvalExpiresAt: identityApprovalExpiresAt(now),
+        tokenIdentifier: undefined,
+        providerSubject: undefined,
+        issuer: undefined,
+        verifiedAt: undefined,
+        updatedAt: now,
+      });
+    }
+    for (const email of aliasPlan.renew) {
+      const identity = identityByEmail.get(email);
+      if (!identity) continue;
+      await ctx.db.patch("memberIdentities", identity._id, {
+        approvalExpiresAt: identityApprovalExpiresAt(now),
+        updatedAt: now,
+      });
+    }
+    for (const email of aliasPlan.migrate) {
+      const identity = identityByEmail.get(email);
+      if (!identity) continue;
+      await ctx.db.patch("memberIdentities", identity._id, {
+        provider: "logto",
+        status: "pending",
+        approvalExpiresAt: identityApprovalExpiresAt(now),
         tokenIdentifier: undefined,
         providerSubject: undefined,
         issuer: undefined,
@@ -393,11 +446,13 @@ export const upsertMember = mutation({
         provider: "logto",
         normalizedEmail: email,
         status: "pending",
+        approvalExpiresAt: identityApprovalExpiresAt(now),
         createdAt: now,
         updatedAt: now,
         createdByMemberId: actor._id,
       });
     }
+    await assertUsableAdminContinuity(ctx);
     await writeAuditEvent(ctx, {
       actorType: "member",
       actorMemberId: actor._id,
@@ -408,6 +463,8 @@ export const upsertMember = mutation({
         role: args.role,
         addedApprovedIdentities: aliasPlan.add.length,
         reenabledApprovedIdentities: aliasPlan.reenable.length,
+        renewedApprovedIdentities: aliasPlan.renew.length,
+        migratedLegacyIdentities: aliasPlan.migrate.length,
         disabledApprovedIdentities: aliasPlan.disable.length,
       },
     });
@@ -430,7 +487,7 @@ export const create = mutation({
     assert(emails.length > 0, "VALIDATION_ERROR", "Approve at least one email.");
     assert(emails.length <= 10, "VALIDATION_ERROR", "Use 10 approved emails or fewer per member.");
     for (const email of emails) {
-      assert(email.includes("@"), "VALIDATION_ERROR", `Invalid email: ${email}`);
+      assert(isValidApprovedEmail(email), "VALIDATION_ERROR", `Invalid email: ${email}`);
       const existing = await ctx.db
         .query("memberIdentities")
         .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
@@ -453,6 +510,7 @@ export const create = mutation({
         provider: "logto",
         normalizedEmail: email,
         status: "pending",
+        approvalExpiresAt: identityApprovalExpiresAt(now),
         createdAt: now,
         updatedAt: now,
         createdByMemberId: actor._id,
@@ -478,7 +536,7 @@ export const addApprovedIdentity = mutation({
     const member = await ctx.db.get("members", args.memberId);
     assert(member, "NOT_FOUND", "Member not found.");
     const email = normalizeEmail(args.email);
-    assert(email.includes("@"), "VALIDATION_ERROR", "Enter a valid email.");
+    assert(isValidApprovedEmail(email), "VALIDATION_ERROR", "Enter a valid email.");
     const existing = await ctx.db
       .query("memberIdentities")
       .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
@@ -490,6 +548,7 @@ export const addApprovedIdentity = mutation({
       provider: "logto",
       normalizedEmail: email,
       status: "pending",
+      approvalExpiresAt: identityApprovalExpiresAt(now),
       createdAt: now,
       updatedAt: now,
       createdByMemberId: actor._id,
@@ -524,7 +583,8 @@ export const setIdentityStatus = mutation({
       assert(
         ownIdentities.some(
           (candidate) =>
-            candidate._id !== identity._id && candidate.status === "verified",
+            candidate._id !== identity._id
+            && isUsableLeadershipIdentity(candidate),
         ),
         "VALIDATION_ERROR",
         "Keep at least one other verified identity on your own account.",
@@ -532,12 +592,16 @@ export const setIdentityStatus = mutation({
     }
     await ctx.db.patch("memberIdentities", identity._id, {
       status: args.status,
+      approvalExpiresAt: args.status === "pending"
+        ? identityApprovalExpiresAt(Date.now())
+        : undefined,
       tokenIdentifier: undefined,
       providerSubject: undefined,
       issuer: undefined,
       verifiedAt: undefined,
       updatedAt: Date.now(),
     });
+    await assertUsableAdminContinuity(ctx);
     await writeAuditEvent(ctx, {
       actorType: "member",
       actorMemberId: actor._id,
@@ -580,6 +644,7 @@ export const update = mutation({
       status: args.status ?? member.status,
       updatedAt: Date.now(),
     });
+    await assertUsableAdminContinuity(ctx);
     await writeAuditEvent(ctx, {
       actorType: "member",
       actorMemberId: actor._id,
