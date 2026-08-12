@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/empty"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
+import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime } from "../format"
 import { calculateDecisionResults } from "../results"
@@ -49,39 +49,40 @@ export function DecisionsPage() {
       )}
     >
 
-      <Tabs className="dc-list-toolbar" value={filter} onValueChange={(value) => setFilter(value as Filter)}>
-        <TabsList variant="line" aria-label="Decision status">
-          {filters.map((item) => (
-            <TabsTrigger
-              key={item.id}
-              value={item.id}
-            >
-              {item.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <LeadershipSurface className="leadership-decision-surface" flush>
+        <Tabs className="dc-list-toolbar" value={filter} onValueChange={(value) => setFilter(value as Filter)}>
+          <TabsList variant="line" aria-label="Decision status">
+            {filters.map((item) => (
+              <TabsTrigger
+                key={item.id}
+                value={item.id}
+              >
+                {item.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      {decisions.length === 0 ? (
-        <Empty className="dc-empty-state">
-          <EmptyHeader>
-            <EmptyMedia variant="icon"><CircleCheck /></EmptyMedia>
-            <EmptyTitle>No decisions here</EmptyTitle>
-          </EmptyHeader>
-          <EmptyContent>
-            <Button asChild className="dc-touch"><Link to="/decisions/new">Create one</Link></Button>
-          </EmptyContent>
-        </Empty>
-      ) : (
-        <div className="dc-decision-list">
-          <div className="dc-question-table-head" aria-hidden="true">
-            <span>Question</span>
-            <span>Status</span>
-            <span>Responses</span>
-            <span>Deadline</span>
-            <span />
-          </div>
-          {decisions.map((decision) => {
+        {decisions.length === 0 ? (
+          <Empty className="dc-empty-state">
+            <EmptyHeader>
+              <EmptyMedia variant="icon"><CircleCheck /></EmptyMedia>
+              <EmptyTitle>No decisions here</EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button asChild className="dc-touch"><Link to="/decisions/new">Create one</Link></Button>
+            </EmptyContent>
+          </Empty>
+        ) : (
+          <div className="dc-decision-list">
+            <div className="dc-question-table-head" aria-hidden="true">
+              <span>Question</span>
+              <span>Status</span>
+              <span>Responses</span>
+              <span>Deadline</span>
+              <span />
+            </div>
+            {decisions.map((decision) => {
             const results = calculateDecisionResults(decision, snapshot.responses)
             const response = viewer ? responseFor(decision.id, viewer.memberId) : undefined
             const canRespond = Boolean(
@@ -97,7 +98,6 @@ export function DecisionsPage() {
               <article className="dc-decision-row" key={decision.id}>
                 <div className="dc-question-cell">
                   <h2><Link to={primaryHref}>{decision.title}</Link></h2>
-                  <span className="dc-question-updated">Updated {formatDateTime(decision.updatedAt, decision.timezone)}</span>
                 </div>
                 <div className="dc-question-status-stack">
                   <DecisionStatusBadge status={decision.status} />
@@ -139,9 +139,10 @@ export function DecisionsPage() {
                 </div>
               </article>
             )
-          })}
-        </div>
-      )}
+            })}
+          </div>
+        )}
+      </LeadershipSurface>
     </LeadershipPage>
   )
 }

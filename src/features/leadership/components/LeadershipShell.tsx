@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react"
 import { Link, NavLink, useLocation } from "react-router-dom"
-import { LogOut, PanelLeft } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -64,6 +64,13 @@ export function LeadershipShell({
   return (
     <div className="dc-app-shell ws-shell leadership-shell">
       <aside className="leadership-sidebar">
+        <Link to="/workspace" className="leadership-brand" aria-label="UBLDA workspace">
+          <span className="leadership-brand__mark" aria-hidden="true">
+            <img src="/logo.png" alt="" />
+          </span>
+          <span className="leadership-brand__wordmark">UBLDA</span>
+        </Link>
+
         <nav className="leadership-suite-nav" aria-label="Leadership workspace">
           <NavigationLinks items={leadershipNavigation} />
         </nav>
@@ -98,17 +105,16 @@ export function LeadershipShell({
 
       <div className="leadership-workspace">
         <header className="leadership-topbar">
-          <div>
+          <Link to="/workspace" className="leadership-mobile-brand" aria-label="UBLDA workspace">
+            <img src="/logo.png" alt="" />
+            <span>UBLDA</span>
+          </Link>
+          <div className="leadership-topbar__copy">
             <div className="leadership-topbar__title">
-              <PanelLeft aria-hidden="true" />
               <h1>{header.title}</h1>
               <Badge variant="outline" className="leadership-term-badge">2026–27</Badge>
             </div>
-            <p>{header.description}</p>
           </div>
-          <Link to="/workspace" className="leadership-topbar__logo" aria-label="UBLDA workspace">
-            <img src="/logo.png" alt="" />
-          </Link>
         </header>
 
         <main

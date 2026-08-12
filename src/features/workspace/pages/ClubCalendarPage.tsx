@@ -3,7 +3,7 @@ import { CalendarDays, CalendarPlus, MapPin } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -70,7 +70,7 @@ export function ClubCalendarPage() {
         <div className="ws-date-strip" aria-label="next 14 days">{weeks.map((date) => <div className="ws-date" key={date.toISOString()}><span>{date.toLocaleDateString("en-US", { weekday: "short" }).toLowerCase()}</span><strong>{date.getDate()}</strong><small>{date.toLocaleDateString("en-US", { month: "short" }).toLowerCase()}</small></div>)}</div>
       </LeadershipSurface>
       <LeadershipSection className="ws-calendar-agenda" title="agenda" flush>
-        {upcoming.length ? upcoming.map((event) => <article className="ws-calendar-row" key={event.id}><time dateTime={event.startAt}><strong>{formatEventDate(event, { weekday: "short" })}</strong><span>{formatEventTime(event)}</span></time><span className="ws-calendar-accent" /><div><strong>{event.title}</strong>{event.location && <small><MapPin /> {event.location}</small>}</div><span className={`ws-status ws-status-${event.status}`}>{event.status}</span></article>) : <Empty className="ws-empty ws-calendar-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarDays /></EmptyMedia><EmptyTitle>nothing on the calendar</EmptyTitle><EmptyDescription>Upcoming meetings, deadlines, and events will appear here.</EmptyDescription></EmptyHeader></Empty>}
+        {upcoming.length ? upcoming.map((event) => <article className="ws-calendar-row" key={event.id}><time dateTime={event.startAt}><strong>{formatEventDate(event, { weekday: "short" })}</strong><span>{formatEventTime(event)}</span></time><span className="ws-calendar-accent" /><div><strong>{event.title}</strong>{event.location && <small><MapPin /> {event.location}</small>}</div><span className={`ws-status ws-status-${event.status}`}>{event.status}</span></article>) : <Empty className="ws-empty ws-calendar-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarDays /></EmptyMedia><EmptyTitle>nothing on the calendar</EmptyTitle></EmptyHeader></Empty>}
       </LeadershipSection>
     </LeadershipPage>
   )
