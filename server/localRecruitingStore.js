@@ -625,9 +625,6 @@ var bookingEmailLaunchStatus = () => {
 };
 
 // server/launchReadiness.ts
-var hasAnyAdminSecret = () => Boolean(
-  process.env.UBLDA_SUPER_ADMIN_PASSWORD || process.env.SAM_BODINE_PASSWORD
-);
 var overallStatus = (checks) => {
   if (checks.some((check) => check.status === "fail")) return "fail";
   if (checks.some((check) => check.status === "warn")) return "warn";
@@ -653,12 +650,6 @@ var buildLaunchReadiness = () => {
       label: "Resume uploads",
       status: process.env.BLOB_READ_WRITE_TOKEN ? "pass" : "warn",
       detail: process.env.BLOB_READ_WRITE_TOKEN ? "Uploaded resumes are stored privately in Vercel Blob and served only to recruiting admins." : "Resume uploads work locally, but production should use private Vercel Blob."
-    },
-    {
-      id: "admin-secret",
-      label: "Admin session secret",
-      status: hasAnyAdminSecret() ? "pass" : "warn",
-      detail: hasAnyAdminSecret() ? "Super-admin fallback sessions are signed with a configured secret." : "No super-admin fallback secret is configured. Password accounts can still work, but recovery is harder."
     }
   ];
   return {

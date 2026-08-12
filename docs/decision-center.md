@@ -68,7 +68,7 @@ Start from [`.env.decisions.example`](../.env.decisions.example). It is separate
 | `CONVEX_AUTH_APP_ID` | Vercel and Convex | Server-only | Dedicated audience for five-minute Convex tokens |
 | `CONVEX_AUTH_JWKS` | Convex | Server-side deployment setting | Public JWKS URL; use the same auth-bridge URL |
 | `CONVEX_AUTH_SIGNING_PRIVATE_KEY` | Vercel | Secret | PKCS8 RSA private key used only by the auth bridge |
-| `CONVEX_AUTH_PUBLIC_JWKS` | Vercel | Server-only | One matching RS256 public signing key, including a stable `kid` |
+| `CONVEX_AUTH_PUBLIC_JWKS` | Vercel | Server-only | One active RS256 public key, or up to three public keys during a bounded rotation overlap; every key needs a unique stable `kid` |
 | `CONVEX_AUTH_ALLOWED_ORIGINS` | Vercel | Server-only | Comma-separated production origins allowed to exchange a Logto ID token |
 | `BOOTSTRAP_ADMIN_EMAILS` | Convex deployment | Server-side deployment setting | Comma-separated, normalized verified emails allowed to initialize an empty workspace |
 
@@ -99,13 +99,14 @@ Create a dedicated Logto tenant and **Single-page app**, then:
 
 1. Use Logto's hosted sign-in page with email address and password enabled. Keep phone, username, social connectors, and other unused methods disabled.
 2. Disable public account registration in the sign-in experience. The UBLDA page exposes one redirect button and never collects or handles credentials itself.
-3. Pre-create each approved administrator/member in the Logto user console or Management API. Deliver initial passwords outside the repository; never place a member password in source, a committed env file, a test, a screenshot, shell history, or deployment logs.
-4. Register `http://localhost:5173/auth/callback` and `https://ublda.org/auth/callback` as redirect URIs. Register the matching `/workspace` URLs as post-sign-out redirect URIs. Add a preview host only while deliberately testing that preview.
-5. Copy the tenant endpoint to `VITE_LOGTO_ENDPOINT` and the SPA application ID to `VITE_LOGTO_APP_ID`.
-6. Copy the exact OIDC issuer from tenant discovery metadata to Vercel's server-only `LOGTO_ISSUER`. It is normally `https://<tenant>.logto.app/oidc`. Set Vercel's server-only `LOGTO_APP_ID` to the same SPA app ID; Logto uses it as the ID-token audience.
-7. The React client requests Logto's email scope in addition to the default `openid`, `profile`, and `offline_access` scopes. Inspect one development ID token before bootstrap and confirm `aud` is the app ID, `email` is the signed-in primary address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
+3. Require MFA for leadership accounts in Logto. Prefer passkeys or authenticator apps, issue recovery codes once, and have each member verify recovery before launch. Do not use a shared recovery inbox or shared second factor.
+4. Pre-create each approved administrator/member in the Logto user console or Management API. Deliver initial passwords outside the repository; never place a member password in source, a committed env file, a test, a screenshot, shell history, or deployment logs.
+5. Register `http://localhost:5173/auth/callback` and `https://ublda.org/auth/callback` as redirect URIs. Register the matching `/workspace` URLs as post-sign-out redirect URIs. Add a preview host only while deliberately testing that preview. `www.ublda.org` redirects to the apex host before OAuth begins and should not be a second production callback.
+6. Copy the tenant endpoint to `VITE_LOGTO_ENDPOINT` and the SPA application ID to `VITE_LOGTO_APP_ID`.
+7. Copy the exact OIDC issuer from tenant discovery metadata to Vercel's server-only `LOGTO_ISSUER`. It is normally `https://<tenant>.logto.app/oidc`. Set Vercel's server-only `LOGTO_APP_ID` to the same SPA app ID; Logto uses it as the ID-token audience.
+8. The React client requests Logto's email scope in addition to the default `openid`, `profile`, and `offline_access` scopes. Inspect one development ID token before bootstrap and confirm `aud` is the app ID, `email` is the signed-in primary address, and `email_verified` is the boolean `true`. Do not bootstrap if any claim is absent or differently typed.
 
-Authentication is one pre-created Logto user per person, while authorization is one UBLDA member record in Convex. Disabling public registration is defense in depth: a valid Logto session still cannot access the workspace until its verified email is present in the Convex roster. Existing verified Clerk identity rows may migrate once to a matching verified Logto identity; arbitrary verified rows cannot be rebound.
+Authentication is one pre-created Logto user per person, while authorization is one UBLDA member record in Convex. Disabling public registration is defense in depth: a valid Logto session still cannot access the workspace until its verified email is present in the Convex roster. A verified identity is never rebound by email; an administrator must create a fresh pending invitation for a new Logto subject.
 
 ### 3. Set Convex deployment variables
 
@@ -129,7 +130,7 @@ Bootstrap is intentionally one-time and fail-closed:
 3. Invoke `members.bootstrapCurrentIdentity` through the live application flow.
 4. Verify that one active admin member and one verified identity were created.
 5. Use the authenticated roster settings to add the other members and their approved email aliases.
-6. Each added member signs in and claims a pending approved identity through `members.claimApprovedIdentity`.
+6. Each added member signs in and claims a pending approved identity through `members.claimApprovedIdentity` within 14 days. Saving the same pending alias again renews that invitation for another 14 days.
 
 After any member exists, a new identity cannot bootstrap the workspace. It must be pre-approved by an admin. One person may have multiple approved email aliases, but the database enforces one ballot per `(decisionId, memberId)` rather than one ballot per email.
 
@@ -160,8 +161,11 @@ The Convex HTTP Actions reject direct public traffic unless
 `X-UBLDA-Gateway-Secret` matches this shared value. Never put the secret in a
 `VITE_*` variable, client configuration, bearer token, log, or screenshot.
 
-For pre-Convex abuse control, configure one Vercel WAF fixed-window rate-limit
-rule covering both `/mcp` and `/api/decision-agent/*`, keyed by IP or JA4. Vercel
+For pre-Convex abuse control, configure Vercel WAF fixed-window rate-limit
+rules covering `/api/convex-auth`, `/api/speaker-ops`, `/mcp`, and
+`/api/decision-agent/*`, keyed by IP or JA4. Give the two interactive auth
+endpoints a short burst allowance that comfortably covers nine simultaneous
+members without allowing sustained token-exchange abuse. Vercel
 documents WAF rate limiting on Hobby, but the rule is project-side deployment
 state, not an in-process guarantee in this repository. Serverless memory is not
 shared across instances and must not be treated as a reliable IP limiter. Verify
@@ -183,6 +187,23 @@ npm run build
 ```
 
 Then verify the immutable deployment on desktop and a real iPhone, including Logto email/password sign-in, sign-out, rejection of an unapproved identity, and recovery from an iMessage in-app browser. A successful local build or Vercel HTTP 200 is not production proof by itself.
+
+### Member lifecycle and recovery
+
+- **Onboard:** create one Logto user, require MFA enrollment, create one active Convex member, add the exact verified email as a pending alias, and have that person claim it before the 14-day expiry.
+- **Change email:** add and claim the new alias before disabling the old one. Never edit a verified identity into a different account.
+- **Switch accounts:** use the workspace's **try another account** action. It performs a full Logto sign-out before ordinary sign-in so refresh tokens and the hosted-provider session do not leak across members.
+- **Offboard:** first mark the Convex member inactive, which immediately blocks every protected query and Speaker Ops lookup. Then revoke the user's Logto sessions, disable the Logto account, and revoke any personal agent keys.
+- **Recover:** an administrator can renew an expired pending alias. Lost MFA recovery must be handled in Logto after verifying the person; it must not be bypassed by adding a password fallback to this application.
+
+### Auth bridge key rotation
+
+The bridge derives the public key from `CONVEX_AUTH_SIGNING_PRIVATE_KEY` and will sign only when it matches exactly one published JWKS entry. To rotate without interrupting five-minute Convex sessions:
+
+1. Add the new public key to `CONVEX_AUTH_PUBLIC_JWKS` while retaining the current key.
+2. Deploy and verify that the JWKS endpoint publishes both unique `kid` values.
+3. Replace `CONVEX_AUTH_SIGNING_PRIVATE_KEY` with the new matching private key; the bridge automatically selects its matching `kid`.
+4. After the old five-minute tokens and downstream JWKS caches have expired, remove the old public key. Never publish private RSA fields.
 
 ## Governance model
 

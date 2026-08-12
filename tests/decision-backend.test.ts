@@ -8,7 +8,36 @@ import {
 } from "../convex/lib/crypto.ts";
 import { tallyOptions } from "../convex/lib/tally.ts";
 import { decisionUpdateViolation } from "../convex/lib/updatePolicy.ts";
-import { planIdentityAliasSync } from "../convex/lib/identityPolicy.ts";
+import {
+  IDENTITY_APPROVAL_TTL_MS,
+  hasUsableAdminContinuity,
+  isUsableLeadershipIdentity,
+  isValidApprovedEmail,
+  pendingIdentityIsClaimable,
+  planIdentityAliasSync,
+} from "../convex/lib/identityPolicy.ts";
+
+test("only verified non-Clerk identities can keep an administrator signed in", () => {
+  assert.equal(isUsableLeadershipIdentity({ status: "verified", provider: "logto" }), true);
+  assert.equal(isUsableLeadershipIdentity({ status: "verified", provider: "clerk" }), false);
+  assert.equal(isUsableLeadershipIdentity({ status: "pending", provider: "logto" }), false);
+});
+
+test("admin continuity ignores active rows that no longer have a usable login", () => {
+  const loggedInAdmin = {
+    role: "admin" as const,
+    status: "active" as const,
+    identities: [{ status: "verified" as const, provider: "logto" }],
+  };
+  const strandedAdmin = {
+    role: "admin" as const,
+    status: "active" as const,
+    identities: [{ status: "verified" as const, provider: "clerk" }],
+  };
+  assert.equal(hasUsableAdminContinuity([loggedInAdmin, strandedAdmin]), true);
+  assert.equal(hasUsableAdminContinuity([strandedAdmin]), false);
+  assert.equal(hasUsableAdminContinuity([{ ...loggedInAdmin, role: "member" }]), false);
+});
 import { decisionPublicSlug } from "../convex/lib/publicIds.ts";
 import { availabilityPublicSlug } from "../convex/lib/publicIds.ts";
 import {
@@ -121,10 +150,72 @@ test("member alias sync is exact and re-enables disabled aliases as pending", ()
     {
       add: ["new@example.com"],
       reenable: ["restore@example.com"],
+      renew: [],
+      migrate: [],
       disable: ["remove@example.com"],
       selfLockout: false,
     },
   );
+});
+
+test("member alias sync renews retained pending invitations", () => {
+  const plan = planIdentityAliasSync(
+    [{ email: "pending@example.com", status: "pending" }],
+    ["pending@example.com"],
+    false,
+  );
+  assert.deepEqual(plan.renew, ["pending@example.com"]);
+});
+
+test("saving a legacy Clerk alias creates a bounded Logto migration invitation", () => {
+  const plan = planIdentityAliasSync(
+    [{ email: "legacy@example.com", status: "verified", provider: "clerk" }],
+    ["legacy@example.com"],
+    false,
+  );
+  assert.deepEqual(plan.migrate, ["legacy@example.com"]);
+  assert.equal(plan.selfLockout, false);
+
+  const selfPlan = planIdentityAliasSync(
+    [{ email: "legacy@example.com", status: "verified", provider: "clerk" }],
+    ["legacy@example.com"],
+    true,
+  );
+  assert.equal(selfPlan.selfLockout, true);
+});
+
+test("pending identity invitations expire after fourteen days", () => {
+  const createdAt = 1_000;
+  assert.equal(
+    pendingIdentityIsClaimable({ status: "pending", createdAt }, createdAt + 1),
+    true,
+  );
+  assert.equal(
+    pendingIdentityIsClaimable(
+      { status: "pending", createdAt },
+      createdAt + IDENTITY_APPROVAL_TTL_MS,
+    ),
+    false,
+  );
+  assert.equal(
+    pendingIdentityIsClaimable({
+      status: "pending",
+      createdAt,
+      approvalExpiresAt: createdAt + 50,
+    }, createdAt + 51),
+    false,
+  );
+  assert.equal(
+    pendingIdentityIsClaimable({ status: "verified", createdAt }, createdAt + 1),
+    false,
+  );
+});
+
+test("approved identity emails use a bounded complete address", () => {
+  assert.equal(isValidApprovedEmail("leader@umich.edu"), true);
+  assert.equal(isValidApprovedEmail("leader@umich"), false);
+  assert.equal(isValidApprovedEmail("leader @umich.edu"), false);
+  assert.equal(isValidApprovedEmail(`${"a".repeat(245)}@umich.edu`), false);
 });
 
 test("member alias sync blocks removal of the actor's last verified identity", () => {

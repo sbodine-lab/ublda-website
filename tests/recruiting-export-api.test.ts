@@ -114,7 +114,7 @@ const seedRecruitingData = async () => {
   return admin.sessionToken
 }
 
-test('exports recruiting candidates as admin-only CSV', async () => {
+test('rejects a previously issued local recruiting-admin session for candidate exports', async () => {
   await withStore(async () => {
     const sessionToken = await seedRecruitingData()
 
@@ -124,29 +124,20 @@ test('exports recruiting candidates as admin-only CSV', async () => {
 
     const authorized = createResponse()
     await handler({ method: 'GET', query: { type: 'candidates', sessionToken }, headers: {} }, authorized.res)
-    assert.equal(authorized.result().statusCode, 200)
-    assert.equal(authorized.result().headers.get('content-type'), 'text/csv; charset=utf-8')
-    assert.match(String(authorized.result().headers.get('content-disposition')), /ublda-interview-candidates\.csv/)
-
-    const csv = String(authorized.result().payload)
-    assert.match(csv, /^name,email,program,status,assigned_slot/m)
-    assert.match(csv, /Alex Chen,alexchen@umich\.edu/)
-    assert.match(csv, /Events and Programming,Marketing and Social Media,Outreach and Partnerships/)
+    assert.equal(authorized.result().statusCode, 401)
+    assert.match(String((authorized.result().payload as Record<string, unknown>).error), /admin session/i)
+    assert.equal(authorized.result().headers.has('content-disposition'), false)
   })
 })
 
-test('exports interviewer availability CSV for recruiting admins', async () => {
+test('rejects a previously issued local recruiting-admin session for interviewer exports', async () => {
   await withStore(async () => {
     const sessionToken = await seedRecruitingData()
 
     const response = createResponse()
     await handler({ method: 'GET', query: { type: 'interviewers', sessionToken }, headers: {} }, response.res)
-    assert.equal(response.result().statusCode, 200)
-    assert.match(String(response.result().headers.get('content-disposition')), /ublda-interviewer-availability\.csv/)
-
-    const csv = String(response.result().payload)
-    assert.match(csv, /^name,email,role,max_interviews/m)
-    assert.match(csv, /Sam Bodine,sbodine@umich\.edu/)
-    assert.match(csv, /Thu, May 7/)
+    assert.equal(response.result().statusCode, 401)
+    assert.match(String((response.result().payload as Record<string, unknown>).error), /admin session/i)
+    assert.equal(response.result().headers.has('content-disposition'), false)
   })
 })

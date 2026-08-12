@@ -38,7 +38,7 @@ const createResponse = () => {
   }
 }
 
-test('serves stored resumes only to recruiting admins', async () => {
+test('rejects previously issued local recruiting-admin sessions for stored resumes', async () => {
   const originalDataFile = process.env.UBLDA_LOCAL_DATA_FILE
   const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
   const dir = await mkdtemp(path.join(tmpdir(), 'ublda-resume-api-'))
@@ -91,10 +91,9 @@ test('serves stored resumes only to recruiting admins', async () => {
       query: { candidate: 'alexchen@umich.edu', sessionToken: admin.sessionToken },
       headers: {},
     }, authorized.res)
-    assert.equal(authorized.result().statusCode, 200)
-    assert.equal(authorized.result().headers.get('content-type'), 'application/pdf')
-    assert.equal(Buffer.isBuffer(authorized.result().payload), true)
-    assert.equal((authorized.result().payload as Buffer).toString('utf8'), 'resume')
+    assert.equal(authorized.result().statusCode, 401)
+    assert.match(String((authorized.result().payload as Record<string, unknown>).error), /admin session/i)
+    assert.equal(authorized.result().headers.has('content-type'), false)
   } finally {
     if (originalDataFile === undefined) {
       delete process.env.UBLDA_LOCAL_DATA_FILE

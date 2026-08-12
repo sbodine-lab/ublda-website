@@ -47,6 +47,21 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
       await adapter.signIn()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Secure sign-in could not be opened.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const switchAccount = async () => {
+    setSubmitting(true)
+    setError(undefined)
+    try {
+      // Complete provider sign-out first. The next screen starts an ordinary
+      // Logto sign-in, which avoids relying on unsupported account prompts.
+      await adapter.signOut()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "This account could not be signed out.")
+    } finally {
       setSubmitting(false)
     }
   }
@@ -64,17 +79,24 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
       description={snapshot.auth.status === "signed-out" ? "Continue to the secure leadership sign-in." : undefined}
     >
       {snapshot.auth.status === "misconfigured" ? (
-        <Alert variant="destructive">
-          <AlertTitle>sign-in is not configured</AlertTitle>
-          <AlertDescription>{snapshot.auth.message}</AlertDescription>
-        </Alert>
+        <div className="dc-auth-denied">
+          <Alert variant="destructive">
+            <AlertTitle>sign-in could not be verified</AlertTitle>
+            <AlertDescription>{snapshot.auth.message}</AlertDescription>
+          </Alert>
+          <Button variant="outline" className="dc-touch" disabled={submitting} onClick={() => void signIn()}>
+            {submitting ? <Spinner data-icon="inline-start" /> : null}
+            try sign in again
+          </Button>
+        </div>
       ) : snapshot.auth.status === "access-denied" ? (
         <div className="dc-auth-denied">
           <Alert variant="destructive">
             <AlertTitle>this account is not approved</AlertTitle>
             <AlertDescription>{snapshot.auth.message}</AlertDescription>
           </Alert>
-          <Button variant="outline" className="dc-touch" onClick={() => void adapter.signOut()}>
+          <Button variant="outline" className="dc-touch" disabled={submitting} onClick={() => void switchAccount()}>
+            {submitting ? <Spinner data-icon="inline-start" /> : null}
             try another account
           </Button>
         </div>

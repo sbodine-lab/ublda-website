@@ -62,7 +62,15 @@ import { WorkspaceDataProvider } from "@/features/workspace/WorkspaceDataProvide
 import { createLiveWorkspaceAdapter, type MutableLiveWorkspaceAdapter } from "@/features/workspace/liveAdapter"
 import { mapClubWorkspace, type BackendClubWorkspaceSnapshot } from "@/features/workspace/liveContracts"
 import type { ClubWorkspaceSnapshot, CreateClubEventInput, CreateProjectInput, CreateProjectTaskInput, TaskStatus, UpdateDirectoryProfileInput } from "@/features/workspace/types"
-import { logtoIsLoadingForConvex } from "./logtoConvexAuth"
+import {
+  createLogtoConvexTokenCoordinator,
+  leadershipOperationTimedOut,
+  logtoInitialSessionHasResolved,
+  logtoIsLoadingForConvex,
+  logtoSessionKeyFromIdToken,
+  resolveLeadershipMembership,
+  withLeadershipRequestTimeout,
+} from "./logtoConvexAuth"
 import { LeadershipIdentityProvider } from "./leadershipIdentityContext"
 
 type EmptyArgs = Record<string, never>
@@ -289,9 +297,17 @@ function activityDetail(action: string): string {
   return details[action] ?? "Updated the decision."
 }
 
+type LeadershipSessionState =
+  | { status: "idle" | "error" }
+  | { status: "ready"; key: string }
+
 type MembershipState =
-  | { status: "idle" | "ready" }
-  | { status: "denied"; message: string }
+  | { status: "idle" }
+  | { status: "ready"; sessionKey: string }
+  | { status: "denied"; message: string; sessionKey: string }
+  | { status: "error"; message: string; sessionKey: string }
+
+const AUTH_SETTLEMENT_TIMEOUT_MS = 15_000
 
 function LiveDecisionBridge({
   adapter,
@@ -303,6 +319,23 @@ function LiveDecisionBridge({
   workspaceAdapter: MutableLiveWorkspaceAdapter
 }) {
   const logtoAuth = useLogto()
+  const [initialLogtoSessionResolved, setInitialLogtoSessionResolved] = useState(() => (
+    logtoInitialSessionHasResolved(false, logtoAuth.isLoading, logtoAuth.isAuthenticated)
+  ))
+  const [initialLogtoTimedOut, setInitialLogtoTimedOut] = useState(false)
+  useEffect(() => {
+    if (
+      !initialLogtoSessionResolved
+      && logtoInitialSessionHasResolved(false, logtoAuth.isLoading, logtoAuth.isAuthenticated)
+    ) {
+      queueMicrotask(() => setInitialLogtoSessionResolved(true))
+    }
+  }, [initialLogtoSessionResolved, logtoAuth.isAuthenticated, logtoAuth.isLoading])
+  useEffect(() => {
+    if (initialLogtoSessionResolved || !logtoAuth.isLoading) return
+    const timeout = window.setTimeout(() => setInitialLogtoTimedOut(true), AUTH_SETTLEMENT_TIMEOUT_MS)
+    return () => window.clearTimeout(timeout)
+  }, [initialLogtoSessionResolved, logtoAuth.isLoading])
   const {
     clearAccessToken: clearLeadershipAccessToken,
     getAccessToken: getLeadershipAccessToken,
@@ -312,20 +345,35 @@ function LiveDecisionBridge({
   const getLeadershipIdToken = useCallback(async (forceRefresh = false) => {
     if (!leadershipIsAuthenticated) return null
     if (forceRefresh) {
-      await clearLeadershipAccessToken()
-      if (!await getLeadershipAccessToken()) return null
+      const refreshed = await withLeadershipRequestTimeout(async () => {
+        await clearLeadershipAccessToken()
+        return await getLeadershipAccessToken()
+      })
+      if (!refreshed) return null
     }
     return await getLeadershipIdTokenFromLogto() ?? null
   }, [clearLeadershipAccessToken, getLeadershipAccessToken, getLeadershipIdTokenFromLogto, leadershipIsAuthenticated])
   const leadershipIdentity = useMemo(() => ({ getIdToken: getLeadershipIdToken }), [getLeadershipIdToken])
   const convexAuth = useConvexAuth()
+  const [convexAuthTimedOut, setConvexAuthTimedOut] = useState(false)
+  useEffect(() => {
+    if (!leadershipIsAuthenticated || !convexAuth.isLoading) {
+      queueMicrotask(() => setConvexAuthTimedOut(false))
+      return
+    }
+    const timeout = window.setTimeout(() => setConvexAuthTimedOut(true), AUTH_SETTLEMENT_TIMEOUT_MS)
+    return () => window.clearTimeout(timeout)
+  }, [convexAuth.isLoading, leadershipIsAuthenticated])
   const location = useLocation()
   const stateSlug = location.state && typeof location.state === "object" && "decisionSlug" in location.state
     ? String(location.state.decisionSlug)
     : undefined
   const route = pathSlug(location.pathname, stateSlug)
   const availabilityRoute = availabilityPathSlug(location.pathname)
+  const [leadershipSession, setLeadershipSession] = useState<LeadershipSessionState>({ status: "idle" })
   const [membership, setMembership] = useState<MembershipState>({ status: "idle" })
+  const [requiredDataPendingSince, setRequiredDataPendingSince] = useState<number | null>(null)
+  const [requiredDataTimedOut, setRequiredDataTimedOut] = useState(false)
   const attemptedRef = useRef(false)
   const attemptGenerationRef = useRef(0)
 
@@ -350,7 +398,56 @@ function LiveDecisionBridge({
   const updateDirectoryProfileMutation = useMutation(updateDirectoryProfileRef)
 
   useEffect(() => {
-    if (logtoAuth.isAuthenticated) return
+    let active = true
+    if (!leadershipIsAuthenticated) {
+      queueMicrotask(() => {
+        if (active) setLeadershipSession({ status: "idle" })
+      })
+      return () => { active = false }
+    }
+    void withLeadershipRequestTimeout(() => getLeadershipIdTokenFromLogto()).then((idToken) => {
+      if (!active) return
+      setLeadershipSession(idToken
+        ? { status: "ready", key: logtoSessionKeyFromIdToken(idToken) }
+        : { status: "error" })
+    }).catch(() => {
+      if (active) setLeadershipSession({ status: "error" })
+    })
+    return () => { active = false }
+  }, [getLeadershipIdTokenFromLogto, leadershipIsAuthenticated])
+
+  const leadershipSessionKey = leadershipSession.status === "ready" ? leadershipSession.key : null
+
+  useEffect(() => {
+    if (!leadershipIsAuthenticated || !leadershipSessionKey) return
+    let active = true
+    const verifyCurrentAccount = () => {
+      void withLeadershipRequestTimeout(() => getLeadershipIdTokenFromLogto()).then((idToken) => {
+        if (!active) return
+        const nextKey = idToken ? logtoSessionKeyFromIdToken(idToken) : null
+        if (nextKey !== leadershipSessionKey) window.location.reload()
+      }).catch(() => {
+        // Account-change detection is best-effort. The primary auth state has
+        // its own bounded error UI, so a transient foreground check must not
+        // create an unhandled rejection or a reload loop.
+      })
+    }
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === null || event.key.startsWith("logto:")) verifyCurrentAccount()
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") verifyCurrentAccount()
+    }
+    window.addEventListener("storage", onStorage)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+    return () => {
+      active = false
+      window.removeEventListener("storage", onStorage)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+    }
+  }, [getLeadershipIdTokenFromLogto, leadershipIsAuthenticated, leadershipSessionKey])
+
+  useEffect(() => {
     attemptedRef.current = false
     attemptGenerationRef.current += 1
     let cancelled = false
@@ -358,12 +455,12 @@ function LiveDecisionBridge({
       if (!cancelled) setMembership({ status: "idle" })
     })
     return () => { cancelled = true }
-  }, [logtoAuth.isAuthenticated])
+  }, [leadershipIsAuthenticated, leadershipSessionKey])
 
   useEffect(() => {
     if (
-      logtoAuth.isLoading
-      || !logtoAuth.isAuthenticated
+      !logtoAuth.isAuthenticated
+      || !leadershipSessionKey
       || convexAuth.isLoading
       || !convexAuth.isAuthenticated
       || attemptedRef.current
@@ -372,24 +469,16 @@ function LiveDecisionBridge({
     attemptedRef.current = true
     const generation = ++attemptGenerationRef.current
     void (async () => {
-      try {
-        await claimIdentity({})
-        if (attemptGenerationRef.current === generation) setMembership({ status: "ready" })
-        return
-      } catch {
+      const result = await resolveLeadershipMembership({
+        claim: () => claimIdentity({}),
         // The first approved administrator may initialize a completely empty
         // workspace. Convex independently checks BOOTSTRAP_ADMIN_EMAILS.
-      }
-      try {
-        await bootstrapIdentity({})
-        if (attemptGenerationRef.current === generation) setMembership({ status: "ready" })
-      } catch {
-        if (attemptGenerationRef.current === generation) {
-          setMembership({
-            status: "denied",
-            message: "Use an email that an administrator has added to your roster profile, or ask an administrator to approve this account.",
-          })
-        }
+        bootstrap: () => bootstrapIdentity({}),
+      })
+      if (attemptGenerationRef.current === generation) {
+        setMembership(result.status === "ready"
+          ? { status: "ready", sessionKey: leadershipSessionKey }
+          : { ...result, sessionKey: leadershipSessionKey })
       }
     })()
   }, [
@@ -397,13 +486,13 @@ function LiveDecisionBridge({
     claimIdentity,
     convexAuth.isAuthenticated,
     convexAuth.isLoading,
+    leadershipSessionKey,
     logtoAuth.isAuthenticated,
-    logtoAuth.isLoading,
   ])
 
-  const ready = membership.status === "ready"
+  const ready = membership.status === "ready" && membership.sessionKey === leadershipSessionKey
   const workspaceState = useQueryState({ query: workspaceRef, args: ready ? {} : "skip" })
-  const workspace = workspaceState.status === "success" ? workspaceState.data : undefined
+  const workspace = ready && workspaceState.status === "success" ? workspaceState.data : undefined
   const currentRouteSlug = route.currentRoute
     ? [...(workspace?.decisions ?? [])]
         .sort((a, b) => b.updatedAt - a.updatedAt)
@@ -431,6 +520,29 @@ function LiveDecisionBridge({
     args: ready && detail && resultsAllowed ? { decisionId: detail._id } : "skip",
   })
   const results = resultsState.status === "success" ? resultsState.data : undefined
+  const requiredDataPending = ready && (
+    workspaceState.status === "pending"
+    || Boolean(resolvedRouteSlug) && detailState.status === "pending"
+    || resultsAllowed && resultsState.status === "pending"
+  )
+  useEffect(() => {
+    if (!requiredDataPending) {
+      queueMicrotask(() => {
+        setRequiredDataPendingSince(null)
+        setRequiredDataTimedOut(false)
+      })
+      return
+    }
+    const startedAt = requiredDataPendingSince ?? Date.now()
+    if (requiredDataPendingSince === null) queueMicrotask(() => setRequiredDataPendingSince(startedAt))
+    const remaining = Math.max(0, AUTH_SETTLEMENT_TIMEOUT_MS - (Date.now() - startedAt))
+    const timeout = window.setTimeout(() => {
+      if (leadershipOperationTimedOut(startedAt, Date.now(), AUTH_SETTLEMENT_TIMEOUT_MS)) {
+        setRequiredDataTimedOut(true)
+      }
+    }, remaining)
+    return () => window.clearTimeout(timeout)
+  }, [requiredDataPending, requiredDataPendingSince])
   const activityState = useQueryState({
     query: activityRef,
     args: ready && route.resultsRoute && detail?.canManage
@@ -454,8 +566,8 @@ function LiveDecisionBridge({
     args: ready ? {} : "skip",
   })
   const availabilityRows = useMemo(() => (
-    availabilityListState.status === "success" ? availabilityListState.data : []
-  ), [availabilityListState])
+    ready && availabilityListState.status === "success" ? availabilityListState.data : []
+  ), [availabilityListState, ready])
   const resolvedAvailabilitySlug = availabilityRoute.slug
     ?? (availabilityRoute.currentRoute ? availabilityRows[0]?.slug : undefined)
   const availabilityDetailState = useQueryState({
@@ -463,18 +575,42 @@ function LiveDecisionBridge({
     args: ready && resolvedAvailabilitySlug ? { slug: resolvedAvailabilitySlug } : "skip",
   })
   const clubWorkspaceState = useQueryState({ query: clubWorkspaceRef, args: ready ? {} : "skip" })
-  const availabilityDetail = availabilityDetailState.status === "success"
+  const availabilityDetail = ready && availabilityDetailState.status === "success"
     ? availabilityDetailState.data
     : undefined
 
   const snapshot = useMemo<DecisionCenterSnapshot>(() => {
     let auth: DecisionCenterSnapshot["auth"]
-    if (logtoAuth.error) {
+    if (logtoAuth.error || initialLogtoTimedOut) {
       auth = {
         status: "misconfigured",
-        message: "The secure sign-in service could not be reached. Try again, then ask an administrator to check the Logto setup if the problem continues.",
+        message: initialLogtoTimedOut
+          ? "The secure sign-in service did not finish loading. Reload and try again."
+          : "The secure sign-in service could not be reached. Try again, then ask an administrator to check the Logto setup if the problem continues.",
       }
-    } else if (logtoAuth.isLoading || convexAuth.isLoading) {
+    } else if (logtoAuth.isAuthenticated && leadershipSession.status === "error") {
+      auth = {
+        status: "misconfigured",
+        message: "Your secure session could not be read. Try signing in again.",
+      }
+    } else if (convexAuthTimedOut) {
+      auth = {
+        status: "misconfigured",
+        message: "The secure workspace connection did not finish loading. Check your connection and try again.",
+      }
+    } else if (requiredDataTimedOut) {
+      auth = {
+        status: "misconfigured",
+        message: "The leadership workspace took too long to load. Check your connection and try again.",
+      }
+    } else if (
+      logtoIsLoadingForConvex(
+        logtoAuth.isLoading,
+        logtoAuth.isAuthenticated,
+        initialLogtoSessionResolved,
+      )
+      || convexAuth.isLoading
+    ) {
       auth = { status: "loading" }
     } else if (!logtoAuth.isAuthenticated) {
       auth = { status: "signed-out" }
@@ -483,10 +619,18 @@ function LiveDecisionBridge({
         status: "misconfigured",
         message: "Sign-in completed, but the Decision Center could not verify its Convex authentication setup.",
       }
-    } else if (membership.status === "denied") {
+    } else if (
+      membership.status === "error"
+      && membership.sessionKey === leadershipSessionKey
+    ) {
+      auth = { status: "misconfigured", message: membership.message }
+    } else if (
+      membership.status === "denied"
+      && membership.sessionKey === leadershipSessionKey
+    ) {
       auth = { status: "access-denied", message: membership.message }
     } else if (
-      membership.status !== "ready"
+      !ready
       || workspaceState.status === "pending"
       || resolvedRouteSlug && detailState.status === "pending"
       || resultsAllowed && resultsState.status === "pending"
@@ -588,10 +732,15 @@ function LiveDecisionBridge({
     adminMembersState,
     convexAuth.isAuthenticated,
     convexAuth.isLoading,
+    convexAuthTimedOut,
     detail,
     detailState.status,
     eligibleMembersState,
     agentKeysState,
+    leadershipSession,
+    leadershipSessionKey,
+    initialLogtoSessionResolved,
+    initialLogtoTimedOut,
     membership,
     logtoAuth.error,
     logtoAuth.isAuthenticated,
@@ -599,9 +748,11 @@ function LiveDecisionBridge({
     results,
     resultsAllowed,
     resultsState.status,
+    requiredDataTimedOut,
     resolvedRouteSlug,
     workspace,
     workspaceState.status,
+    ready,
   ])
 
   useEffect(() => {
@@ -637,21 +788,36 @@ function LiveDecisionBridge({
   }, [availabilityAdapter, availabilitySnapshot])
 
   const clubWorkspaceSnapshot = useMemo<ClubWorkspaceSnapshot>(() => {
-    if (clubWorkspaceState.status === "success") return mapClubWorkspace(clubWorkspaceState.data)
-    return { events: [], projects: [], tasks: [], people: [], loading: clubWorkspaceState.status === "pending", error: clubWorkspaceState.status === "error" ? "Workspace could not be loaded." : undefined }
-  }, [clubWorkspaceState])
+    if (ready && clubWorkspaceState.status === "success") return mapClubWorkspace(clubWorkspaceState.data)
+    return { events: [], projects: [], tasks: [], people: [], loading: ready && clubWorkspaceState.status === "pending", error: ready && clubWorkspaceState.status === "error" ? "Workspace could not be loaded." : undefined }
+  }, [clubWorkspaceState, ready])
 
   useEffect(() => { workspaceAdapter.replaceSnapshot(clubWorkspaceSnapshot) }, [clubWorkspaceSnapshot, workspaceAdapter])
 
   const operations = useMemo(() => ({
     async signIn() {
-      await logtoAuth.signIn({
+      if (initialLogtoTimedOut || convexAuthTimedOut || requiredDataTimedOut) {
+        window.location.reload()
+        return
+      }
+      await withLeadershipRequestTimeout(() => logtoAuth.signIn({
         redirectUri: `${window.location.origin}/auth/callback`,
-        postRedirectUri: window.location.href,
-      })
+      }))
     },
     async signOut() {
-      await logtoAuth.signOut(`${window.location.origin}/workspace`)
+      const returnUrl = `${window.location.origin}/workspace`
+      try {
+        await withLeadershipRequestTimeout(() => logtoAuth.signOut(returnUrl))
+      } finally {
+        // A successful sign-out navigates away immediately. If provider
+        // discovery or browser navigation failed, finish local cleanup and
+        // recover instead of leaving the account trapped.
+        window.setTimeout(() => {
+          void withLeadershipRequestTimeout(() => logtoAuth.clearAllTokens(), 2_000)
+            .catch(() => undefined)
+            .finally(() => window.location.replace(returnUrl))
+        }, 1_500)
+      }
     },
     async submitResponse(decisionId: string, answer: BallotAnswer, rationale?: string) {
       const current = adapter.getSnapshot()
@@ -809,10 +975,13 @@ function LiveDecisionBridge({
     closeDecisionMutation,
     createAgentKeyAction,
     createDecisionMutation,
+    convexAuthTimedOut,
     finalizeDecisionMutation,
+    initialLogtoTimedOut,
     logtoAuth,
     publishDecisionMutation,
     reopenDecisionMutation,
+    requiredDataTimedOut,
     revokeAgentKeyMutation,
     submitBallotMutation,
     upsertMemberMutation,
@@ -910,67 +1079,63 @@ function useLogtoConvexAuth() {
     isAuthenticated,
     isLoading,
   } = useLogto()
-  const inFlightTokenRef = useRef<Promise<string | null> | null>(null)
-  const convexAuthIsLoading = logtoIsLoadingForConvex(isLoading, isAuthenticated)
-
-  const fetchAccessToken = useCallback(async ({ forceRefreshToken }: { forceRefreshToken: boolean }) => {
-    if (!isAuthenticated) return null
-    if (inFlightTokenRef.current) return await inFlightTokenRef.current
-
-    const pending = (async () => {
-      const exchange = async (idToken: string) => {
-        const response = await fetch('/api/convex-auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken }),
-        })
-        const payload = await response.json().catch(() => null) as { token?: unknown; error?: unknown } | null
-        return { response, payload }
+  const [initialSessionResolved, setInitialSessionResolved] = useState(() => (
+    logtoInitialSessionHasResolved(false, isLoading, isAuthenticated)
+  ))
+  useEffect(() => {
+    if (
+      !initialSessionResolved
+      && logtoInitialSessionHasResolved(false, isLoading, isAuthenticated)
+    ) {
+      queueMicrotask(() => setInitialSessionResolved(true))
+    }
+  }, [initialSessionResolved, isAuthenticated, isLoading])
+  const convexAuthIsLoading = logtoIsLoadingForConvex(
+    isLoading,
+    isAuthenticated,
+    initialSessionResolved,
+  )
+  const tokenCoordinator = useMemo(() => createLogtoConvexTokenCoordinator({
+    getIdToken,
+    async refreshLogtoSession() {
+      await clearAccessToken()
+      return Boolean(await getAccessToken())
+    },
+    async exchange(idToken, signal) {
+      const response = await fetch('/api/convex-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+        cache: 'no-store',
+        credentials: 'same-origin',
+        signal,
+      })
+      const payload = await response.json().catch(() => null) as { token?: unknown; error?: unknown } | null
+      return {
+        ok: response.ok,
+        status: response.status,
+        token: payload?.token,
+        error: payload?.error,
       }
-      const refreshLogtoSession = async () => {
-        await clearAccessToken()
-        return await getAccessToken()
-      }
-
-      if (forceRefreshToken && !await refreshLogtoSession()) return null
-      let idToken = await getIdToken()
-      if (!idToken) return null
-      let result = await exchange(idToken)
-
-      // Logto stores the ID token separately from the access token. Refreshing
-      // the access token also replaces an expired ID token, so retry once when
-      // the bridge rejects a stale browser session.
-      if (result.response.status === 401 && !forceRefreshToken) {
-        const refreshedAccessToken = await refreshLogtoSession()
-        idToken = await getIdToken()
-        if (!refreshedAccessToken || !idToken) return null
-        result = await exchange(idToken)
-      }
-
-      if (!result.response.ok || typeof result.payload?.token !== 'string') {
-        throw new Error(
-          typeof result.payload?.error === 'string'
-            ? result.payload.error
-            : 'The leadership sign-in session could not be verified.',
-        )
-      }
-      return result.payload.token
-    })().catch((error) => {
-      // Convex token fetchers must settle with null on failure. Store that
-      // settled promise so concurrent callers cannot keep auth loading either.
+    },
+    reportError(error) {
       console.error(
         'convex_auth_token_fetch_failed',
         error instanceof Error ? error.message : 'Unknown error',
       )
-      return null
-    })
-    inFlightTokenRef.current = pending
-    try {
-      return await pending
-    } finally {
-      if (inFlightTokenRef.current === pending) inFlightTokenRef.current = null
-    }
-  }, [clearAccessToken, getAccessToken, getIdToken, isAuthenticated])
+    },
+  }), [clearAccessToken, getAccessToken, getIdToken])
+
+  useEffect(() => {
+    if (!isAuthenticated) tokenCoordinator.invalidate()
+  }, [isAuthenticated, tokenCoordinator])
+
+  useEffect(() => () => tokenCoordinator.invalidate(), [tokenCoordinator])
+
+  const fetchAccessToken = useCallback(async (options: { forceRefreshToken: boolean }) => {
+    if (!isAuthenticated) return null
+    return await tokenCoordinator.fetchAccessToken(options)
+  }, [isAuthenticated, tokenCoordinator])
 
   return useMemo(() => ({ isLoading: convexAuthIsLoading, isAuthenticated, fetchAccessToken }), [
     convexAuthIsLoading,
