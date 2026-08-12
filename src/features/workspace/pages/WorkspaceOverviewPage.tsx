@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarDays, CheckCircle2, FolderKanban } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Progress } from "@/components/ui/progress"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
 import { useAvailabilityData } from "@/features/availability/availabilityDataContext"
@@ -25,7 +25,7 @@ export function WorkspaceOverviewPage() {
   const firstName = viewer?.displayName.split(/\s+/)[0]?.toLowerCase() ?? "there"
 
   return (
-    <LeadershipPage className="ws-overview-page" eyebrow="workspace" title={`good morning, ${firstName}`}>
+    <LeadershipPage className="ws-overview-page" title={`good morning, ${firstName}`}>
 
       {workspace.error && <p className="ws-error" role="alert">{workspace.error}</p>}
 
@@ -47,7 +47,7 @@ export function WorkspaceOverviewPage() {
               ))}
             </div>
           ) : (
-            <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarDays /></EmptyMedia><EmptyTitle>nothing scheduled</EmptyTitle><EmptyDescription>add the next board meeting or deadline.</EmptyDescription></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/calendar">open calendar</Link></Button></EmptyContent></Empty>
+            <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarDays /></EmptyMedia><EmptyTitle>nothing scheduled</EmptyTitle></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/calendar">open calendar</Link></Button></EmptyContent></Empty>
           )}
         </LeadershipSection>
 
@@ -71,7 +71,7 @@ export function WorkspaceOverviewPage() {
                 </article>
               )
             })}
-          </div> : <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no active projects</EmptyTitle><EmptyDescription>New work will appear here once a project is started.</EmptyDescription></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/projects">open projects</Link></Button></EmptyContent></Empty>}
+          </div> : <Empty className="ws-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no active projects</EmptyTitle></EmptyHeader><EmptyContent><Button variant="outline" asChild><Link to="/projects">open projects</Link></Button></EmptyContent></Empty>}
         </LeadershipSection>
       </div>
 

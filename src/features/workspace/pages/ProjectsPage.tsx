@@ -3,7 +3,7 @@ import { ChevronDown, FolderKanban, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
@@ -58,7 +58,7 @@ export function ProjectsPage() {
 
   return (
     <LeadershipPage className="ws-projects-page" action={newProjectDialog}>
-      {!projects.length ? <Empty className="ws-empty ws-page-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no projects yet</EmptyTitle><EmptyDescription>Projects organize owners, tasks, due dates, and progress in one place.</EmptyDescription></EmptyHeader></Empty> : null}
+      {!projects.length ? <Empty className="ws-empty ws-page-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no projects yet</EmptyTitle></EmptyHeader></Empty> : null}
       {lanes.map((currentLane) => {
         const laneProjects = projects.filter((project) => project.lane === currentLane)
         if (!laneProjects.length) return null

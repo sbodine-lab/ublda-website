@@ -1,9 +1,9 @@
 import { ArrowRight, CalendarClock, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
-import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
+import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
 import { dateLabel } from "../format"
 import { AvailabilityResultsPanel } from "../components/AvailabilityResultsPanel"
@@ -19,7 +19,8 @@ export function SchedulingDashboardPage() {
       action={viewer?.role === "admin" ? <Button asChild className="ws-primary-action"><Link to="/scheduling/new"><Plus data-icon="inline-start" /> new poll</Link></Button> : null}
     >
 
-      <div className="av-dashboard">
+      <LeadershipSurface className="leadership-scheduling-surface" flush>
+        <div className="av-dashboard">
         <section className="av-poll-list-pane" aria-label="scheduling polls">
           <header className="av-list-heading"><h2>polls</h2><span>{snapshot.polls.length}</span></header>
           <div className="av-poll-list">
@@ -34,7 +35,7 @@ export function SchedulingDashboardPage() {
                 </Button>
               </article>
             ))}
-            {!snapshot.polls.length && !snapshot.loading ? <Empty className="av-empty-list"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>no scheduling polls</EmptyTitle><EmptyDescription>Create a poll when the group needs to find time together.</EmptyDescription></EmptyHeader></Empty> : null}
+            {!snapshot.polls.length && !snapshot.loading ? <Empty className="av-empty-list"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>no scheduling polls</EmptyTitle></EmptyHeader></Empty> : null}
           </div>
         </section>
 
@@ -47,9 +48,10 @@ export function SchedulingDashboardPage() {
               </header>
               <AvailabilityResultsPanel poll={snapshot.activePoll} />
             </>
-          ) : snapshot.loading ? <p className="av-dashboard-loading">loading…</p> : <Empty className="av-detail-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>choose a poll</EmptyTitle><EmptyDescription>Poll details and response coverage will appear here.</EmptyDescription></EmptyHeader></Empty>}
+          ) : snapshot.loading ? <p className="av-dashboard-loading">loading…</p> : <Empty className="av-detail-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>choose a poll</EmptyTitle></EmptyHeader></Empty>}
         </section>
-      </div>
+        </div>
+      </LeadershipSurface>
     </LeadershipPage>
   )
 }
