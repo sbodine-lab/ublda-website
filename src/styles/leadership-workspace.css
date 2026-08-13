@@ -3,7 +3,6 @@
 .dc-ballot-page,
 .dc-auth-page,
 .av-public-page,
-.av-dashboard,
 .av-create-page,
 .av-workspace-results,
 .ws-shell {
@@ -38,7 +37,6 @@
 .dc-ballot-page *,
 .dc-auth-page *,
 .av-public-page *,
-.av-dashboard *,
 .av-create-page *,
 .av-workspace-results *,
 .ws-shell * {
@@ -49,7 +47,6 @@
 .dc-ballot-page :where(h1, h2, h3),
 .dc-auth-page :where(h1, h2, h3),
 .av-public-page :where(h1, h2, h3),
-.av-dashboard :where(h1, h2, h3),
 .av-create-page :where(h1, h2, h3),
 .av-workspace-results :where(h1, h2, h3),
 .ws-shell :where(h1, h2, h3) {
@@ -63,7 +60,6 @@
 .dc-ballot-page [data-slot="button"],
 .dc-auth-page [data-slot="button"],
 .av-public-page [data-slot="button"],
-.av-dashboard [data-slot="button"],
 .av-create-page [data-slot="button"],
 .av-workspace-results [data-slot="button"] {
   border-radius: 8px;
@@ -77,7 +73,6 @@
 .dc-ballot-page [data-slot="button"]:hover,
 .dc-auth-page [data-slot="button"]:hover,
 .av-public-page [data-slot="button"]:hover,
-.av-dashboard [data-slot="button"]:hover,
 .av-create-page [data-slot="button"]:hover,
 .av-workspace-results [data-slot="button"]:hover {
   transform: translateY(-1px);
@@ -293,7 +288,6 @@
 
 .ws-primary-action,
 .dc-desktop-create-button,
-.av-list-heading > [data-slot="button"],
 .av-results-actions [data-slot="button"]:last-child,
 .av-liquid-button {
   border-color: #142b4a !important;
@@ -304,7 +298,6 @@
 
 .ws-primary-action:hover,
 .dc-desktop-create-button:hover,
-.av-list-heading > [data-slot="button"]:hover,
 .av-results-actions [data-slot="button"]:last-child:hover,
 .av-liquid-button:hover {
   background: #0d203a !important;
@@ -695,30 +688,7 @@
   color: #142b4a !important;
 }
 
-/* Scheduling / When2Meet-style availability */
-.av-dashboard {
-  display: grid;
-  grid-template-columns: minmax(330px, 38%) minmax(0, 1fr);
-  min-height: 100vh;
-  background: transparent;
-}
-
-.av-poll-list-pane {
-  border-right: 1px solid rgba(30, 43, 63, 0.1);
-  background: rgba(255, 255, 255, 0.42);
-}
-
-.av-list-heading {
-  min-height: 112px;
-  padding: 28px 32px;
-  border-color: rgba(30, 43, 63, 0.1);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px) saturate(128%);
-  -webkit-backdrop-filter: blur(20px) saturate(128%);
-}
-
-.av-list-heading h1,
-.av-detail-heading h1,
+/* Scheduling */
 .av-public-page h1,
 .av-create-page h1,
 .av-workspace-results h1 {
@@ -727,55 +697,89 @@
   letter-spacing: -0.035em;
 }
 
-.av-poll-list {
-  border-color: rgba(30, 43, 63, 0.1);
+.av-scheduling-index {
+  width: min(100%, 1080px);
+  margin-top: 20px;
 }
 
-.av-poll-row {
-  min-height: 112px;
-  padding: 24px 32px;
-  border-color: rgba(30, 43, 63, 0.09);
-  transition: background-color 180ms ease, box-shadow 240ms ease;
+.av-scheduling-index__header {
+  padding-bottom: 14px;
 }
 
-.av-poll-row:hover {
-  background: rgba(20, 43, 74, 0.018);
-}
-
-.av-poll-row-active {
-  background: linear-gradient(90deg, rgba(20, 43, 74, 0.06), rgba(20, 43, 74, 0.025));
-  box-shadow: inset 2px 0 #142b4a;
-}
-
-.av-poll-row h2 {
-  color: #142b4a;
-  font-size: 14px;
+.av-scheduling-index__header h2 {
+  margin: 0;
+  color: #121722;
+  font-size: 17px;
   font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.av-scheduling-list {
+  border-top: 1px solid rgba(30, 43, 63, 0.12);
+  border-bottom: 1px solid rgba(30, 43, 63, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.av-scheduling-row {
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.25fr) minmax(220px, 1fr) 112px 132px;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(30, 43, 63, 0.09);
+}
+
+.av-scheduling-row:last-child {
+  border-bottom: 0;
+}
+
+.av-scheduling-row h3,
+.av-scheduling-row p {
+  margin: 0;
+}
+
+.av-scheduling-row h3 {
+  color: #121722;
+  font-size: 14px;
+  font-weight: 620;
   letter-spacing: -0.01em;
 }
 
-.av-poll-row p {
+.av-scheduling-row p,
+.av-scheduling-status {
   color: #697181;
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
-.av-poll-row [data-slot="button"] {
+.av-scheduling-status--needed {
+  color: #85640d;
+}
+
+.av-scheduling-status--finalized {
+  color: #4f5866;
+}
+
+.av-scheduling-row__action[data-slot="button"] {
+  min-height: 44px;
+  justify-self: end;
+  padding-inline: 4px;
   color: #142b4a;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 620;
 }
 
-.av-dashboard-detail {
-  min-width: 0;
-  padding: 48px 44px 88px;
+.av-scheduling-row__action svg {
+  width: 14px;
+  height: 14px;
 }
 
-.av-detail-heading {
-  padding-bottom: 28px;
-  border-color: rgba(30, 43, 63, 0.1);
-}
-
-.av-detail-heading > p {
-  margin-top: 7px;
+.av-scheduling-message {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 18px 20px;
   color: #697181;
   font-size: 12px;
 }
@@ -1098,66 +1102,6 @@
   max-width: 62ch;
 }
 
-.av-dashboard-page .av-dashboard {
-  min-height: 540px;
-  overflow: hidden;
-  grid-template-columns: minmax(300px, 36%) minmax(0, 1fr);
-  border: 1px solid rgba(30, 43, 63, 0.1);
-  border-radius: var(--ws-surface-radius);
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 10px 30px rgba(18, 31, 49, 0.035);
-}
-
-.av-dashboard-page .av-poll-list-pane {
-  min-width: 0;
-  background: rgba(248, 250, 253, 0.58);
-}
-
-.av-dashboard-page .av-list-heading {
-  min-height: 58px;
-  padding: 0 20px;
-  background: rgba(255, 255, 255, 0.68);
-}
-
-.av-dashboard-page .av-list-heading h2,
-.av-dashboard-page .av-detail-heading h2 {
-  margin: 0;
-  color: #142b4a;
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
-.av-dashboard-page .av-list-heading span {
-  color: #697181;
-  font-size: 11px;
-}
-
-.av-dashboard-page .av-poll-row {
-  min-height: 102px;
-  padding: 20px;
-}
-
-.av-dashboard-page .av-dashboard-detail {
-  min-width: 0;
-  padding: 30px 32px 48px;
-}
-
-.av-dashboard-page .av-detail-heading {
-  padding-bottom: 22px;
-}
-
-.av-dashboard-page .av-detail-empty,
-.av-dashboard-page .av-dashboard-loading {
-  min-height: 430px;
-}
-
-.av-dashboard-page .av-dashboard-loading {
-  display: grid;
-  place-items: center;
-  color: #697181;
-}
-
 @media (max-width: 1040px) {
   .dc-question-table-head,
   .dc-decision-row {
@@ -1289,7 +1233,6 @@
   }
 
   .dc-page-heading h1,
-  .av-list-heading h1,
   .av-detail-heading h1,
   .av-public-page h1,
   .av-create-page h1 {
@@ -1349,43 +1292,30 @@
     margin-top: 8px;
   }
 
-  .av-dashboard-page .av-dashboard {
-    display: block;
-    min-height: 0;
-    padding-bottom: 0;
+  .av-scheduling-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 5px 18px;
+    padding-inline: 16px;
   }
 
-  .av-poll-list-pane {
-    border-right: 0;
+  .av-scheduling-row h3 {
+    grid-column: 1;
+    grid-row: 1;
   }
 
-  .av-dashboard-page .av-list-heading {
-    position: static;
-    min-height: 54px;
-    padding: 0 16px;
+  .av-scheduling-row p {
+    grid-column: 1;
+    grid-row: 2;
   }
 
-  .av-dashboard-page .av-poll-list {
-    margin: 0;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+  .av-scheduling-status {
+    grid-column: 1;
+    grid-row: 3;
   }
 
-  .av-poll-row {
-    min-height: 98px;
-    padding: 20px 16px;
-  }
-
-  .av-dashboard-page .av-dashboard-detail {
-    display: block;
-    padding: 24px 16px 32px;
-    border-top: 1px solid rgba(30, 43, 63, 0.1);
-  }
-
-  .av-dashboard-page .av-detail-empty,
-  .av-dashboard-page .av-dashboard-loading {
-    min-height: 220px;
+  .av-scheduling-row__action[data-slot="button"] {
+    grid-column: 2;
+    grid-row: 1 / span 3;
   }
 
   .ws-person-row {
@@ -1481,7 +1411,6 @@
   .dc-ballot-page *,
   .dc-auth-page *,
   .av-public-page *,
-  .av-dashboard *,
   .av-create-page *,
   .av-workspace-results *,
   .ws-shell * {
