@@ -40,7 +40,7 @@ export function ProjectsPage() {
   const personName = (id?: string) => people.find((person) => person.memberId === id)?.displayName ?? "unassigned"
 
   const newProjectDialog = isAdmin ? (
-    <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); if (!nextOpen) setFocusedField(undefined) }}>
+    <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); setFocusedField(nextOpen ? "name" : undefined) }}>
       <DialogTrigger asChild><Button className="ws-primary-action"><Plus data-icon="inline-start" /> New project</Button></DialogTrigger>
       <DialogContent className="ws-dialog ws-project-dialog">
         <DialogHeader><DialogTitle>New project</DialogTitle></DialogHeader>
