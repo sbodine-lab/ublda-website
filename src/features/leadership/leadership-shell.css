@@ -135,14 +135,12 @@
     background-color 180ms ease,
     border-color 180ms ease,
     box-shadow 220ms var(--leadership-ease),
-    color 180ms ease,
-    transform 220ms var(--leadership-ease);
+    color 180ms ease;
 }
 
 .leadership-suite-link:hover {
   background: rgba(255, 255, 255, 0.58);
   color: var(--leadership-blue-strong);
-  transform: translateX(1px);
 }
 
 .leadership-suite-link--active {
