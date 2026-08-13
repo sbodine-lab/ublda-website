@@ -138,7 +138,6 @@ function ProgramSlots({
       <div className="speaker-section__heading">
         <div>
           <h2 id="program-slots-title">Program slots</h2>
-          <p>One fall fireside and one winter fireside. Either slot can stay empty.</p>
         </div>
       </div>
       <div className="speaker-slot-list">
