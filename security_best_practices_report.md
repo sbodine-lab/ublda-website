@@ -2,7 +2,7 @@
 
 Date: 2026-08-12
 
-Scope: the UBLDA leadership browser client, Logto-to-Convex token bridge, Convex member binding, Speaker Ops authorization, and retired recruiting-administrator authentication paths.
+Scope: the UBLDA leadership browser client, Logto-to-Convex token bridge, Convex member binding, and Speaker Ops authorization.
 
 ## Result
 
@@ -13,7 +13,7 @@ The application now has one leadership trust path:
 3. Convex authorizes that stable Logto subject against an active member record.
 4. Speaker Ops verifies the same identity and active Convex member before every read or mutation.
 
-The orphaned applicant-account and recruiting-dashboard identity plane is retired. Public applications, interview booking, and interviewer availability remain available without creating a second account or session system.
+The orphaned applicant-account and recruiting-dashboard identity plane, including public E-board applications and interview scheduling, has been removed. General membership sign-up remains separate and does not create a leadership account or session.
 
 ## Resolved findings
 
@@ -23,12 +23,11 @@ The public Apps Script handler accepted a caller-supplied `googleSignIn` account
 
 Resolution:
 
-- Apps Script rejects the former applicant-account and interview-assignment actions without minting or restoring sessions.
-- The Vercel applicant-account and dashboard endpoints return a permanent retirement response for every former auth action, including old sessions.
-- Retired recruiting-admin endpoints fail closed instead of trusting local, HMAC, preview, or Apps Script sessions.
-- Public application and booking endpoints remain independent of the retired account plane.
+- The Apps Script source now handles only general membership sign-up.
+- Applicant-account, application, interview, resume, recruiting-export, recruiting-health, and dashboard endpoints are absent from the application.
+- The retired recruiting UI, persistence layer, matching code, shared-password sessions, and generated runtime were deleted together.
 
-Operational gate: the live Apps Script deployment must be updated or disabled. Committing this source does not alter an already-published Apps Script web app. Revoke or invalidate its existing account sessions after deployment.
+Operational gate: the live Apps Script deployment must be updated with the membership-only source or disabled. Committing this source does not alter an already-published Apps Script web app.
 
 ### High: shared-password administrator fallback
 
@@ -36,9 +35,8 @@ The retired shared password could still create a signed HMAC administrator sessi
 
 Resolution:
 
-- Shared-password matching, HMAC issuance, and local administrator payload construction are removed or permanently fail closed.
-- Former environment-variable names cannot restore the behavior.
-- Applicant sign-in is retired entirely, so an officer email cannot cross into leadership authorization through that route.
+- Shared-password matching, HMAC issuance, local administrator payload construction, and applicant sign-in were deleted.
+- Former environment-variable names cannot restore the behavior because no code reads them.
 - Launch-readiness guidance no longer recommends a shared administrator secret.
 
 ### High: endless loading and account-crossing client work
@@ -114,8 +112,8 @@ These are provider or deployment settings and cannot be proven by repository cod
 1. Rotate the leadership password that was previously shared in chat, then revoke existing Logto sessions.
 2. Require MFA for all nine Logto users; prefer passkeys or authenticator apps and issue individual recovery codes.
 3. Disable public Logto registration and verify only the exact apex redirect and post-logout URIs are registered.
-4. Redeploy or disable the live Apps Script and invalidate its legacy sessions.
-5. Remove retired shared-password environment values from Vercel after confirming no candidate flow depends on them.
+4. Redeploy the membership-only Apps Script or disable the old deployment.
+5. Remove retired recruiting, email, and shared-password environment values from Vercel.
 6. Configure and verify Vercel WAF rate limits for `/api/convex-auth`, `/api/speaker-ops`, `/mcp`, and `/api/decision-agent/*`.
 7. Exercise sign-in, sign-out, account switching, unapproved-member rejection, offboarding, expired-invite recovery, and mobile in-app-browser recovery on the immutable production deployment.
 

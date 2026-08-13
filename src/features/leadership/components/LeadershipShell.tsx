@@ -1,8 +1,16 @@
 import { useEffect, type ReactNode } from "react"
 import { Link, NavLink, useLocation } from "react-router-dom"
-import { LogOut } from "lucide-react"
+import { LogOut, Menu } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import {
   leadershipAdminNavigation,
@@ -111,6 +119,52 @@ export function LeadershipShell({
               <Badge variant="outline" className="leadership-term-badge">2026–27</Badge>
             </div>
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="leadership-mobile-menu-trigger"
+                aria-label="Open workspace navigation"
+              >
+                <Menu />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={10} className="leadership-mobile-menu">
+              <DropdownMenuLabel>Workspace</DropdownMenuLabel>
+              {leadershipNavigation.map(({ to, label, icon: Icon, end }) => (
+                <DropdownMenuItem key={to} asChild className="leadership-mobile-menu-item">
+                  <NavLink to={to} end={end}>
+                    <Icon aria-hidden="true" />
+                    <span>{label}</span>
+                  </NavLink>
+                </DropdownMenuItem>
+              ))}
+              {role === "admin" ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Admin</DropdownMenuLabel>
+                  {leadershipAdminNavigation.map(({ to, label, icon: Icon, end }) => (
+                    <DropdownMenuItem key={to} asChild className="leadership-mobile-menu-item">
+                      <NavLink to={to} end={end}>
+                        <Icon aria-hidden="true" />
+                        <span>{label}</span>
+                      </NavLink>
+                    </DropdownMenuItem>
+                  ))}
+                </>
+              ) : null}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                className="leadership-mobile-menu-item"
+                onSelect={() => void onSignOut()}
+              >
+                <LogOut aria-hidden="true" />
+                <span>Sign out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
 
         <main

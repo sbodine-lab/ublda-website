@@ -10,8 +10,6 @@ import Advisory from './pages/Advisory'
 import Join from './pages/Join'
 import Links from './pages/Links'
 import Brand from './pages/Brand'
-import InterviewerAvailability from './pages/InterviewerAvailability'
-import InterviewBooking from './pages/InterviewBooking'
 import HousingIntelligence from './pages/HousingIntelligence'
 
 const DecisionCenterEntry = lazy(() => (
@@ -78,12 +76,6 @@ export default function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/advisory" element={<Advisory />} />
         <Route path="/join" element={<Join />} />
-        <Route path="/apply" element={<InterviewBooking />} />
-        <Route path="/portal" element={<InterviewBooking />} />
-        <Route path="/interview-signup" element={<InterviewBooking />} />
-        <Route path="/interview-booking" element={<InterviewBooking />} />
-        <Route path="/interviewer-availability" element={<InterviewerAvailability />} />
-        <Route path="/eboard-availability" element={<InterviewerAvailability />} />
         <Route path="/housing-intelligence" element={<HousingIntelligence />} />
         <Route path="/housing" element={<HousingIntelligence />} />
         <Route path="/links" element={<Links />} />

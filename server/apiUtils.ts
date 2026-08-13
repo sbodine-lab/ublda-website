@@ -70,5 +70,5 @@ export const queryOrBearerSessionToken = (req: VercelRequest) => (
 
 export const contentDisposition = (fileName: string, disposition: 'inline' | 'attachment' = 'inline') => {
   const safeName = fileName.replace(/["\r\n]/g, '')
-  return `${disposition}; filename="${safeName || 'resume.pdf'}"`
+  return `${disposition}; filename="${safeName || 'download.bin'}"`
 }

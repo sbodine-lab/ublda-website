@@ -4,20 +4,9 @@
 
 Local preview, Logto/Convex configuration, governance rules, and agent API/MCP setup are documented in [Decision Center setup and operations](docs/decision-center.md).
 
-## Interview launch checklist
+## Leadership workspace
 
-The interview signup flow can be opened without automated confirmation email. Candidates see their booked slot in the browser after submitting. Before opening the form publicly, configure these Vercel environment variables:
-
-- `BLOB_READ_WRITE_TOKEN` for private recruiting data, slot locks, and resume uploads.
-
-Leadership administration uses the Logto + Convex member roster described in the Decision Center operations guide. The former shared-password, applicant-account, Apps Script session, dashboard, resume, health, and CSV-export authorization paths are retired. Public applications, interview booking, and interviewer availability remain available without that second auth plane.
-
-Optional automated confirmation email:
-
-- `RESEND_API_KEY` for booking confirmation email.
-- `UBLDA_EMAIL_FROM`, normally `UBLDA Interviews <interviews@ublda.org>`.
-- `UBLDA_EMAIL_DOMAIN_VERIFIED=true` only after the sender domain passes SPF/DKIM verification in Resend.
-- `UBLDA_REQUIRE_BOOKING_EMAIL=true` only if the form should fail closed when automated confirmation email is unavailable.
+Leadership administration uses the Logto + Convex member roster described in the Decision Center operations guide. The retired E-board recruiting portal, applicant accounts, interview scheduler, resume storage, exports, health checks, and shared-password admin backend have been removed. General membership sign-up remains available at `/join`.
 
 ## Local development
 
