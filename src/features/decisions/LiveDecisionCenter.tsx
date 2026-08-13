@@ -286,17 +286,6 @@ function activityType(action: string): DecisionActivity["type"] | undefined {
   return types[action]
 }
 
-function activityDetail(action: string): string {
-  const details: Record<string, string> = {
-    "decision.created": "Created the decision.",
-    "decision.published": "Opened the decision for responses.",
-    "decision.closed": "Closed responses.",
-    "decision.reopened": "Reopened responses.",
-    "decision.finalized": "Recorded the final outcome.",
-  }
-  return details[action] ?? "Updated the decision."
-}
-
 type LeadershipSessionState =
   | { status: "idle" | "error" }
   | { status: "ready"; key: string }
@@ -596,12 +585,12 @@ function LiveDecisionBridge({
     } else if (convexAuthTimedOut) {
       auth = {
         status: "misconfigured",
-        message: "The secure workspace connection did not finish loading. Check your connection and try again.",
+        message: "The workspace did not finish loading. Check your connection and try again.",
       }
     } else if (requiredDataTimedOut) {
       auth = {
         status: "misconfigured",
-        message: "The leadership workspace took too long to load. Check your connection and try again.",
+        message: "The workspace took too long to load. Check your connection and try again.",
       }
     } else if (
       logtoIsLoadingForConvex(
@@ -617,7 +606,7 @@ function LiveDecisionBridge({
     } else if (!convexAuth.isAuthenticated) {
       auth = {
         status: "misconfigured",
-        message: "Sign-in completed, but the Decision Center could not verify its Convex authentication setup.",
+        message: "Signed in, but the workspace could not verify its connection.",
       }
     } else if (
       membership.status === "error"
@@ -642,7 +631,7 @@ function LiveDecisionBridge({
     ) {
       auth = {
         status: "misconfigured",
-        message: "The private Decision Center data service could not be loaded. Ask an administrator to check the Logto and Convex setup.",
+        message: "The workspace could not load. Ask an admin to check the setup.",
       }
     } else if (workspace) {
       auth = { status: "signed-in", viewer: workspace.viewer }
@@ -714,7 +703,7 @@ function LiveDecisionBridge({
             actorDisplayName: event.actorDisplayName,
             type,
             at: new Date(event.createdAt).toISOString(),
-            detail: activityDetail(event.action),
+            detail: "",
           } satisfies DecisionActivity]
         })
       : []
@@ -887,7 +876,7 @@ function LiveDecisionBridge({
       try {
         await closeDecisionMutation({
           decisionId,
-          reason: "Closed by the decision owner from the Decision Center.",
+          reason: "Closed by the owner from the workspace.",
         })
       } catch (caught) {
         throw new Error(cleanConvexError(caught, "The decision could not be closed."))
@@ -897,7 +886,7 @@ function LiveDecisionBridge({
       try {
         await reopenDecisionMutation({
           decisionId,
-          reason: "Reopened by the decision owner from the Decision Center.",
+          reason: "Reopened by the owner from the workspace.",
           clearDeadline: true,
         })
       } catch (caught) {

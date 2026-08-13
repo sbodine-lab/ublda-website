@@ -5,10 +5,18 @@ import {
   ArrowUp,
   Check,
   Pencil,
+  SearchX,
 } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -138,8 +146,8 @@ function BallotChoices({
               <span className="dc-rank-number">{index + 1}</span>
               <span className="dc-rank-label"><b>{option.label}</b></span>
               <span className="dc-rank-actions">
-                <Button type="button" variant="ghost" size="icon-lg" className="dc-touch" onClick={() => move(index, -1)} disabled={index === 0} aria-label={`Move ${option.label} up`}><ArrowUp /></Button>
-                <Button type="button" variant="ghost" size="icon-lg" className="dc-touch" onClick={() => move(index, 1)} disabled={index === answer.ranking.length - 1} aria-label={`Move ${option.label} down`}><ArrowDown /></Button>
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => move(index, -1)} disabled={index === 0} aria-label={`Move ${option.label} up`}><ArrowUp /></Button>
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => move(index, 1)} disabled={index === answer.ranking.length - 1} aria-label={`Move ${option.label} down`}><ArrowDown /></Button>
               </span>
             </li>
           )
@@ -155,7 +163,7 @@ function BallotChoices({
         id="ballot-input"
         value={answer.text}
         onChange={(event) => onChange({ type: "input", text: event.target.value })}
-        placeholder="Write the context, concern, or recommendation the board should consider."
+        placeholder="Your answer"
         rows={6}
       />
     </Field>
@@ -204,24 +212,26 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
 
   if (!editing && receipt) {
     return (
-      <section className="dc-confirmation dc-submit-confirmation" aria-live="polite">
+      <section className="dc-confirmation" aria-live="polite">
         <div className={cn("dc-submit-check", justSubmitted && "dc-submit-check-animated")} aria-hidden="true"><Check /></div>
-        <h2>submitted</h2>
-        {decision.rules.resultsVisibility === "after-submit" && (
-          <Button asChild className="dc-touch dc-live-results-button"><Link to="/results" state={{ decisionSlug: decision.slug }}>view live results</Link></Button>
-        )}
-        {decision.status === "open" && decision.rules.allowResponseEdits && (
-          <Button variant="outline" className="dc-touch" onClick={() => {
-            setJustSubmitted(false)
-            setEditing(true)
-          }}><Pencil /> edit</Button>
-        )}
+        <h2>Submitted</h2>
+        <div className="dc-confirmation-actions">
+          {decision.status === "open" && decision.rules.allowResponseEdits && (
+            <Button variant="outline" onClick={() => {
+              setJustSubmitted(false)
+              setEditing(true)
+            }}><Pencil data-icon="inline-start" /> Edit</Button>
+          )}
+          {decision.rules.resultsVisibility === "after-submit" && (
+            <Button asChild><Link to="/results" state={{ decisionSlug: decision.slug }}>View results</Link></Button>
+          )}
+        </div>
       </section>
     )
   }
 
   return (
-    <section className="dc-ballot-form" aria-label="your response">
+    <section className="dc-ballot-form" aria-label="Your response">
       {decision.ballotType === "ranked" && <p className="dc-ranking-instruction">Use the arrows to put your strongest choice first.</p>}
       <BallotChoices
         decision={decision}
@@ -234,15 +244,15 @@ function BallotForm({ decision, existing }: { decision: DecisionRecord; existing
 
       {existing && existing.confirmedRevision !== decision.revision && (
         <Alert>
-          <AlertTitle>This decision changed</AlertTitle>
+          <AlertTitle>This question changed</AlertTitle>
           <AlertDescription>Review revision {decision.revision} and confirm your response again.</AlertDescription>
         </Alert>
       )}
       {error && <p className="dc-inline-error" role="alert">{error}</p>}
       <div className="dc-submit-bar">
-        {existing && <Button type="button" variant="ghost" className="dc-touch" onClick={() => setEditing(false)}>Cancel</Button>}
-        <Button type="button" size="lg" className="dc-touch" onClick={submit} disabled={submitting}>
-          {submitting ? "submitting…" : "submit"}
+        {existing && <Button type="button" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>}
+        <Button type="button" onClick={submit} disabled={submitting}>
+          {submitting ? "Submitting…" : "Submit"}
         </Button>
       </div>
     </section>
@@ -258,8 +268,21 @@ function SignedInBallot() {
   if (!decision) {
     return (
       <main id="main-content" className="dc-ballot-page">
-        <div className="dc-public-topbar dc-public-topbar--logo-only"><Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link></div>
-        <section className="dc-not-found"><h1>Question not found</h1><p>This link may be incomplete or the question may have been removed.</p><Button asChild><Link to="/decisions">View questions</Link></Button></section>
+        <div className="dc-public-topbar">
+          <Button variant="ghost" asChild><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> Back to questions</Link></Button>
+          <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link>
+        </div>
+        <div className="dc-ballot-document">
+          <Empty className="dc-empty-state">
+            <EmptyHeader>
+              <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
+              <EmptyTitle>Question not found</EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button variant="outline" size="sm" asChild><Link to="/decisions">Back to questions</Link></Button>
+            </EmptyContent>
+          </Empty>
+        </div>
       </main>
     )
   }
@@ -272,7 +295,7 @@ function SignedInBallot() {
   return (
     <main id="main-content" className="dc-ballot-page">
       <div className="dc-public-topbar">
-        <Button variant="ghost" asChild className="dc-touch"><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> All questions</Link></Button>
+        <Button variant="ghost" asChild><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> Back to questions</Link></Button>
         <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link>
       </div>
 
@@ -283,11 +306,11 @@ function SignedInBallot() {
         </header>
 
         {!isEligible ? (
-          <Alert><AlertTitle>You can view this decision, but you are not in its electorate.</AlertTitle><AlertDescription>Ask a decision administrator if the roster snapshot is incorrect.</AlertDescription></Alert>
+          <Alert><AlertTitle>You cannot respond to this question</AlertTitle><AlertDescription>Ask an admin if that looks wrong.</AlertDescription></Alert>
         ) : decision.status === "draft" ? (
-          <Alert><AlertTitle>This decision is still a draft.</AlertTitle><AlertDescription>Options and rules may change before responses open.</AlertDescription></Alert>
+          <Alert><AlertTitle>This question is still a draft</AlertTitle><AlertDescription>Options may still change.</AlertDescription></Alert>
         ) : decision.status !== "open" && !existing ? (
-          <Alert><AlertTitle>Responses are closed.</AlertTitle><AlertDescription>This decision is no longer accepting responses.</AlertDescription></Alert>
+          <Alert><AlertTitle>Responses are closed</AlertTitle></Alert>
         ) : (
           <BallotForm key={`${decision.id}-${decision.revision}`} decision={decision} existing={existing} />
         )}

@@ -1,0 +1,77 @@
+/* ---------------------------------------------------------------------------
+   Cascade escapes for the leadership primitives.
+
+   `src/styles/global.css` ships an unlayered site reset. Unlayered author rules
+   outrank every Tailwind utility, because Tailwind emits into @layer utilities
+   and layered normal declarations always lose to unlayered ones. The rules
+   below are the only four places a component cannot express the spec as a
+   utility. Each uses an attribute selector, so it wins on specificity and no
+   `!important` is needed. Geometry, colour and motion stay in the components;
+   nothing else belongs in this file.
+
+   Padding is deliberately NOT restored here — the portal/reset restore lives in
+   src/styles/leadership-workspace.css and is owned by the foundation
+   workstream.
+--------------------------------------------------------------------------- */
+
+/* Spec §4/§5: one focus treatment in the app — a navy border plus
+   --lx-ring-shadow. global.css paints a 2px outline at 3px offset on every
+   :focus-visible, which would double up on the ring. (0,2,0) beats (0,1,0). */
+[data-slot]:focus-visible {
+  outline: none;
+}
+
+/* Spec §2.4/§6: Radix renders these titles as <h2>, and global.css sets the
+   public-site display serif, its size, weight and colour on every heading
+   element — beating the component's own layered type utilities. */
+[data-slot="dialog-title"],
+[data-slot="alert-dialog-title"],
+[data-slot="sheet-title"] {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--lx-ink);
+}
+
+/* Spec §6: `max-height: min(88vh, 720px)`. global.css pins portalled dialogs
+   to `calc(100dvh - 2rem)` — taller than the spec on a large monitor, and
+   unlayered, so the component's own utility loses. Radix always sets
+   `data-state` here, which takes the selector to (0,2,0). */
+[data-slot="dialog-content"][data-state],
+[data-slot="alert-dialog-content"][data-state] {
+  max-height: min(88vh, 720px);
+}
+
+/* global.css caps every <p> at 60ch. These descriptions render as <p> and must
+   fill the column they were given. */
+[data-slot="dialog-description"],
+[data-slot="alert-dialog-description"],
+[data-slot="sheet-description"],
+[data-slot="field-description"] {
+  max-width: none;
+}
+
+/* global.css resets `a { color: inherit }`, so a Button rendered through Slot
+   as an anchor drops its variant colour. `default` is already restored in
+   global.css; these are the rest. */
+a[data-slot="button"][data-variant="outline"] {
+  color: var(--lx-ink);
+}
+
+a[data-slot="button"][data-variant="ghost"] {
+  color: var(--lx-muted);
+}
+
+a[data-slot="button"][data-variant="ghost"]:hover {
+  color: var(--lx-ink);
+}
+
+a[data-slot="button"][data-variant="destructive"] {
+  color: #b42318;
+}
+
+a[data-slot="button"][data-variant="link"] {
+  color: var(--lx-navy);
+}

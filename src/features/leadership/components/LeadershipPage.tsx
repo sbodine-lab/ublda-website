@@ -1,19 +1,19 @@
-import { useId, type ReactNode } from "react"
+import { useContext, useId, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { LeadershipHeaderActionContext } from "../headerActionContext"
 
 interface LeadershipPageProps {
   action?: ReactNode
   children: ReactNode
   className?: string
-  eyebrow?: ReactNode
   title?: ReactNode
 }
 
@@ -22,7 +22,6 @@ interface LeadershipSectionProps {
   children: ReactNode
   className?: string
   contentClassName?: string
-  description?: ReactNode
   flush?: boolean
   title: ReactNode
   titleId?: string
@@ -39,26 +38,16 @@ export function LeadershipPage({
   action,
   children,
   className,
-  eyebrow,
   title,
 }: LeadershipPageProps) {
-  const hasHeading = Boolean(eyebrow || title)
+  const headerSlot = useContext(LeadershipHeaderActionContext)
 
   return (
     <div className={cn("ws-page leadership-page", className)}>
-      {hasHeading || action ? (
-        <header className={cn(
-          "leadership-page__header",
-          !hasHeading && "leadership-page__header--action-only",
-        )}>
-          {hasHeading ? (
-            <div className="leadership-page__heading">
-              {eyebrow ? <p className="leadership-page__eyebrow">{eyebrow}</p> : null}
-              {title ? <h2>{title}</h2> : null}
-            </div>
-          ) : null}
-          {action ? <div className="leadership-page__action">{action}</div> : null}
-        </header>
+      {title ? <h2 className="leadership-page__title">{title}</h2> : null}
+      {action && headerSlot ? createPortal(action, headerSlot) : null}
+      {action && !headerSlot ? (
+        <div className="leadership-page__action">{action}</div>
       ) : null}
       {children}
     </div>
@@ -70,7 +59,6 @@ export function LeadershipSection({
   children,
   className,
   contentClassName,
-  description,
   flush = false,
   title,
   titleId,
@@ -83,7 +71,6 @@ export function LeadershipSection({
       <Card size="sm" className="leadership-section__card">
         <CardHeader className="leadership-section__header">
           <CardTitle id={headingId}>{title}</CardTitle>
-          {description ? <CardDescription>{description}</CardDescription> : null}
           {action ? <CardAction>{action}</CardAction> : null}
         </CardHeader>
         <CardContent className={cn(

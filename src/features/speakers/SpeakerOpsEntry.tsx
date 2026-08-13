@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ArrowUpRight,
-  CalendarDays,
   CircleDot,
-  DoorOpen,
   ListFilter,
   Search,
   Settings2,
@@ -12,7 +10,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -22,12 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Spinner } from '@/components/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { LeadershipSection } from '@/features/leadership/components/LeadershipPage'
 import {
   PROGRAM_SLOT_STATUS_LABELS,
   PROGRAM_TERM_LABELS,
@@ -49,17 +49,16 @@ import { useLeadershipIdentity } from '@/features/decisions/leadershipIdentityCo
 import { withLeadershipRequestTimeout } from '@/features/decisions/logtoConvexAuth'
 import './speaker-ops.css'
 
-type WorkspaceView = 'pipeline' | 'slots' | 'rooms' | 'calendar'
+type WorkspaceView = 'pipeline' | 'rooms' | 'calendar'
 type ApiRecord = Record<string, unknown>
 
 const ROSS_ROOM_URL = 'https://rossweb.bus.umich.edu/ross-operations/event-form-instructions/'
 const ROSS_CALENDAR_URL = 'https://rossweb.bus.umich.edu/academics/studentresources/ross-academic-calendar/'
 
-const navigation: Array<{ id: WorkspaceView; label: string; icon: typeof Users }> = [
-  { id: 'pipeline', label: 'Pipeline', icon: Users },
-  { id: 'slots', label: 'Program slots', icon: CircleDot },
-  { id: 'rooms', label: 'Room requests', icon: DoorOpen },
-  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+const workflowTabs: Array<{ id: WorkspaceView; label: string }> = [
+  { id: 'pipeline', label: 'Pipeline' },
+  { id: 'rooms', label: 'Rooms' },
+  { id: 'calendar', label: 'Calendar' },
 ]
 
 class SpeakerOpsApiError extends Error {
@@ -89,7 +88,7 @@ const api = async (body: ApiRecord, idToken: string) => {
 }
 
 const formatShortDate = (value: string) => {
-  if (!value) return 'Not set'
+  if (!value) return '—'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('en-US', {
@@ -103,11 +102,11 @@ const formatShortDate = (value: string) => {
 }
 
 const relativeDate = (value: string) => {
-  if (!value) return 'No contact'
+  if (!value) return '—'
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(value))
 }
 
-const ownerName = (email: string) => SPEAKER_OPS_MEMBERS.find((member) => member.email === email)?.name.split(' ')[0] || email
+const ownerName = (email: string) => SPEAKER_OPS_MEMBERS.find((member) => member.email === email)?.name || email
 
 const stageTone = (stage: SpeakerStage) => {
   if (stage === 'committed') return 'blue'
@@ -134,29 +133,33 @@ function ProgramSlots({
   onEdit: (slot: ProgramSlot) => void
 }) {
   return (
-    <section className="speaker-section" aria-labelledby="program-slots-title">
-      <div className="speaker-section__heading">
-        <div>
-          <h2 id="program-slots-title">Program slots</h2>
+    <LeadershipSection title="Program slots" titleId="program-slots-title" flush>
+      {workspace.slots.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon"><CircleDot /></EmptyMedia>
+            <EmptyTitle>No slots yet</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className="speaker-slot-list">
+          {workspace.slots.map((slot) => {
+            const room = workspace.roomRequests.find((request) => request.id === slot.roomRequestId)
+            const lead = workspace.leads.find((candidate) => candidate.id === slot.leadId)
+            return (
+              <button key={slot.id} type="button" className="speaker-slot-row" onClick={() => onEdit(slot)}>
+                <span className="speaker-slot-row__name">{slot.label}</span>
+                <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
+                <span><span className="speaker-label-inline">Preferred time</span>{formatShortDate(slot.preferredStart)}</span>
+                <span><span className="speaker-label-inline">Speaker</span>{lead?.name || '—'}</span>
+                <span><span className="speaker-label-inline">Room</span>{room?.roomName || '—'}</span>
+                <Settings2 aria-hidden="true" />
+              </button>
+            )
+          })}
         </div>
-      </div>
-      <div className="speaker-slot-list">
-        {workspace.slots.map((slot) => {
-          const room = workspace.roomRequests.find((request) => request.id === slot.roomRequestId)
-          const lead = workspace.leads.find((candidate) => candidate.id === slot.leadId)
-          return (
-            <button key={slot.id} type="button" className="speaker-slot-row" onClick={() => onEdit(slot)}>
-              <span className="speaker-slot-row__name">{slot.label}</span>
-              <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
-              <span><span className="speaker-label-inline">Preferred time</span>{formatShortDate(slot.preferredStart)}</span>
-              <span><span className="speaker-label-inline">Speaker</span>{lead?.name || 'Not chosen'}</span>
-              <span><span className="speaker-label-inline">Room</span>{room?.roomName || ROOM_REQUEST_STATUS_LABELS[room?.status || 'draft']}</span>
-              <Settings2 aria-hidden="true" />
-            </button>
-          )
-        })}
-      </div>
-    </section>
+      )}
+    </LeadershipSection>
   )
 }
 
@@ -176,75 +179,91 @@ function Pipeline({
     .filter((lead) => `${lead.name} ${lead.organization} ${lead.nextAction}`.toLowerCase().includes(query.toLowerCase()))
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)), [query, term, workspace.leads])
 
+  const filters = (
+    <div className="speaker-filters">
+      <div className="speaker-search">
+        <Search aria-hidden="true" />
+        <Input aria-label="Search speakers" placeholder="Search" value={query} onChange={(event) => setQuery(event.target.value)} />
+      </div>
+      <Select value={term} onValueChange={(value) => setTerm(value as ProgramTerm | 'all')}>
+        <SelectTrigger size="sm" aria-label="Filter by term">
+          <ListFilter aria-hidden="true" />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="all">All terms</SelectItem>
+            <SelectItem value="fall-2026">Fall 2026</SelectItem>
+            <SelectItem value="winter-2027">Winter 2027</SelectItem>
+            <SelectItem value="later">Later</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
+  )
+
   return (
-    <section className="speaker-section speaker-section--pipeline" aria-labelledby="pipeline-title">
-      <div className="speaker-section__heading speaker-section__heading--controls">
-        <div>
-          <h2 id="pipeline-title">Pipeline</h2>
-          <p>{visibleLeads.length} speakers</p>
-        </div>
-        <div className="speaker-filters">
-          <div className="speaker-search">
-            <Search aria-hidden="true" />
-            <Input aria-label="Search speakers" placeholder="Search" value={query} onChange={(event) => setQuery(event.target.value)} />
-          </div>
-          <Select value={term} onValueChange={(value) => setTerm(value as ProgramTerm | 'all')}>
-            <SelectTrigger size="sm" aria-label="Filter by term">
-              <ListFilter aria-hidden="true" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="all">All terms</SelectItem>
-                <SelectItem value="fall-2026">Fall 2026</SelectItem>
-                <SelectItem value="winter-2027">Winter 2027</SelectItem>
-                <SelectItem value="later">Later</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="speaker-table-wrap">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Speaker</TableHead>
-              <TableHead>Stage</TableHead>
-              <TableHead>Term</TableHead>
-              <TableHead>Format</TableHead>
-              <TableHead>Owner</TableHead>
-              <TableHead>Next action</TableHead>
-              <TableHead>Contact</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visibleLeads.map((lead) => (
-              <TableRow
-                key={lead.id}
-                data-state={selectedLead?.id === lead.id ? 'selected' : undefined}
-                className="speaker-table-row"
-                onClick={() => onSelect(lead)}
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') onSelect(lead)
-                }}
-              >
-                <TableCell>
-                  <span className="speaker-name">{lead.name}</span>
-                  <span className="speaker-org">{lead.organization}</span>
-                </TableCell>
-                <TableCell><StatusBadge label={SPEAKER_STAGE_LABELS[lead.stage]} tone={stageTone(lead.stage)} /></TableCell>
-                <TableCell>{PROGRAM_TERM_LABELS[lead.term]}</TableCell>
-                <TableCell>{SPEAKER_FORMAT_LABELS[lead.format]}</TableCell>
-                <TableCell>{ownerName(lead.ownerEmail)}</TableCell>
-                <TableCell className="speaker-next-action">{lead.nextAction}</TableCell>
-                <TableCell>{relativeDate(lead.lastContactAt)}</TableCell>
+    <LeadershipSection
+      title={(
+        <span className="speaker-title-row">
+          Pipeline
+          <span className="speaker-count">{visibleLeads.length}</span>
+        </span>
+      )}
+      titleId="pipeline-title"
+      action={filters}
+      flush
+    >
+      {visibleLeads.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon"><Users /></EmptyMedia>
+            <EmptyTitle>No leads yet</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className="speaker-table-wrap">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Speaker</TableHead>
+                <TableHead>Stage</TableHead>
+                <TableHead>Term</TableHead>
+                <TableHead>Format</TableHead>
+                <TableHead>Owner</TableHead>
+                <TableHead>Next action</TableHead>
+                <TableHead>Contact</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </section>
+            </TableHeader>
+            <TableBody>
+              {visibleLeads.map((lead) => (
+                <TableRow
+                  key={lead.id}
+                  data-state={selectedLead?.id === lead.id ? 'selected' : undefined}
+                  className="speaker-table-row"
+                  onClick={() => onSelect(lead)}
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') onSelect(lead)
+                  }}
+                >
+                  <TableCell>
+                    <span className="speaker-name">{lead.name}</span>
+                    <span className="speaker-org">{lead.organization}</span>
+                  </TableCell>
+                  <TableCell><StatusBadge label={SPEAKER_STAGE_LABELS[lead.stage]} tone={stageTone(lead.stage)} /></TableCell>
+                  <TableCell>{PROGRAM_TERM_LABELS[lead.term]}</TableCell>
+                  <TableCell>{SPEAKER_FORMAT_LABELS[lead.format]}</TableCell>
+                  <TableCell>{ownerName(lead.ownerEmail)}</TableCell>
+                  <TableCell className="speaker-next-action">{lead.nextAction}</TableCell>
+                  <TableCell>{relativeDate(lead.lastContactAt)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </LeadershipSection>
   )
 }
 
@@ -281,12 +300,11 @@ function LeadSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="speaker-sheet sm:max-w-md">
+      <SheetContent className="speaker-sheet">
         <SheetHeader>
           <SheetTitle>{draft.name}</SheetTitle>
           <SheetDescription>{draft.organization}</SheetDescription>
         </SheetHeader>
-        <Separator />
         <div className="speaker-sheet__body">
           {error && <p className="speaker-form-error" role="alert">{error}</p>}
           <FieldGroup className="gap-4">
@@ -331,12 +349,11 @@ function LeadSheet({
             <Field>
               <FieldLabel htmlFor="lead-evidence">Evidence</FieldLabel>
               <Textarea id="lead-evidence" rows={4} value={draft.evidence} onChange={(event) => setDraft({ ...draft, evidence: event.target.value })} />
-              <FieldDescription>Keep the source and date. Do not turn an interested reply into a confirmed date.</FieldDescription>
             </Field>
           </FieldGroup>
         </div>
         <SheetFooter className="speaker-sheet__footer">
-          <Button size="sm" onClick={save} disabled={busy}>
+          <Button onClick={save} disabled={busy}>
             {busy && <Spinner data-icon="inline-start" />}
             Save changes
           </Button>
@@ -364,7 +381,6 @@ function SlotSheet({
   const [busy, setBusy] = useState(false)
   useEffect(() => setDraft(slot), [slot])
   if (!draft) return null
-  const room = workspace.roomRequests.find((request) => request.id === draft.roomRequestId)
   const candidates = workspace.leads.filter((lead) => lead.term === draft.term && !['closed', 'deferred', 'funding-blocked'].includes(lead.stage))
 
   const save = async () => {
@@ -382,19 +398,13 @@ function SlotSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="speaker-sheet sm:max-w-md">
+      <SheetContent className="speaker-sheet">
         <SheetHeader>
           <SheetTitle>{draft.label}</SheetTitle>
           <SheetDescription>Dates stay internal until Ross approves the room.</SheetDescription>
         </SheetHeader>
-        <Separator />
         <div className="speaker-sheet__body">
           {error && <p className="speaker-form-error" role="alert">{error}</p>}
-          <Alert className="speaker-room-gate">
-            <DoorOpen />
-            <AlertTitle>Room gate</AlertTitle>
-            <AlertDescription>{room?.status === 'approved' ? `Approved: ${room.roomName}` : `Ross request is ${room?.status || 'not started'}.`}</AlertDescription>
-          </Alert>
           <FieldGroup className="gap-4">
             <Field>
               <FieldLabel>Speaker</FieldLabel>
@@ -409,7 +419,6 @@ function SlotSheet({
                 <SelectTrigger className="w-full" aria-label="Status"><SelectValue /></SelectTrigger>
                 <SelectContent><SelectGroup>{Object.entries(PROGRAM_SLOT_STATUS_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
               </Select>
-              <FieldDescription>Only a workspace admin can confirm. The server checks Ross approval.</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="preferred-start">Preferred date and time</FieldLabel>
@@ -422,7 +431,7 @@ function SlotSheet({
           </FieldGroup>
         </div>
         <SheetFooter className="speaker-sheet__footer">
-          <Button size="sm" onClick={save} disabled={busy}>{busy && <Spinner data-icon="inline-start" />}Save slot</Button>
+          <Button onClick={save} disabled={busy}>{busy && <Spinner data-icon="inline-start" />}Save slot</Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -448,16 +457,15 @@ function RoomRequests({ workspace, onSave }: { workspace: SpeakerOpsWorkspace; o
   }
 
   return (
-    <section className="speaker-section speaker-room-section" aria-labelledby="room-requests-title">
-      <div className="speaker-section__heading">
-        <div>
-          <h2 id="room-requests-title">Room requests</h2>
-          <p>Submit incomplete details now and update them later. Ross usually replies within three business days.</p>
-        </div>
+    <LeadershipSection
+      title="Room requests"
+      titleId="room-requests-title"
+      action={(
         <Button asChild variant="outline" size="sm">
           <a href={ROSS_ROOM_URL} target="_blank" rel="noreferrer">Ross instructions<ArrowUpRight data-icon="inline-end" /></a>
         </Button>
-      </div>
+      )}
+    >
       {error && <Alert variant="destructive"><AlertTitle>Could not save</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
       <div className="speaker-room-grid">
         {workspace.roomRequests.map((request) => {
@@ -503,42 +511,43 @@ function RoomRequests({ workspace, onSave }: { workspace: SpeakerOpsWorkspace; o
               </FieldGroup>
               <div className="speaker-room-card__meta">
                 <span>Owner: {ownerName(draft.requestedByEmail)}</span>
-                <span>{draft.responseDueAt ? `Follow up ${formatShortDate(draft.responseDueAt)}` : 'Response clock starts when submitted'}</span>
+                {draft.responseDueAt ? <span>Follow up {formatShortDate(draft.responseDueAt)}</span> : null}
               </div>
               <Button size="sm" onClick={() => save(draft)} disabled={saving === request.id}>{saving === request.id && <Spinner data-icon="inline-start" />}Save request</Button>
             </div>
           )
         })}
       </div>
-    </section>
+    </LeadershipSection>
   )
 }
 
 function CalendarView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
   return (
-    <section className="speaker-section" aria-labelledby="calendar-title">
-      <div className="speaker-section__heading">
-        <div><h2 id="calendar-title">Calendar</h2><p>Working windows, not speaker offers.</p></div>
-        <Button asChild variant="outline" size="sm"><a href={ROSS_CALENDAR_URL} target="_blank" rel="noreferrer">Ross calendar<ArrowUpRight data-icon="inline-end" /></a></Button>
-      </div>
-      <Alert className="speaker-room-gate">
-        <CalendarDays />
-        <AlertTitle>Calendar-safe does not mean booked</AlertTitle>
-        <AlertDescription>Check the room first, then the speaker. Keep both proposed dates internal until Ross replies.</AlertDescription>
-      </Alert>
-      <div className="speaker-calendar-grid">
-        {workspace.slots.map((slot) => (
-          <div className="speaker-calendar-card" key={slot.id}>
-            <span className="speaker-eyebrow">{PROGRAM_TERM_LABELS[slot.term]}</span>
-            <h3>{formatShortDate(slot.preferredStart)}</h3>
-            <p>Backup: {formatShortDate(slot.backupStart)}</p>
-            <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
-          </div>
-        ))}
-      </div>
-      <div className="speaker-calendar-notes">
-        <h3>Dates to avoid</h3>
-        <ul>
+    <>
+      <LeadershipSection
+        title="Calendar"
+        titleId="calendar-title"
+        action={(
+          <Button asChild variant="outline" size="sm">
+            <a href={ROSS_CALENDAR_URL} target="_blank" rel="noreferrer">Ross calendar<ArrowUpRight data-icon="inline-end" /></a>
+          </Button>
+        )}
+      >
+        <div className="speaker-calendar-grid">
+          {workspace.slots.map((slot) => (
+            <div className="speaker-calendar-card" key={slot.id}>
+              <span className="speaker-eyebrow">{PROGRAM_TERM_LABELS[slot.term]}</span>
+              <h3>{formatShortDate(slot.preferredStart)}</h3>
+              <p>Backup: {formatShortDate(slot.backupStart)}</p>
+              <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
+            </div>
+          ))}
+        </div>
+      </LeadershipSection>
+
+      <LeadershipSection title="Dates to avoid" titleId="dates-to-avoid-title" flush>
+        <ul className="speaker-calendar-notes">
           <li><span>Oct 19–20, 2026</span><span>Fall study break</span></li>
           <li><span>Nov 25–28, 2026</span><span>Thanksgiving recess</span></li>
           <li><span>Dec 14–21, 2026</span><span>Ross final exams</span></li>
@@ -546,8 +555,8 @@ function CalendarView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
           <li><span>Mar 6–15, 2027</span><span>Winter break</span></li>
           <li><span>Apr 29–May 6, 2027</span><span>Ross final exams</span></li>
         </ul>
-      </div>
-    </section>
+      </LeadershipSection>
+    </>
   )
 }
 
@@ -585,44 +594,46 @@ function SpeakerWorkspace({
   }
 
   return (
-    <div className="speaker-ops speaker-page">
-      <nav className="speaker-workflow-tabs" aria-label="Speaker Ops sections">
-        {navigation.map((item) => {
-          const Icon = item.icon
-          return (
-            <Button
-              key={item.id}
-              variant="ghost"
-              size="sm"
-              data-active={view === item.id}
-              aria-current={view === item.id ? 'page' : undefined}
-              onClick={() => setView(item.id)}
-            >
-              <Icon data-icon="inline-start" />{item.label}
-            </Button>
-          )
-        })}
-      </nav>
-      <div className="speaker-content" data-view={view}>
-        {(view === 'pipeline' || view === 'slots') && (
+    <Tabs
+      value={view}
+      onValueChange={(next) => setView(next as WorkspaceView)}
+      className="speaker-ops speaker-page"
+    >
+      <TabsList variant="line" className="speaker-workflow-tabs" aria-label="Speaker Ops sections">
+        {workflowTabs.map((tab) => (
+          <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
+        ))}
+      </TabsList>
+
+      <TabsContent value="pipeline">
+        <div className="ws-page speaker-content">
           <ProgramSlots
             workspace={workspace}
             onEdit={(slot) => { setSelectedSlot(slot); setSlotOpen(true) }}
           />
-        )}
-        {view === 'pipeline' && (
           <Pipeline
             workspace={workspace}
             selectedLead={selectedLead}
             onSelect={(lead) => { setSelectedLead(lead); setLeadOpen(true) }}
           />
-        )}
-        {view === 'rooms' && <RoomRequests workspace={workspace} onSave={saveRoom} />}
-        {view === 'calendar' && <CalendarView workspace={workspace} />}
-      </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="rooms">
+        <div className="ws-page speaker-content">
+          <RoomRequests workspace={workspace} onSave={saveRoom} />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="calendar">
+        <div className="ws-page speaker-content">
+          <CalendarView workspace={workspace} />
+        </div>
+      </TabsContent>
+
       <LeadSheet lead={selectedLead} open={leadOpen} onOpenChange={setLeadOpen} onSave={saveLead} />
       <SlotSheet slot={selectedSlot} workspace={workspace} open={slotOpen} onOpenChange={setSlotOpen} onSave={saveSlot} />
-    </div>
+    </Tabs>
   )
 }
 
@@ -672,16 +683,16 @@ export function SpeakerOpsEntry() {
   }
 
   if (loading) {
-    return <div className="speaker-loading speaker-loading--embedded" aria-live="polite"><Spinner /><span>Opening Speaker Ops</span></div>
+    return <div className="speaker-loading" aria-live="polite"><Spinner /><span>Loading…</span></div>
   }
   if (error || !workspace) {
     return (
-      <div className="speaker-ops speaker-page speaker-page--error">
+      <div className="ws-page speaker-page--error">
         <Alert variant="destructive">
           <AlertTitle>Speaker Ops could not be opened</AlertTitle>
           <AlertDescription>{error || 'Try refreshing the leadership workspace.'}</AlertDescription>
         </Alert>
-        <Button type="button" variant="outline" onClick={retryLoad}>try again</Button>
+        <Button type="button" variant="outline" onClick={retryLoad}>Try again</Button>
       </div>
     )
   }

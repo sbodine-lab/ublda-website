@@ -1,4 +1,11 @@
-import type { ClubEvent, ProjectLane, ProjectStatus, TaskStatus } from "./types"
+import type {
+  ClubEvent,
+  ClubEventStatus,
+  ClubEventType,
+  ProjectLane,
+  ProjectStatus,
+  TaskStatus,
+} from "./types"
 
 export const programAreaLabels: Record<ProjectLane, string> = {
   "community-career": "Community + career",
@@ -8,17 +15,30 @@ export const programAreaLabels: Record<ProjectLane, string> = {
 }
 
 export const projectStatusLabels: Record<ProjectStatus, string> = {
-  planned: "planned",
-  active: "active",
-  blocked: "blocked",
-  complete: "complete",
+  planned: "Planned",
+  active: "Active",
+  blocked: "Blocked",
+  complete: "Complete",
 }
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
-  todo: "to do",
-  working: "working",
-  blocked: "blocked",
-  done: "done",
+  todo: "To do",
+  working: "Working",
+  blocked: "Blocked",
+  done: "Done",
+}
+
+export const eventTypeLabels: Record<ClubEventType, string> = {
+  meeting: "Meeting",
+  event: "Event",
+  deadline: "Deadline",
+  project: "Project",
+}
+
+export const eventStatusLabels: Record<ClubEventStatus, string> = {
+  tentative: "Tentative",
+  confirmed: "Confirmed",
+  cancelled: "Cancelled",
 }
 
 export function formatEventDate(event: ClubEvent, options?: Intl.DateTimeFormatOptions) {
@@ -36,16 +56,18 @@ export function formatEventTime(event: ClubEvent) {
     hour: "numeric",
     minute: "2-digit",
   })
-  const start = formatter.format(new Date(event.startAt)).toLowerCase()
+  const start = formatter.format(new Date(event.startAt))
   if (!event.endAt) return start
-  return `${start} – ${formatter.format(new Date(event.endAt)).toLowerCase()}`
+  return `${start} – ${formatter.format(new Date(event.endAt))}`
 }
 
 export function formatDueDate(value?: string) {
   if (!value) return "—"
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
-    .format(new Date(`${value}T00:00:00.000Z`))
-    .toLowerCase()
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00.000Z`))
 }
 
 export function todayDateInput(date = new Date()) {

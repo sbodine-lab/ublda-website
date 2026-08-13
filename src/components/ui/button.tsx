@@ -3,35 +3,53 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { lxFocus, lxInvalid, lxTransition } from "@/components/ui/lx"
 
+/**
+ * Spec §5. Four sizes, five variants, one focus treatment. Buttons change
+ * background on hover and nothing else — no lift, no scale, no shadow bloom.
+ */
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  [
+    "group/button inline-flex shrink-0 items-center justify-center select-none whitespace-nowrap",
+    // `[border-color:transparent]`, not `border-transparent`: the variants set
+    // their border with an arbitrary property, and tailwind-merge only dedupes
+    // against the same key. Mixing the two forms left `border-transparent`
+    // winning the cascade, so `outline` buttons rendered with no visible edge.
+    "border [border-color:transparent] bg-clip-padding [font-family:inherit] leading-[1.2]",
+    "disabled:pointer-events-none disabled:opacity-[0.55]",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[16px]",
+    // Leading/trailing icons tighten the inset they sit against.
+    "has-data-[icon=inline-start]:pl-[10px] has-data-[icon=inline-end]:pr-[10px]",
+    lxTransition,
+    lxFocus,
+    lxInvalid,
+  ].join(" "),
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        default:
+          "[background-color:var(--lx-navy)] [color:#ffffff] hover:[background-color:var(--lx-navy-strong)] active:[background-color:var(--lx-navy-strong)]",
         outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "[background-color:var(--lx-surface)] [border-color:var(--lx-border)] [color:var(--lx-ink)] hover:[background-color:var(--lx-canvas)] aria-expanded:[background-color:var(--lx-canvas)]",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "bg-transparent [color:var(--lx-muted)] hover:[background-color:var(--lx-hover-wash)] hover:[color:var(--lx-ink)] aria-expanded:[background-color:var(--lx-hover-wash)] aria-expanded:[color:var(--lx-ink)]",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "[background-color:#fef3f2] [color:#b42318] hover:[background-color:#fee4e2]",
+        link: "[color:var(--lx-navy)] underline-offset-4 hover:underline",
       },
       size: {
         default:
-          "h-11 gap-2 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-9 gap-1 rounded-[min(var(--radius-md),12px)] px-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-12 gap-2 px-5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
-        icon: "size-11",
+          "h-[36px] gap-[6px] rounded-[var(--lx-radius-control)] px-[14px] text-[13px] [font-weight:550]",
+        xs: "h-[26px] gap-[4px] rounded-[6px] px-[8px] text-[11.5px] [font-weight:560] [&_svg:not([class*='size-'])]:size-[14px]",
+        sm: "h-[32px] gap-[6px] rounded-[var(--lx-radius-control)] px-[12px] text-[12.5px] [font-weight:550] [&_svg:not([class*='size-'])]:size-[14px]",
+        lg: "h-[40px] gap-[8px] rounded-[var(--lx-radius-control)] px-[18px] text-[13.5px] [font-weight:550]",
+        icon: "size-[36px] rounded-[var(--lx-radius-control)]",
         "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+          "size-[24px] rounded-[6px] [&_svg:not([class*='size-'])]:size-[14px]",
         "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-12",
+          "size-[28px] rounded-[var(--lx-radius-control)] [&_svg:not([class*='size-'])]:size-[14px]",
+        "icon-lg": "size-[40px] rounded-[var(--lx-radius-control)]",
       },
     },
     defaultVariants: {

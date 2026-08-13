@@ -126,7 +126,7 @@ const demoDecisions: DecisionRecord[] = [
     slug: "v_52a9ce03e6f847178b14d2c0",
     title: "Choose the fall programming focus",
     overview: "Pick the primary theme that should guide the first month of programming.",
-    contextPoints: ["This is a draft. Options can still change before anyone responds."],
+    contextPoints: ["Options may still change."],
     status: "draft",
     ballotType: "single",
     options: [
@@ -153,7 +153,7 @@ const demoDecisions: DecisionRecord[] = [
     id: "decision-retro-location",
     slug: "v_b9071df54e2a4c96a8137f40",
     title: "Rank the workshop location options",
-    overview: "This closed preview demonstrates exact turnout and ranked first-choice results.",
+    overview: "Ranked vote on the fall speaker slate.",
     contextPoints: ["Final selection remains a manual board decision."],
     status: "closed",
     ballotType: "ranked",
@@ -258,7 +258,7 @@ const demoActivity: DecisionActivity[] = [
     actorMemberId: "member-preview-admin",
     type: "created",
     at: demoCreatedAt,
-    detail: "Created the decision.",
+    detail: "",
   },
   {
     id: "activity-published-open",
@@ -266,7 +266,7 @@ const demoActivity: DecisionActivity[] = [
     actorMemberId: "member-preview-admin",
     type: "published",
     at: demoCreatedAt,
-    detail: "Opened voting with seven eligible members.",
+    detail: "",
   },
   {
     id: "activity-closed-ranked",
@@ -274,7 +274,7 @@ const demoActivity: DecisionActivity[] = [
     actorMemberId: "member-preview-admin",
     type: "closed",
     at: "2026-07-28T20:00:00.000Z",
-    detail: "Closed responses manually.",
+    detail: "",
   },
 ]
 
@@ -289,13 +289,14 @@ function initialSnapshot(): DecisionCenterSnapshot {
   }
 }
 
+// The activity feed has no renderer. The shape is kept for the server
+// contract; the detail line is not written here.
 function createActivity(
   actorMemberId: string,
   type: DecisionActivity["type"],
-  detail: string,
   decisionId?: string,
 ): DecisionActivity {
-  return { id: uid("activity"), actorMemberId, type, detail, decisionId, at: isoNow() }
+  return { id: uid("activity"), actorMemberId, type, detail: "", decisionId, at: isoNow() }
 }
 
 export function createDemoDecisionAdapter(): DecisionCenterAdapter {
@@ -369,12 +370,7 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           : [...snapshot.responses, response],
         activity: [
           ...snapshot.activity,
-          createActivity(
-            memberId,
-            existing ? "updated-response" : "responded",
-            existing ? "Updated their response." : "Submitted a response.",
-            decisionId,
-          ),
+          createActivity(memberId, existing ? "updated-response" : "responded", decisionId),
         ],
       })
       return response
@@ -413,9 +409,9 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
         decisions: [decision, ...snapshot.decisions],
         activity: [
           ...snapshot.activity,
-          createActivity(memberId, "created", "Created the decision.", decisionId),
+          createActivity(memberId, "created", decisionId),
           ...(input.status === "open"
-            ? [createActivity(memberId, "published", "Opened the decision for responses.", decisionId)]
+            ? [createActivity(memberId, "published", decisionId)]
             : []),
         ],
       })
@@ -428,7 +424,7 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
         decisions: snapshot.decisions.map((decision) => decision.id === decisionId
           ? { ...decision, status: "closed", updatedAt: isoNow() }
           : decision),
-        activity: [...snapshot.activity, createActivity(memberId, "closed", "Closed responses manually.", decisionId)],
+        activity: [...snapshot.activity, createActivity(memberId, "closed", decisionId)],
       })
     },
     async reopenDecision(decisionId) {
@@ -438,10 +434,10 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
         decisions: snapshot.decisions.map((decision) => decision.id === decisionId
           ? { ...decision, status: "open", updatedAt: isoNow() }
           : decision),
-        activity: [...snapshot.activity, createActivity(memberId, "reopened", "Reopened responses manually.", decisionId)],
+        activity: [...snapshot.activity, createActivity(memberId, "reopened", decisionId)],
       })
     },
-    async finalizeDecision(decisionId, outcome, note) {
+    async finalizeDecision(decisionId, outcome) {
       const memberId = viewerId()
       update({
         ...snapshot,
@@ -450,12 +446,7 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           : decision),
         activity: [
           ...snapshot.activity,
-          createActivity(
-            memberId,
-            "finalized",
-            `Recorded outcome: ${outcome.trim()}${note?.trim() ? ` (${note.trim()})` : ""}`,
-            decisionId,
-          ),
+          createActivity(memberId, "finalized", decisionId),
         ],
       })
     },
@@ -476,7 +467,7 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           : [...snapshot.members, member],
         activity: existing
           ? snapshot.activity
-          : [...snapshot.activity, createActivity(actorMemberId, "member-added", `Added ${member.displayName} to the roster.`)],
+          : [...snapshot.activity, createActivity(actorMemberId, "member-added")],
       })
       return member
     },
@@ -496,13 +487,12 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
       update({
         ...snapshot,
         agentKeys: [record, ...snapshot.agentKeys],
-        activity: [...snapshot.activity, createActivity(actorMemberId, "agent-key-created", `Created agent key “${record.name}”.`)],
+        activity: [...snapshot.activity, createActivity(actorMemberId, "agent-key-created")],
       })
       return { record, secret }
     },
     async revokeAgentKey(agentKeyId) {
       const actorMemberId = viewerId()
-      const target = snapshot.agentKeys.find((key) => key.id === agentKeyId)
       update({
         ...snapshot,
         agentKeys: snapshot.agentKeys.map((key) => key.id === agentKeyId
@@ -510,7 +500,7 @@ export function createDemoDecisionAdapter(): DecisionCenterAdapter {
           : key),
         activity: [
           ...snapshot.activity,
-          createActivity(actorMemberId, "agent-key-revoked", `Revoked agent key “${target?.name ?? "Unknown"}”.`),
+          createActivity(actorMemberId, "agent-key-revoked"),
         ],
       })
     },

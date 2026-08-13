@@ -41,15 +41,15 @@ function demoResults() {
     responseCount: 8,
     cellCounts,
     candidates,
-    missing: [{ memberId: "member-9", displayName: "Alexa" }],
+    missing: [{ memberId: "member-membership", displayName: "Cooper Perry" }],
   }
 }
 
 let activePoll: AvailabilityPollDetail = {
   id: "availability-fall-kickoff",
   slug: "s_preview_fall_kickoff",
-  title: "fall kickoff",
-  note: "find 45 minutes for the full board.",
+  title: "Fall kickoff",
+  note: "Find 45 minutes for the full board",
   status: "open",
   durationMinutes: 45,
   dateKeys,
@@ -74,7 +74,7 @@ let polls: AvailabilityPollSummary[] = [
   {
     id: "availability-weekly",
     slug: "s_preview_weekly",
-    title: "weekly e-board meeting",
+    title: "Weekly e-board meeting",
     note: "",
     status: "open",
     durationMinutes: 60,
