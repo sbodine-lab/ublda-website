@@ -18,24 +18,18 @@ export function dateLabel(dateKey: string, options?: Intl.DateTimeFormatOptions)
 
 export function dayParts(dateKey: string): { day: string; date: string } {
   return {
-    day: dateLabel(dateKey, { weekday: "short" }).split(" ")[0].toLowerCase(),
+    day: dateLabel(dateKey, { weekday: "short" }).split(" ")[0],
     date: String(Number(dateKey.slice(-2))),
   }
 }
 
-export function durationLabel(minutes: number): string {
-  if (minutes < 60) return `${minutes} minutes`
-  if (minutes % 60 === 0) return `${minutes / 60} ${minutes === 60 ? "hour" : "hours"}`
-  return `${Math.floor(minutes / 60)} hr ${minutes % 60} min`
-}
-
 export function timezoneLabel(timezone: string): string {
-  if (timezone === "America/Detroit") return "detroit time"
-  return timezone.replaceAll("_", " ").replace("/", " · ").toLowerCase()
+  if (timezone === "America/Detroit") return "Detroit time"
+  return timezone.replaceAll("_", " ").replace("/", " · ")
 }
 
 export function candidateLabel(dateKey: string, startMinutes: number, endMinutes: number): string {
-  return `${dateLabel(dateKey, { weekday: "short", month: "short", day: "numeric" }).toLowerCase()} · ${minutesLabel(startMinutes)}–${minutesLabel(endMinutes)}`
+  return `${dateLabel(dateKey, { weekday: "short", month: "short", day: "numeric" })} · ${minutesLabel(startMinutes)}–${minutesLabel(endMinutes)}`
 }
 
 export function parseTimeInput(value: string): number {

@@ -30,8 +30,7 @@ export function LogtoAuthCallback() {
     return (
       <LeadershipAuthScreen
         loading
-        title="Opening the leadership workspace"
-        description="Finishing secure sign-in."
+        title="Signing you in…"
       />
     )
   }
@@ -39,10 +38,10 @@ export function LogtoAuthCallback() {
   return (
     <LeadershipAuthScreen title="Sign-in could not be completed" live="assertive">
       <p className="dc-inline-error" role="alert">
-        {timedOut ? "Sign-in took too long to finish. Return to the workspace and try again." : "Return to the workspace and try again."}
+        {timedOut ? "Sign-in took too long." : "Something went wrong."}
       </p>
-      <Button type="button" className="dc-auth-action dc-touch" onClick={() => window.location.replace('/workspace')}>
-        return to sign in
+      <Button type="button" className="dc-auth-action" onClick={() => window.location.replace('/workspace')}>
+        Try again
       </Button>
     </LeadershipAuthScreen>
   )

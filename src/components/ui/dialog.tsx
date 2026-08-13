@@ -5,6 +5,12 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  lxDialogFooter,
+  lxDialogMotion,
+  lxDialogSurface,
+  lxOverlay,
+} from "@/components/ui/lx"
 import { XIcon } from "lucide-react"
 
 function Dialog({
@@ -38,15 +44,17 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
-        className
-      )}
+      className={cn(lxOverlay, className)}
       {...props}
     />
   )
 }
 
+/**
+ * Spec §6. One width, one radius, one shadow, one padding — the five dialogs
+ * in the app used to disagree on all of them plus the footer tint and the
+ * close-button inset.
+ */
 function DialogContent({
   className,
   children,
@@ -61,7 +69,11 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          lxDialogSurface,
+          lxDialogMotion,
+          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+          "w-[min(100vw-32px,520px)] max-h-[min(88vh,720px)] overflow-y-auto",
+          "gap-[16px] rounded-[var(--lx-radius-surface)] outline-none",
           className
         )}
         {...props}
@@ -71,11 +83,10 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               variant="ghost"
-              className="absolute top-2 right-2"
+              className="absolute top-[14px] right-[14px]"
               size="icon-sm"
             >
-              <XIcon
-              />
+              <XIcon />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>
@@ -89,7 +100,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex shrink-0 flex-col gap-[4px]", className)}
       {...props}
     />
   )
@@ -106,10 +117,7 @@ function DialogFooter({
   return (
     <div
       data-slot="dialog-footer"
-      className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
-        className
-      )}
+      className={cn(lxDialogFooter, "rounded-b-[var(--lx-radius-surface)]", className)}
       {...props}
     >
       {children}
@@ -130,7 +138,7 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-base leading-none font-medium",
+        "[font-family:inherit] text-[16px] leading-[1.2] [font-weight:650] [letter-spacing:-0.01em] [color:var(--lx-ink)]",
         className
       )}
       {...props}
@@ -146,7 +154,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        "text-[13px] leading-[1.45] [font-weight:450] [color:var(--lx-muted)] *:[a]:underline *:[a]:underline-offset-3",
         className
       )}
       {...props}

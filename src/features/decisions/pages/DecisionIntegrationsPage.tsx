@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { Bot, Check, Copy, KeyRound, Plus, ShieldCheck, Terminal, Trash2 } from "lucide-react"
+import { Copy, KeyRound, Plus, Trash2 } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,36 +11,49 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Empty,
+  EmptyContent,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime } from "../format"
-import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
+import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import type { AgentScope, CreatedAgentKey } from "../types"
 
-const scopeLabels: Record<AgentScope, { label: string; description: string }> = {
-  "decisions:read": { label: "Read decisions", description: "List and inspect decision metadata." },
-  "decisions:write": { label: "Write drafts", description: "Create and update unpublished decision drafts." },
-  "decisions:publish": { label: "Publish decisions", description: "Open an approved draft for responses." },
-  "decisions:manage": { label: "Manage decisions", description: "Check response status and close decisions." },
-  "results:read": { label: "Read results", description: "Access participation and aggregate results." },
+const scopeLabels: Record<AgentScope, string> = {
+  "decisions:read": "Read questions",
+  "decisions:write": "Write drafts",
+  "decisions:publish": "Open questions",
+  "decisions:manage": "Manage questions",
+  "results:read": "Read results",
 }
 
 const allScopes = Object.keys(scopeLabels) as AgentScope[]
 
-function CreateAgentKeyDialog({ onCreated }: { onCreated(key: CreatedAgentKey): void }) {
+function CreateAgentKeyDialog({ compact = false, onCreated }: { compact?: boolean; onCreated(key: CreatedAgentKey): void }) {
   const { adapter } = useDecisionData()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
@@ -51,7 +64,7 @@ function CreateAgentKeyDialog({ onCreated }: { onCreated(key: CreatedAgentKey): 
 
   const create = async () => {
     if (!name.trim()) {
-      setError("Name this key so the board knows what uses it.")
+      setError("Name this key.")
       return
     }
     if (scopes.length === 0) {
@@ -74,14 +87,34 @@ function CreateAgentKeyDialog({ onCreated }: { onCreated(key: CreatedAgentKey): 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button className="dc-touch"><Plus /> Create agent key</Button></DialogTrigger>
-      <DialogContent className="dc-agent-key-dialog">
-        <DialogHeader><DialogTitle>Create an agent key</DialogTitle><DialogDescription>Give each tool its own key and only the permissions it needs.</DialogDescription></DialogHeader>
-        <label className="dc-field-block"><span>Key name</span><Input value={name} onChange={(event) => setName(event.target.value)} placeholder="My Codex setup" /></label>
-        <fieldset className="dc-scope-list"><legend>Permissions</legend>{allScopes.map((scope) => <label key={scope}><Checkbox checked={scopes.includes(scope)} onCheckedChange={(checked) => setScopes((current) => checked === true ? [...new Set([...current, scope])] : current.filter((item) => item !== scope))} /><span><b>{scopeLabels[scope].label}</b><small>{scopeLabels[scope].description}</small></span></label>)}</fieldset>
-        <label className="dc-field-block"><span>Expiration <small>Optional</small></span><Input type="date" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} /></label>
+      <DialogTrigger asChild>
+        {compact
+          ? <Button variant="outline" size="sm">New key</Button>
+          : <Button><Plus data-icon="inline-start" /> New key</Button>}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>New key</DialogTitle></DialogHeader>
+        <label className="dc-field-block"><span>Name</span><Input value={name} onChange={(event) => setName(event.target.value)} placeholder="My Codex setup" /></label>
+        <fieldset className="dc-scope-list">
+          <legend>Permissions</legend>
+          {allScopes.map((scope) => (
+            <label key={scope}>
+              <Checkbox
+                checked={scopes.includes(scope)}
+                onCheckedChange={(checked) => setScopes((current) => checked === true
+                  ? [...new Set([...current, scope])]
+                  : current.filter((item) => item !== scope))}
+              />
+              <span><b>{scopeLabels[scope]}</b></span>
+            </label>
+          ))}
+        </fieldset>
+        <label className="dc-field-block"><span>Expires <small>Optional</small></span><Input type="date" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} /></label>
         {error && <p className="dc-inline-error" role="alert">{error}</p>}
-        <DialogFooter><Button variant="outline" className="dc-touch" onClick={() => setOpen(false)}>Cancel</Button><Button className="dc-touch" disabled={saving} onClick={() => void create()}>{saving ? "Creating…" : "Create key"}</Button></DialogFooter>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button disabled={saving} onClick={() => void create()}>{saving ? "Creating…" : "Create key"}</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
@@ -112,60 +145,111 @@ export function DecisionIntegrationsPage() {
     window.setTimeout(() => setCopied(undefined), 1800)
   }
 
+  const activeKeys = snapshot.agentKeys.filter((key) => !key.revokedAt).length
+
   return (
-    <LeadershipPage className="dc-page dc-integrations-page" action={<CreateAgentKeyDialog onCreated={setCreatedKey} />}>
-
-      <Alert className="dc-integration-boundary"><ShieldCheck /><AlertTitle>Your key, your access</AlertTitle><AlertDescription>Keys belong to the member who created them and can reach only their selected Decision Center scopes. They do not expose owner-local strategy, transcripts, or other private Brain data.</AlertDescription></Alert>
-
+    <LeadershipPage className="dc-page" action={<CreateAgentKeyDialog onCreated={setCreatedKey} />}>
       {createdKey && (
-        <section className="dc-secret-reveal" aria-live="polite">
-          <div><KeyRound /><span><p className="dc-eyebrow">Copy this now</p><h2>Your key will not be shown again.</h2></span></div>
-          <code>{createdKey.secret}</code>
-          <Button className="dc-touch" onClick={() => void copy(createdKey.secret, "secret")}><Copy /> {copied === "secret" ? "Copied" : "Copy key"}</Button>
-          {adapter.mode === "demo" && <p>This is a non-working preview key. Live keys must be generated and hashed on the server.</p>}
-        </section>
+        <LeadershipSection title="Copy this key" titleId="new-key-title">
+          <div className="dc-secret-reveal" aria-live="polite">
+            <p className="dc-page-note">It will not be shown again.</p>
+            <code>{createdKey.secret}</code>
+            <div>
+              <Button variant="outline" onClick={() => void copy(createdKey.secret, "secret")}>
+                <Copy data-icon="inline-start" /> {copied === "secret" ? "Copied" : "Copy key"}
+              </Button>
+            </div>
+            {adapter.mode === "demo" && <p>Preview key. Not usable.</p>}
+          </div>
+        </LeadershipSection>
       )}
 
-      <div className="dc-integration-grid">
-        <section className="dc-integration-guide">
-          <div className="dc-integration-icon"><Bot /></div>
-          <p className="dc-eyebrow">MCP</p>
-          <h2>Connect an agent</h2>
-          <p>Add one remote MCP endpoint, keep the token in an environment variable, then ask your agent to draft or open a decision.</p>
-          <div className="dc-code-block"><pre><code>{mcpConfig}</code></pre><Button variant="outline" size="sm" onClick={() => void copy(mcpConfig, "mcp")}><Copy /> {copied === "mcp" ? "Copied" : "Copy config"}</Button></div>
-          <div className="dc-prompt-example"><span>Try saying</span><p>“Create a draft decision asking whether we should change the weekly meeting format. Include the three constraints below and use yes, no, or propose something else.”</p></div>
-        </section>
+      <LeadershipSection title="MCP" titleId="mcp-title">
+        <div className="dc-code-block">
+          <pre><code>{mcpConfig}</code></pre>
+          <Button variant="outline" size="sm" onClick={() => void copy(mcpConfig, "mcp")}>
+            <Copy data-icon="inline-start" /> {copied === "mcp" ? "Copied" : "Copy config"}
+          </Button>
+        </div>
+      </LeadershipSection>
 
-        <section className="dc-integration-guide">
-          <div className="dc-integration-icon"><Terminal /></div>
-          <p className="dc-eyebrow">HTTP API</p>
-          <h2>Use the same endpoint directly</h2>
-          <p>Send scoped, idempotent requests from an approved script or internal tool. The server audits every mutation.</p>
-          <div className="dc-endpoint-row"><code>{restEndpoint}</code><Button variant="ghost" size="icon-lg" className="dc-touch" onClick={() => void copy(restEndpoint, "endpoint")} aria-label="Copy endpoint"><Copy /></Button></div>
-          <ul className="dc-api-capabilities"><li><Check /> Create a draft, then publish explicitly</li><li><Check /> List and inspect decisions</li><li><Check /> Check response status and aggregate results</li><li><Check /> Close with an explicit manage scope</li></ul>
-        </section>
-      </div>
+      <LeadershipSection title="API" titleId="api-title">
+        <div className="dc-endpoint-row">
+          <code>{restEndpoint}</code>
+          <Button variant="ghost" size="icon-sm" onClick={() => void copy(restEndpoint, "endpoint")} aria-label="Copy endpoint"><Copy /></Button>
+        </div>
+      </LeadershipSection>
 
-      <section className="dc-key-section" aria-labelledby="keys-title">
-        <div className="dc-results-section-heading"><div><p className="dc-eyebrow">Your access</p><h2 id="keys-title">Agent keys</h2></div><span>{snapshot.agentKeys.filter((key) => !key.revokedAt).length} active</span></div>
-        {snapshot.agentKeys.length === 0 ? <div className="dc-key-empty"><KeyRound /><p>No keys yet. Create one when you are ready to connect an agent.</p></div> : (
-          <div className="dc-key-list">
-            {snapshot.agentKeys.map((key) => (
-              <article key={key.id} className={key.revokedAt ? "dc-key-revoked" : undefined}>
-                <div><KeyRound /><span><b>{key.name}</b><code>{key.prefix}…</code></span></div>
-                <div className="dc-key-scopes">{key.scopes.map((scope) => <Badge variant="outline" key={scope}>{scopeLabels[scope].label}</Badge>)}</div>
-                <div className="dc-key-dates"><span>Created {formatDateTime(key.createdAt)}</span><span>{key.revokedAt ? `Revoked ${formatDateTime(key.revokedAt)}` : key.expiresAt ? `Expires ${formatDateTime(key.expiresAt)}` : "No expiration"}</span></div>
-                {!key.revokedAt && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon-lg" className="dc-touch" aria-label={`Revoke ${key.name}`}><Trash2 /></Button></AlertDialogTrigger>
-                    <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Revoke “{key.name}”?</AlertDialogTitle><AlertDialogDescription>The connected agent will immediately lose access. This cannot be undone; create a new key if access is needed later.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction variant="destructive" onClick={() => void adapter.revokeAgentKey(key.id)}>Revoke key</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </article>
-            ))}
-          </div>
+      <LeadershipSection
+        title="Keys"
+        titleId="keys-title"
+        action={<span className="dc-question-meta">{activeKeys} active</span>}
+        flush={snapshot.agentKeys.length > 0}
+        className="dc-flush-table"
+      >
+        {snapshot.agentKeys.length === 0 ? (
+          <Empty className="dc-empty-state">
+            <EmptyHeader>
+              <EmptyMedia variant="icon"><KeyRound /></EmptyMedia>
+              <EmptyTitle>No keys yet</EmptyTitle>
+            </EmptyHeader>
+            <EmptyContent>
+              <CreateAgentKeyDialog compact onCreated={setCreatedKey} />
+            </EmptyContent>
+          </Empty>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Key</TableHead>
+                <TableHead>Permissions</TableHead>
+                <TableHead>Expires</TableHead>
+                <TableHead><span className="sr-only">Actions</span></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {snapshot.agentKeys.map((key) => (
+                <TableRow key={key.id} className={key.revokedAt ? "dc-key-revoked" : undefined}>
+                  <TableCell>
+                    <span className="dc-key-name"><b>{key.name}</b><code>{key.prefix}…</code></span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="dc-key-scopes">
+                      {key.scopes.map((scope) => <Badge variant="outline" key={scope}>{scopeLabels[scope]}</Badge>)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="dc-question-meta">
+                      {key.revokedAt
+                        ? `Revoked ${formatDateTime(key.revokedAt)}`
+                        : key.expiresAt ? formatDateTime(key.expiresAt) : "Never"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="dc-row-action">
+                    {!key.revokedAt && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon-sm" aria-label={`Revoke ${key.name}`}><Trash2 /></Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Revoke “{key.name}”?</AlertDialogTitle>
+                            <AlertDialogDescription>The connected tool loses access straight away. This cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction variant="destructive" onClick={() => void adapter.revokeAgentKey(key.id)}>Revoke key</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
-      </section>
+      </LeadershipSection>
     </LeadershipPage>
   )
 }

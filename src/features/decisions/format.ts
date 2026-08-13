@@ -15,7 +15,7 @@ export const ballotTypeLabels: Record<BallotType, string> = {
 }
 
 export const resultsVisibilityLabels: Record<ResultsVisibility, string> = {
-  "after-submit": "After someone responds",
+  "after-submit": "After you respond",
   "after-close": "After responses close",
   "admins-only": "Admins only",
 }
@@ -27,11 +27,11 @@ export const tieRuleLabels: Record<TieRule, string> = {
 }
 
 export const outcomeRuleLabels: Record<DecisionOutcomeRule, string> = {
-  advisory: "Advisory · record outcome manually",
-  plurality: "Plurality · most responses wins",
-  majority: "Majority · more than half",
-  "approval-threshold": "Approval threshold · set a percent",
-  borda: "Borda count · ranked points",
+  advisory: "Advisory",
+  plurality: "Most responses wins",
+  majority: "More than half",
+  "approval-threshold": "Approval threshold",
+  borda: "Ranked points",
 }
 
 export function formatDateTime(value: string | undefined, timezone = "America/Detroit") {
@@ -61,14 +61,6 @@ export function formatDateTime(value: string | undefined, timezone = "America/De
   return formatter.format(new Date(value))
 }
 
-export function formatRelativeDate(value: string) {
-  const date = new Date(value)
-  const deltaMs = date.getTime() - Date.now()
-  const deltaHours = Math.round(deltaMs / (1000 * 60 * 60))
-  const formatter = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" })
-  if (Math.abs(deltaHours) < 24) return formatter.format(deltaHours, "hour")
-  return formatter.format(Math.round(deltaHours / 24), "day")
-}
 
 export function initials(name: string) {
   return name

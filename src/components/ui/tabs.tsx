@@ -1,45 +1,95 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion"
 import { Tabs as TabsPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { lxFocus } from "@/components/ui/lx"
+
+/**
+ * Spec §7.1. One tab bar for the whole app, with a single underline that
+ * slides between triggers.
+ *
+ * The shadcn default shipped a pill background, a shadow and an animated
+ * `after:` underline behind Tailwind's `data-active:` variant, which compiles
+ * to the literal attribute `[data-active]`. Radix emits `data-state="active"`,
+ * so none of it ever matched: the only reason an active tab was visible was a
+ * hand-written `box-shadow: inset 0 -2px` in app CSS, with no transition. The
+ * indicator below is a `layoutId` element, so React moves one node between
+ * triggers and framer-motion interpolates the gap.
+ */
+type TabsContextValue = { layoutId: string; value?: string }
+
+const TabsContext = React.createContext<TabsContextValue>({ layoutId: "" })
 
 function Tabs({
   className,
   orientation = "horizontal",
+  value,
+  defaultValue,
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  const layoutId = React.useId()
+  const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue)
+  // Read straight through in the controlled case so the indicator never lags
+  // the panel by a frame.
+  const current = value ?? uncontrolledValue
+
+  const handleValueChange = React.useCallback(
+    (next: string) => {
+      setUncontrolledValue(next)
+      onValueChange?.(next)
+    },
+    [onValueChange]
+  )
+
+  const context = React.useMemo<TabsContextValue>(
+    () => ({ layoutId, value: current }),
+    [layoutId, current]
+  )
+
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      className={cn(
-        "group/tabs flex gap-2 data-horizontal:flex-col",
-        className
-      )}
-      {...props}
-    />
+    <TabsContext.Provider value={context}>
+      <LayoutGroup id={layoutId}>
+        <TabsPrimitive.Root
+          data-slot="tabs"
+          orientation={orientation}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={handleValueChange}
+          className={cn(
+            "group/tabs flex gap-[16px] data-[orientation=horizontal]:flex-col",
+            className
+          )}
+          {...props}
+        />
+      </LayoutGroup>
+    </TabsContext.Provider>
   )
 }
 
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none",
+  [
+    "group/tabs-list relative inline-flex w-fit items-center gap-[4px] bg-transparent",
+    "border-b [border-color:var(--lx-hairline)]",
+    "group-data-[orientation=vertical]/tabs:h-fit group-data-[orientation=vertical]/tabs:flex-col",
+    "group-data-[orientation=vertical]/tabs:items-stretch",
+    "group-data-[orientation=vertical]/tabs:border-b-0 group-data-[orientation=vertical]/tabs:border-r",
+  ].join(" "),
   {
     variants: {
-      variant: {
-        default: "bg-muted",
-        line: "gap-1 bg-transparent",
-      },
+      // The pill variant is gone — there is one tab bar in the app now. The
+      // prop stays so existing `variant="line"` call sites keep type-checking.
+      variant: { default: "", line: "" },
     },
-    defaultVariants: {
-      variant: "default",
-    },
+    defaultVariants: { variant: "line" },
   }
 )
 
 function TabsList({
   className,
-  variant = "default",
+  variant = "line",
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
@@ -55,20 +105,56 @@ function TabsList({
 
 function TabsTrigger({
   className,
+  children,
+  value,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+  const { layoutId, value: current } = React.useContext(TabsContext)
+  const reduceMotion = useReducedMotion()
+  const active = current === value
+
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
+      value={value}
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
-        "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
+        "lx-tab relative inline-flex h-[36px] shrink-0 items-center justify-center",
+        "rounded-none border-0 bg-transparent px-[12px] whitespace-nowrap",
+        "[font-family:inherit] text-[13px] [font-weight:550] leading-[1.2] [color:var(--lx-muted)]",
+        "transition-[color] duration-[140ms] ease-[var(--lx-ease)]",
+        "hover:[color:var(--lx-ink)] data-[state=active]:[color:var(--lx-ink)]",
+        "disabled:pointer-events-none disabled:opacity-[0.55]",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[16px]",
+        lxFocus,
         className
       )}
       {...props}
-    />
+    >
+      {/* Active is signalled by ink colour and the sliding underline, not by a
+          heavier label. Weight-shifting the active tab reflows its neighbours
+          mid-travel; the earlier fix for that rendered a hidden duplicate of
+          every label, which put "OpenOpen" in the trigger's text content. */}
+      <span className="lx-tab__label pointer-events-none flex items-center justify-center gap-[6px]">
+        {children}
+      </span>
+
+      {active ? (
+        <motion.span
+          layoutId={`${layoutId}-indicator`}
+          className={cn(
+            "lx-tab__indicator pointer-events-none absolute inset-x-0 -bottom-px h-[2px] rounded-[2px]",
+            "[background-color:var(--lx-navy)]",
+            "group-data-[orientation=vertical]/tabs:inset-x-auto group-data-[orientation=vertical]/tabs:-right-px",
+            "group-data-[orientation=vertical]/tabs:inset-y-0 group-data-[orientation=vertical]/tabs:h-auto group-data-[orientation=vertical]/tabs:w-[2px]"
+          )}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 420, damping: 38, mass: 0.9 }
+          }
+        />
+      ) : null}
+    </TabsPrimitive.Trigger>
   )
 }
 
@@ -79,7 +165,7 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 text-sm outline-none", className)}
+      className={cn("flex-1 text-[13px] outline-none", className)}
       {...props}
     />
   )

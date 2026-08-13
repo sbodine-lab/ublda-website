@@ -2,15 +2,23 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import "@/components/ui/primitives.css"
 
 const alertVariants = cva(
-  "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+  [
+    "group/alert relative grid w-full gap-[4px] rounded-[var(--lx-radius-control)] border p-[16px]",
+    "text-left [font-family:inherit] text-[13px] leading-[1.45]",
+    "has-data-[slot=alert-action]:pr-[64px]",
+    "has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-[10px]",
+    "*:[svg]:row-span-2 *:[svg]:translate-y-[1px] *:[svg]:text-current *:[svg:not([class*='size-'])]:size-[16px]",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default: "bg-card text-card-foreground",
+        default:
+          "[background-color:var(--lx-canvas)] [border-color:var(--lx-hairline)] [color:var(--lx-ink)]",
         destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
+          "[background-color:#fef3f2] [border-color:rgba(180,35,24,0.16)] [color:#b42318] *:data-[slot=alert-description]:[color:#b42318]",
       },
     },
     defaultVariants: {
@@ -39,7 +47,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="alert-title"
       className={cn(
-        "font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
+        "text-[13px] leading-[1.2] [font-weight:600] group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3",
         className
       )}
       {...props}
@@ -55,7 +63,7 @@ function AlertDescription({
     <div
       data-slot="alert-description"
       className={cn(
-        "text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+        "text-[13px] leading-[1.45] [color:var(--lx-muted)] [&_a]:underline [&_a]:underline-offset-3",
         className
       )}
       {...props}
@@ -67,7 +75,7 @@ function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="alert-action"
-      className={cn("absolute top-2 right-2", className)}
+      className={cn("absolute top-[12px] right-[12px]", className)}
       {...props}
     />
   )

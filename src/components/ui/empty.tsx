@@ -1,13 +1,19 @@
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import "@/components/ui/primitives.css"
 
+/**
+ * Spec §8.6. One empty state everywhere: 180px tall, centred, no dashed
+ * border, a fact for a title and at most one call to action.
+ */
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="empty"
       className={cn(
-        "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-xl border-dashed p-6 text-center text-balance",
+        "flex w-full min-w-0 flex-col items-center justify-center gap-[12px]",
+        "min-h-[180px] px-[24px] py-[32px] text-center [font-family:inherit]",
         className
       )}
       {...props}
@@ -19,19 +25,22 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="empty-header"
-      className={cn("flex max-w-sm flex-col items-center gap-2", className)}
+      className={cn(
+        "flex max-w-[320px] flex-col items-center gap-[6px]",
+        className
+      )}
       {...props}
     />
   )
 }
 
 const emptyMediaVariants = cva(
-  "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default: "bg-transparent",
-        icon: "flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4",
+        icon: "size-[40px] rounded-full [background-color:var(--lx-canvas)] [color:var(--lx-faint)] [&_svg:not([class*='size-'])]:size-[20px]",
       },
     },
     defaultVariants: {
@@ -60,7 +69,7 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="empty-title"
       className={cn(
-        "font-heading text-sm font-medium tracking-tight",
+        "[font-family:inherit] text-[13.5px] leading-[1.2] [font-weight:550] [color:var(--lx-ink)]",
         className
       )}
       {...props}
@@ -73,7 +82,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
     <div
       data-slot="empty-description"
       className={cn(
-        "text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
+        "text-[13px] leading-[1.45] [color:var(--lx-muted)] [&>a]:underline [&>a]:underline-offset-4",
         className
       )}
       {...props}
@@ -86,7 +95,7 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="empty-content"
       className={cn(
-        "flex w-full max-w-sm min-w-0 flex-col items-center gap-2.5 text-sm text-balance",
+        "flex w-full max-w-[320px] min-w-0 flex-col items-center gap-[8px] text-[13px]",
         className
       )}
       {...props}

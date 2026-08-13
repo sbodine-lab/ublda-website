@@ -20,8 +20,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
       <LeadershipAuthScreen
         loading
         preview={adapter.mode === "demo"}
-        title="Opening the leadership workspace"
-        description="Checking your secure session."
+        title="Loading…"
       />
     )
   }
@@ -67,7 +66,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
   }
 
   const title = isWorkspaceSignIn
-    ? "Leadership Sign In"
+    ? "Sign in"
     : isSchedulingLink
       ? "A scheduling poll is waiting"
       : "A question is waiting"
@@ -76,28 +75,27 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
     <LeadershipAuthScreen
       preview={adapter.mode === "demo"}
       title={title}
-      description={snapshot.auth.status === "signed-out" ? "Continue to Secure Leadership Sign In" : undefined}
     >
       {snapshot.auth.status === "misconfigured" ? (
         <div className="dc-auth-denied">
           <Alert variant="destructive">
-            <AlertTitle>sign-in could not be verified</AlertTitle>
+            <AlertTitle>Sign-in could not be verified</AlertTitle>
             <AlertDescription>{snapshot.auth.message}</AlertDescription>
           </Alert>
-          <Button variant="outline" className="dc-touch" disabled={submitting} onClick={() => void signIn()}>
+          <Button variant="outline" disabled={submitting} onClick={() => void signIn()}>
             {submitting ? <Spinner data-icon="inline-start" /> : null}
-            try sign in again
+            Try again
           </Button>
         </div>
       ) : snapshot.auth.status === "access-denied" ? (
         <div className="dc-auth-denied">
           <Alert variant="destructive">
-            <AlertTitle>this account is not approved</AlertTitle>
+            <AlertTitle>This account is not approved</AlertTitle>
             <AlertDescription>{snapshot.auth.message}</AlertDescription>
           </Alert>
-          <Button variant="outline" className="dc-touch" disabled={submitting} onClick={() => void switchAccount()}>
+          <Button variant="outline" disabled={submitting} onClick={() => void switchAccount()}>
             {submitting ? <Spinner data-icon="inline-start" /> : null}
-            try another account
+            Use another account
           </Button>
         </div>
       ) : (
@@ -105,12 +103,12 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
           <Button
             type="button"
             size="lg"
-            className="dc-auth-action dc-touch"
+            className="dc-auth-action"
             disabled={submitting}
             onClick={() => void signIn()}
           >
             {submitting ? <Spinner data-icon="inline-start" /> : null}
-            Continue to Sign In
+            Sign in
           </Button>
         </div>
       )}

@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react"
-import {
-  CheckCircle2,
-  ClipboardCheck,
-  Copy,
-  Lock,
-  RotateCcw,
-} from "lucide-react"
+import { CheckCircle2, ClipboardCheck, Copy, Lock, RotateCcw, SearchX } from "lucide-react"
 import { Link, useLocation, useParams } from "react-router-dom"
 import {
   AlertDialog,
@@ -30,8 +24,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Empty,
+  EmptyContent,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 import { Textarea } from "@/components/ui/textarea"
-import { DecisionStatusBadge } from "../components/DecisionStatusBadge"
+import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useDecisionData } from "../decisionDataContext"
 import { formatDateTime, initials } from "../format"
 import { calculateDecisionResults, describeBallotAnswer } from "../results"
@@ -55,7 +56,19 @@ export function DecisionResultsPage() {
   const results = useMemo(() => decision ? calculateDecisionResults(decision, snapshot.responses) : undefined, [decision, snapshot.responses])
 
   if (!decision || !results) {
-    return <div className="dc-page dc-not-found"><h1>Results not found</h1><p>This decision may no longer exist.</p><Button asChild><Link to="/decisions">Back to decisions</Link></Button></div>
+    return (
+      <LeadershipPage className="dc-page">
+        <Empty className="dc-empty-state">
+          <EmptyHeader>
+            <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
+            <EmptyTitle>Question not found</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="outline" size="sm" asChild><Link to="/decisions">Back to questions</Link></Button>
+          </EmptyContent>
+        </Empty>
+      </LeadershipPage>
+    )
   }
 
   const isAdmin = viewer?.role === "admin"
@@ -70,13 +83,23 @@ export function DecisionResultsPage() {
 
   if (!canView) {
     return (
-      <div className="dc-page dc-results-locked">
-        <Lock />
-        <p className="dc-eyebrow">Results are private</p>
-        <h1>Everyone gets space to answer independently.</h1>
-        <p>{decision.rules.resultsVisibility === "admins-only" ? "Only decision administrators can see these results." : "Results will appear after responses close."}</p>
-        <Button asChild className="dc-touch"><Link to={`/d/${decision.slug}`}>Back to the decision</Link></Button>
-      </div>
+      <LeadershipPage className="dc-page">
+        <Empty className="dc-empty-state">
+          <EmptyHeader>
+            <EmptyMedia variant="icon"><Lock /></EmptyMedia>
+            <EmptyTitle>
+              {decision.rules.resultsVisibility === "admins-only"
+                ? "Only admins can see these results."
+                : decision.rules.resultsVisibility === "after-close"
+                  ? "Results unlock after responses close."
+                  : "Results unlock after you respond."}
+            </EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="outline" size="sm" asChild><Link to={`/d/${decision.slug}`}>Open the question</Link></Button>
+          </EmptyContent>
+        </Empty>
+      </LeadershipPage>
     )
   }
 
@@ -120,11 +143,11 @@ export function DecisionResultsPage() {
 
   const finalize = async () => {
     if (!outcome.trim()) {
-      setError("Record the final board outcome before finalizing.")
+      setError("Write the outcome before finalizing.")
       return
     }
     if (finalizationNeedsNote && !finalizationNote.trim()) {
-      setError("Explain why the board is finalizing with an unresolved or unmet saved rule.")
+      setError("Add a note explaining the unmet rule.")
       return
     }
     const saved = await run(() => adapter.finalizeDecision(
@@ -135,31 +158,32 @@ export function DecisionResultsPage() {
     if (saved) setFinalizeOpen(false)
   }
 
-  return (
-    <div className="dc-page dc-results-page">
-      <header className="dc-results-header">
-        <div>
-          <div className="dc-ballot-kicker"><DecisionStatusBadge status={decision.status} /><span className="dc-live-label">live results</span></div>
-          <h1>{decision.title}</h1>
-        </div>
-        <div className="dc-results-header-actions">
-          <Button variant="outline" className="dc-touch" onClick={copyLink}><Copy /> {copied ? "Copied" : "Copy voting link"}</Button>
-          <Button variant="outline" className="dc-touch" asChild><Link to={`/d/${decision.slug}`}>View ballot</Link></Button>
-        </div>
-      </header>
+  const tallyTitle = results.tallyUnit === "points"
+    ? "Ranked points"
+    : decision.ballotType === "ranked" ? "First choices" : "Results"
 
+  return (
+    <LeadershipPage
+      className="dc-page"
+      action={(
+        <div className="dc-page-actions">
+          <Button variant="outline" onClick={copyLink}><Copy data-icon="inline-start" /> {copied ? "Copied" : "Copy link"}</Button>
+          <Button variant="outline" asChild><Link to={`/d/${decision.slug}`}>Open question</Link></Button>
+        </div>
+      )}
+    >
       {decision.outcome && (
-        <Alert className="dc-outcome-alert"><ClipboardCheck /><AlertTitle>Recorded outcome</AlertTitle><AlertDescription>{decision.outcome}</AlertDescription></Alert>
+        <Alert><ClipboardCheck /><AlertTitle>Recorded outcome</AlertTitle><AlertDescription>{decision.outcome}</AlertDescription></Alert>
       )}
 
-      <section className="dc-live-results-count" aria-live="polite" aria-label={`${results.responseCount} of ${results.eligibleCount} responses received`}>
-        <strong>{results.responseCount}<span> of {results.eligibleCount}</span></strong>
-        <span>responses</span>
-      </section>
-
-      <section className="dc-results-section" aria-labelledby="tally-title">
-        <div className="dc-results-section-heading">
-          <h2 id="tally-title">{results.tallyUnit === "points" ? "Borda point totals" : decision.ballotType === "ranked" ? "First-choice totals" : "Results"}</h2>
+      <LeadershipSection title={tallyTitle} titleId="tally-title">
+        <div
+          className="dc-live-results-count"
+          aria-live="polite"
+          aria-label={`${results.responseCount} of ${results.eligibleCount} responses received`}
+        >
+          <strong>{results.responseCount}<span> of {results.eligibleCount}</span></strong>
+          <span>responses</span>
         </div>
         <div className="dc-tally-list" aria-live="polite">
           {results.tally.map((row) => (
@@ -169,76 +193,80 @@ export function DecisionResultsPage() {
             </div>
           ))}
         </div>
-      </section>
-
-      {canManage && <div className="dc-results-columns">
-        <section className="dc-results-section" aria-labelledby="missing-title">
-          <div className="dc-results-section-heading"><h2 id="missing-title">Still waiting on</h2><span>{missingMembers.length}</span></div>
-          {missingMembers.length === 0 ? (
-            <p className="dc-all-in"><CheckCircle2 /> Everyone in this electorate responded.</p>
-          ) : (
-            <ul className="dc-person-list">
-              {missingMembers.map((member) => member && (
-                <li key={member.id}><Avatar><AvatarFallback>{initials(member.displayName)}</AvatarFallback></Avatar><span><b>{member.displayName}</b></span></li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="dc-results-section" aria-labelledby="comments-title">
-          <div className="dc-results-section-heading"><h2 id="comments-title">Responses and context</h2></div>
-          {responseDetails.length === 0 ? <p>{results.responseCount === 0 ? "No responses yet." : "Individual response detail is not available for this decision."}</p> : (
-            <ul className="dc-response-detail-list">
-              {responseDetails.map(({ response, member }) => (
-                <li key={response.id}>
-                  <div><Avatar><AvatarFallback>{initials(member?.displayName ?? "Member")}</AvatarFallback></Avatar><span><b>{member?.displayName ?? "Roster member"}</b><small>{formatDateTime(response.revisedAt ?? response.submittedAt, decision.timezone)}</small></span></div>
-                  <strong>{describeBallotAnswer(decision, response.answer)}</strong>
-                  {response.rationale && <p>{response.rationale}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>}
+      </LeadershipSection>
 
       {canManage && (
-        <section className="dc-decision-controls" aria-labelledby="controls-title">
-          <div><h2 id="controls-title">Close or finalize</h2><p>Closing stops responses. Finalizing records the board’s decision.</p></div>
-          <div>
-            {decision.status === "open" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild><Button variant="outline" className="dc-touch" disabled={working}>Close responses</Button></AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader><AlertDialogTitle>Close responses?</AlertDialogTitle><AlertDialogDescription>Members will no longer be able to submit or edit. You can reopen this decision later, and the action will be logged.</AlertDialogDescription></AlertDialogHeader>
-                  <AlertDialogFooter><AlertDialogCancel>Keep open</AlertDialogCancel><AlertDialogAction onClick={() => void run(() => adapter.closeDecision(decision.id))}>Close responses</AlertDialogAction></AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+        <div className="dc-results-columns">
+          <LeadershipSection title="Still waiting on" titleId="missing-title">
+            {missingMembers.length === 0 ? (
+              <p className="dc-all-in"><CheckCircle2 aria-hidden="true" /> Everyone who can respond has responded.</p>
+            ) : (
+              <ul className="dc-person-list">
+                {missingMembers.map((member) => member && (
+                  <li key={member.id}><Avatar><AvatarFallback>{initials(member.displayName)}</AvatarFallback></Avatar><span><b>{member.displayName}</b></span></li>
+                ))}
+              </ul>
             )}
-            {decision.status === "closed" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild><Button variant="outline" className="dc-touch" disabled={working}><RotateCcw /> Reopen</Button></AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader><AlertDialogTitle>Reopen responses?</AlertDialogTitle><AlertDialogDescription>Members will be able to submit or edit again. The previous deadline will be cleared, and the action will be logged.</AlertDialogDescription></AlertDialogHeader>
-                  <AlertDialogFooter><AlertDialogCancel>Keep closed</AlertDialogCancel><AlertDialogAction onClick={() => void run(() => adapter.reopenDecision(decision.id))}>Reopen responses</AlertDialogAction></AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+          </LeadershipSection>
+
+          <LeadershipSection title="Responses" titleId="comments-title">
+            {responseDetails.length === 0 ? (
+              <p className="dc-page-note">{results.responseCount === 0 ? "No responses yet." : "Individual responses are not available for this question."}</p>
+            ) : (
+              <ul className="dc-response-detail-list">
+                {responseDetails.map(({ response, member }) => (
+                  <li key={response.id}>
+                    <div><Avatar><AvatarFallback>{initials(member?.displayName ?? "Member")}</AvatarFallback></Avatar><span><b>{member?.displayName ?? "Roster member"}</b><small>{formatDateTime(response.revisedAt ?? response.submittedAt, decision.timezone)}</small></span></div>
+                    <strong>{describeBallotAnswer(decision, response.answer)}</strong>
+                    {response.rationale && <p>{response.rationale}</p>}
+                  </li>
+                ))}
+              </ul>
             )}
-            {decision.status === "closed" && (
-              <Dialog open={finalizeOpen} onOpenChange={setFinalizeOpen}>
-                <DialogTrigger asChild><Button className="dc-touch">Record final outcome</Button></DialogTrigger>
-                <DialogContent className="dc-finalize-dialog">
-                  <DialogHeader><DialogTitle>Record the board’s outcome</DialogTitle><DialogDescription>Write the actual decision in plain language. This is intentionally a manual step.</DialogDescription></DialogHeader>
-                  <label className="dc-field-block"><span>Final outcome</span><Textarea value={outcome} onChange={(event) => setOutcome(event.target.value)} rows={4} placeholder="The board decided to…" /></label>
-                  <label className="dc-field-block"><span>Finalization note <small>{finalizationNeedsNote ? "Required for an unmet or unresolved rule" : "Optional"}</small></span><Textarea value={finalizationNote} onChange={(event) => setFinalizationNote(event.target.value)} rows={3} placeholder="Explain any tie, turnout gap, or manual judgment the board resolved." /></label>
-                  {error && <p className="dc-inline-error" role="alert">{error}</p>}
-                  <DialogFooter><Button variant="outline" className="dc-touch" onClick={() => setFinalizeOpen(false)}>Cancel</Button><Button className="dc-touch" disabled={working} onClick={() => void finalize()}>{working ? "Saving…" : "Finalize decision"}</Button></DialogFooter>
-                </DialogContent>
-              </Dialog>
-            )}
+          </LeadershipSection>
+        </div>
+      )}
+
+      {canManage && (
+        <LeadershipSection title="Close or finalize" titleId="controls-title">
+          <div className="dc-decision-controls">
+            <p className="dc-page-note">Closing stops responses. Finalizing records the outcome.</p>
+            <div>
+              {decision.status === "open" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild><Button variant="outline" disabled={working}>Close responses</Button></AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle>Close responses?</AlertDialogTitle><AlertDialogDescription>Members can no longer respond. You can reopen it later.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel>Keep open</AlertDialogCancel><AlertDialogAction onClick={() => void run(() => adapter.closeDecision(decision.id))}>Close responses</AlertDialogAction></AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              {decision.status === "closed" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild><Button variant="outline" disabled={working}><RotateCcw data-icon="inline-start" /> Reopen</Button></AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle>Reopen responses?</AlertDialogTitle><AlertDialogDescription>Members can respond again. The old deadline is cleared.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel>Keep closed</AlertDialogCancel><AlertDialogAction onClick={() => void run(() => adapter.reopenDecision(decision.id))}>Reopen responses</AlertDialogAction></AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              {decision.status === "closed" && (
+                <Dialog open={finalizeOpen} onOpenChange={setFinalizeOpen}>
+                  <DialogTrigger asChild><Button>Record outcome</Button></DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader><DialogTitle>Record the outcome</DialogTitle><DialogDescription>Write the outcome in plain language.</DialogDescription></DialogHeader>
+                    <label className="dc-field-block"><span>Outcome</span><Textarea value={outcome} onChange={(event) => setOutcome(event.target.value)} rows={4} placeholder="The board decided to…" /></label>
+                    <label className="dc-field-block"><span>Note <small>{finalizationNeedsNote ? "Required" : "Optional"}</small></span><Textarea value={finalizationNote} onChange={(event) => setFinalizationNote(event.target.value)} rows={3} /></label>
+                    {error && <p className="dc-inline-error" role="alert">{error}</p>}
+                    <DialogFooter><Button variant="outline" onClick={() => setFinalizeOpen(false)}>Cancel</Button><Button disabled={working} onClick={() => void finalize()}>{working ? "Saving…" : "Finalize"}</Button></DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
           </div>
           {error && !finalizeOpen && <p className="dc-inline-error" role="alert">{error}</p>}
-        </section>
+        </LeadershipSection>
       )}
-    </div>
+    </LeadershipPage>
   )
 }

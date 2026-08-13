@@ -1,354 +1,336 @@
-/* Shared leadership workspace finish: Speaker Ops, questions, and scheduling. */
+/* ---------------------------------------------------------------------------
+   Shared leadership workspace finish: sign-in, questions, scheduling, ballot.
+
+   The first block in this file is the portal escape. Every Radix surface
+   (dialog, sheet, select, dropdown, tooltip) mounts on document.body, outside
+   every feature shell, so it resolves :root from the public site — teal brand
+   colours, the display serif, and the unlayered `* { padding: 0 }` reset with
+   nothing to restore it. `body:has(…)` has specificity (0,1,1) and beats all
+   three without a single !important.
+
+   That one block is why dashboard focus rings are navy rather than teal, why a
+   dialog is set in Plus Jakarta, and why a button inside a dialog has any
+   horizontal padding at all.
+--------------------------------------------------------------------------- */
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) {
+  /* Mirror of the token block in features/leadership/leadership-shell.css.
+     Declared here so portalled surfaces resolve the same values. */
+  --lx-navy: #142b4a;
+  --lx-navy-strong: #0d203a;
+  --lx-ink: #101828;
+  --lx-muted: #5b6472;
+  --lx-faint: #8792a3;
+  --lx-canvas: #f6f8fb;
+  --lx-surface: #ffffff;
+  --lx-hairline: rgba(16, 24, 40, 0.08);
+  --lx-border: rgba(16, 24, 40, 0.14);
+  --lx-ring: #2d5682;
+  --lx-ring-shadow: 0 0 0 3px rgba(45, 86, 130, 0.18);
+  --lx-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --lx-shadow-md: 0 4px 12px rgba(16, 24, 40, 0.06);
+  --lx-shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.12);
+  --lx-hover-wash: rgba(16, 24, 40, 0.04);
+  --lx-active-wash: rgba(20, 43, 74, 0.07);
+  --lx-radius-control: 8px;
+  --lx-radius-surface: 12px;
+  --lx-radius-pill: 999px;
+  --lx-ease: cubic-bezier(0.2, 0, 0, 1);
+  --lx-dur-fast: 120ms;
+  --lx-dur-base: 180ms;
+  --lx-font: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+
+  /* Public-brand tokens the dashboard must not inherit. Teal stays the club's
+     brand everywhere else; these overrides are scoped to dashboard pages. */
+  --color-teal: #2d5682;
+  --color-teal-soft: #eef3f9;
+  --color-teal-muted: rgba(20, 43, 74, 0.18);
+  --ring: #2d5682;
+  --accent: #eef3f9;
+  --accent-foreground: #142b4a;
+  --secondary: #eef3f9;
+  --secondary-foreground: #142b4a;
+  --chart-1: #2d5682;
+  --chart-5: #142b4a;
+
+  /* One family. `font-heading` (used by CardTitle, DialogTitle, EmptyTitle) and
+     the bare `h1, h2, h3` rule in global.css both resolve --font-display, which
+     is the public-site serif. It must not render in the dashboard. */
+  --font-body: var(--lx-font);
+  --font-display: var(--lx-font);
+  --font-heading: var(--lx-font);
+
+  /* global.css sizes every bare h1-h3 at `var(--type-lg)` — clamp(36px, 4.2vw,
+     52px) on the public site. Neutralising the token rather than out-specifying
+     the rule means a feature stylesheet's own heading size still wins on
+     specificity, instead of racing this file for a tie-break. */
+  --type-lg: 1em;
+}
+
+/* --- Padding restore -------------------------------------------------------
+   `global.css` sets `*, *::before, *::after { padding: 0 }` unlayered, which
+   beats every Tailwind `px-*` utility (those live in @layer utilities). The UI
+   components keep expressing padding as normal utilities; these rules are what
+   make them land, in the shell and in portals alike. One rule per data-slot,
+   keyed off data-size where the component has sizes.
+-------------------------------------------------------------------------- */
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"] {
+  padding-inline: 14px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"][data-size="xs"] {
+  padding-inline: 8px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"][data-size="sm"] {
+  padding-inline: 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"][data-size="lg"] {
+  padding-inline: 18px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"]:has([data-icon="inline-start"]) {
+  padding-inline-start: 10px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"]:has([data-icon="inline-end"]) {
+  padding-inline-end: 10px;
+}
+
+/* Icon-only buttons are square. Last, so it wins the tie with the rules above. */
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"][data-size^="icon"] {
+  padding-inline: 0;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="input"] {
+  padding-inline: 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="textarea"] {
+  padding: 10px 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="select-trigger"] {
+  padding-inline: 12px 10px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="select-trigger"][data-size="sm"] {
+  padding-inline: 10px 8px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="select-content"],
+  [data-slot="dropdown-menu-content"]
+) {
+  padding: 4px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="select-item"] {
+  padding: 6px 30px 6px 8px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dropdown-menu-item"],
+  [data-slot="dropdown-menu-sub-trigger"],
+  [data-slot="select-label"],
+  [data-slot="dropdown-menu-label"]
+) {
+  padding: 6px 8px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dropdown-menu-checkbox-item"],
+  [data-slot="dropdown-menu-radio-item"]
+) {
+  padding: 6px 30px 6px 8px;
+}
+
+/* TabsTrigger states its inset as `px-[12px]` (tabs.tsx), which the unlayered
+   `*` reset flattens to zero — the Questions filters rendered as one run-on
+   string, "OpenDraftsClosedAll". Restored here with the rest of the slots. */
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="tabs-trigger"] {
+  padding-inline: 12px;
+}
+
+/* Toggle and ToggleGroupItem express their inset as a Tailwind `px-*` utility
+   (toggle.tsx `toggleVariants`), so the unlayered `*` reset flattens them the
+   same way it does buttons. Live on /decisions/new and the ballot page. */
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="toggle"],
+  [data-slot="toggle-group-item"]
+) {
+  padding-inline: 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="toggle"],
+  [data-slot="toggle-group-item"]
+)[data-size="sm"] {
+  padding-inline: 10px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="toggle"],
+  [data-slot="toggle-group-item"]
+)[data-size="lg"] {
+  padding-inline: 14px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="badge"] {
+  padding-inline: 8px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="alert"] {
+  padding: 16px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"]
+) {
+  padding: 24px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dialog-footer"],
+  [data-slot="alert-dialog-footer"]
+) {
+  margin: 20px -24px -24px;
+  padding: 16px 24px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="sheet-content"] {
+  padding: 0;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="sheet-header"] {
+  padding: 24px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="sheet-footer"] {
+  padding: 16px 24px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="empty"] {
+  padding: 32px 24px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="card-header"] {
+  padding-inline: 20px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="card-content"],
+  [data-slot="card-footer"]
+) {
+  padding: 20px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="table-cell"] {
+  padding: 10px 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="table-head"] {
+  padding-inline: 12px;
+}
+
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="tooltip-content"] {
+  padding: 6px 8px;
+}
+
+/* Type in portals. `body` in global.css is 17px in the public display stack and
+   portalled surfaces inherit from it, not from the shell. This is the portal
+   half of "set the family once, then let it inherit". */
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="select-content"],
+  [data-slot="tooltip-content"]
+) {
+  font-family: var(--lx-font);
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 1.45;
+  color: var(--lx-ink);
+}
+
+/* Radix renders dialog and sheet titles as real <h2>s, so global.css's bare
+   `h1, h2, h3` rule would otherwise size them at clamp(36px, 4.2vw, 52px). */
+body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="popover-content"]
+) :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  color: var(--lx-ink);
+  font-family: var(--lx-font);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Touch targets. One rule, so no component needs a `.dc-touch` escape hatch. */
+@media (max-width: 820px) {
+  body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+    [data-slot="button"],
+    [data-slot="input"],
+    [data-slot="select-trigger"]
+  ) {
+    min-height: 44px;
+  }
+
+  body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+    [data-slot="input"],
+    [data-slot="textarea"],
+    [data-slot="select-trigger"]
+  ) {
+    font-size: 15px;
+  }
+
+  body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) [data-slot="button"][data-size^="icon"] {
+    min-width: 44px;
+  }
+}
+
+/* --- Root surfaces --------------------------------------------------------- */
+
 .dc-app-shell,
 .dc-ballot-page,
 .dc-auth-page,
-.av-public-page,
-.av-create-page,
-.av-workspace-results,
-.ws-shell {
-  --dc-cream: #ffffff;
-  --dc-paper: #ffffff;
-  --dc-navy: #142b4a;
-  --dc-navy-hover: #0d203a;
-  --dc-teal: #142b4a;
-  --dc-teal-wash: #eef3f9;
-  --dc-teal-ink: #142b4a;
-  --dc-gold: #c99a12;
-  --ring: #2d5682;
-  --color-teal: #2d5682;
-  --dc-border: rgba(30, 43, 63, 0.11);
-  --dc-muted: #697181;
-  --dc-soft: #f6f7f9;
-  --av-bg: #ffffff;
-  --av-paper: #ffffff;
-  --av-navy: #142b4a;
-  --av-muted: #697181;
-  --av-wash: #eef3f9;
-  --av-teal: #142b4a;
-  --av-border: rgba(30, 43, 63, 0.11);
+.sched-public {
   min-height: 100vh;
-  background: #ffffff;
-  color: #121722;
-  font-family: Arial, Helvetica, sans-serif !important;
+  background: var(--lx-surface, #ffffff);
+  color: var(--lx-ink, #101828);
+  font-family: var(--lx-font);
+  font-size: 13px;
+  line-height: 1.45;
   text-transform: none;
 }
 
-.dc-app-shell *,
-.dc-ballot-page *,
-.dc-auth-page *,
-.av-public-page *,
-.av-create-page *,
-.av-workspace-results *,
-.ws-shell * {
-  font-family: Arial, Helvetica, sans-serif !important;
+/* global.css paints every bare h1–h6 in the public display serif at
+   clamp(36px, 4.2vw, 52px). The dashboard is one typeface and one type scale.
+   `:where()` keeps this at (0,1,0) so any feature rule still outranks it —
+   it sets the family and a floor, it does not compete for sizes. */
+.dc-app-shell :where(h1, h2, h3, h4, h5, h6),
+.dc-ballot-page :where(h1, h2, h3, h4, h5, h6),
+.sched-public :where(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  color: var(--lx-ink);
+  font-family: var(--lx-font);
+  font-weight: 640;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 
-.dc-app-shell :where(h1, h2, h3),
-.dc-ballot-page :where(h1, h2, h3),
-.dc-auth-page :where(h1, h2, h3),
-.av-public-page :where(h1, h2, h3),
-.av-create-page :where(h1, h2, h3),
-.av-workspace-results :where(h1, h2, h3),
-.ws-shell :where(h1, h2, h3) {
-  color: #142b4a;
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-weight: 650;
-  letter-spacing: -0.025em;
-}
+/* --- Sign-in --------------------------------------------------------------- */
 
-.dc-app-shell [data-slot="button"],
-.dc-ballot-page [data-slot="button"],
-.dc-auth-page [data-slot="button"],
-.av-public-page [data-slot="button"],
-.av-create-page [data-slot="button"],
-.av-workspace-results [data-slot="button"] {
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 550;
-  text-transform: none;
-  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 220ms ease, color 180ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.dc-app-shell [data-slot="button"]:hover,
-.dc-ballot-page [data-slot="button"]:hover,
-.dc-auth-page [data-slot="button"]:hover,
-.av-public-page [data-slot="button"]:hover,
-.av-create-page [data-slot="button"]:hover,
-.av-workspace-results [data-slot="button"]:hover {
-  transform: translateY(-1px);
-}
-
-.dc-app-shell [data-slot="input"],
-.dc-app-shell [data-slot="textarea"],
-.dc-auth-page [data-slot="input"],
-.av-public-page [data-slot="input"],
-.av-create-page [data-slot="input"],
-.av-create-page [data-slot="select-trigger"] {
-  border-color: rgba(30, 43, 63, 0.14);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 1px 2px rgba(18, 31, 49, 0.025);
-  color: #121722;
-}
-
-.dc-app-shell [data-slot="input"]:focus-visible,
-.dc-app-shell [data-slot="textarea"]:focus-visible,
-.dc-auth-page [data-slot="input"]:focus-visible,
-.av-public-page [data-slot="input"]:focus-visible,
-.av-create-page [data-slot="input"]:focus-visible,
-.av-create-page [data-slot="select-trigger"]:focus-visible {
-  border-color: rgba(20, 43, 74, 0.42);
-  box-shadow: 0 0 0 3px rgba(20, 43, 74, 0.09);
-}
-
-/* App shell */
-.ws-shell {
-  --sidebar-width: 236px !important;
-  --ring: #2d5682;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #142b4a;
-  --sidebar-primary: #142b4a;
-  --sidebar-accent: #eef3f9;
-  --sidebar-accent-foreground: #142b4a;
-  --sidebar-border: rgba(30, 43, 63, 0.1);
-  --sidebar-ring: #2d5682;
-  background:
-    radial-gradient(circle at 96% 96%, rgba(201, 154, 18, 0.022), transparent 24%),
-    #ffffff !important;
-  color: #121722;
-}
-
-.ws-sidebar [data-sidebar="sidebar"] {
-  overflow: hidden;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 253, 0.72));
-  border-right: 1px solid rgba(30, 43, 63, 0.1);
-  box-shadow: 8px 0 32px rgba(19, 31, 49, 0.035), inset -1px 0 0 rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(26px) saturate(138%);
-  -webkit-backdrop-filter: blur(26px) saturate(138%);
-}
-
-.ws-sidebar-header {
-  min-height: 64px;
-  justify-content: center;
-  padding: 0;
-  border-bottom: 1px solid rgba(30, 43, 63, 0.08);
-}
-
-.ws-app-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  min-height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 26px;
-  background: rgba(255, 255, 255, 0.86);
-  border-bottom: 1px solid rgba(30, 43, 63, 0.09);
-  box-shadow: 0 10px 30px rgba(18, 31, 49, 0.025);
-  backdrop-filter: blur(22px) saturate(132%);
-  -webkit-backdrop-filter: blur(22px) saturate(132%);
-}
-
-.ws-app-header-controls {
-  width: 32px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.ws-corner-logo {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 10px;
-  transition: background-color 180ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.ws-corner-logo:hover {
-  background: rgba(20, 43, 74, 0.045);
-  transform: translateY(-1px);
-}
-
-.ws-corner-logo img {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-}
-
-.ws-sidebar [data-slot="sidebar-group"] {
-  padding: 12px 10px;
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"] {
-  position: relative;
-  min-height: 36px;
-  border-radius: 8px;
-  padding-inline: 10px;
-  color: #555e6d;
-  font-size: 12px !important;
-  font-weight: 450;
-  transition: background-color 180ms ease, color 180ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"]::before {
-  position: absolute;
-  left: 0;
-  width: 2px;
-  height: 16px;
-  border-radius: 999px;
-  background: #142b4a;
-  content: "";
-  opacity: 0;
-  transform: scaleY(0.25);
-  transition: opacity 180ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"] svg {
-  width: 16px;
-  height: 16px;
-  color: #677184;
-  stroke-width: 1.7;
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"]:hover {
-  background: rgba(20, 43, 74, 0.055);
-  color: #0d203a;
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"][data-active="true"] {
-  background: linear-gradient(90deg, rgba(20, 43, 74, 0.095), rgba(20, 43, 74, 0.045));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 1px 3px rgba(20, 43, 74, 0.025);
-  color: #0d203a;
-  font-weight: 650;
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"][data-active="true"]::before {
-  opacity: 1;
-  transform: scaleY(1);
-}
-
-.ws-sidebar [data-slot="sidebar-menu-button"][data-active="true"] svg {
-  color: #142b4a;
-}
-
-.ws-sidebar-footer {
-  gap: 8px;
-  padding: 10px;
-  border-top: 1px solid rgba(30, 43, 63, 0.08);
-  background: rgba(255, 255, 255, 0.36);
-}
-
-.ws-account-row {
-  padding: 8px 4px 2px;
-}
-
-.ws-account-row [data-slot="avatar"] {
-  background: #eef3f9;
-  border: 1px solid rgba(20, 43, 74, 0.12);
-  color: #142b4a;
-}
-
-.ws-inset,
-.ws-main {
-  background: transparent !important;
-}
-
-.ws-inset {
-  width: auto !important;
-  max-width: calc(100vw - var(--sidebar-width));
-}
-
-.ws-main,
-.dc-workspace-main {
-  min-width: 0;
-  min-height: calc(100vh - 64px);
-}
-
-.ws-page {
-  width: min(100%, 1240px);
-  padding: 44px 36px 96px;
-}
-
-.ws-shell h1 {
-  font-size: clamp(28px, 3vw, 38px) !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.035em !important;
-}
-
-.ws-kicker,
-.dc-eyebrow {
-  color: #697181;
-  font-size: 11px !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.04em !important;
-  text-transform: none;
-}
-
-.ws-primary-action,
-.dc-desktop-create-button,
-.av-results-actions [data-slot="button"]:last-child,
-.av-liquid-button {
-  border-color: #142b4a !important;
-  background: linear-gradient(145deg, #1b3c63, #102642) !important;
-  box-shadow: 0 8px 22px rgba(20, 43, 74, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
-  color: #ffffff !important;
-}
-
-.ws-primary-action:hover,
-.dc-desktop-create-button:hover,
-.av-results-actions [data-slot="button"]:last-child:hover,
-.av-liquid-button:hover {
-  background: #0d203a !important;
-}
-
-.ws-section-heading,
-.ws-agenda-row,
-.ws-project-row,
-.ws-waiting-row,
-.ws-calendar-row,
-.ws-person-row,
-.ws-project-group > header,
-.ws-people-tools {
-  border-color: rgba(30, 43, 63, 0.09);
-}
-
-.ws-section-heading a,
-.ws-add-task-row button,
-.ws-project-mobile-add,
-.ws-shell .dc-mobile-nav-link-active {
-  color: #142b4a;
-}
-
-.ws-agenda-marker,
-.ws-calendar-accent,
-.ws-progress-cell [data-slot="progress-indicator"],
-.ws-table-progress [data-slot="progress-indicator"],
-.ws-project-mobile-card [data-slot="progress-indicator"] {
-  background: #142b4a !important;
-}
-
-.ws-status-active,
-.ws-status-confirmed,
-.ws-status-working,
-.ws-status-complete,
-.ws-status-done {
-  background: #eef3f9;
-  color: #142b4a;
-}
-
-.ws-project-group > header,
-.ws-project-parent td:first-child {
-  border-color: #142b4a;
-}
-
-.ws-people-tools [data-slot="tabs-trigger"][data-state="active"] {
-  color: #142b4a;
-  box-shadow: inset 0 -2px #142b4a;
-}
-
-/* Authentication and public question surfaces */
 .dc-auth-page {
   position: relative;
   isolation: isolate;
@@ -359,7 +341,6 @@
   padding: clamp(20px, 3vw, 36px);
   background: #071827;
   color: #fff;
-  text-transform: none;
 }
 
 .dc-auth-shader,
@@ -371,8 +352,8 @@
 
 .dc-auth-shader > div,
 .dc-auth-shader canvas {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
 }
 
 .dc-auth-shader-scrim {
@@ -382,38 +363,11 @@
     linear-gradient(90deg, rgba(4, 16, 28, 0.74) 0%, rgba(4, 16, 28, 0.28) 52%, rgba(4, 16, 28, 0.12) 100%);
 }
 
-.dc-auth-page::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.26'/%3E%3C/svg%3E");
-  content: "";
-  mix-blend-mode: soft-light;
-  opacity: 0.12;
-  pointer-events: none;
-}
-
 .dc-auth-panel {
   position: relative;
   display: block;
   width: min(100%, 650px);
-  flex: none;
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   text-align: left;
-}
-
-.dc-auth-panel__content {
-  position: relative;
-  display: block;
-  padding: 0;
 }
 
 .dc-auth-copy {
@@ -422,28 +376,49 @@
   margin: 0 0 36px;
 }
 
-.dc-public-topbar--logo-only {
-  justify-content: flex-end;
-}
-
-.dc-auth-panel h1 {
-  max-width: none;
-  margin: 0 0 18px;
-  color: #fff;
-  font-size: clamp(3.25rem, 7vw, 5.5rem);
-  font-weight: 520;
-  letter-spacing: -0.058em;
-  line-height: 0.92;
-  text-align: left;
-}
-
-.dc-auth-guidance {
-  max-width: none;
+.dc-auth-page :where(h1, h2, h3, h4, h5, h6) {
   margin: 0;
-  color: rgba(255, 255, 255, 0.66);
-  font-size: clamp(0.96rem, 1.35vw, 1.08rem);
-  line-height: 1.6;
-  text-align: left;
+  color: #ffffff;
+  font-family: var(--lx-font);
+  line-height: 1.2;
+}
+
+/* This is a two-word sign-in prompt on an internal tool, not a landing-page
+   hero. It was rendering at 88px on a 1440 viewport against an 18px ceiling
+   everywhere else in the app. */
+.dc-auth-panel h1 {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Both live in JSX (LeadershipAuthScreen, DecisionAuthGate) and lost their
+   rules in the rewrite: the panel wrapper collapsed to a bare block and the
+   two access-denied states rendered their Alert and retry Button flush
+   against each other, since global.css zeroes all margins. */
+.dc-auth-panel__content {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.dc-auth-denied {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 420px);
+}
+
+.dc-auth-preview-pill {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .dc-auth-actions {
@@ -455,132 +430,43 @@
   margin: 0;
 }
 
-.dc-auth-secondary-action {
-  width: 100%;
-}
-
 .dc-auth-action[data-slot="button"] {
-  min-height: 56px;
+  min-height: 48px;
   justify-content: center;
-  padding: 0 22px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  background: #f7fbfc;
-  box-shadow: 0 16px 40px rgba(0, 7, 16, 0.25);
-  color: #0f2b3c;
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-transform: none;
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  border: 0;
+  border-radius: var(--lx-radius-control);
+  background: #ffffff;
+  color: var(--lx-navy);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: background-color var(--lx-dur-fast) var(--lx-ease);
 }
 
 .dc-auth-action[data-slot="button"]:hover {
-  background: #fff;
-  box-shadow: 0 20px 48px rgba(0, 7, 16, 0.32);
-  color: #0f2b3c;
-  transform: translateY(-2px);
+  background: #eef3f9;
 }
 
-.dc-auth-action[data-slot="button"]:focus-visible {
-  outline: 2px solid #e3b84f;
-  outline-offset: 4px;
-}
+/* --- Public ballot --------------------------------------------------------- */
 
 .dc-ballot-page,
-.av-public-page {
-  background:
-    radial-gradient(circle at 8% 5%, rgba(20, 43, 74, 0.025), transparent 24%),
-    #ffffff;
+.sched-public {
+  background: var(--lx-surface);
 }
 
-.dc-public-topbar,
-.av-public-topbar {
-  border-color: rgba(30, 43, 63, 0.1);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(22px) saturate(132%);
-  -webkit-backdrop-filter: blur(22px) saturate(132%);
+.dc-public-topbar {
+  border-color: var(--lx-hairline);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
 }
 
-/* Questions */
-.dc-page {
-  width: min(100%, 1280px);
-  padding: 44px 36px 96px;
-}
+/* --- Questions list -------------------------------------------------------- */
 
-.dc-decisions-page .dc-page-heading {
-  margin-bottom: 24px;
-}
-
-.dc-page-heading h1 {
-  margin: 0;
-  font-size: clamp(30px, 3.2vw, 40px);
-  font-weight: 650;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-}
-
+/* The tab bar inside supplies the divider; a border here would double it. */
 .dc-list-toolbar {
-  margin-bottom: 28px;
-  padding: 0;
-  border-color: rgba(30, 43, 63, 0.1);
-}
-
-.dc-list-toolbar [data-slot="tabs-list"] {
-  height: 44px;
-  gap: 24px;
-  background: transparent;
-  padding: 0;
-}
-
-.dc-list-toolbar [data-slot="tabs-trigger"] {
-  height: 44px;
-  padding: 0 2px;
-  border-radius: 0;
-  color: #697181;
-  font-size: 12px;
-  font-weight: 500;
-  box-shadow: none;
-}
-
-.dc-list-toolbar [data-slot="tabs-trigger"][data-state="active"] {
-  color: #142b4a;
-  font-weight: 650;
-  box-shadow: inset 0 -2px #142b4a;
-}
-
-.dc-decision-list {
-  border-top: 1px solid rgba(30, 43, 63, 0.1);
-  border-bottom: 1px solid rgba(30, 43, 63, 0.1);
-}
-
-.dc-question-table-head,
-.dc-decision-row {
-  display: grid;
-  grid-template-columns: minmax(260px, 1.5fr) minmax(150px, 0.72fr) minmax(135px, 0.65fr) minmax(190px, 0.9fr) 112px;
+  min-height: 52px;
+  display: flex;
   align-items: center;
-  gap: 20px;
-}
-
-.dc-question-table-head {
-  min-height: 44px;
-  padding: 0 14px;
-  color: #737c8b;
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
-}
-
-.dc-decision-row {
-  min-height: 110px;
-  padding: 18px 14px;
-  border-top: 1px solid rgba(30, 43, 63, 0.09);
-  transition: background-color 180ms ease, box-shadow 240ms ease;
-}
-
-.dc-decision-row:hover {
-  background: rgba(20, 43, 74, 0.018);
-  box-shadow: inset 2px 0 #142b4a;
 }
 
 .dc-question-cell {
@@ -589,40 +475,18 @@
 
 .dc-question-cell h2 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 13.5px;
+  font-weight: 600;
   line-height: 1.35;
-  letter-spacing: -0.01em;
 }
 
 .dc-question-cell h2 a {
-  color: #121722;
+  color: var(--lx-ink);
   text-decoration: none;
 }
 
 .dc-question-cell h2 a:hover {
-  color: #142b4a;
-}
-
-.dc-question-updated {
-  display: block;
-  margin-top: 6px;
-  color: #858e9c;
-  font-size: 11px;
-}
-
-.dc-question-status-stack {
-  display: flex;
-  align-items: center;
-}
-
-.dc-question-meta-cell {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #566071;
-  font-size: 11px;
-  line-height: 1.35;
+  color: var(--lx-navy);
 }
 
 .dc-question-response-cell {
@@ -630,15 +494,7 @@
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  gap: 8px;
-}
-
-.dc-question-meta-cell svg {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  color: #737c8b;
-  stroke-width: 1.7;
+  gap: 6px;
 }
 
 .dc-response-state {
@@ -646,17 +502,16 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 0;
   border: 0;
   background: transparent;
-  color: #7a5a08;
-  font-size: 10px;
-  font-weight: 650;
+  color: #b54708;
+  font-size: 11.5px;
+  font-weight: 560;
   line-height: 1.25;
 }
 
 .dc-response-state-done {
-  color: #142b4a;
+  color: #175cd3;
 }
 
 .dc-response-state svg {
@@ -666,415 +521,44 @@
   stroke-width: 1.9;
 }
 
-.dc-decision-row-side {
-  align-items: flex-end;
-}
+/* --- Shared list furniture ------------------------------------------------- */
 
-.dc-decision-row-side [data-slot="button"] {
-  min-height: 36px;
-  margin: 0;
-  border-color: rgba(30, 43, 63, 0.14);
-  background: rgba(255, 255, 255, 0.76);
-}
-
-.dc-decision-row-mobile-summary {
-  display: none;
-}
-
-.dc-status-badge,
-.dc-decision-status {
-  border-color: rgba(20, 43, 74, 0.16) !important;
-  background: #eef3f9 !important;
-  color: #142b4a !important;
-}
-
-/* Scheduling */
-.av-public-page h1,
-.av-create-page h1,
-.av-workspace-results h1 {
-  font-size: clamp(28px, 3vw, 38px);
-  font-weight: 650;
-  letter-spacing: -0.035em;
-}
-
-.av-scheduling-index {
-  width: min(100%, 1080px);
-  margin-top: 20px;
-}
-
-.av-scheduling-index__header {
-  padding-bottom: 14px;
-}
-
-.av-scheduling-index__header h2 {
-  margin: 0;
-  color: #121722;
-  font-size: 17px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-
-.av-scheduling-list {
-  border-top: 1px solid rgba(30, 43, 63, 0.12);
-  border-bottom: 1px solid rgba(30, 43, 63, 0.12);
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.av-scheduling-row {
-  min-height: 86px;
-  display: grid;
-  grid-template-columns: minmax(220px, 1.25fr) minmax(220px, 1fr) 112px 132px;
-  align-items: center;
-  gap: 20px;
-  padding: 18px 20px;
-  border-bottom: 1px solid rgba(30, 43, 63, 0.09);
-}
-
-.av-scheduling-row:last-child {
-  border-bottom: 0;
-}
-
-.av-scheduling-row h3,
-.av-scheduling-row p {
-  margin: 0;
-}
-
-.av-scheduling-row h3 {
-  color: #121722;
-  font-size: 14px;
-  font-weight: 620;
-  letter-spacing: -0.01em;
-}
-
-.av-scheduling-row p,
-.av-scheduling-status {
-  color: #697181;
-  font-size: 11.5px;
-}
-
-.av-scheduling-status--needed {
-  color: #85640d;
-}
-
-.av-scheduling-status--finalized {
-  color: #4f5866;
-}
-
-.av-scheduling-row__action[data-slot="button"] {
-  min-height: 44px;
-  justify-self: end;
-  padding-inline: 4px;
-  color: #142b4a;
-  font-size: 12px;
-  font-weight: 620;
-}
-
-.av-scheduling-row__action svg {
-  width: 14px;
-  height: 14px;
-}
-
-.av-scheduling-message {
-  min-height: 86px;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 18px 20px;
-  color: #697181;
-  font-size: 12px;
-}
-
-.av-results-panel {
-  margin-top: 30px;
-}
-
-.av-results-heading h2 {
-  color: #142b4a;
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.av-results-summary {
-  color: #697181;
-  font-size: 11px;
-}
-
-.av-best-times {
-  margin-top: 18px;
-}
-
-.av-best-time {
-  min-height: 58px;
-  border-color: rgba(30, 43, 63, 0.09);
-  color: #142b4a;
-  font-size: 11px;
-}
-
-.av-best-time-top {
-  border: 1px solid rgba(20, 43, 74, 0.13);
-  background: linear-gradient(135deg, rgba(238, 243, 249, 0.94), rgba(255, 255, 255, 0.78));
-  box-shadow: 0 6px 20px rgba(18, 31, 49, 0.035), inset 0 1px 0 rgba(255, 255, 255, 0.78);
-}
-
-.av-best-rank {
-  border-color: rgba(20, 43, 74, 0.16);
-}
-
-.av-best-time-top .av-best-rank,
-.av-best-time [data-slot="progress-indicator"] {
-  background: #142b4a;
-}
-
-.av-best-time [data-slot="progress"] {
-  background: rgba(20, 43, 74, 0.1);
-}
-
-.av-results-actions [data-slot="button"]:first-child {
-  border-color: rgba(30, 43, 63, 0.14);
-  background: rgba(255, 255, 255, 0.78);
-}
-
-.av-heatmap-wrap {
-  margin-top: 34px;
-}
-
-.av-heatmap-cell {
-  border-color: #ffffff;
-  background: rgb(20 43 74 / calc(0.045 + var(--av-strength) * 0.955));
-}
-
-.av-grid {
-  border-color: rgba(30, 43, 63, 0.1);
-  background: #f4f6f9;
-}
-
-.av-grid-corner,
-.av-date-heading,
-.av-time-label,
-.av-slot,
-.av-slot-boundary {
-  border-color: rgba(30, 43, 63, 0.1);
-}
-
-.av-slot[data-selected],
-.av-create-page [data-slot="switch"][data-state="checked"] {
-  background: #142b4a;
-}
-
-.av-create-page,
-.av-workspace-results {
-  padding: 44px 36px 96px;
-}
-
-/* Authenticated admin surface rhythm */
-.ws-shell {
-  --ws-content-max: 1180px;
-  --ws-page-x: clamp(28px, 4vw, 48px);
-  --ws-page-y: 40px;
-  --ws-surface-radius: 14px;
-  --ws-section-gap: 24px;
-}
-
-.ws-sidebar-header {
-  min-height: 72px;
-  justify-content: center;
-  padding: 12px 14px;
-}
-
-.ws-brand {
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 9px;
-  padding: 6px;
-  color: #142b4a;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-}
-
-.ws-brand:hover {
-  background: rgba(20, 43, 74, 0.05);
-}
-
-.ws-brand img {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  object-fit: contain;
-}
-
-.ws-sidebar[data-collapsible="icon"] .ws-brand {
-  justify-content: center;
-  padding-inline: 0;
-}
-
-.ws-sidebar[data-collapsible="icon"] .ws-brand span {
-  display: none;
-}
-
-.ws-app-header {
-  display: none;
-}
-
-.ws-main,
-.dc-workspace-main {
-  min-height: 100vh;
-}
-
-.ws-page,
-.dc-page,
-.av-create-page,
-.av-workspace-results {
-  width: min(100%, var(--ws-content-max));
-  margin: 0 auto;
-  padding: var(--ws-page-y) var(--ws-page-x) 88px;
-}
-
-.ws-page-header,
-.dc-page-heading {
-  width: 100%;
+.dc-app-shell :is(
+  [data-slot="empty"],
+  .ws-empty,
+  .dc-empty-state
+) {
+  min-height: 180px;
   max-width: none;
-  min-height: 88px;
-  margin: 0 0 28px;
-  padding: 0 0 24px;
-  border-bottom: 1px solid rgba(30, 43, 63, 0.1);
-}
-
-.ws-page-header-row,
-.dc-page-heading-actions {
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.dc-page-heading-actions > div {
-  max-width: 760px;
-}
-
-.ws-page-header h1,
-.dc-page-heading h1 {
-  margin: 5px 0 0;
-  font-size: clamp(30px, 3.2vw, 38px) !important;
-  line-height: 1.06;
-}
-
-.ws-kicker,
-.dc-eyebrow {
-  margin: 0 !important;
-  color: #697181;
-  letter-spacing: 0.075em !important;
-  text-transform: uppercase;
-}
-
-.ws-primary-action,
-.dc-desktop-create-button {
-  min-height: 40px;
-  flex: 0 0 auto;
-  padding-inline: 16px;
-}
-
-.ws-overview-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--ws-section-gap);
-}
-
-.ws-section {
-  overflow: hidden;
-  border: 1px solid rgba(30, 43, 63, 0.1);
-  border-radius: var(--ws-surface-radius);
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 10px 30px rgba(18, 31, 49, 0.035);
-}
-
-.ws-section-heading,
-.ws-calendar-agenda > h2 {
-  min-height: 54px;
-  margin: 0;
-  padding: 0 20px;
-  border-bottom: 1px solid rgba(30, 43, 63, 0.09);
-}
-
-.ws-calendar-agenda > h2 {
-  display: flex;
-  align-items: center;
-}
-
-.ws-agenda-list,
-.ws-project-list,
-.ws-waiting > :not(.ws-section-heading) {
-  margin-inline: 20px;
-}
-
-.ws-waiting {
-  margin-top: var(--ws-section-gap);
-}
-
-.ws-empty,
-.dc-empty-state,
-.av-empty-list,
-.av-detail-empty,
-.ws-page-empty {
-  min-height: 220px;
   margin: 0;
   border: 0;
   border-radius: 0;
-  color: #697181;
-}
-
-.ws-empty [data-slot="empty-icon"]:not([data-variant="icon"]) > svg {
-  width: 22px;
-  height: 22px;
-  margin: 0 auto 4px;
-  color: #697181;
-}
-
-.ws-page-empty,
-.dc-empty-state {
-  min-height: 340px;
-  border: 1px dashed rgba(30, 43, 63, 0.14);
-  border-radius: var(--ws-surface-radius);
-  background: rgba(248, 250, 253, 0.5);
-}
-
-.dc-empty-state {
-  max-width: none;
+  background: transparent;
+  color: var(--lx-muted);
 }
 
 .ws-date-strip {
-  border: 1px solid rgba(30, 43, 63, 0.1);
-  border-radius: var(--ws-surface-radius);
-  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--lx-hairline);
+  border-radius: var(--lx-radius-surface);
+  background: var(--lx-surface);
 }
 
-.ws-calendar-agenda {
-  margin-top: var(--ws-section-gap);
-}
-
-.ws-calendar-row {
-  margin-inline: 20px;
-}
-
-.ws-people-tools {
-  min-height: 56px;
-  padding: 0 0 14px;
-}
-
-.ws-people-tools [data-slot="tabs-trigger"] > span {
-  display: inline-flex;
+/* Targeted by class, not `> span`. TabsTrigger now wraps its children in a
+   label element and renders the sliding indicator as a sibling span, so a
+   direct-child selector caught both — the indicator inherited the pill's 20px
+   height and canvas fill and rendered as a grey block over the tab. */
+.ws-tab-count {
   min-width: 20px;
   height: 20px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: 5px;
   padding-inline: 6px;
-  border-radius: 999px;
-  background: rgba(20, 43, 74, 0.06);
-  color: var(--leadership-subtle);
-  font-size: 0.69rem;
+  border-radius: var(--lx-radius-pill);
+  background: var(--lx-canvas);
+  color: var(--lx-muted);
+  font-size: 11.5px;
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1082,11 +566,12 @@
   grid-template-columns: 1fr;
 }
 
+/* Base geometry (min-height, grid tracks) belongs to workspace.css, which
+   loads first. Only the shell-level inset is added here; the ≤820px reflow
+   below stays here so there is one place that owns the breakpoint. */
 .ws-person-row {
-  grid-template-columns: 44px minmax(0, 1fr) minmax(160px, 32%);
-  min-height: 72px;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--lx-radius-control);
 }
 
 .ws-person-row strong {
@@ -1102,253 +587,26 @@
   max-width: 62ch;
 }
 
-@media (max-width: 1040px) {
-  .dc-question-table-head,
-  .dc-decision-row {
-    grid-template-columns: minmax(240px, 1.4fr) minmax(145px, 0.72fr) minmax(125px, 0.62fr) 104px;
-  }
-
-  .dc-question-table-head > :nth-child(4),
-  .dc-decision-row > .dc-question-meta-cell:nth-of-type(4) {
-    display: none;
-  }
-}
-
 @media (max-width: 820px) {
-  .ws-inset {
-    max-width: 100vw;
-  }
-
-  .ws-app-header {
-    display: flex;
-    padding: 0 16px;
-  }
-
-  .ws-app-header-controls {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .ws-corner-logo {
-    width: 36px;
-    height: 36px;
-  }
-
-  .ws-corner-logo img {
-    width: 32px;
-    height: 32px;
-  }
-
-  .ws-shell .dc-mobile-nav {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 48;
-    min-height: calc(70px + env(safe-area-inset-bottom));
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding: 7px 8px env(safe-area-inset-bottom);
-    background: rgba(255, 255, 255, 0.9) !important;
-    border-top: 1px solid rgba(30, 43, 63, 0.1);
-    box-shadow: 0 -16px 40px rgba(18, 31, 49, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(24px) saturate(138%);
-    -webkit-backdrop-filter: blur(24px) saturate(138%);
-  }
-
-  .ws-shell .dc-mobile-nav-link {
-    position: relative;
-    min-width: 0;
-    gap: 4px;
-    border-radius: 9px;
-    color: #737c8b;
-    font-size: 10px !important;
-    font-weight: 500;
-  }
-
-  .ws-shell .dc-mobile-nav-link::before {
-    position: absolute;
-    top: -7px;
-    width: 32px;
-    height: 2px;
-    border-radius: 0 0 999px 999px;
-    background: #142b4a;
-    content: "";
-    opacity: 0;
-    transform: scaleX(0.3);
-    transition: opacity 180ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .ws-shell .dc-mobile-nav-link-active {
-    background: transparent;
-    color: #142b4a;
-    font-weight: 650;
-  }
-
-  .ws-shell .dc-mobile-nav-link-active::before {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-
-  .ws-page,
-  .dc-page,
-  .av-create-page,
-  .av-workspace-results {
-    padding: 26px 16px 112px;
-  }
-
-  .ws-main,
-  .dc-workspace-main {
-    min-height: calc(100vh - 64px);
-  }
-
-  .ws-page-header,
-  .dc-page-heading {
-    min-height: 76px;
-    margin-bottom: 20px;
-    padding-bottom: 18px;
-  }
-
-  .ws-page-header-row,
-  .dc-page-heading-actions {
-    gap: 14px;
-  }
-
-  .ws-page-header-row {
-    align-items: center;
-  }
-
-  .dc-page-heading-actions {
-    align-items: flex-start;
-  }
-
-  .ws-overview-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .ws-waiting,
-  .ws-calendar-agenda {
-    margin-top: 16px;
-  }
-
-  .dc-page-heading h1,
-  .av-detail-heading h1,
-  .av-public-page h1,
-  .av-create-page h1 {
-    font-size: 26px;
-  }
-
-  .dc-question-table-head {
-    display: none;
-  }
-
-  .dc-decision-list {
-    border-top: 0;
-  }
-
-  .dc-decision-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px 18px;
-    min-height: 0;
-    padding: 20px 14px;
-    border: 1px solid rgba(30, 43, 63, 0.1);
-    border-radius: 11px;
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 7px 24px rgba(18, 31, 49, 0.035), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  }
-
-  .dc-decision-row + .dc-decision-row {
-    margin-top: 10px;
-  }
-
   .dc-question-cell {
     grid-column: 1 / -1;
   }
 
-  .dc-question-cell h2 {
-    font-size: 14px;
-  }
-
-  .dc-question-status-stack,
-  .dc-question-response-cell,
-  .dc-question-meta-cell {
+  .dc-question-response-cell {
     display: none;
   }
 
-  .dc-decision-row-side {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .dc-decision-row-mobile-summary {
-    grid-column: 1;
-    grid-row: 2;
-    display: block;
-  }
-
-  .dc-decision-meta {
-    margin-top: 8px;
-  }
-
-  .av-scheduling-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 5px 18px;
-    padding-inline: 16px;
-  }
-
-  .av-scheduling-row h3 {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .av-scheduling-row p {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .av-scheduling-status {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  .av-scheduling-row__action[data-slot="button"] {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-  }
-
   .ws-person-row {
-    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-columns: 40px minmax(0, 1fr);
   }
 
   .ws-person-team {
     grid-column: 2;
     justify-self: start;
-    margin-top: -7px;
+    margin-top: -6px;
     text-align: left;
   }
 
-  .av-results-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .av-best-time {
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    gap: 10px;
-    min-height: 66px;
-  }
-
-  .av-best-time [data-slot="progress"] {
-    grid-column: 2 / -1;
-  }
-
-  .av-create-page,
-  .av-workspace-results {
-    padding: 28px 16px 112px;
-  }
 }
 
 @media (max-width: 520px) {
@@ -1361,64 +619,72 @@
     width: 100%;
   }
 
-  .dc-auth-panel__content {
-    padding: 20px;
-  }
-
   .dc-auth-copy {
     margin: 0 0 30px;
   }
 
   .dc-auth-panel h1 {
-    margin-bottom: 16px;
-    font-size: clamp(3rem, 16vw, 4.2rem);
-    line-height: 0.94;
-  }
-
-  .dc-auth-guidance {
-    font-size: 0.91rem;
+    margin-bottom: 12px;
+    font-size: 1.75rem;
+    line-height: 1.15;
   }
 
   .dc-auth-actions {
     width: 100%;
   }
 
-  .dc-page-heading-actions {
-    align-items: flex-start;
-  }
-
-  .dc-desktop-create-button {
-    display: inline-flex !important;
-    min-height: 38px;
-    padding-inline: 12px;
-  }
-
-  .dc-list-toolbar [data-slot="tabs-list"] {
-    gap: 18px;
-  }
-
-  .av-results-actions {
-    justify-content: space-between;
-  }
-
-  .av-heatmap {
-    min-width: 520px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dc-app-shell *,
+  .dc-app-shell *::before,
+  .dc-app-shell *::after,
   .dc-ballot-page *,
+  .dc-ballot-page *::before,
+  .dc-ballot-page *::after,
   .dc-auth-page *,
-  .av-public-page *,
-  .av-create-page *,
-  .av-workspace-results *,
-  .ws-shell * {
-    scroll-behavior: auto !important;
-    animation-name: none !important;
+  .dc-auth-page *::before,
+  .dc-auth-page *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Radix portals mount on <body>, as siblings of the roots above, so none of
+     those rules reach an open dialog, sheet, select, dropdown or tooltip —
+     all of which carry `animate-in` / `animate-out`. Same `body:has()`
+     mechanism as the portal escape at the top of this file. */
+  body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+    [data-slot="dialog-overlay"],
+    [data-slot="dialog-content"],
+    [data-slot="alert-dialog-overlay"],
+    [data-slot="alert-dialog-content"],
+    [data-slot="sheet-overlay"],
+    [data-slot="sheet-content"],
+    [data-slot="select-content"],
+    [data-slot="dropdown-menu-content"],
+    [data-slot="dropdown-menu-sub-content"],
+    [data-slot="tooltip-content"]
+  ) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Loading indicators are information, not decoration. */
+  .dc-app-shell [data-slot="spinner"],
+  .dc-app-shell .animate-spin,
+  .dc-ballot-page [data-slot="spinner"],
+  .dc-ballot-page .animate-spin,
+  .dc-auth-page [data-slot="spinner"],
+  .dc-auth-page .animate-spin,
+  body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
+    [data-slot="dialog-content"],
+    [data-slot="sheet-content"]
+  ) :is([data-slot="spinner"], .animate-spin) {
+    animation-duration: 900ms !important;
+    animation-iteration-count: infinite !important;
   }
 
   .dc-auth-shader {
@@ -1427,7 +693,7 @@
 
   .dc-auth-page {
     background:
-      radial-gradient(circle at 80% 20%, rgba(8, 125, 121, 0.72), transparent 38%),
+      radial-gradient(circle at 80% 20%, rgba(20, 43, 74, 0.72), transparent 38%),
       radial-gradient(circle at 92% 82%, rgba(212, 160, 52, 0.32), transparent 32%),
       #071827;
   }

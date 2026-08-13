@@ -9,10 +9,21 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { useAvailabilityData } from "../availabilityDataContext"
-import { dayParts, minutesLabel, timezoneLabel } from "../format"
+import { dateLabel, dayParts, minutesLabel, timezoneLabel } from "../format"
 import type { AvailabilityPollDetail } from "../types"
 
 type SaveState = "idle" | "saving" | "saved" | "error"
+
+function PublicTopbar({ title, backTo }: { title: string; backTo: string }) {
+  return (
+    <header className="sched-public-topbar">
+      <Button variant="ghost" size="icon-sm" asChild aria-label="Back to scheduling">
+        <Link to={backTo}><ChevronLeft /></Link>
+      </Button>
+      <h1>{title}</h1>
+    </header>
+  )
+}
 
 export function AvailabilityPollPage() {
   const { slug } = useParams()
@@ -20,13 +31,20 @@ export function AvailabilityPollPage() {
   const poll = pollBySlug(slug)
 
   if (snapshot.loading) {
-    return <main id="main-content" className="av-public-page"><p className="av-loading">opening poll…</p></main>
+    return (
+      <main id="main-content" className="sched-root sched-public">
+        <PublicTopbar title="Loading…" backTo="/scheduling" />
+      </main>
+    )
   }
+
   if (!poll) {
     return (
-      <main id="main-content" className="av-public-page av-not-found">
-        <h1>poll not found</h1>
-        <Button asChild variant="outline"><Link to="/scheduling">back to scheduling</Link></Button>
+      <main id="main-content" className="sched-root sched-public">
+        <PublicTopbar title="Poll not found" backTo="/scheduling" />
+        <div className="sched-public-body">
+          <Button variant="outline" size="sm" asChild><Link to="/scheduling">Back to scheduling</Link></Button>
+        </div>
       </main>
     )
   }
@@ -117,59 +135,65 @@ function AvailabilityPollContent({ poll }: { poll: AvailabilityPollDetail }) {
     persist([...selectedRef.current])
   }
 
-  return (
-    <main id="main-content" className="av-public-page">
-      <header className="av-public-topbar">
-        <Button variant="ghost" size="icon" asChild aria-label="back to scheduling">
-          <Link to="/scheduling"><ChevronLeft /></Link>
-        </Button>
-        <Link to="/scheduling" className="av-logo-lockup" aria-label="Scheduling">
-          <img src="/logo.png" alt="" />
-        </Link>
-      </header>
+  const saveMessage = saveState === "saving"
+    ? "Saving…"
+    : saveState === "error"
+      ? "Try again"
+      : saveState === "saved"
+        ? "Saved"
+        : "Drag across the times that work"
 
-      <article className="av-poll-document">
-        <header className="av-poll-heading">
-          <h1>{poll.title}</h1>
-          {poll.note ? <p>{poll.note}</p> : null}
-          <span className="av-timezone">{timezoneLabel(poll.timezone)}</span>
-        </header>
+  const canSeeResults = (poll.hasResponded && poll.resultsVisibility === "after-submit") || poll.canManage
+
+  return (
+    <main id="main-content" className="sched-root sched-public">
+      <PublicTopbar title={poll.title} backTo="/scheduling" />
+
+      <article className="sched-public-body">
+        {poll.note ? <p className="sched-note">{poll.note}</p> : null}
+        <p className="sched-meta">{timezoneLabel(poll.timezone)}</p>
 
         {poll.status === "finalized" && poll.finalizedDateKey && poll.finalizedStartMinutes !== undefined ? (
-          <section className="av-final-time">
-            <Check />
-            <p>{poll.finalizedDateKey} · {minutesLabel(poll.finalizedStartMinutes)}</p>
-          </section>
+          <p className="sched-final">
+            <Check aria-hidden="true" />
+            {dateLabel(poll.finalizedDateKey, { weekday: "short", month: "short", day: "numeric" })} · {minutesLabel(poll.finalizedStartMinutes)}
+          </p>
         ) : (
           <>
             <div
-              className="av-grid"
-              style={{ "--av-date-count": poll.dateKeys.length } as React.CSSProperties}
+              className="sched-grid"
+              style={{ "--sched-dates": poll.dateKeys.length } as React.CSSProperties}
               onPointerDown={startDrag}
               onPointerMove={continueDrag}
               onPointerUp={finishDrag}
               onPointerCancel={finishDrag}
-              role="grid"
-              aria-label="choose every time you are available"
+              role="group"
+              aria-label="Times you are available"
             >
-              <span className="av-grid-corner" />
+              <span className="sched-grid__corner" />
               {poll.dateKeys.map((dateKey) => {
                 const parts = dayParts(dateKey)
-                return <span className="av-date-heading" key={dateKey}><small>{parts.day}</small><strong>{parts.date}</strong></span>
+                return (
+                  <span className="sched-grid__date" key={dateKey}>
+                    <small>{parts.day}</small><strong>{parts.date}</strong>
+                  </span>
+                )
               })}
               {minutes.flatMap((minute) => [
-                <span className="av-time-label" key={`time-${minute}`}>{minute % 30 === 0 ? minutesLabel(minute) : ""}</span>,
+                <span className="sched-grid__time" key={`time-${minute}`}>
+                  {minute % 30 === 0 ? minutesLabel(minute) : ""}
+                </span>,
                 ...poll.dateKeys.map((dateKey) => {
                   const key = `${dateKey}@${minute}`
                   const active = selected.has(key)
                   return (
                     <button
                       type="button"
-                      className="av-slot"
+                      className="sched-slot"
                       data-availability-key={key}
                       data-selected={active || undefined}
                       aria-pressed={active}
-                      aria-label={`${dateKey}, ${minutesLabel(minute)}`}
+                      aria-label={`${dateLabel(dateKey)}, ${minutesLabel(minute)}`}
                       key={key}
                       onClick={(event) => {
                         if (event.detail !== 0) return
@@ -182,24 +206,21 @@ function AvailabilityPollContent({ poll }: { poll: AvailabilityPollDetail }) {
                   )
                 }),
               ])}
-              <span className="av-time-label av-time-boundary">{minutesLabel(poll.endMinutes)}</span>
-              {poll.dateKeys.map((dateKey) => <span className="av-slot-boundary" key={`${dateKey}-boundary`} />)}
+              <span className="sched-grid__time sched-grid__time--edge">{minutesLabel(poll.endMinutes)}</span>
+              {poll.dateKeys.map((dateKey) => <span className="sched-grid__edge" key={`${dateKey}-boundary`} />)}
             </div>
 
-            <div className="av-save-state" data-save-state={saveState} role="status" aria-live="polite">
-              {saveState === "saving" ? "saving…" : saveState === "error" ? "try again" : saveState === "saved" ? <><Check /> saved</> : "drag across every time that works"}
-            </div>
+            <p className="sched-save" role="status" aria-live="polite">
+              {saveState === "saved" ? <Check aria-hidden="true" /> : null}
+              {saveMessage}
+            </p>
           </>
         )}
 
-        {(poll.hasResponded && poll.resultsVisibility === "after-submit") || poll.canManage ? (
-          <div className="av-poll-action">
-            <Button
-              className="av-liquid-button"
-              variant="outline"
-              onClick={() => navigate(`/s/${poll.slug}/results`)}
-            >
-              see best times
+        {canSeeResults ? (
+          <div className="sched-actions">
+            <Button variant="outline" onClick={() => navigate(`/s/${poll.slug}/results`)}>
+              See best times
             </Button>
           </div>
         ) : null}

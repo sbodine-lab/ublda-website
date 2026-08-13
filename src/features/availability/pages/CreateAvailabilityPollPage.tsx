@@ -1,9 +1,10 @@
-import { Check, Plus, X } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { useMemo, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel, FieldTitle } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -16,6 +17,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
+import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
 import {
   dateLabel,
@@ -48,7 +50,17 @@ export function CreateAvailabilityPollPage() {
   const sortedDates = useMemo(() => [...dates].sort(), [dates])
 
   if (viewer?.role !== "admin") {
-    return <div className="dc-page av-create-denied"><h1>admin access required</h1></div>
+    return (
+      <LeadershipPage className="sched-root">
+        <Alert>
+          <AlertTitle>Admin access required</AlertTitle>
+          <AlertDescription>Only admins can create polls.</AlertDescription>
+        </Alert>
+        <div className="sched-actions">
+          <Button variant="outline" size="sm" asChild><Link to="/scheduling">Back to scheduling</Link></Button>
+        </div>
+      </LeadershipPage>
+    )
   }
 
   const addDate = () => {
@@ -76,91 +88,133 @@ export function CreateAvailabilityPollPage() {
       const href = `${window.location.origin}/s/${created.slug}`
       try {
         await navigator.clipboard.writeText(href)
-        toast("poll created · link copied")
+        toast("Poll created · link copied")
       } catch {
-        toast("poll created")
+        toast("Poll created")
       }
       navigate(`/s/${created.slug}`)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "the poll could not be created.")
+      setError(caught instanceof Error ? caught.message : "The poll could not be created.")
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="dc-page av-create-page">
-      <header className="av-create-header">
-        <h1>new scheduling poll</h1>
-        <Button variant="ghost" size="icon" asChild aria-label="close">
-          <Link to="/scheduling"><X /></Link>
-        </Button>
-      </header>
-
-      <form onSubmit={submit} className="av-create-form">
-        <FieldGroup>
+    <LeadershipPage className="sched-root">
+      <LeadershipSurface>
+        <form onSubmit={submit} className="sched-form">
           <Field>
-            <FieldLabel htmlFor="availability-title">what are we scheduling?</FieldLabel>
-            <Input id="availability-title" value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={160} autoFocus />
+            <FieldLabel htmlFor="poll-title">What are we scheduling</FieldLabel>
+            <Input
+              id="poll-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              required
+              maxLength={160}
+              autoFocus
+            />
           </Field>
 
-          <Field>
-            <FieldLabel>how long?</FieldLabel>
-            <Select value={String(duration)} onValueChange={(value) => setDuration(Number(value))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectGroup>{durations.map((value) => <SelectItem value={String(value)} key={value}>{value} minutes</SelectItem>)}</SelectGroup></SelectContent>
-            </Select>
-          </Field>
+          <div className="sched-form-row">
+            <Field>
+              <FieldLabel htmlFor="poll-length">Length</FieldLabel>
+              <Select value={String(duration)} onValueChange={(value) => setDuration(Number(value))}>
+                <SelectTrigger id="poll-length" aria-label="Length"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {durations.map((value) => (
+                      <SelectItem value={String(value)} key={value}>{value} minutes</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
 
-          <Field>
-            <FieldLabel>possible dates</FieldLabel>
-            <div className="av-date-chips">
-              {sortedDates.map((dateKey) => (
-                <Button type="button" variant="outline" size="sm" key={dateKey} onClick={() => setDates((current) => current.filter((value) => value !== dateKey))}>
-                  {dateLabel(dateKey).toLowerCase()} <X data-icon="inline-end" />
-                </Button>
-              ))}
+            <Field>
+              <FieldLabel htmlFor="poll-deadline">Reply by</FieldLabel>
+              <Input
+                id="poll-deadline"
+                type="datetime-local"
+                value={deadline}
+                onChange={(event) => setDeadline(event.target.value)}
+              />
+            </Field>
+          </div>
+
+          <Field aria-labelledby="poll-dates-title">
+            <FieldTitle id="poll-dates-title">Possible dates</FieldTitle>
+            {sortedDates.length ? (
+              <div className="sched-chips">
+                {sortedDates.map((dateKey) => (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    key={dateKey}
+                    aria-label={`Remove ${dateLabel(dateKey)}`}
+                    onClick={() => setDates((current) => current.filter((value) => value !== dateKey))}
+                  >
+                    {dateLabel(dateKey)} <X data-icon="inline-end" />
+                  </Button>
+                ))}
+              </div>
+            ) : null}
+            <div className="sched-add-date">
+              <Input
+                type="date"
+                value={newDate}
+                onChange={(event) => setNewDate(event.target.value)}
+                aria-label="Add a date"
+              />
+              <Button type="button" variant="outline" onClick={addDate} disabled={!newDate || dates.length >= 14}>
+                <Plus data-icon="inline-start" /> Add date
+              </Button>
             </div>
-            <div className="av-add-date">
-              <Input type="date" value={newDate} onChange={(event) => setNewDate(event.target.value)} aria-label="add possible date" />
-              <Button type="button" variant="ghost" onClick={addDate} disabled={!newDate || dates.length >= 14}><Plus data-icon="inline-start" /> add date</Button>
+          </Field>
+
+          <Field aria-labelledby="poll-window-title">
+            <FieldTitle id="poll-window-title">Time window</FieldTitle>
+            <div className="sched-time-window">
+              <Input
+                type="time"
+                step="900"
+                value={startTime}
+                onChange={(event) => setStartTime(event.target.value)}
+                aria-label="Earliest time"
+              />
+              <span aria-hidden="true">–</span>
+              <Input
+                type="time"
+                step="900"
+                value={endTime}
+                onChange={(event) => setEndTime(event.target.value)}
+                aria-label="Latest time"
+              />
             </div>
+            <p className="sched-meta">{timezoneLabel(timezone)}</p>
           </Field>
 
-          <Field>
-            <FieldLabel>time window</FieldLabel>
-            <div className="av-time-inputs">
-              <Input type="time" step="900" value={startTime} onChange={(event) => setStartTime(event.target.value)} aria-label="earliest time" />
-              <span>—</span>
-              <Input type="time" step="900" value={endTime} onChange={(event) => setEndTime(event.target.value)} aria-label="latest time" />
-            </div>
+          <Field aria-labelledby="poll-who-title">
+            <FieldTitle id="poll-who-title">Who responds</FieldTitle>
+            <p className="sched-static">All {activeMembers.length} members</p>
           </Field>
 
-          <Field>
-            <FieldLabel>who should respond?</FieldLabel>
-            <div className="av-readonly-value">all {activeMembers.length} members</div>
+          <Field orientation="horizontal">
+            <FieldLabel htmlFor="poll-results">Show results to members</FieldLabel>
+            <Switch id="poll-results" checked={showResults} onCheckedChange={setShowResults} />
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="availability-deadline">reply by</FieldLabel>
-            <Input id="availability-deadline" type="datetime-local" value={deadline} onChange={(event) => setDeadline(event.target.value)} />
-          </Field>
+          {error ? <p className="sched-error" role="alert">{error}</p> : null}
 
-          <div className="av-readonly-value av-timezone-value">{timezoneLabel(timezone)}</div>
-
-          <Field orientation="horizontal" className="av-switch-field">
-            <FieldLabel htmlFor="availability-results">let people see results</FieldLabel>
-            <Switch id="availability-results" checked={showResults} onCheckedChange={setShowResults} />
-          </Field>
-        </FieldGroup>
-
-        {error ? <p className="dc-inline-error" role="alert">{error}</p> : null}
-
-        <Button type="submit" variant="outline" className="av-liquid-button" disabled={submitting || !title.trim() || dates.length === 0}>
-          {submitting ? <Spinner data-icon="inline-start" /> : <Check data-icon="inline-start" />}
-          create & copy link
-        </Button>
-      </form>
-    </div>
+          <div className="sched-form-actions">
+            <Button type="submit" disabled={submitting || !title.trim() || dates.length === 0}>
+              {submitting ? <Spinner data-icon="inline-start" /> : null}
+              Create poll
+            </Button>
+          </div>
+        </form>
+      </LeadershipSurface>
+    </LeadershipPage>
   )
 }
