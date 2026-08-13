@@ -8,6 +8,7 @@ import {
   handleSpeakerOpsRequest,
   type SpeakerOpsIdentityVerifier,
 } from './server/speakerOpsService.ts'
+import { getLocalWeather } from './server/weatherService.ts'
 
 const LOCAL_LEADERSHIP_PREVIEW_TOKEN = 'ublda-local-leadership-preview'
 const verifyLocalSpeakerOpsIdentity: SpeakerOpsIdentityVerifier = async (idToken) => {
@@ -50,6 +51,26 @@ const sendJson = (res: ServerResponse, statusCode: number, payload: unknown) => 
 const devApiPlugin = () => ({
   name: 'ublda-dev-api',
   configureServer(server: import('vite').ViteDevServer) {
+    server.middlewares.use('/api/weather', async (req: IncomingMessage, res: ServerResponse) => {
+      if (req.method !== 'GET') {
+        res.setHeader('Allow', 'GET')
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      try {
+        const headers = new Headers()
+        for (const [name, value] of Object.entries(req.headers)) {
+          const firstValue = Array.isArray(value) ? value[0] : value
+          if (firstValue) headers.set(name, firstValue)
+        }
+        sendJson(res, 200, await getLocalWeather(headers))
+      } catch (error) {
+        console.error('Local weather unavailable', error)
+        sendJson(res, 503, { error: 'Local weather is temporarily unavailable.' })
+      }
+    })
+
     server.middlewares.use('/api/speaker-ops', async (req: IncomingMessage, res: ServerResponse) => {
       if (req.method !== 'POST') {
         sendJson(res, 405, { error: 'Method not allowed' })

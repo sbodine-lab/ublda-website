@@ -12,10 +12,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
 import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useWorkspaceData } from "../workspaceDataContext"
-import { formatDueDate, laneLabels, projectStatusLabels, taskStatusLabels } from "../format"
+import { formatDueDate, programAreaLabels, projectStatusLabels, taskStatusLabels } from "../format"
 import type { ProjectLane, TaskStatus } from "../types"
 
-const lanes: ProjectLane[] = ["community-career", "advisory", "catalyst", "operations"]
+const programAreas: ProjectLane[] = ["community-career", "advisory", "catalyst", "operations"]
 
 export function ProjectsPage() {
   const adapter = useWorkspaceData()
@@ -24,10 +24,10 @@ export function ProjectsPage() {
   const viewer = snapshot.auth.status === "signed-in" ? snapshot.auth.viewer : undefined
   const isAdmin = viewer?.role === "admin"
   const [open, setOpen] = useState(false)
-  const [lane, setLane] = useState<ProjectLane>("operations")
+  const [programArea, setProgramArea] = useState<ProjectLane>("operations")
   async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget)
-    try { await adapter.createProject({ name: String(form.get("name") ?? ""), lane, ownerMemberId: String(form.get("owner") ?? "") || undefined, status: "planned", dueDate: String(form.get("due") ?? "") || undefined, summary: String(form.get("summary") ?? "") || undefined }); toast.success("project added"); setOpen(false) } catch (caught) { toast.error(caught instanceof Error ? caught.message : "project could not be added") }
+    try { await adapter.createProject({ name: String(form.get("name") ?? ""), lane: programArea, ownerMemberId: String(form.get("owner") ?? "") || undefined, status: "planned", dueDate: String(form.get("due") ?? "") || undefined }); toast.success("Project added"); setOpen(false) } catch (caught) { toast.error(caught instanceof Error ? caught.message : "Project could not be added") }
   }
   async function createTask(projectId: string) {
     const title = window.prompt("task")?.trim(); if (!title) return
@@ -40,17 +40,16 @@ export function ProjectsPage() {
 
   const newProjectDialog = isAdmin ? (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button className="ws-primary-action"><Plus data-icon="inline-start" /> new project</Button></DialogTrigger>
-      <DialogContent className="ws-dialog">
-        <DialogHeader><DialogTitle>new project</DialogTitle></DialogHeader>
+      <DialogTrigger asChild><Button className="ws-primary-action"><Plus data-icon="inline-start" /> New project</Button></DialogTrigger>
+      <DialogContent className="ws-dialog ws-project-dialog">
+        <DialogHeader><DialogTitle>New project</DialogTitle></DialogHeader>
         <form onSubmit={createProject}>
           <FieldGroup>
-            <Field><FieldLabel htmlFor="project-name">name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field>
-            <Field><FieldLabel htmlFor="project-summary">one-line outcome</FieldLabel><Input id="project-summary" name="summary" /></Field>
-            <div className="ws-form-grid"><Field><FieldLabel>lane</FieldLabel><Select value={lane} onValueChange={(value) => setLane(value as ProjectLane)}><SelectTrigger className="w-full"><SelectValue /></SelectTrigger><SelectContent>{lanes.map((value) => <SelectItem key={value} value={value}>{laneLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div>
-            <Field><FieldLabel htmlFor="project-due">due</FieldLabel><Input id="project-due" name="due" type="date" /></Field>
+            <Field><FieldLabel htmlFor="project-name">Project name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field>
+            <div className="ws-form-grid"><Field><FieldLabel htmlFor="project-program-area">Program area</FieldLabel><Select value={programArea} onValueChange={(value) => setProgramArea(value as ProjectLane)}><SelectTrigger id="project-program-area" className="w-full" aria-label="Program area"><SelectValue /></SelectTrigger><SelectContent>{programAreas.map((value) => <SelectItem key={value} value={value}>{programAreaLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">Owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">Unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div>
+            <Field><FieldLabel htmlFor="project-due">Due date</FieldLabel><Input id="project-due" name="due" type="date" /></Field>
           </FieldGroup>
-          <DialogFooter className="ws-dialog-footer"><Button type="submit">create project</Button></DialogFooter>
+          <DialogFooter className="ws-dialog-footer"><Button type="submit" className="ws-dialog-submit">Create project</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
@@ -59,21 +58,21 @@ export function ProjectsPage() {
   return (
     <LeadershipPage className="ws-projects-page" action={newProjectDialog}>
       {!projects.length ? <Empty className="ws-empty ws-page-empty"><EmptyHeader><EmptyMedia variant="icon"><FolderKanban /></EmptyMedia><EmptyTitle>no projects yet</EmptyTitle></EmptyHeader></Empty> : null}
-      {lanes.map((currentLane) => {
-        const laneProjects = projects.filter((project) => project.lane === currentLane)
-        if (!laneProjects.length) return null
+      {programAreas.map((currentProgramArea) => {
+        const areaProjects = projects.filter((project) => project.lane === currentProgramArea)
+        if (!areaProjects.length) return null
         return <LeadershipSection
           className="ws-project-group"
-          key={currentLane}
-          title={<span className="leadership-section-title-row"><ChevronDown />{laneLabels[currentLane]}</span>}
-          action={<span className="leadership-section-count">{laneProjects.length}</span>}
+          key={currentProgramArea}
+          title={<span className="leadership-section-title-row"><ChevronDown />{programAreaLabels[currentProgramArea]}</span>}
+          action={<span className="leadership-section-count">{areaProjects.length}</span>}
           flush
-        ><div className="ws-project-mobile">{laneProjects.map((project) => {
+        ><div className="ws-project-mobile">{areaProjects.map((project) => {
           const projectTasks = tasks.filter((task) => task.projectId === project.id)
           const done = projectTasks.filter((task) => task.status === "done").length
           const progress = projectTasks.length ? Math.round(done / projectTasks.length * 100) : 0
           return <article className="ws-project-mobile-card" key={`${project.id}-mobile`}><div className="ws-project-mobile-title"><div><strong>{project.name}</strong>{project.summary && <small>{project.summary}</small>}</div><span className={`ws-status ws-status-${project.status}`}>{projectStatusLabels[project.status]}</span></div><div className="ws-project-mobile-meta"><span>{personName(project.ownerMemberId)}</span><span>{formatDueDate(project.dueDate)}</span><span>{progress}%</span></div><Progress value={progress} />{projectTasks.map((task) => <div className="ws-project-mobile-task" key={`${task.id}-mobile`}><strong>{task.title}</strong><div><span>{personName(task.ownerMemberId)}</span><Select value={task.status} onValueChange={(value) => void changeTask(task.id, value as TaskStatus)} disabled={!isAdmin && task.ownerMemberId !== viewer?.memberId}><SelectTrigger size="sm" className="ws-status-select"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(taskStatusLabels).map(([value, label]) => <SelectItem value={value} key={value}>{label}</SelectItem>)}</SelectContent></Select></div></div>)}{isAdmin && <button type="button" className="ws-project-mobile-add" onClick={() => void createTask(project.id)}><Plus /> add task</button>}</article>
-        })}</div><div className="ws-table-wrap"><Table><TableHeader><TableRow><TableHead>item</TableHead><TableHead>owner</TableHead><TableHead>status</TableHead><TableHead>due</TableHead><TableHead>progress</TableHead></TableRow></TableHeader><TableBody>{laneProjects.flatMap((project) => {
+        })}</div><div className="ws-table-wrap"><Table><TableHeader><TableRow><TableHead>item</TableHead><TableHead>owner</TableHead><TableHead>status</TableHead><TableHead>due</TableHead><TableHead>progress</TableHead></TableRow></TableHeader><TableBody>{areaProjects.flatMap((project) => {
           const projectTasks = tasks.filter((task) => task.projectId === project.id)
           const done = projectTasks.filter((task) => task.status === "done").length
           const progress = projectTasks.length ? Math.round(done / projectTasks.length * 100) : 0

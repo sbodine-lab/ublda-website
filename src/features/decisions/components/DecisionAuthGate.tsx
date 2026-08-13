@@ -67,7 +67,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
   }
 
   const title = isWorkspaceSignIn
-    ? "Leadership sign in"
+    ? "Leadership Sign In"
     : isSchedulingLink
       ? "A scheduling poll is waiting"
       : "A question is waiting"
@@ -76,7 +76,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
     <LeadershipAuthScreen
       preview={adapter.mode === "demo"}
       title={title}
-      description={snapshot.auth.status === "signed-out" ? "Continue to the secure leadership sign-in." : undefined}
+      description={snapshot.auth.status === "signed-out" ? "Continue to Secure Leadership Sign In" : undefined}
     >
       {snapshot.auth.status === "misconfigured" ? (
         <div className="dc-auth-denied">
@@ -110,7 +110,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
             onClick={() => void signIn()}
           >
             {submitting ? <Spinner data-icon="inline-start" /> : null}
-            continue to sign in
+            Continue to Sign In
           </Button>
         </div>
       )}

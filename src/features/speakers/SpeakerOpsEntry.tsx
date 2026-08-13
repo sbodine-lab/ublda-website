@@ -149,7 +149,7 @@ function ProgramSlots({
             <button key={slot.id} type="button" className="speaker-slot-row" onClick={() => onEdit(slot)}>
               <span className="speaker-slot-row__name">{slot.label}</span>
               <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
-              <span><span className="speaker-label-inline">Preferred</span>{formatShortDate(slot.preferredStart)}</span>
+              <span><span className="speaker-label-inline">Preferred time</span>{formatShortDate(slot.preferredStart)}</span>
               <span><span className="speaker-label-inline">Speaker</span>{lead?.name || 'Not chosen'}</span>
               <span><span className="speaker-label-inline">Room</span>{room?.roomName || ROOM_REQUEST_STATUS_LABELS[room?.status || 'draft']}</span>
               <Settings2 aria-hidden="true" />
