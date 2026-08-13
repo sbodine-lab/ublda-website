@@ -1,12 +1,17 @@
-import { ArrowRight, CalendarClock, Plus } from "lucide-react"
+import { ArrowRight, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
-import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
+import { LeadershipPage } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
 import { dateLabel } from "../format"
-import { AvailabilityResultsPanel } from "../components/AvailabilityResultsPanel"
+import type { AvailabilityPollSummary } from "../types"
+
+function pollStatus(poll: AvailabilityPollSummary) {
+  if (poll.status === "finalized") return { label: "Finalized", modifier: " av-scheduling-status--finalized" }
+  if (!poll.hasResponded && !poll.canManage) return { label: "Response needed", modifier: " av-scheduling-status--needed" }
+  return { label: poll.hasResponded ? "Responded" : "Open", modifier: "" }
+}
 
 export function SchedulingDashboardPage() {
   const { snapshot } = useAvailabilityData()
@@ -16,42 +21,46 @@ export function SchedulingDashboardPage() {
   return (
     <LeadershipPage
       className="av-dashboard-page"
-      action={viewer?.role === "admin" ? <Button asChild className="ws-primary-action"><Link to="/scheduling/new"><Plus data-icon="inline-start" /> new poll</Link></Button> : null}
+      action={viewer?.role === "admin" ? (
+        <Button asChild className="ws-primary-action">
+          <Link to="/scheduling/new"><Plus data-icon="inline-start" /> New poll</Link>
+        </Button>
+      ) : null}
     >
+      <section className="av-scheduling-index" aria-labelledby="scheduling-polls-title">
+        <header className="av-scheduling-index__header">
+          <h2 id="scheduling-polls-title">Scheduling polls</h2>
+        </header>
 
-      <LeadershipSurface className="leadership-scheduling-surface" flush>
-        <div className="av-dashboard">
-        <section className="av-poll-list-pane" aria-label="scheduling polls">
-          <header className="av-list-heading"><h2>polls</h2><span>{snapshot.polls.length}</span></header>
-          <div className="av-poll-list">
-            {snapshot.polls.map((poll) => (
-              <article className={snapshot.activePoll?.id === poll.id ? "av-poll-row av-poll-row-active" : "av-poll-row"} key={poll.id}>
-                <h2>{poll.title}</h2>
-                <p>{poll.responseCount} of {poll.eligibleCount} responded {poll.deadline ? <>· due {dateLabel(poll.deadline.slice(0, 10)).toLowerCase()}</> : null}</p>
-                <Button variant="link" size="sm" asChild>
-                  <Link to={poll.hasResponded || poll.canManage ? `/scheduling/${poll.slug}/results` : `/s/${poll.slug}`}>
-                    {poll.hasResponded || poll.canManage ? "view results" : "reply"} <ArrowRight data-icon="inline-end" />
-                  </Link>
-                </Button>
-              </article>
-            ))}
-            {!snapshot.polls.length && !snapshot.loading ? <Empty className="av-empty-list"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>no scheduling polls</EmptyTitle></EmptyHeader></Empty> : null}
-          </div>
-        </section>
+        <div className="av-scheduling-list">
+          {snapshot.loading ? <p className="av-scheduling-message">Loading…</p> : null}
 
-        <section className="av-dashboard-detail">
-          {snapshot.activePoll ? (
+          {!snapshot.loading ? (
             <>
-              <header className="av-detail-heading">
-                <h2>{snapshot.activePoll.title}</h2>
-                {snapshot.activePoll.note ? <p>{snapshot.activePoll.note}</p> : null}
-              </header>
-              <AvailabilityResultsPanel poll={snapshot.activePoll} />
+              {snapshot.polls.map((poll) => {
+                const status = pollStatus(poll)
+
+                return (
+                  <article className="av-scheduling-row" key={poll.id}>
+                    <h3>{poll.title}</h3>
+                    <p>
+                      {poll.responseCount} of {poll.eligibleCount} responded
+                      {poll.deadline ? <> · Due {dateLabel(poll.deadline.slice(0, 10))}</> : null}
+                    </p>
+                    <span className={`av-scheduling-status${status.modifier}`}>{status.label}</span>
+                    <Button variant="link" size="sm" className="av-scheduling-row__action" asChild>
+                      <Link to={poll.hasResponded || poll.canManage ? `/scheduling/${poll.slug}/results` : `/s/${poll.slug}`}>
+                        {poll.hasResponded || poll.canManage ? "View results" : "Reply"} <ArrowRight data-icon="inline-end" />
+                      </Link>
+                    </Button>
+                  </article>
+                )
+              })}
+              {!snapshot.polls.length ? <p className="av-scheduling-message">No scheduling polls yet.</p> : null}
             </>
-          ) : snapshot.loading ? <p className="av-dashboard-loading">loading…</p> : <Empty className="av-detail-empty"><EmptyHeader><EmptyMedia variant="icon"><CalendarClock /></EmptyMedia><EmptyTitle>choose a poll</EmptyTitle></EmptyHeader></Empty>}
-        </section>
+          ) : null}
         </div>
-      </LeadershipSurface>
+      </section>
     </LeadershipPage>
   )
 }

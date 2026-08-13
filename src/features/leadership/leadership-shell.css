@@ -690,8 +690,7 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
 
 .leadership-calendar-surface,
 .leadership-directory-surface,
-.leadership-decision-surface,
-.leadership-scheduling-surface {
+.leadership-decision-surface {
   overflow: hidden;
 }
 
@@ -706,11 +705,6 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
 
 .leadership-decision-surface .dc-decision-list {
   border-bottom: 0;
-}
-
-.leadership-scheduling-surface .av-dashboard {
-  min-height: 560px;
-  background: transparent;
 }
 
 .leadership-page .ws-project-group {
@@ -748,7 +742,6 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
   .ws-calendar-row,
   .ws-person-row,
   .dc-decision-row,
-  .av-poll-row,
   .speaker-slot-row,
   .speaker-table-row
 ) {
@@ -765,7 +758,6 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
   .ws-calendar-row,
   .ws-person-row,
   .dc-decision-row,
-  .av-poll-row,
   .speaker-slot-row,
   .speaker-table-row
 ):hover {
