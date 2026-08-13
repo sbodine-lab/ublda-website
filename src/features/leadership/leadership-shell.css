@@ -741,25 +741,6 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
   background: transparent;
 }
 
-@keyframes leadership-surface-enter {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.995);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.leadership-page > * {
-  animation: leadership-surface-enter 520ms var(--leadership-ease) both;
-}
-
-.leadership-page > :nth-child(2) { animation-delay: 45ms; }
-.leadership-page > :nth-child(3) { animation-delay: 85ms; }
-.leadership-page > :nth-child(4) { animation-delay: 120ms; }
-
 .dc-app-shell.leadership-shell :is(
   .ws-agenda-row,
   .ws-project-row,
