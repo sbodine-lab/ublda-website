@@ -694,7 +694,7 @@
 }
 
 .speaker-table-wrap [data-slot="table"] {
-  min-width: 1040px;
+  min-width: 960px;
 }
 
 .speaker-table-wrap [data-slot="table-header"] {

@@ -139,7 +139,7 @@
 .ws-person-row > div { display: flex; flex-direction: column; }
 .ws-person-row > div span, .ws-person-team { color: #6c767c; }
 
-.ws-dialog { max-width: 580px !important; background: #fff !important; text-transform: lowercase; }
+.ws-dialog { width: calc(100% - 2rem); max-width: 580px !important; background: #fff !important; text-transform: lowercase; }
 .ws-dialog [data-slot="dialog-title"] { font-family: var(--font-body, "Plus Jakarta Sans", sans-serif) !important; font-size: 1.25rem !important; font-weight: 600 !important; }
 .ws-dialog form { display: flex; flex-direction: column; gap: 22px; }
 .ws-dialog label, .ws-dialog input, .ws-dialog select, .ws-dialog button { font-family: var(--font-body, "Plus Jakarta Sans", sans-serif) !important; }

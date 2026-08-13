@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import Reveal from '../components/Reveal'
 import './Join.css'
@@ -46,12 +45,6 @@ const faqs = [
 ]
 
 const years = ['Freshman', 'Sophomore', 'Junior', 'Senior']
-
-const eboardRoles = [
-  'Events & Programming',
-  'Marketing & Social Media',
-  'Outreach & Partnerships',
-]
 
 export default function Join() {
   const [submitted, setSubmitted] = useState(false)
@@ -250,49 +243,6 @@ export default function Join() {
               </form>
             </Reveal>
           )}
-        </div>
-      </section>
-
-      {/* ─── E-Board Applications ─── */}
-      <section className="section join-eboard">
-        <div className="container">
-          <Reveal>
-            <p className="section__label">Join the E-Board</p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="join-eboard__title">
-              We're looking for three new e-board members.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="join-eboard__subtitle">
-              Current e-board interviews are Ross/BBA-focused so we can stay aligned
-              with Ross recognition requirements. Upload your resume, rank your
-              role preferences, and pick one covered interview slot. We'll use the conversation to
-              learn more.
-            </p>
-          </Reveal>
-
-          <div className="join-eboard__grid">
-            {eboardRoles.map((role, i) => (
-              <Reveal key={role} delay={0.3 + i * 0.1}>
-                <div className="eboard-card">
-                  <h3 className="eboard-card__title">{role}</h3>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={0.6}>
-            <div className="join-eboard__cta">
-              <Link to="/portal" className="btn btn--primary btn--lg">
-                Open interview signup
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-            </div>
-          </Reveal>
         </div>
       </section>
 

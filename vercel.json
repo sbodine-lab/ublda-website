@@ -35,9 +35,6 @@
     { "source": "/api/submissions/facility-correction", "destination": "/api/housing?housingPath=/submissions/facility-correction" },
     { "source": "/api/referrals", "destination": "/api/housing?housingPath=/referrals" },
     { "source": "/api/admin/review-queue", "destination": "/api/housing?housingPath=/admin/review-queue" },
-    { "source": "/api/recruiting-export", "destination": "/api/recruiting?recruitingPath=/recruiting-export" },
-    { "source": "/api/recruiting-health", "destination": "/api/recruiting?recruitingPath=/recruiting-health" },
-    { "source": "/api/resume", "destination": "/api/recruiting?recruitingPath=/resume" },
     { "source": "/((?!api/|assets/|src/|@vite/|@react-refresh|@id/|node_modules/|favicon\\.svg|logo\\.svg|highlights/|partners-blda\\.webp).*)", "destination": "/index.html" }
   ]
 }

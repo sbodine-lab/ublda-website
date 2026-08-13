@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:store": "esbuild server/localRecruitingStore.ts --bundle --platform=node --format=esm --packages=external --outfile=server/localRecruitingStore.js && esbuild server/speakerOpsStore.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsStore.js && esbuild server/speakerOpsService.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsService.js",
+    "build:store": "esbuild server/speakerOpsStore.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsStore.js && esbuild server/speakerOpsService.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsService.js",
     "prebuild": "npm run build:store",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -20,7 +20,6 @@
     "@modelcontextprotocol/server": "^2.0.0",
     "@paper-design/shaders-react": "^0.0.80",
     "@vercel/blob": "^2.3.3",
-    "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.43.0",

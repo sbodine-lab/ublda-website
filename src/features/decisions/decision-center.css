@@ -1632,10 +1632,20 @@
 .dc-member-dialog,
 .dc-agent-key-dialog,
 .dc-finalize-dialog {
+  width: calc(100% - 2rem);
   max-width: 520px !important;
   background: #faf9f6 !important;
   color: #0f2b3c !important;
   font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+}
+
+.dc-agent-key-dialog {
+  gap: 10px;
+}
+
+.dc-agent-key-dialog .dc-scope-list label {
+  min-height: 48px;
+  padding-block: 7px;
 }
 
 .dc-member-dialog [data-slot="dialog-title"],

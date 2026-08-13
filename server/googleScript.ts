@@ -1,9 +1,5 @@
 type ScriptJson = Record<string, unknown>
 
-export const shouldMirrorToLegacyScript = () => (
-  process.env.UBLDA_RECRUITING_WRITE_MODE === 'legacy-script'
-)
-
 export const postRawJsonWithTimeout = async (
   url: string,
   body: ScriptJson,
@@ -43,13 +39,4 @@ export const postJsonWithTimeout = async (
   }
 
   return result
-}
-
-export const postGoogleScript = async (
-  body: ScriptJson,
-  fallbackError: string,
-) => {
-  const scriptUrl = process.env.GOOGLE_SCRIPT_URL
-  if (!scriptUrl) return null
-  return postJsonWithTimeout(scriptUrl, body, fallbackError)
 }

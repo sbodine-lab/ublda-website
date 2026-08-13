@@ -1,15 +1,9 @@
 /**
  * Google Calendar links, in one place.
  *
- * Two callers with two different shapes of truth:
- *  · the marketing events page, whose dates are hand-authored English
- *    ("October 1, 2026" + "7:00 PM - 8:00 PM") — `buildGCalUrl`, moved here
- *    verbatim so its behaviour is unchanged;
- *  · the portal, whose events carry real ISO instants — `googleCalendarUrl`.
- *
- * Everything the club runs is authored in Detroit time. The portal path sends
- * Google a UTC instant, which is unambiguous everywhere; the marketing path
- * sends a floating local time, which is what that page has always done.
+ * The public events page hand-authors dates in English
+ * ("October 1, 2026" + "7:00 PM - 8:00 PM"). Keep that conversion here so the
+ * page component only owns presentation.
  */
 
 const GCAL_RENDER = 'https://calendar.google.com/calendar/render'
@@ -66,43 +60,6 @@ export function buildGCalUrl(event: MarketingCalendarEvent): string {
     details: event.description,
     location: event.location,
   })
-
-  return `${GCAL_RENDER}?${params.toString()}`
-}
-
-/** ISO instant → Google's `20261001T230000Z`. Returns '' for anything unparseable. */
-const toUtcStamp = (iso: string): string => {
-  const ms = Date.parse(iso || '')
-  if (Number.isNaN(ms)) return ''
-  return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
-}
-
-export type PortalCalendarEvent = {
-  title: string
-  startsAt: string
-  endsAt?: string
-  details?: string
-  location?: string
-}
-
-/**
- * The portal's add-to-calendar link. Returns '' when `startsAt` is not a real
- * instant, so a caller can simply not render the control rather than shipping a
- * link to a broken Google page.
- */
-export function googleCalendarUrl(event: PortalCalendarEvent): string {
-  const start = toUtcStamp(event.startsAt)
-  if (!start) return ''
-
-  const end = toUtcStamp(event.endsAt || '') || start
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: event.title,
-    dates: `${start}/${end}`,
-  })
-
-  if (event.details) params.set('details', event.details)
-  if (event.location) params.set('location', event.location)
 
   return `${GCAL_RENDER}?${params.toString()}`
 }
