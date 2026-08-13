@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode } from "react"
 import { Link, NavLink, useLocation } from "react-router-dom"
 import { LogOut, Menu } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -116,7 +115,6 @@ export function LeadershipShell({
           <div className="leadership-topbar__copy">
             <div className="leadership-topbar__title">
               <h1>{header.title}</h1>
-              <Badge variant="outline" className="leadership-term-badge">2026–27</Badge>
             </div>
           </div>
           <DropdownMenu>

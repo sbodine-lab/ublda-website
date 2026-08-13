@@ -31,7 +31,7 @@
   --leadership-ease: cubic-bezier(0.22, 1, 0.36, 1);
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 228px minmax(0, 1fr);
+  grid-template-columns: 214px minmax(0, 1fr);
   overflow-x: clip;
   background:
     radial-gradient(circle at 5% 2%, rgba(255, 255, 255, 0.98), transparent 25%),
@@ -42,6 +42,8 @@
   font-family: var(--font-body, "Plus Jakarta Sans", system-ui, sans-serif) !important;
   font-size: 13px;
   line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .leadership-shell .leadership-sidebar,
@@ -59,8 +61,8 @@
   height: 100svh;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 18px 14px 14px;
+  gap: 14px;
+  padding: 16px 12px 12px;
   overflow: hidden;
   background: linear-gradient(158deg, rgba(255, 255, 255, 0.86), rgba(248, 251, 255, 0.66));
   border-right: 1px solid var(--leadership-glass-border);
@@ -82,11 +84,11 @@
 }
 
 .leadership-brand {
-  min-height: 46px;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  padding: 2px 8px 10px;
+  padding: 1px 8px 7px;
   text-decoration: none;
 }
 
@@ -108,26 +110,26 @@
 .leadership-sidebar__section nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .leadership-suite-nav {
-  gap: 2px;
+  gap: 3px;
 }
 
 .leadership-suite-link {
   position: relative;
   width: 100%;
-  height: 38px;
+  height: 34px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 0 9px;
+  gap: 8px;
+  padding: 0 8px;
   border: 1px solid transparent;
-  border-radius: 11px;
+  border-radius: 9px;
   color: #555e6d;
-  font-size: 12px;
-  font-weight: 520;
+  font-size: 11.5px !important;
+  font-weight: 540;
   text-decoration: none;
   transition:
     background-color 180ms ease,
@@ -153,10 +155,10 @@
 }
 
 .leadership-suite-link svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   flex: 0 0 auto;
-  padding: 4.5px;
+  padding: 4px;
   border-radius: 7px;
   background: transparent;
   color: #677184;
@@ -181,17 +183,19 @@
 .leadership-sidebar__section {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding-top: 13px;
+  gap: 6px;
+  margin-top: 3px;
+  padding-top: 12px;
   border-top: 1px solid rgba(30, 43, 63, 0.08);
 }
 
 .leadership-nav-label {
-  padding: 0 10px;
+  padding: 0 8px;
   color: #8a929f;
   font-size: 10px;
   font-weight: 650;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .leadership-sidebar__account {
@@ -358,18 +362,6 @@
   font-weight: 680 !important;
   line-height: 1.16;
   letter-spacing: -0.025em !important;
-}
-
-.leadership-term-badge {
-  height: 22px;
-  padding: 0 8px;
-  border-color: rgba(45, 86, 130, 0.2);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 5px 14px rgba(20, 43, 74, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.86);
-  color: var(--leadership-blue);
-  font-size: 10px;
-  font-weight: 600;
 }
 
 .leadership-main {
@@ -805,7 +797,7 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
 
 @media (max-width: 1100px) {
   .dc-app-shell.leadership-shell {
-    grid-template-columns: 204px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr);
   }
 
   .leadership-topbar {
@@ -870,10 +862,6 @@ body:has(.dc-app-shell.leadership-shell) [data-slot="select-item"] {
     font-size: 17px !important;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .leadership-term-badge {
-    display: none;
   }
 
   .leadership-main {

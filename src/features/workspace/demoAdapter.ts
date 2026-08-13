@@ -11,28 +11,10 @@ import type {
   TaskStatus,
   UpdateDirectoryProfileInput,
 } from "./types"
+import { workspaceDirectory } from "./directoryData"
 
 const uid = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-const members = [
-  ["member-preview-admin", "Preview Admin", "president", "executive"],
-  ["member-community", "Community Lead", "community lead", "community + career"],
-  ["member-events", "Events Lead", "events lead", "operations"],
-  ["member-finance", "Finance Lead", "treasurer", "catalyst"],
-  ["member-partnerships", "Partnerships Lead", "partnerships lead", "advisory"],
-  ["member-communications", "Communications Lead", "communications lead", "operations"],
-  ["member-operations", "Operations Lead", "operations lead", "operations"],
-  ["member-programming", "Programming Lead", "programming lead", "community + career"],
-  ["member-membership", "Membership Lead", "membership lead", "operations"],
-] as const
-
-let people: DirectoryProfile[] = members.map(([memberId, displayName, clubRole, team], index) => ({
-  memberId,
-  displayName,
-  workspaceRole: index === 0 ? "admin" : "member",
-  clubRole,
-  team,
-  isLeadership: true,
-}))
+let people: DirectoryProfile[] = workspaceDirectory.map((person) => ({ ...person }))
 
 let events: ClubEvent[] = [
   { id: "event-board", title: "weekly e-board", type: "meeting", startAt: "2026-08-12T21:00:00.000Z", endAt: "2026-08-12T22:00:00.000Z", timezone: "America/Detroit", location: "michigan union", ownerMemberId: "member-operations", status: "confirmed" },

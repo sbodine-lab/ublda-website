@@ -1,4 +1,5 @@
-import { ArrowRight, CalendarDays, CheckCircle2, FolderKanban } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ArrowRight, CalendarDays, CheckCircle2, CloudSun, FolderKanban, Moon, Sun } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -7,7 +8,42 @@ import { useDecisionData } from "@/features/decisions/decisionDataContext"
 import { useAvailabilityData } from "@/features/availability/availabilityDataContext"
 import { LeadershipPage, LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useWorkspaceData } from "../workspaceDataContext"
-import { formatDueDate, formatEventDate, formatEventTime, laneLabels } from "../format"
+import { formatDueDate, formatEventDate, formatEventTime, programAreaLabels } from "../format"
+
+type LocalWeather = {
+  apparentTemperatureF: number
+  condition: string
+  isDay: boolean
+  location: string
+  temperatureF: number
+}
+
+function useLocalWeather() {
+  const [weather, setWeather] = useState<LocalWeather>()
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void fetch("/api/weather", {
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Weather request failed with ${response.status}.`)
+        return response.json() as Promise<LocalWeather>
+      })
+      .then(setWeather)
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          console.info("Local weather is unavailable.")
+        }
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  return weather
+}
 
 export function WorkspaceOverviewPage() {
   const workspace = useWorkspaceData().getSnapshot()
@@ -22,10 +58,26 @@ export function WorkspaceOverviewPage() {
   const waitingDecisions = decisions.decisions.filter((decision) => decision.status === "open" && decision.isEligible && !decisions.responses.some((response) => response.decisionId === decision.id && response.memberId === viewer?.memberId && response.confirmedRevision === decision.revision))
   const waitingPolls = availability.polls.filter((poll) => poll.status === "open" && !poll.hasResponded)
   const waitingTasks = viewer ? workspace.tasks.filter((task) => task.ownerMemberId === viewer.memberId && task.status !== "done") : []
-  const firstName = viewer?.displayName.split(/\s+/)[0]?.toLowerCase() ?? "there"
+  const firstName = viewer?.displayName.trim().split(/\s+/)[0] ?? "there"
+  const weather = useLocalWeather()
+  const WeatherIcon = weather ? (weather.condition === "Clear" ? (weather.isDay ? Sun : Moon) : CloudSun) : CloudSun
 
   return (
-    <LeadershipPage className="ws-overview-page" title={`good morning, ${firstName}`}>
+    <LeadershipPage
+      className="ws-overview-page"
+      title={`Good morning, ${firstName}`}
+      action={weather ? (
+        <div
+          className="ws-local-weather"
+          aria-label={`${weather.temperatureF} degrees and ${weather.condition.toLowerCase()} in ${weather.location}. Feels like ${weather.apparentTemperatureF} degrees.`}
+        >
+          <WeatherIcon aria-hidden="true" />
+          <strong>{weather.temperatureF}°</strong>
+          <span>{weather.condition}</span>
+          <span className="ws-local-weather__location">{weather.location}</span>
+        </div>
+      ) : null}
+    >
 
       {workspace.error && <p className="ws-error" role="alert">{workspace.error}</p>}
 
@@ -65,7 +117,7 @@ export function WorkspaceOverviewPage() {
               const nextTask = projectTasks.find((task) => task.status !== "done")
               return (
                 <article className="ws-project-row" key={project.id}>
-                  <div><strong>{project.name}</strong><small>{laneLabels[project.lane]}</small></div>
+                  <div><strong>{project.name}</strong><small>{programAreaLabels[project.lane]}</small></div>
                   <div><span>{nextTask?.title ?? "no open tasks"}</span><small>{formatDueDate(nextTask?.dueDate ?? project.dueDate)}</small></div>
                   <div className="ws-progress-cell"><span>{progress}%</span><Progress value={progress} /></div>
                 </article>

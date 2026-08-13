@@ -24,7 +24,7 @@ export interface LeadershipRouteHeader {
 }
 
 export const leadershipNavigation: LeadershipNavigationItem[] = [
-  { to: "/workspace", label: "Overview", icon: Home, end: true },
+  { to: "/workspace", label: "Dashboard", icon: Home, end: true },
   { to: "/decisions", label: "Questions", icon: MessageCircleQuestion, end: true },
   { to: "/scheduling", label: "Scheduling", icon: CalendarClock },
   { to: "/leadership/speakers", label: "Speaker Ops", icon: MicVocal },
@@ -105,7 +105,7 @@ const routeHeaders: Array<{
   {
     matches: (pathname) => pathname === "/workspace",
     header: {
-      title: "Overview",
+      title: "Dashboard",
       description: "Upcoming events, active work, and what needs your attention.",
     },
   },

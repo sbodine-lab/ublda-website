@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { ArrowRight, CalendarClock, CircleCheck, Plus, Users } from "lucide-react"
+import { ArrowRight, CalendarClock, CircleAlert, CircleCheck, Plus, Users } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
@@ -101,15 +101,17 @@ export function DecisionsPage() {
                 </div>
                 <div className="dc-question-status-stack">
                   <DecisionStatusBadge status={decision.status} />
+                </div>
+                <div className="dc-question-response-cell">
+                  <div className="dc-question-meta-cell">
+                    <Users />
+                    <span>{results.responseCount} of {results.eligibleCount} responses</span>
+                  </div>
                   {canRespond && (
                     <span className={cn("dc-response-state", response && "dc-response-state-done")}>
-                      {response ? <><CircleCheck /> Responded</> : "Needs your response"}
+                      {response ? <><CircleCheck /> Responded</> : <><CircleAlert /> Response needed</>}
                     </span>
                   )}
-                </div>
-                <div className="dc-question-meta-cell">
-                  <Users />
-                  <span>{results.responseCount} of {results.eligibleCount} responses</span>
                 </div>
                 <div className="dc-question-meta-cell">
                   <CalendarClock />
@@ -128,7 +130,7 @@ export function DecisionsPage() {
                     <DecisionStatusBadge status={decision.status} />
                     {canRespond && (
                       <span className={cn("dc-response-state", response && "dc-response-state-done")}>
-                        {response ? <><CircleCheck /> Responded</> : "Needs your response"}
+                        {response ? <><CircleCheck /> Responded</> : <><CircleAlert /> Response needed</>}
                       </span>
                     )}
                   </div>

@@ -1,10 +1,10 @@
 import type { ClubEvent, ProjectLane, ProjectStatus, TaskStatus } from "./types"
 
-export const laneLabels: Record<ProjectLane, string> = {
-  "community-career": "community + career",
-  advisory: "accessibility advisory",
-  catalyst: "catalyst finance lab",
-  operations: "operations",
+export const programAreaLabels: Record<ProjectLane, string> = {
+  "community-career": "Community + career",
+  advisory: "Accessibility advisory",
+  catalyst: "Catalyst finance lab",
+  operations: "Operations",
 }
 
 export const projectStatusLabels: Record<ProjectStatus, string> = {
