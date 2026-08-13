@@ -25,6 +25,7 @@ export function ProjectsPage() {
   const isAdmin = viewer?.role === "admin"
   const [open, setOpen] = useState(false)
   const [programArea, setProgramArea] = useState<ProjectLane>("operations")
+  const [focusedField, setFocusedField] = useState<string>()
   async function createProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget)
     try { await adapter.createProject({ name: String(form.get("name") ?? ""), lane: programArea, ownerMemberId: String(form.get("owner") ?? "") || undefined, status: "planned", dueDate: String(form.get("due") ?? "") || undefined }); toast.success("Project added"); setOpen(false) } catch (caught) { toast.error(caught instanceof Error ? caught.message : "Project could not be added") }
@@ -39,15 +40,15 @@ export function ProjectsPage() {
   const personName = (id?: string) => people.find((person) => person.memberId === id)?.displayName ?? "unassigned"
 
   const newProjectDialog = isAdmin ? (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); if (!nextOpen) setFocusedField(undefined) }}>
       <DialogTrigger asChild><Button className="ws-primary-action"><Plus data-icon="inline-start" /> New project</Button></DialogTrigger>
       <DialogContent className="ws-dialog ws-project-dialog">
         <DialogHeader><DialogTitle>New project</DialogTitle></DialogHeader>
         <form onSubmit={createProject}>
           <FieldGroup>
-            <Field><FieldLabel htmlFor="project-name">Project name</FieldLabel><Input id="project-name" name="name" autoFocus required /></Field>
-            <div className="ws-form-grid"><Field><FieldLabel htmlFor="project-program-area">Program area</FieldLabel><Select value={programArea} onValueChange={(value) => setProgramArea(value as ProjectLane)}><SelectTrigger id="project-program-area" className="w-full" aria-label="Program area"><SelectValue /></SelectTrigger><SelectContent>{programAreas.map((value) => <SelectItem key={value} value={value}>{programAreaLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">Owner</FieldLabel><select id="project-owner" name="owner" className="ws-native-select"><option value="">Unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div>
-            <Field><FieldLabel htmlFor="project-due">Due date</FieldLabel><Input id="project-due" name="due" type="date" /></Field>
+            <Field><FieldLabel htmlFor="project-name">Project name</FieldLabel><Input id="project-name" name="name" className={focusedField === "name" ? "ws-project-field--focused" : undefined} onFocus={() => setFocusedField("name")} onBlur={() => setFocusedField(undefined)} autoFocus required /></Field>
+            <div className="ws-form-grid"><Field><FieldLabel htmlFor="project-program-area">Program area</FieldLabel><Select value={programArea} onValueChange={(value) => setProgramArea(value as ProjectLane)}><SelectTrigger id="project-program-area" className={`w-full ${focusedField === "program-area" ? "ws-project-field--focused" : ""}`} onFocus={() => setFocusedField("program-area")} onBlur={() => setFocusedField(undefined)} aria-label="Program area"><SelectValue /></SelectTrigger><SelectContent>{programAreas.map((value) => <SelectItem key={value} value={value}>{programAreaLabels[value]}</SelectItem>)}</SelectContent></Select></Field><Field><FieldLabel htmlFor="project-owner">Owner</FieldLabel><select id="project-owner" name="owner" className={`ws-native-select ${focusedField === "owner" ? "ws-project-field--focused" : ""}`} onFocus={() => setFocusedField("owner")} onBlur={() => setFocusedField(undefined)}><option value="">Unassigned</option>{people.map((person) => <option value={person.memberId} key={person.memberId}>{person.displayName}</option>)}</select></Field></div>
+            <Field><FieldLabel htmlFor="project-due">Due date</FieldLabel><Input id="project-due" name="due" type="date" className={focusedField === "due" ? "ws-project-field--focused" : undefined} onFocus={() => setFocusedField("due")} onBlur={() => setFocusedField(undefined)} /></Field>
           </FieldGroup>
           <DialogFooter className="ws-dialog-footer"><Button type="submit" className="ws-dialog-submit">Create project</Button></DialogFooter>
         </form>
