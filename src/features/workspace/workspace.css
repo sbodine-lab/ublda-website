@@ -202,7 +202,8 @@
 }
 
 .ws-project-dialog :is([data-slot="input"], [data-slot="select-trigger"], .ws-native-select):focus,
-.ws-project-dialog :is([data-slot="input"], [data-slot="select-trigger"], .ws-native-select):focus-visible {
+.ws-project-dialog :is([data-slot="input"], [data-slot="select-trigger"], .ws-native-select):focus-visible,
+.ws-project-dialog .ws-project-field--focused {
   outline: none !important;
   border-color: rgba(20, 43, 74, 0.62) !important;
   box-shadow: 0 0 0 1px rgba(20, 43, 74, 0.2) !important;
