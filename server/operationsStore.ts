@@ -346,7 +346,8 @@ export class OperationsStore {
     const blob = await get(BLOB_PATH, { access: 'private', useCache: false })
     if (!blob || blob.statusCode !== 200) return { data: emptyData() as LegacyOperationsData, etag: null as string | null }
     const raw = await new Response(blob.stream).text()
-    return { data: JSON.parse(raw) as LegacyOperationsData, etag: blob.blob.etag || null }
+    const etag = blob.blob.etag?.replace(/^W\//, '') || null
+    return { data: JSON.parse(raw) as LegacyOperationsData, etag }
   }
 
   private async writeBlob(data: OperationsData, etag: string | null) {
