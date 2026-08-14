@@ -83,6 +83,30 @@ test('serves and mutates Speaker Ops with the verified Convex actor', async (t) 
   assert.equal(refreshed.activity[0]?.actorEmail, actor.email)
 })
 
+test('rejects an API attempt to reuse a speaker across both fall slots without persisting partial edits', async (t) => {
+  const { directory, options } = await buildOptions()
+  t.after(() => rm(directory, { recursive: true, force: true }))
+
+  const before = await options.store.workspace(actor)
+  const secondaryBefore = before.slots.find((slot) => slot.id === 'fall-2026-secondary')
+  assert.ok(secondaryBefore)
+
+  const response = await handleSpeakerOpsRequest({
+    action: 'updateSlot',
+    idToken: 'canonical-logto-id-token',
+    slot: {
+      id: 'fall-2026-secondary',
+      leadId: 'deb-ruh',
+      preferredStart: '2026-12-01T18:30:00-05:00',
+    },
+  }, '127.0.0.1', options)
+  assert.equal(response.status, 400)
+  assert.match(String(response.body.error), /different speaker/i)
+
+  const after = await options.store.workspace(actor)
+  assert.deepEqual(after.slots.find((slot) => slot.id === 'fall-2026-secondary'), secondaryBefore)
+})
+
 test('uses the Convex roster as the sole leadership authorization source', async () => {
   let queriedToken = ''
   let queriedUrl = ''

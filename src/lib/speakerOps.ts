@@ -25,8 +25,33 @@ export const SPEAKER_STAGES = [
 export type SpeakerStage = typeof SPEAKER_STAGES[number]
 export type ProgramTerm = 'fall-2026' | 'winter-2027' | 'later'
 export type SpeakerFormat = 'in-person' | 'virtual' | 'flexible' | 'unknown'
+export type SpeakerConfidence = 'high' | 'medium' | 'low' | 'unverified'
+export type SpeakerRecommendation = 'recommended' | 'alternate' | 'hold' | 'research' | 'not-selected'
+export type SpeakerCostStatus = 'free' | 'quote-requested' | 'quoted' | 'funding-needed' | 'unknown'
+export type SpeakerTravelRequirement = 'required' | 'not-required' | 'unknown'
+export type ProposedSlotStatus = 'idea' | 'offered' | 'accepted' | 'declined'
 export type ProgramSlotStatus = 'planning' | 'room-requested' | 'room-approved' | 'confirmed'
 export type RoomRequestStatus = 'draft' | 'submitted' | 'approved' | 'declined'
+
+export type SpeakerProposedSlot = {
+  id: string
+  startAt: string
+  eventTimezone: string
+  status: ProposedSlotStatus
+  evidence: string
+}
+
+export type SpeakerResearchLink = {
+  label: string
+  url: string
+}
+
+export type SpeakerEducation = {
+  school: string
+  degree: string
+  year: string
+  evidenceUrl: string
+}
 
 export type SpeakerLead = {
   id: string
@@ -36,17 +61,39 @@ export type SpeakerLead = {
   term: ProgramTerm
   format: SpeakerFormat
   ownerEmail: SpeakerOpsMemberEmail
+  confidence: SpeakerConfidence
+  recommendation: SpeakerRecommendation
+  recommendationRank: number | null
+  selectionRationale: string
+  shortBio: string
+  education: SpeakerEducation[]
+  credentials: string[]
+  qualifications: string[]
+  whyTheyMatter: string
+  speakerTimezone: string
+  proposedSlots: SpeakerProposedSlot[]
+  drawScore: number | null
+  drawRationale: string
+  missionFitScore: number | null
+  missionFitRationale: string
+  logisticsNotes: string
+  travelRequired: SpeakerTravelRequirement
+  costStatus: SpeakerCostStatus
+  quotedFee: number | null
+  fundingPlan: string
   nextAction: string
   evidence: string
   blocker: string
+  researchLinks: SpeakerResearchLink[]
+  researchNotes: string
   lastContactAt: string
   updatedAt: string
 }
 
 export type ProgramSlot = {
-  id: 'fall-2026' | 'winter-2027'
+  id: 'fall-2026-primary' | 'fall-2026-secondary'
   label: string
-  term: Exclude<ProgramTerm, 'later'>
+  term: 'fall-2026'
   status: ProgramSlotStatus
   preferredStart: string
   backupStart: string
@@ -121,6 +168,42 @@ export const SPEAKER_FORMAT_LABELS: Record<SpeakerFormat, string> = {
   virtual: 'Virtual',
   flexible: 'Flexible',
   unknown: 'Unknown',
+}
+
+export const SPEAKER_CONFIDENCE_LABELS: Record<SpeakerConfidence, string> = {
+  high: 'High confidence',
+  medium: 'Medium confidence',
+  low: 'Low confidence',
+  unverified: 'Unverified',
+}
+
+export const SPEAKER_RECOMMENDATION_LABELS: Record<SpeakerRecommendation, string> = {
+  recommended: 'Recommended',
+  alternate: 'Alternate',
+  hold: 'Hold',
+  research: 'Needs research',
+  'not-selected': 'Not selected',
+}
+
+export const SPEAKER_COST_STATUS_LABELS: Record<SpeakerCostStatus, string> = {
+  free: 'Free',
+  'quote-requested': 'Quote requested',
+  quoted: 'Quoted',
+  'funding-needed': 'Funding needed',
+  unknown: 'Unknown',
+}
+
+export const SPEAKER_TRAVEL_LABELS: Record<SpeakerTravelRequirement, string> = {
+  required: 'Travel required',
+  'not-required': 'No travel required',
+  unknown: 'Unknown',
+}
+
+export const PROPOSED_SLOT_STATUS_LABELS: Record<ProposedSlotStatus, string> = {
+  idea: 'Internal option',
+  offered: 'Offered',
+  accepted: 'Accepted',
+  declined: 'Declined',
 }
 
 export const PROGRAM_SLOT_STATUS_LABELS: Record<ProgramSlotStatus, string> = {

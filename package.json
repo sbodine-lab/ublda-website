@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:store": "esbuild server/speakerOpsStore.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsStore.js && esbuild server/speakerOpsService.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsService.js",
+    "build:store": "esbuild server/speakerOpsStore.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsStore.js && esbuild server/speakerOpsService.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/speakerOpsService.js && esbuild server/operationsStore.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/operationsStore.js && esbuild server/operationsService.ts --bundle --platform=node --format=esm --packages=external --allow-overwrite --outfile=server/operationsService.js",
     "prebuild": "npm run build:store",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

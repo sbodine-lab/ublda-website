@@ -29,6 +29,7 @@ import { useDecisionData } from "../decisionDataContext"
 import { initials } from "../format"
 import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
 import type { DecisionMember, MemberRole, UpsertMemberInput } from "../types"
+import { canHoldAdminRole, isFixedAdminEmail } from "@/lib/adminPolicy"
 
 function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?(): void }) {
   const { adapter } = useDecisionData()
@@ -39,6 +40,9 @@ function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?()
   const [active, setActive] = useState(member?.active ?? true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string>()
+  const parsedAliases = aliases.split(/\n|,/).map((alias) => alias.trim().toLowerCase()).filter(Boolean)
+  const fixedAdmin = Boolean(member?.identityAliases.some(isFixedAdminEmail))
+  const adminEligible = canHoldAdminRole(parsedAliases)
 
   // Every open starts from the stored member, so Cancel discards edits.
   const changeOpen = (next: boolean) => {
@@ -53,13 +57,21 @@ function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?()
   }
 
   const save = async () => {
-    const identityAliases = aliases.split(/\n|,/).map((alias) => alias.trim().toLowerCase()).filter(Boolean)
+    const identityAliases = parsedAliases
     if (!displayName.trim()) {
       setError("Add the member’s name.")
       return
     }
     if (identityAliases.length === 0 || identityAliases.some((alias) => !alias.includes("@"))) {
       setError("Add at least one valid email address.")
+      return
+    }
+    if (role === "admin" && !canHoldAdminRole(identityAliases)) {
+      setError("Only Sam, Alexa, or Cooper’s single fixed U-M email can hold admin access.")
+      return
+    }
+    if (fixedAdmin && (role !== "admin" || !active)) {
+      setError("Sam, Alexa, and Cooper must remain active admins.")
       return
     }
     const input: UpsertMemberInput = { id: member?.id, displayName, identityAliases, role, active }
@@ -93,11 +105,11 @@ function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?()
         <label className="dc-field-block"><span>Email addresses <small>One per line</small></span><Textarea value={aliases} onChange={(event) => setAliases(event.target.value)} placeholder={"name@umich.edu\nname@gmail.com"} rows={4} autoCapitalize="none" autoCorrect="off" /></label>
         <div className="dc-field-block">
           <Label htmlFor={`role-${member?.id ?? "new"}`}>Access</Label>
-          <Select value={role} onValueChange={(value) => setRole(value as MemberRole)}>
+          <Select value={role} disabled={fixedAdmin} onValueChange={(value) => setRole(value as MemberRole)}>
             <SelectTrigger id={`role-${member?.id ?? "new"}`} aria-label="Access"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="member">Member</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="admin" disabled={!adminEligible && !fixedAdmin}>Admin</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -106,8 +118,9 @@ function MemberDialog({ member, onSaved }: { member?: DecisionMember; onSaved?()
             <Label htmlFor={`active-${member?.id ?? "new"}`}>Active</Label>
             <p>Past questions keep their original roster.</p>
           </div>
-          <Switch id={`active-${member?.id ?? "new"}`} checked={active} onCheckedChange={setActive} />
+          <Switch id={`active-${member?.id ?? "new"}`} checked={active} disabled={fixedAdmin} onCheckedChange={setActive} />
         </div>
+        {fixedAdmin ? <p className="dc-field-note">Fixed admin access cannot be demoted or deactivated.</p> : null}
         {error && <p className="dc-inline-error" role="alert">{error}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={() => changeOpen(false)}>Cancel</Button>

@@ -19,6 +19,11 @@ import {
   pendingIdentityIsClaimable,
   planIdentityAliasSync,
 } from "./lib/identityPolicy";
+import {
+  effectiveLeadershipRole,
+  isFixedAdminEmail,
+  memberAuthorityViolation,
+} from "../shared/adminPolicy";
 
 function bootstrapAllowlist(): Set<string> {
   return new Set(
@@ -68,7 +73,10 @@ async function assertUsableAdminContinuity(ctx: MutationCtx): Promise<void> {
     identities: await ctx.db
       .query("memberIdentities")
       .withIndex("by_member", (q) => q.eq("memberId", admin._id))
-      .collect(),
+      .collect()
+      .then((identities) => identities.filter((identity) =>
+        isFixedAdminEmail(identity.normalizedEmail)
+      )),
   })));
   if (hasUsableAdminContinuity(candidates)) return;
   fail(
@@ -88,7 +96,10 @@ export const resolveIdentityInternal = internalQuery({
       .unique();
     if (!mapping || mapping.status !== "verified") return null;
     const member = await ctx.db.get("members", mapping.memberId);
-    return member?.status === "active" ? member : null;
+    return member?.status === "active" ? {
+      ...member,
+      role: effectiveLeadershipRole(member.role, mapping.normalizedEmail),
+    } : null;
   },
 });
 
@@ -147,9 +158,9 @@ export const bootstrapCurrentIdentity = mutation({
       "Your email must be verified.",
     );
     assert(
-      bootstrapAllowlist().has(email),
+      bootstrapAllowlist().has(email) && isFixedAdminEmail(email),
       "FORBIDDEN",
-      "This email is not in BOOTSTRAP_ADMIN_EMAILS.",
+      "This email is not an approved fixed administrator identity.",
     );
 
     const now = Date.now();
@@ -341,6 +352,12 @@ export const upsertMember = mutation({
     }
     const now = Date.now();
     let memberId = args.memberId;
+    let currentIdentities = memberId
+      ? await ctx.db
+          .query("memberIdentities")
+          .withIndex("by_member", (q) => q.eq("memberId", memberId!))
+          .collect()
+      : [];
     if (memberId) {
       const existing = await ctx.db.get("members", memberId);
       assert(existing, "NOT_FOUND", "Member not found.");
@@ -353,6 +370,19 @@ export const upsertMember = mutation({
         args.role,
         args.status ?? existing.status,
       );
+      const violation = memberAuthorityViolation({
+        currentEmails: currentIdentities
+          .filter((identity) => identity.status !== "disabled")
+          .map((identity) => identity.normalizedEmail),
+        nextEmails: args.approvedEmails === undefined
+          ? currentIdentities
+              .filter((identity) => identity.status !== "disabled")
+              .map((identity) => identity.normalizedEmail)
+          : emails,
+        nextRole: args.role,
+        nextStatus: args.status ?? existing.status,
+      });
+      assert(!violation, "VALIDATION_ERROR", violation ?? "Invalid administrator state.");
       await ctx.db.patch("members", memberId, {
         displayName,
         role: args.role,
@@ -361,6 +391,13 @@ export const upsertMember = mutation({
       });
     } else {
       assert(emails.length > 0, "VALIDATION_ERROR", "Approve at least one email for a new member.");
+      const violation = memberAuthorityViolation({
+        currentEmails: [],
+        nextEmails: emails,
+        nextRole: args.role,
+        nextStatus: args.status ?? "active",
+      });
+      assert(!violation, "VALIDATION_ERROR", violation ?? "Invalid administrator state.");
       memberId = await ctx.db.insert("members", {
         displayName,
         role: args.role,
@@ -370,10 +407,7 @@ export const upsertMember = mutation({
         createdByMemberId: actor._id,
       });
     }
-    const currentIdentities = await ctx.db
-      .query("memberIdentities")
-      .withIndex("by_member", (q) => q.eq("memberId", memberId!))
-      .collect();
+    if (!args.memberId) currentIdentities = [];
     const aliasPlan = args.approvedEmails === undefined
       ? { add: [], reenable: [], renew: [], migrate: [], disable: [], selfLockout: false }
       : planIdentityAliasSync(
@@ -495,6 +529,14 @@ export const create = mutation({
       assert(!existing, "CONFLICT", `${email} is already assigned to a member.`);
     }
 
+    const violation = memberAuthorityViolation({
+      currentEmails: [],
+      nextEmails: emails,
+      nextRole: args.role,
+      nextStatus: "active",
+    });
+    assert(!violation, "VALIDATION_ERROR", violation ?? "Invalid administrator state.");
+
     const now = Date.now();
     const memberId = await ctx.db.insert("members", {
       displayName,
@@ -542,6 +584,20 @@ export const addApprovedIdentity = mutation({
       .withIndex("by_normalized_email", (q) => q.eq("normalizedEmail", email))
       .unique();
     assert(!existing, "CONFLICT", "That email is already assigned.");
+    const currentIdentities = await ctx.db
+      .query("memberIdentities")
+      .withIndex("by_member", (q) => q.eq("memberId", member._id))
+      .collect();
+    const currentEmails = currentIdentities
+      .filter((identity) => identity.status !== "disabled")
+      .map((identity) => identity.normalizedEmail);
+    const violation = memberAuthorityViolation({
+      currentEmails,
+      nextEmails: [...currentEmails, email],
+      nextRole: member.role,
+      nextStatus: member.status,
+    });
+    assert(!violation, "VALIDATION_ERROR", violation ?? "Invalid administrator state.");
     const now = Date.now();
     const identityId = await ctx.db.insert("memberIdentities", {
       memberId: member._id,
@@ -575,6 +631,13 @@ export const setIdentityStatus = mutation({
     requireAdmin(actor);
     const identity = await ctx.db.get("memberIdentities", args.identityId);
     assert(identity, "NOT_FOUND", "Identity not found.");
+    const identityMember = await ctx.db.get("members", identity.memberId);
+    assert(identityMember, "NOT_FOUND", "Member not found.");
+    assert(
+      !(identityMember.role === "admin" && isFixedAdminEmail(identity.normalizedEmail)),
+      "VALIDATION_ERROR",
+      "A fixed administrator identity cannot be disabled or reset.",
+    );
     if (identity.memberId === actor._id && identity.status === "verified") {
       const ownIdentities = await ctx.db
         .query("memberIdentities")
@@ -628,6 +691,20 @@ export const update = mutation({
     if (args.memberId === actor._id && args.status === "inactive") {
       fail("VALIDATION_ERROR", "You cannot deactivate your own member account.");
     }
+    const identities = await ctx.db
+      .query("memberIdentities")
+      .withIndex("by_member", (q) => q.eq("memberId", member._id))
+      .collect();
+    const currentEmails = identities
+      .filter((identity) => identity.status !== "disabled")
+      .map((identity) => identity.normalizedEmail);
+    const violation = memberAuthorityViolation({
+      currentEmails,
+      nextEmails: currentEmails,
+      nextRole: args.role ?? member.role,
+      nextStatus: args.status ?? member.status,
+    });
+    assert(!violation, "VALIDATION_ERROR", violation ?? "Invalid administrator state.");
     await ensureAdminContinuity(
       ctx,
       member,

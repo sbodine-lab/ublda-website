@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ArrowUpRight,
+  Award,
+  BookOpen,
   CircleDot,
+  ExternalLink,
   ListFilter,
   Search,
-  Settings2,
   Users,
 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -31,22 +33,32 @@ import { LeadershipSection } from '@/features/leadership/components/LeadershipPa
 import {
   PROGRAM_SLOT_STATUS_LABELS,
   PROGRAM_TERM_LABELS,
+  PROPOSED_SLOT_STATUS_LABELS,
   ROOM_REQUEST_STATUS_LABELS,
+  SPEAKER_CONFIDENCE_LABELS,
+  SPEAKER_COST_STATUS_LABELS,
   SPEAKER_FORMAT_LABELS,
   SPEAKER_OPS_MEMBERS,
+  SPEAKER_RECOMMENDATION_LABELS,
   SPEAKER_STAGE_LABELS,
+  SPEAKER_TRAVEL_LABELS,
   type ProgramSlot,
   type ProgramSlotStatus,
   type ProgramTerm,
   type RoomRequest,
   type RoomRequestStatus,
   type SpeakerFormat,
+  type SpeakerConfidence,
+  type SpeakerCostStatus,
   type SpeakerLead,
   type SpeakerOpsWorkspace,
+  type SpeakerRecommendation,
   type SpeakerStage,
+  type SpeakerTravelRequirement,
 } from '@/lib/speakerOps'
 import { useLeadershipIdentity } from '@/features/decisions/leadershipIdentityContext'
 import { withLeadershipRequestTimeout } from '@/features/decisions/logtoConvexAuth'
+import { formatAnnArborTime, formatSpeakerTime } from '@/lib/speakerTime'
 import './speaker-ops.css'
 
 type WorkspaceView = 'pipeline' | 'rooms' | 'calendar'
@@ -87,24 +99,7 @@ const api = async (body: ApiRecord, idToken: string) => {
   return payload
 }
 
-const formatShortDate = (value: string) => {
-  if (!value) return '—'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Detroit',
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)
-}
-
-const relativeDate = (value: string) => {
-  if (!value) return '—'
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(value))
-}
+const formatShortDate = formatAnnArborTime
 
 const ownerName = (email: string) => SPEAKER_OPS_MEMBERS.find((member) => member.email === email)?.name || email
 
@@ -144,16 +139,13 @@ function ProgramSlots({
       ) : (
         <div className="speaker-slot-list">
           {workspace.slots.map((slot) => {
-            const room = workspace.roomRequests.find((request) => request.id === slot.roomRequestId)
             const lead = workspace.leads.find((candidate) => candidate.id === slot.leadId)
             return (
               <button key={slot.id} type="button" className="speaker-slot-row" onClick={() => onEdit(slot)}>
                 <span className="speaker-slot-row__name">{slot.label}</span>
                 <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
-                <span><span className="speaker-label-inline">Preferred time</span>{formatShortDate(slot.preferredStart)}</span>
+                <span><span className="speaker-label-inline">Date</span>{formatShortDate(slot.preferredStart)}</span>
                 <span><span className="speaker-label-inline">Speaker</span>{lead?.name || '—'}</span>
-                <span><span className="speaker-label-inline">Room</span>{room?.roomName || '—'}</span>
-                <Settings2 aria-hidden="true" />
               </button>
             )
           })}
@@ -176,8 +168,11 @@ function Pipeline({
   const [term, setTerm] = useState<ProgramTerm | 'all'>('all')
   const visibleLeads = useMemo(() => workspace.leads
     .filter((lead) => term === 'all' || lead.term === term)
-    .filter((lead) => `${lead.name} ${lead.organization} ${lead.nextAction}`.toLowerCase().includes(query.toLowerCase()))
-    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)), [query, term, workspace.leads])
+    .filter((lead) => `${lead.name} ${lead.organization} ${lead.nextAction} ${lead.shortBio} ${lead.qualifications.join(' ')}`.toLowerCase().includes(query.toLowerCase()))
+    .sort((left, right) => {
+      const rank = (left.recommendationRank ?? 999) - (right.recommendationRank ?? 999)
+      return rank || right.updatedAt.localeCompare(left.updatedAt)
+    }), [query, term, workspace.leads])
 
   const filters = (
     <div className="speaker-filters">
@@ -228,39 +223,37 @@ function Pipeline({
               <TableRow>
                 <TableHead>Speaker</TableHead>
                 <TableHead>Stage</TableHead>
-                <TableHead>Term</TableHead>
-                <TableHead>Format</TableHead>
-                <TableHead>Owner</TableHead>
+                <TableHead>Decision</TableHead>
+                <TableHead>Score</TableHead>
                 <TableHead>Next action</TableHead>
-                <TableHead>Contact</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleLeads.map((lead) => (
-                <TableRow
-                  key={lead.id}
-                  data-state={selectedLead?.id === lead.id ? 'selected' : undefined}
-                  className="speaker-table-row"
-                  onClick={() => onSelect(lead)}
-                  tabIndex={0}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') onSelect(lead)
-                  }}
-                >
+                <TableRow key={lead.id} data-state={selectedLead?.id === lead.id ? 'selected' : undefined} className="speaker-table-row">
                   <TableCell>
-                    <span className="speaker-name">{lead.name}</span>
-                    <span className="speaker-org">{lead.organization}</span>
+                    <button type="button" className="speaker-name-button" onClick={() => onSelect(lead)} aria-label={`Open speaker details for ${lead.name}`}>
+                      <span className="speaker-name">{lead.name}</span>
+                      <span className="speaker-org">{lead.organization}</span>
+                    </button>
                   </TableCell>
                   <TableCell><StatusBadge label={SPEAKER_STAGE_LABELS[lead.stage]} tone={stageTone(lead.stage)} /></TableCell>
-                  <TableCell>{PROGRAM_TERM_LABELS[lead.term]}</TableCell>
-                  <TableCell>{SPEAKER_FORMAT_LABELS[lead.format]}</TableCell>
-                  <TableCell>{ownerName(lead.ownerEmail)}</TableCell>
+                  <TableCell><StatusBadge label={SPEAKER_RECOMMENDATION_LABELS[lead.recommendation]} tone={lead.recommendation === 'recommended' ? 'blue' : 'outline'} /></TableCell>
+                  <TableCell>{lead.drawScore ?? '—'} / {lead.missionFitScore ?? '—'}</TableCell>
                   <TableCell className="speaker-next-action">{lead.nextAction}</TableCell>
-                  <TableCell>{relativeDate(lead.lastContactAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          <div className="speaker-mobile-list">
+            {visibleLeads.map((lead) => (
+              <button key={lead.id} type="button" className="speaker-mobile-card" onClick={() => onSelect(lead)} aria-label={`Open speaker details for ${lead.name}`}>
+                <span className="speaker-mobile-card__top"><span><strong>{lead.name}</strong><small>{lead.organization}</small></span><StatusBadge label={SPEAKER_STAGE_LABELS[lead.stage]} tone={stageTone(lead.stage)} /></span>
+                <span className="speaker-mobile-card__meta"><span><small>Decision</small>{SPEAKER_RECOMMENDATION_LABELS[lead.recommendation]}</span><span><small>Score</small>{lead.drawScore ?? '—'} / {lead.missionFitScore ?? '—'}</span></span>
+                <span className="speaker-mobile-card__action"><small>Next action</small>{lead.nextAction}</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </LeadershipSection>
@@ -307,6 +300,65 @@ function LeadSheet({
         </SheetHeader>
         <div className="speaker-sheet__body">
           {error && <p className="speaker-form-error" role="alert">{error}</p>}
+          <section className="speaker-profile" aria-label={`${draft.name} profile`}>
+            <div className="speaker-profile__status">
+              <StatusBadge label={SPEAKER_RECOMMENDATION_LABELS[draft.recommendation]} tone={draft.recommendation === 'recommended' ? 'blue' : 'outline'} />
+              <StatusBadge label={SPEAKER_CONFIDENCE_LABELS[draft.confidence]} tone={draft.confidence === 'high' ? 'blue' : draft.confidence === 'low' || draft.confidence === 'unverified' ? 'yellow' : 'outline'} />
+            </div>
+            <p className="speaker-profile__bio">{draft.shortBio || 'Background summary is unverified.'}</p>
+
+            <div className="speaker-profile__grid">
+              <div className="speaker-profile__block">
+                <h3><BookOpen aria-hidden="true" />Education</h3>
+                {draft.education.length ? (
+                  <ul>{draft.education.map((item, index) => (
+                    <li key={`${item.school}-${index}`}>
+                      <strong>{item.school}</strong>
+                      <span>{[item.degree, item.year].filter(Boolean).join(' · ')}</span>
+                      {item.evidenceUrl ? <a href={item.evidenceUrl} target="_blank" rel="noreferrer">Source<ExternalLink aria-hidden="true" /></a> : null}
+                    </li>
+                  ))}</ul>
+                ) : <p>Unverified</p>}
+              </div>
+              <div className="speaker-profile__block">
+                <h3><Award aria-hidden="true" />Credentials</h3>
+                {draft.credentials.length ? <ul>{draft.credentials.map((item) => <li key={item}>{item}</li>)}</ul> : <p>Unverified</p>}
+              </div>
+            </div>
+
+            <div className="speaker-profile__block">
+              <h3>Qualifications</h3>
+              {draft.qualifications.length ? <ul>{draft.qualifications.map((item) => <li key={item}>{item}</li>)}</ul> : <p>Unverified</p>}
+            </div>
+            <div className="speaker-profile__block">
+              <h3>Why book them</h3>
+              <p>{draft.whyTheyMatter || draft.selectionRationale || 'Assessment pending.'}</p>
+            </div>
+            {draft.proposedSlots.length ? (
+              <div className="speaker-profile__block">
+                <h3>Proposed times</h3>
+                <ul>{draft.proposedSlots.map((slot) => (
+                  <li key={slot.id}>
+                    <strong>Ann Arbor · {formatSpeakerTime(slot.startAt, slot.eventTimezone || 'America/Detroit') || formatAnnArborTime(slot.startAt)}</strong>
+                    <span>{formatSpeakerTime(slot.startAt, draft.speakerTimezone)
+                      ? `Speaker local · ${formatSpeakerTime(slot.startAt, draft.speakerTimezone)} (${draft.speakerTimezone})`
+                      : 'Speaker local time unavailable — timezone unverified'}</span>
+                    <span>{PROPOSED_SLOT_STATUS_LABELS[slot.status]}</span>
+                    {slot.evidence ? <span>{slot.evidence}</span> : null}
+                  </li>
+                ))}</ul>
+              </div>
+            ) : null}
+            <details className="speaker-profile__sources">
+              <summary>Sources and limits</summary>
+              <p>{draft.researchNotes || 'No source note.'}</p>
+              {draft.researchLinks.length ? <div className="speaker-profile__links">{draft.researchLinks.map((link) => <a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label || 'Source'}<ExternalLink aria-hidden="true" /></a>)}</div> : null}
+            </details>
+          </section>
+
+          <div className="speaker-edit-heading">
+            <h3>Operations record</h3>
+          </div>
           <FieldGroup className="gap-4">
             <div className="speaker-field-grid">
               <Field>
@@ -337,7 +389,81 @@ function LeadSheet({
                   <SelectContent><SelectGroup>{SPEAKER_OPS_MEMBERS.map((member) => <SelectItem key={member.email} value={member.email}>{member.name}</SelectItem>)}</SelectGroup></SelectContent>
                 </Select>
               </Field>
+              <Field>
+                <FieldLabel>Confidence</FieldLabel>
+                <Select value={draft.confidence} onValueChange={(confidence) => setDraft({ ...draft, confidence: confidence as SpeakerConfidence })}>
+                  <SelectTrigger className="w-full" aria-label="Confidence"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectGroup>{Object.entries(SPEAKER_CONFIDENCE_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
+                </Select>
+              </Field>
+              <Field>
+                <FieldLabel>Selection</FieldLabel>
+                <Select value={draft.recommendation} onValueChange={(recommendation) => setDraft({ ...draft, recommendation: recommendation as SpeakerRecommendation })}>
+                  <SelectTrigger className="w-full" aria-label="Selection"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectGroup>{Object.entries(SPEAKER_RECOMMENDATION_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
+                </Select>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-timezone">Speaker timezone</FieldLabel>
+                <Input id="lead-timezone" value={draft.speakerTimezone} onChange={(event) => setDraft({ ...draft, speakerTimezone: event.target.value })} placeholder="Unverified" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-last-contact">Last contact</FieldLabel>
+                <Input id="lead-last-contact" value={draft.lastContactAt} onChange={(event) => setDraft({ ...draft, lastContactAt: event.target.value })} placeholder="ISO date or date-time" />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-draw-score">Draw score (1–5)</FieldLabel>
+                <Input id="lead-draw-score" type="number" min={1} max={5} value={draft.drawScore ?? ''} onChange={(event) => setDraft({ ...draft, drawScore: event.target.value ? Number(event.target.value) : null })} />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-fit-score">Mission fit (1–5)</FieldLabel>
+                <Input id="lead-fit-score" type="number" min={1} max={5} value={draft.missionFitScore ?? ''} onChange={(event) => setDraft({ ...draft, missionFitScore: event.target.value ? Number(event.target.value) : null })} />
+              </Field>
+              <Field>
+                <FieldLabel>Cost status</FieldLabel>
+                <Select value={draft.costStatus} onValueChange={(costStatus) => setDraft({ ...draft, costStatus: costStatus as SpeakerCostStatus })}>
+                  <SelectTrigger className="w-full" aria-label="Cost status"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectGroup>{Object.entries(SPEAKER_COST_STATUS_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
+                </Select>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-fee">Quoted fee (USD)</FieldLabel>
+                <Input id="lead-fee" type="number" min={0} value={draft.quotedFee ?? ''} onChange={(event) => setDraft({ ...draft, quotedFee: event.target.value ? Number(event.target.value) : null })} />
+              </Field>
+              <Field>
+                <FieldLabel>Travel</FieldLabel>
+                <Select value={draft.travelRequired} onValueChange={(travelRequired) => setDraft({ ...draft, travelRequired: travelRequired as SpeakerTravelRequirement })}>
+                  <SelectTrigger className="w-full" aria-label="Travel requirement"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectGroup>{Object.entries(SPEAKER_TRAVEL_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
+                </Select>
+              </Field>
             </div>
+            <Field>
+              <FieldLabel htmlFor="lead-bio">Concise background</FieldLabel>
+              <Textarea id="lead-bio" rows={3} value={draft.shortBio} onChange={(event) => setDraft({ ...draft, shortBio: event.target.value })} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="lead-selection">Selection rationale</FieldLabel>
+              <Textarea id="lead-selection" rows={2} value={draft.selectionRationale} onChange={(event) => setDraft({ ...draft, selectionRationale: event.target.value })} />
+            </Field>
+            <div className="speaker-field-grid">
+              <Field>
+                <FieldLabel htmlFor="lead-draw-rationale">Draw rationale</FieldLabel>
+                <Textarea id="lead-draw-rationale" rows={3} value={draft.drawRationale} onChange={(event) => setDraft({ ...draft, drawRationale: event.target.value })} />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="lead-fit-rationale">Mission-fit rationale</FieldLabel>
+                <Textarea id="lead-fit-rationale" rows={3} value={draft.missionFitRationale} onChange={(event) => setDraft({ ...draft, missionFitRationale: event.target.value })} />
+              </Field>
+            </div>
+            <Field>
+              <FieldLabel htmlFor="lead-logistics">Logistics</FieldLabel>
+              <Textarea id="lead-logistics" rows={2} value={draft.logisticsNotes} onChange={(event) => setDraft({ ...draft, logisticsNotes: event.target.value })} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="lead-funding">Cost and funding plan</FieldLabel>
+              <Textarea id="lead-funding" rows={2} value={draft.fundingPlan} onChange={(event) => setDraft({ ...draft, fundingPlan: event.target.value })} />
+            </Field>
             <Field>
               <FieldLabel htmlFor="lead-next-action">Next action</FieldLabel>
               <Textarea id="lead-next-action" rows={2} value={draft.nextAction} onChange={(event) => setDraft({ ...draft, nextAction: event.target.value })} />
@@ -349,6 +475,10 @@ function LeadSheet({
             <Field>
               <FieldLabel htmlFor="lead-evidence">Evidence</FieldLabel>
               <Textarea id="lead-evidence" rows={4} value={draft.evidence} onChange={(event) => setDraft({ ...draft, evidence: event.target.value })} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="lead-research-notes">Research notes and caveats</FieldLabel>
+              <Textarea id="lead-research-notes" rows={4} value={draft.researchNotes} onChange={(event) => setDraft({ ...draft, researchNotes: event.target.value })} />
             </Field>
           </FieldGroup>
         </div>
@@ -472,10 +602,16 @@ function RoomRequests({ workspace, onSave }: { workspace: SpeakerOpsWorkspace; o
           const draft = drafts[request.id] || request
           const slot = workspace.slots.find((candidate) => candidate.id === request.slotId)
           const setDraft = (patch: Partial<RoomRequest>) => setDrafts((current) => ({ ...current, [request.id]: { ...draft, ...patch } }))
+          const allowedStatuses: Record<RoomRequestStatus, RoomRequestStatus[]> = {
+            draft: ['draft', 'submitted'],
+            submitted: ['submitted', 'approved', 'declined'],
+            approved: ['approved'],
+            declined: ['declined', 'draft'],
+          }
           return (
             <div className="speaker-room-card" key={request.id}>
               <div className="speaker-room-card__header">
-                <div><h3>{slot?.label}</h3><p>{formatShortDate(draft.preferredStart)}</p></div>
+                <div><h3>{slot?.label}</h3><span className="speaker-card-date">{formatShortDate(draft.preferredStart)}</span></div>
                 <StatusBadge label={ROOM_REQUEST_STATUS_LABELS[draft.status]} tone={draft.status === 'approved' ? 'blue' : draft.status === 'submitted' ? 'yellow' : 'outline'} />
               </div>
               <FieldGroup className="gap-4">
@@ -484,7 +620,7 @@ function RoomRequests({ workspace, onSave }: { workspace: SpeakerOpsWorkspace; o
                     <FieldLabel>Status</FieldLabel>
                     <Select value={draft.status} onValueChange={(status) => setDraft({ status: status as RoomRequestStatus })}>
                       <SelectTrigger className="w-full" aria-label={`${slot?.label || request.slotId} room request status`}><SelectValue /></SelectTrigger>
-                      <SelectContent><SelectGroup>{Object.entries(ROOM_REQUEST_STATUS_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectGroup></SelectContent>
+                      <SelectContent><SelectGroup>{allowedStatuses[request.status].map((value) => <SelectItem key={value} value={value}>{ROOM_REQUEST_STATUS_LABELS[value]}</SelectItem>)}</SelectGroup></SelectContent>
                     </Select>
                   </Field>
                   <Field>
@@ -496,8 +632,8 @@ function RoomRequests({ workspace, onSave }: { workspace: SpeakerOpsWorkspace; o
                     <Input id={`${request.id}-room`} value={draft.roomName} onChange={(event) => setDraft({ roomName: event.target.value })} placeholder="Required for approval" />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor={`${request.id}-reference`}>Request reference</FieldLabel>
-                    <Input id={`${request.id}-reference`} value={draft.reference} onChange={(event) => setDraft({ reference: event.target.value })} />
+                    <FieldLabel htmlFor={`${request.id}-reference`}>Ross approval reference / source</FieldLabel>
+                    <Input id={`${request.id}-reference`} value={draft.reference} onChange={(event) => setDraft({ reference: event.target.value })} placeholder="Required for approval" />
                   </Field>
                 </div>
                 <Field>
@@ -539,7 +675,7 @@ function CalendarView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
             <div className="speaker-calendar-card" key={slot.id}>
               <span className="speaker-eyebrow">{PROGRAM_TERM_LABELS[slot.term]}</span>
               <h3>{formatShortDate(slot.preferredStart)}</h3>
-              <p>Backup: {formatShortDate(slot.backupStart)}</p>
+              <span className="speaker-card-date">Backup: {formatShortDate(slot.backupStart)}</span>
               <StatusBadge label={PROGRAM_SLOT_STATUS_LABELS[slot.status]} tone={slotTone(slot.status)} />
             </div>
           ))}
@@ -549,6 +685,7 @@ function CalendarView({ workspace }: { workspace: SpeakerOpsWorkspace }) {
       <LeadershipSection title="Dates to avoid" titleId="dates-to-avoid-title" flush>
         <ul className="speaker-calendar-notes">
           <li><span>Oct 19–20, 2026</span><span>Fall study break</span></li>
+          <li><span>Nov 8–13, 2026</span><span>Ross Tech Week; avoid competing with Nov 10 programming</span></li>
           <li><span>Nov 25–28, 2026</span><span>Thanksgiving recess</span></li>
           <li><span>Dec 14–21, 2026</span><span>Ross final exams</span></li>
           <li><span>Jan 18, 2027</span><span>Martin Luther King Jr. Day</span></li>

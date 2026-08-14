@@ -8,6 +8,7 @@ import {
   handleSpeakerOpsRequest,
   type SpeakerOpsIdentityVerifier,
 } from './server/speakerOpsService.ts'
+import { handleOperationsRequest } from './server/operationsService.ts'
 import { getLocalWeather } from './server/weatherService.ts'
 
 const LOCAL_LEADERSHIP_PREVIEW_TOKEN = 'ublda-local-leadership-preview'
@@ -83,6 +84,23 @@ const devApiPlugin = () => ({
         || req.socket.remoteAddress
         || 'local-preview'
       const result = await handleSpeakerOpsRequest(body, ip, {
+        verifyIdentity: verifyLocalSpeakerOpsIdentity,
+      })
+      sendJson(res, result.status, { ...result.body, localPreview: true })
+    })
+
+    server.middlewares.use('/api/operations', async (req: IncomingMessage, res: ServerResponse) => {
+      if (req.method !== 'POST') {
+        sendJson(res, 405, { error: 'Method not allowed' })
+        return
+      }
+
+      const body = await readJsonBody(req)
+      const forwarded = req.headers['x-forwarded-for']
+      const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(',')[0]?.trim()
+        || req.socket.remoteAddress
+        || 'local-preview'
+      const result = await handleOperationsRequest(body, ip, {
         verifyIdentity: verifyLocalSpeakerOpsIdentity,
       })
       sendJson(res, result.status, { ...result.body, localPreview: true })

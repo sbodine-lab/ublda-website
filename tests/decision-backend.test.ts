@@ -16,6 +16,52 @@ import {
   pendingIdentityIsClaimable,
   planIdentityAliasSync,
 } from "../convex/lib/identityPolicy.ts";
+import {
+  canHoldAdminRole,
+  effectiveLeadershipRole,
+  isFixedAdminEmail,
+  memberAuthorityViolation,
+} from "../shared/adminPolicy.ts";
+
+test("only the three fixed email identities can exercise stored Convex admin authority", () => {
+  for (const email of ["sbodine@umich.edu", "atchiang@umich.edu", "cooperry@umich.edu"]) {
+    assert.equal(isFixedAdminEmail(email), true)
+    assert.equal(effectiveLeadershipRole("admin", email), "admin")
+    assert.equal(canHoldAdminRole([email]), true)
+  }
+  assert.equal(effectiveLeadershipRole("admin", "alternate-admin@umich.edu"), "member")
+  assert.equal(effectiveLeadershipRole("member", "sbodine@umich.edu"), "member")
+  assert.equal(canHoldAdminRole(["andsack@umich.edu"]), false)
+  assert.equal(canHoldAdminRole(["sbodine@umich.edu", "alternate@umich.edu"]), false)
+})
+
+test("fixed Convex admins cannot be demoted, deactivated, removed, or replaced", () => {
+  const base = {
+    currentEmails: ["sbodine@umich.edu"],
+    nextEmails: ["sbodine@umich.edu"],
+    nextRole: "admin" as const,
+    nextStatus: "active" as const,
+  }
+  assert.equal(memberAuthorityViolation(base), null)
+  assert.match(memberAuthorityViolation({ ...base, nextRole: "member" }) || "", /remain active administrators/i)
+  assert.match(memberAuthorityViolation({ ...base, nextStatus: "inactive" }) || "", /remain active administrators/i)
+  assert.match(memberAuthorityViolation({ ...base, nextEmails: ["atchiang@umich.edu"] }) || "", /cannot be removed or replaced/i)
+})
+
+test("nonallowlisted and aliased identities cannot be granted Convex admin", () => {
+  assert.match(memberAuthorityViolation({
+    currentEmails: [],
+    nextEmails: ["andsack@umich.edu"],
+    nextRole: "admin",
+    nextStatus: "active",
+  }) || "", /only the fixed/i)
+  assert.match(memberAuthorityViolation({
+    currentEmails: [],
+    nextEmails: ["cooperry@umich.edu", "personal@example.com"],
+    nextRole: "admin",
+    nextStatus: "active",
+  }) || "", /only the fixed/i)
+})
 
 test("only verified non-Clerk identities can keep an administrator signed in", () => {
   assert.equal(isUsableLeadershipIdentity({ status: "verified", provider: "logto" }), true);

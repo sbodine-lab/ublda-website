@@ -4,6 +4,7 @@ import type { ActionCtx, MutationCtx, QueryCtx } from "./server";
 import type { Doc } from "./types";
 import { assert, fail } from "./errors";
 import { makeFunctionReference } from "convex/server";
+import { effectiveLeadershipRole } from "../../shared/adminPolicy";
 
 type DatabaseCtx = QueryCtx | MutationCtx;
 type AuthCtx = Pick<QueryCtx, "auth"> | Pick<ActionCtx, "auth">;
@@ -56,7 +57,10 @@ export async function requireMember(ctx: DatabaseCtx): Promise<AuthenticatedMemb
   if (!member || member.status !== "active") {
     fail("FORBIDDEN", "This member account is inactive.");
   }
-  return member;
+  return {
+    ...member,
+    role: effectiveLeadershipRole(member.role, mapping.normalizedEmail),
+  };
 }
 
 export async function requireActionMember(
