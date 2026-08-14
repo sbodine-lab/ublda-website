@@ -938,10 +938,10 @@ export class SpeakerOpsStore {
     const blob = await get(BLOB_PATH, { access: 'private', useCache: false })
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null as string | null }
     const raw = await new Response(blob.stream).text()
-    // Vercel Blob returns weak ETags (for example `W/<opaque>`). `ifMatch`
-    // expects that exact validator; stripping the prefix makes every
-    // conditional write fail even when no concurrent writer exists.
-    return { data: JSON.parse(raw) as LegacySpeakerOpsData, etag: blob.blob.etag || null }
+    // Private Blob GET responses expose a weak HTTP validator, while Blob's
+    // conditional write API expects the corresponding strong ETag.
+    const etag = blob.blob.etag?.replace(/^W\//, '') || null
+    return { data: JSON.parse(raw) as LegacySpeakerOpsData, etag }
   }
 
   private async writeBlob(data: SpeakerOpsData, etag: string | null) {

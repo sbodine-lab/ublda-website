@@ -307,7 +307,8 @@ var OperationsStore = class {
     const blob = await get(BLOB_PATH, { access: "private", useCache: false });
     if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null };
     const raw = await new Response(blob.stream).text();
-    return { data: JSON.parse(raw), etag: blob.blob.etag || null };
+    const etag = blob.blob.etag?.replace(/^W\//, "") || null;
+    return { data: JSON.parse(raw), etag };
   }
   async writeBlob(data, etag) {
     await put(BLOB_PATH, `${JSON.stringify(data, null, 2)}
@@ -1736,7 +1737,8 @@ var SpeakerOpsStore = class {
     const blob = await get2(BLOB_PATH2, { access: "private", useCache: false });
     if (!blob || blob.statusCode !== 200) return { data: emptyData2(), etag: null };
     const raw = await new Response(blob.stream).text();
-    return { data: JSON.parse(raw), etag: blob.blob.etag || null };
+    const etag = blob.blob.etag?.replace(/^W\//, "") || null;
+    return { data: JSON.parse(raw), etag };
   }
   async writeBlob(data, etag) {
     await put2(BLOB_PATH2, `${JSON.stringify(data, null, 2)}
