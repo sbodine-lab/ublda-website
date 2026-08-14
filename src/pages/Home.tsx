@@ -51,8 +51,8 @@ const upcoming = [
 ]
 
 const exec = [
-  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Runs the show and keeps UBLDA pointed in the right direction, from speaker events to campus-wide partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
-  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Bridges disability advocacy and the broader Ross community. Makes sure no one gets left out of the conversation.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
+  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Leads speaker events and campus partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
+  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Connects disability advocacy with Ross and keeps accessibility in the room.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
   { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
 ]
 
@@ -105,9 +105,9 @@ export default function Home() {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
               }}
             >
-              Disability inclusion belongs in business. We're a Michigan Ross student
-              org for students passionate about the mission, whether you're headed
-              into consulting, finance, product, or any career where real impact matters.
+              Disability inclusion belongs in business. UBLDA brings Michigan Ross
+              students together through client work, speaker events, workshops, and
+              the BLDA community.
             </motion.p>
 
             <motion.div

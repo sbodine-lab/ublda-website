@@ -32,6 +32,7 @@ export function DecisionAuthGate({ children }: PropsWithChildren) {
     || location.pathname === "/people"
     || location.pathname === "/leadership/speakers"
     || location.pathname === "/speaker-ops"
+    || location.pathname === "/operations"
     || location.pathname === "/decisions"
     || location.pathname.startsWith("/decisions/")
     || location.pathname === "/results"

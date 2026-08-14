@@ -73,7 +73,7 @@
   width: 100%;
   min-height: 56px;
   display: grid;
-  grid-template-columns: minmax(170px, 1.25fr) 126px minmax(190px, 1.2fr) minmax(150px, 1fr) minmax(125px, 0.85fr) 16px;
+  grid-template-columns: minmax(170px, 1.25fr) 126px minmax(190px, 1.2fr) minmax(150px, 1fr);
   align-items: center;
   gap: 20px;
   padding: 12px 20px;
@@ -108,12 +108,6 @@
   font-weight: 560;
   letter-spacing: 0.01em;
   line-height: 1.2;
-}
-
-.speaker-slot-row > svg {
-  width: 16px;
-  height: 16px;
-  color: var(--lx-faint);
 }
 
 /* ─── Status chips — the one place a pill radius is allowed ─── */
@@ -191,15 +185,32 @@
 }
 
 .speaker-table-wrap [data-slot="table"] {
-  min-width: 960px;
-}
-
-.speaker-table-row {
-  cursor: pointer;
+  min-width: 760px;
 }
 
 .speaker-table-row[data-state="selected"] {
   background: var(--lx-active-wash);
+}
+
+.speaker-name-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.speaker-name-button:focus-visible,
+.speaker-mobile-card:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--lx-accent);
+  outline-offset: 3px;
+}
+
+.speaker-mobile-list {
+  display: none;
 }
 
 .speaker-name,
@@ -263,7 +274,7 @@
   line-height: 1.2;
 }
 
-.speaker-room-card__header p,
+.speaker-card-date,
 .speaker-room-card__meta {
   margin: 0;
   color: var(--lx-muted);
@@ -309,7 +320,7 @@
   letter-spacing: -0.005em;
 }
 
-.speaker-calendar-card p,
+.speaker-card-date,
 .speaker-eyebrow {
   margin: 0;
   color: var(--lx-muted);
@@ -347,8 +358,8 @@
 
 .speaker-sheet {
   gap: 0;
-  width: min(100vw, 440px);
-  max-width: min(100vw, 440px);
+  width: min(100vw, 680px);
+  max-width: min(100vw, 680px);
   border-left: 1px solid var(--lx-hairline);
   border-radius: var(--lx-radius-surface) 0 0 var(--lx-radius-surface);
   background: var(--lx-surface, #ffffff);
@@ -364,6 +375,122 @@
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+}
+
+.speaker-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 20px;
+  border: 1px solid var(--lx-hairline);
+  border-radius: var(--lx-radius-surface);
+  background: #fafbfc;
+}
+
+.speaker-profile__status,
+.speaker-profile__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.speaker-profile__bio {
+  margin: 0;
+  color: var(--lx-ink);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.speaker-profile__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.speaker-profile__block {
+  min-width: 0;
+}
+
+.dc-app-shell.leadership-shell .speaker-profile__block h3,
+.dc-app-shell.leadership-shell .speaker-edit-heading h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 7px;
+  color: var(--lx-ink);
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.speaker-profile__block h3 svg {
+  width: 15px;
+  height: 15px;
+  color: var(--lx-muted);
+}
+
+.speaker-profile__block p,
+.speaker-profile__block ul {
+  margin: 0;
+  color: var(--lx-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.speaker-profile__block ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 18px;
+}
+
+.speaker-profile__block li strong,
+.speaker-profile__block li span {
+  display: block;
+}
+
+.speaker-profile__block li a,
+.speaker-profile__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--lx-navy);
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.speaker-profile__block li a svg,
+.speaker-profile__links a svg {
+  width: 12px;
+  height: 12px;
+}
+
+.speaker-profile__links {
+  margin-top: 10px;
+}
+
+.speaker-profile__sources {
+  padding-top: 12px;
+  border-top: 1px solid var(--lx-hairline);
+  color: var(--lx-muted);
+  font-size: 12px;
+}
+
+.speaker-profile__sources summary {
+  cursor: pointer;
+  color: var(--lx-ink);
+  font-weight: 620;
+}
+
+.speaker-profile__sources p {
+  margin: 10px 0 0;
+  line-height: 1.45;
+}
+
+.speaker-edit-heading {
+  margin: 0 0 16px;
 }
 
 .speaker-sheet__footer {
@@ -413,11 +540,10 @@
   }
 
   .speaker-slot-row {
-    grid-template-columns: minmax(145px, 1fr) 112px minmax(170px, 1fr) 16px;
+    grid-template-columns: minmax(145px, 1fr) 112px minmax(170px, 1fr);
   }
 
-  .speaker-slot-row > span:nth-of-type(4),
-  .speaker-slot-row > span:nth-of-type(5) {
+  .speaker-slot-row > span:nth-of-type(4) {
     display: none;
   }
 }
@@ -441,7 +567,7 @@
   }
 
   .speaker-slot-row {
-    grid-template-columns: minmax(0, 1fr) auto 16px;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
     padding-inline: 16px;
   }
@@ -451,12 +577,13 @@
   }
 
   .speaker-table-wrap [data-slot="table"] {
-    min-width: 920px;
+    min-width: 760px;
   }
 
   .speaker-calendar-grid,
   .speaker-room-grid,
-  .speaker-field-grid {
+  .speaker-field-grid,
+  .speaker-profile__grid {
     grid-template-columns: 1fr;
   }
 
@@ -479,6 +606,60 @@
   .speaker-room-card,
   .speaker-calendar-card {
     padding: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .speaker-table-wrap [data-slot="table"] {
+    display: none;
+  }
+
+  .speaker-mobile-list {
+    display: grid;
+  }
+
+  .speaker-mobile-card {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    border-bottom: 1px solid var(--lx-line);
+    background: transparent;
+    color: var(--lx-ink);
+    text-align: left;
+  }
+
+  .speaker-mobile-card__top,
+  .speaker-mobile-card__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .speaker-mobile-card__top > span:first-child,
+  .speaker-mobile-card__meta > span,
+  .speaker-mobile-card__action {
+    display: grid;
+    gap: 2px;
+  }
+
+  .speaker-mobile-card__top small,
+  .speaker-mobile-card__meta small,
+  .speaker-mobile-card__action small {
+    color: var(--lx-faint);
+    font-size: 11px;
+  }
+
+  .speaker-mobile-card__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .speaker-mobile-card__action {
+    color: var(--lx-muted);
+    font-size: 12.5px;
+    line-height: 1.45;
   }
 }
 

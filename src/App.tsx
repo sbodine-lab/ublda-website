@@ -20,7 +20,7 @@ const DecisionCenterEntry = lazy(() => (
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
 const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory']
-const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/signin', '/dashboard', '/members']
+const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/operations', '/signin', '/dashboard', '/members']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
   prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))

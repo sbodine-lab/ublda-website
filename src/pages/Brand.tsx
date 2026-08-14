@@ -40,7 +40,7 @@ export default function Brand() {
           <h1 className="brand-hero__title">Brand Guide</h1>
           <p className="brand-hero__sub">
             Everything you need to create consistent, on-brand materials for UBLDA -
-            from social media posts to slide decks.
+            for social media posts and slide decks.
           </p>
         </div>
       </section>
@@ -713,7 +713,7 @@ export default function Brand() {
                 <span className="brand-voice-card__yes">Yes:</span> "We partner with organizations to create actionable accessibility solutions."
               </div>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__no">No:</span> "We leverage synergistic paradigms to optimize stakeholder engagement."
+                <span className="brand-voice-card__no">No:</span> "We provide dynamic solutions for every stakeholder."
               </div>
             </div>
           </div>

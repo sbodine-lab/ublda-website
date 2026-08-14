@@ -183,9 +183,8 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="about__cta-sub">
-              Whether you want to lead consulting projects, host events, or simply
-              show up and learn, there's a place for you. Join 30+ Ross students
-              who are making disability inclusion the standard in business.
+              Lead a project, help run events, join a workshop, or just show up and
+              learn. More than 30 Ross students work on disability inclusion in business.
             </p>
           </Reveal>
           <Reveal delay={0.2}>

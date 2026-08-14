@@ -2,6 +2,7 @@ import {
   Bot,
   CalendarClock,
   CalendarDays,
+  ClipboardCheck,
   FolderKanban,
   Home,
   MessageCircleQuestion,
@@ -27,6 +28,7 @@ export const leadershipNavigation: LeadershipNavigationItem[] = [
   { to: "/decisions", label: "Questions", icon: MessageCircleQuestion, end: true },
   { to: "/scheduling", label: "Scheduling", icon: CalendarClock },
   { to: "/leadership/speakers", label: "Speakers", icon: MicVocal },
+  { to: "/operations", label: "Operations", icon: ClipboardCheck },
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/projects", label: "Projects", icon: FolderKanban },
   { to: "/people", label: "People", icon: Users },
@@ -59,6 +61,7 @@ const routeHeaders: Array<{
   header: LeadershipRouteHeader
 }> = [
   { matches: (pathname) => pathname === "/leadership/speakers", header: { title: "Speakers" } },
+  { matches: (pathname) => pathname === "/operations", header: { title: "Operations" } },
   { matches: (pathname) => pathname === "/decisions/settings", header: { title: "Members" } },
   { matches: (pathname) => pathname === "/decisions/integrations", header: { title: "Integrations" } },
   { matches: (pathname) => pathname === "/decisions/new", header: { title: "New question" } },

@@ -7,6 +7,7 @@ const EXACT_LEADERSHIP_PATHS = new Set([
   '/people',
   '/leadership/speakers',
   '/speaker-ops',
+  '/operations',
   '/decision',
   '/decisions',
   '/results',

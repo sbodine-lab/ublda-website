@@ -16,6 +16,7 @@ import { PeoplePage } from "@/features/workspace/pages/PeoplePage"
 import { ProjectsPage } from "@/features/workspace/pages/ProjectsPage"
 import { WorkspaceOverviewPage } from "@/features/workspace/pages/WorkspaceOverviewPage"
 import { SpeakerOpsEntry } from "@/features/speakers/SpeakerOpsEntry"
+import { OperationsEntry } from "@/features/operations/OperationsEntry"
 import { LogtoAuthCallback } from "./LogtoAuthCallback"
 import "@/features/availability/availability.css"
 import "./decision-center.css"
@@ -56,6 +57,7 @@ export function DecisionCenterRoutes({ logtoCallback = false }: { logtoCallback?
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/people" element={<PeoplePage />} />
         <Route path="/leadership/speakers" element={<SpeakerOpsEntry />} />
+        <Route path="/operations" element={<OperationsEntry />} />
         <Route path="/speaker-ops" element={<Navigate to="/leadership/speakers" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/workspace" replace />} />

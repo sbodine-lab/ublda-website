@@ -1,10 +1,846 @@
-// server/speakerOpsStore.ts
+// server/operationsStore.js
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
+var FIXED_ADMIN_EMAILS = [
+  "sbodine@umich.edu",
+  "atchiang@umich.edu",
+  "cooperry@umich.edu"
+];
+var OPERATIONS_SUPER_ADMINS = FIXED_ADMIN_EMAILS;
+var ATTENDANCE_STATUS_LABELS = {
+  not_invited: "Not on invite",
+  unrecorded: "Not recorded",
+  present: "Present",
+  late: "Late",
+  absent: "Absent",
+  excused: "Excused"
+};
+var STRIKE_REASON_LABELS = {
+  meeting_absence: "Meeting absence",
+  notice: "Notice requirement",
+  deliverable: "Missed deliverable",
+  communication: "Communication"
+};
+var STRIKE_STATUS_LABELS = {
+  active: "Active",
+  excused: "Excused",
+  voided: "Voided"
+};
+var DOCUMENT_CATEGORY_LABELS = {
+  constitution: "Constitution",
+  meeting_notes: "Meeting notes",
+  archive: "Archive"
+};
+var DOCUMENT_STATUS_LABELS = {
+  current: "Current",
+  draft: "Draft",
+  superseded: "Superseded",
+  archived: "Archived",
+  unverified: "Unverified"
+};
+var REVIEW_STAGE_LABELS = {
+  draft: "Draft",
+  ready_for_review: "Ready for review",
+  in_review: "In review",
+  changes_requested: "Changes requested",
+  approved: "Approved"
+};
+var BLOB_PATH = "operations/state.json";
+var WRITE_ATTEMPTS = 5;
+var queues = /* @__PURE__ */ new Map();
+var defaultDataPath = () => process.env.UBLDA_OPERATIONS_DATA_FILE ? path.resolve(process.env.UBLDA_OPERATIONS_DATA_FILE) : path.join(process.cwd(), ".ublda-local-data", "operations.json");
+var cleanText = (value, max = 500) => typeof value === "string" ? value.replace(/[<>]/g, "").trim().slice(0, max) : "";
+var randomId = (prefix) => `${prefix}_${randomBytes(10).toString("base64url")}`;
+var canUseBlob = (forceLocal) => !forceLocal && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+var mutationRejected = (result) => Boolean(
+  result && typeof result === "object" && "ok" in result && result.ok === false
+);
+var isOperationsSuperAdmin = (email) => OPERATIONS_SUPER_ADMINS.includes(email.trim().toLowerCase());
+var validDocumentDriveUrl = (value) => {
+  if (typeof value !== "string" || !value.trim()) return "";
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || url.username || url.password) return "";
+    const validPath = url.hostname === "drive.google.com" ? /^\/file\/d\/[A-Za-z0-9_-]+\/view\/?$/.test(url.pathname) : url.hostname === "docs.google.com" ? /^\/(?:document|spreadsheets|presentation)\/d\/[A-Za-z0-9_-]+(?:\/(?:edit|view))?\/?$/.test(url.pathname) : false;
+    if (!validPath) return "";
+    url.hash = "";
+    return url.toString().slice(0, 500);
+  } catch {
+    return "";
+  }
+};
+var accountSeeds = (updatedAt) => [
+  { name: "Sam Bodine", email: "sbodine@umich.edu", title: "Co-President", role: "super_admin", updatedAt, updatedBy: "system" },
+  { name: "Alexa Chiang", email: "atchiang@umich.edu", title: "Co-President", role: "super_admin", updatedAt, updatedBy: "system" },
+  { name: "Cooper Perry", email: "cooperry@umich.edu", title: "Executive Vice President", role: "super_admin", updatedAt, updatedBy: "system" },
+  { name: "Alex Forstner", email: "alexfors@umich.edu", title: "VP Education", role: "officer", updatedAt, updatedBy: "system" },
+  { name: "Andrew Sackett", email: "andsack@umich.edu", title: "VP Events", role: "officer", updatedAt, updatedBy: "system" },
+  { name: "Landon Miller", email: "landonem@umich.edu", title: "VP Finance", role: "officer", updatedAt, updatedBy: "system" },
+  { name: "Lindsey Ye", email: "ylindsey@umich.edu", title: "VP Operations", role: "officer", updatedAt, updatedBy: "system" },
+  { name: "Samantha Naber", email: "snaber@umich.edu", title: "Leadership Team", role: "officer", updatedAt, updatedBy: "system" },
+  { name: "Solomon Deyoung", email: "sdeyoun@umich.edu", title: "Leadership Team", role: "officer", updatedAt, updatedBy: "system" }
+];
+var eventSeeds = () => [{
+  id: "team-meeting-2026-08-14",
+  title: "UBLDA Team Meeting",
+  startsAt: "2026-08-14T15:45:00-04:00",
+  endsAt: "2026-08-14T16:15:00-04:00",
+  timezone: "America/Detroit",
+  location: "Location / Meet link not yet verified",
+  sourceNote: "The user confirmed the live Calendar window of 3:45\u20134:15 PM ET. The location or Google Meet link has not yet been verified.",
+  sourceStatus: "user_confirmed",
+  calendarStartsAt: "2026-08-14T15:45:00-04:00",
+  calendarEndsAt: "2026-08-14T16:15:00-04:00",
+  calendarUrl: "",
+  lastVerifiedAt: "2026-08-14T00:00:00-04:00"
+}];
+var documentSeeds = (updatedAt) => [
+  {
+    id: "constitution",
+    title: "UBLDA - Constitution.docx",
+    category: "constitution",
+    driveUrl: "https://drive.google.com/file/d/1OQM2b62K93_uKrNVAh0iTSRHtBAP8bDD/view",
+    sourceStatus: "verified",
+    currentStatus: "current",
+    sourceNote: "Verified in Drive under Core Documents (DOCX). Governance review is still required: named roles conflict with current responsibilities, and the advisor, weekly-meeting, and 75% participation requirements need confirmation.",
+    ownerEmail: "cooperry@umich.edu",
+    lastVerifiedAt: "2026-08-14T00:00:00-04:00",
+    updatedAt,
+    updatedBy: "system"
+  },
+  {
+    id: "team-meeting-notes-2026-08-14",
+    title: "UBLDA Team Meeting Notes \u2014 August 14, 2026",
+    category: "meeting_notes",
+    driveUrl: "https://docs.google.com/document/d/1TKPrLVm80gsmUnNn5g2iwfmAwIWIlsTMiHJJlL3bx8M/edit",
+    sourceStatus: "verified",
+    currentStatus: "current",
+    sourceNote: "Verified shared notes document for today's team meeting. A canonical Meeting Notes folder link was not supplied, so this record links directly to the verified file.",
+    ownerEmail: "ylindsey@umich.edu",
+    lastVerifiedAt: "2026-08-14T00:00:00-04:00",
+    updatedAt,
+    updatedBy: "system"
+  },
+  {
+    id: "founding-notes-2026-06-28",
+    title: "Founding Team Meeting Notes \u2014 June 28, 2026",
+    category: "meeting_notes",
+    driveUrl: "https://docs.google.com/document/d/1FS__OHUyk2ryLXH7LN8Ii06JAtr_SNcBcChK91fn0vI",
+    sourceStatus: "verified",
+    currentStatus: "current",
+    sourceNote: "Brain document #14; source of the current three-strike operating rule.",
+    ownerEmail: "cooperry@umich.edu",
+    lastVerifiedAt: "2026-08-14T00:00:00-04:00",
+    updatedAt,
+    updatedBy: "system"
+  },
+  {
+    id: "meeting-notes-2026-07-29",
+    title: "Full E-Board Meeting Notes \u2014 July 29, 2026",
+    category: "archive",
+    driveUrl: "https://docs.google.com/document/d/1SRRQmmC0yx271dYn6tmrSudjmsfTO6c9HAhjL_myNck/edit",
+    sourceStatus: "verified",
+    currentStatus: "archived",
+    sourceNote: "Public notes link recorded in the Brain July 29 artifact handoff.",
+    ownerEmail: "ylindsey@umich.edu",
+    lastVerifiedAt: "2026-07-29T00:00:00-04:00",
+    updatedAt,
+    updatedBy: "system"
+  }
+];
+var emptyData = () => {
+  const seededAt = "2026-08-14T00:00:00-04:00";
+  const accounts = Object.fromEntries(accountSeeds(seededAt).map((account) => [account.email, account]));
+  const events = Object.fromEntries(eventSeeds().map((event) => [event.id, event]));
+  const attendance = Object.fromEntries(accountSeeds(seededAt).map((account) => {
+    const invited = account.email !== "atchiang@umich.edu";
+    const record = {
+      id: `attendance-team-meeting-2026-08-14-${account.email.split("@")[0]}`,
+      eventId: "team-meeting-2026-08-14",
+      memberEmail: account.email,
+      invited,
+      inviteSourceNote: invited ? "Included on the live Google Calendar invite snapshot." : "Not listed among the eight invitees on the live Google Calendar snapshot; do not infer an absence.",
+      status: invited ? "unrecorded" : "not_invited",
+      noticeAt: "",
+      notes: "",
+      updatedAt: seededAt,
+      updatedBy: "system"
+    };
+    return [record.id, record];
+  }));
+  const documents = Object.fromEntries(documentSeeds(seededAt).map((document) => [document.id, document]));
+  const review = {
+    id: "review-constitution",
+    title: "Constitution independent review",
+    artifactType: "document",
+    artifactId: "constitution",
+    ownerEmail: "sbodine@umich.edu",
+    reviewerEmail: "cooperry@umich.edu",
+    stage: "draft",
+    independentReviewer: true,
+    reviewNotes: [],
+    history: [],
+    updatedAt: seededAt
+  };
+  return {
+    version: 1,
+    accounts,
+    events,
+    attendance,
+    strikes: {},
+    escalations: {},
+    documents,
+    reviews: { [review.id]: review },
+    activity: []
+  };
+};
+var normalizeAccount = (seed, raw) => {
+  const email = seed.email.toLowerCase();
+  const requestedRole = raw?.role;
+  const allowedRole = requestedRole && ["officer", "member", "inactive"].includes(requestedRole) ? requestedRole : seed.role;
+  return {
+    ...seed,
+    ...raw,
+    email,
+    name: cleanText(raw?.name || seed.name, 120) || seed.name,
+    title: cleanText(raw?.title || seed.title, 120) || seed.title,
+    role: isOperationsSuperAdmin(email) ? "super_admin" : allowedRole,
+    updatedAt: cleanText(raw?.updatedAt || seed.updatedAt, 80),
+    updatedBy: cleanText(raw?.updatedBy || seed.updatedBy, 160)
+  };
+};
+var normalizeData = (raw) => {
+  const seed = emptyData();
+  const accounts = Object.fromEntries(Object.values(seed.accounts).map((account) => [
+    account.email,
+    normalizeAccount(account, raw.accounts?.[account.email])
+  ]));
+  const attendance = Object.fromEntries(Object.values(seed.attendance).map((record) => {
+    const stored = raw.attendance?.[record.id];
+    if (!record.invited) return [record.id, { ...record, ...stored || {}, invited: false, status: "not_invited", inviteSourceNote: record.inviteSourceNote }];
+    return [record.id, { ...record, ...stored || {}, invited: true, inviteSourceNote: record.inviteSourceNote }];
+  }));
+  const documents = Object.fromEntries(Object.values(seed.documents).map((document) => {
+    const merged = { ...document, ...raw.documents?.[document.id] || {} };
+    const driveUrl = validDocumentDriveUrl(merged.driveUrl);
+    const sourceStatus = merged.sourceStatus === "verified" && driveUrl ? "verified" : "unverified";
+    return [document.id, {
+      ...merged,
+      driveUrl,
+      sourceStatus,
+      lastVerifiedAt: sourceStatus === "verified" ? cleanText(merged.lastVerifiedAt, 80) : ""
+    }];
+  }));
+  return {
+    version: 1,
+    accounts,
+    events: { ...seed.events, ...raw.events || {} },
+    attendance,
+    strikes: raw.strikes || {},
+    escalations: raw.escalations || {},
+    documents,
+    reviews: { ...seed.reviews, ...raw.reviews || {} },
+    activity: Array.isArray(raw.activity) ? raw.activity.slice(0, 250) : []
+  };
+};
+var operationsEventStatus = (event, now = /* @__PURE__ */ new Date()) => {
+  const current = now.getTime();
+  const starts = new Date(event.startsAt).getTime();
+  const ends = new Date(event.endsAt).getTime();
+  if (current < starts) return "upcoming";
+  if (current < ends) return "active";
+  return "inactive";
+};
+var policy = {
+  escalationAt: 3,
+  source: "Brain document #14 \u2014 UBLDA Founding Team Meeting Notes, June 28, 2026",
+  sourceUrl: "https://docs.google.com/document/d/1FS__OHUyk2ryLXH7LN8Ii06JAtr_SNcBcChK91fn0vI",
+  rules: [
+    "More than one missed meeting in a month may earn a strike, with exceptions for illness and genuine academic, club, or career conflicts.",
+    "No notice at least 24 hours before a general team meeting may earn a strike.",
+    "No notice at least 72 hours before a club event may earn a strike.",
+    "A missed deliverable without notice may earn a strike.",
+    "Not responding within a reasonable time may earn a communication strike.",
+    "Three active strikes trigger a standing review with Sam, Alexa, and Cooper."
+  ]
+};
+var accountRoleFor = (data, actor) => {
+  if (isOperationsSuperAdmin(actor.email)) return "super_admin";
+  return data.accounts[actor.email.toLowerCase()]?.role || "member";
+};
+var OperationsAccessError = class extends Error {
+  status = 403;
+  constructor(message) {
+    super(message);
+    this.name = "OperationsAccessError";
+  }
+};
+var OperationsStore = class {
+  dataPath;
+  forceLocal;
+  now;
+  constructor(dataPath = defaultDataPath(), options = {}) {
+    this.dataPath = dataPath;
+    this.forceLocal = Boolean(options.forceLocal);
+    this.now = options.now || (() => /* @__PURE__ */ new Date());
+  }
+  storageKey() {
+    return canUseBlob(this.forceLocal) ? BLOB_PATH : this.dataPath;
+  }
+  async readLocal() {
+    try {
+      return JSON.parse(await readFile(this.dataPath, "utf8"));
+    } catch {
+      return emptyData();
+    }
+  }
+  async writeLocal(data) {
+    await mkdir(path.dirname(this.dataPath), { recursive: true });
+    const tempPath = `${this.dataPath}.${process.pid}.${randomBytes(5).toString("base64url")}.tmp`;
+    await writeFile(tempPath, `${JSON.stringify(data, null, 2)}
+`, { mode: 384 });
+    await rename(tempPath, this.dataPath);
+  }
+  async readBlob() {
+    const blob = await get(BLOB_PATH, { access: "private", useCache: false });
+    if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null };
+    const raw = await new Response(blob.stream).text();
+    return { data: JSON.parse(raw), etag: blob.blob.etag || null };
+  }
+  async writeBlob(data, etag) {
+    await put(BLOB_PATH, `${JSON.stringify(data, null, 2)}
+`, {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: Boolean(etag),
+      contentType: "application/json",
+      ...etag ? { ifMatch: etag } : {}
+    });
+  }
+  async readData() {
+    const raw = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
+    return normalizeData(raw);
+  }
+  async updateData(mutation) {
+    const key = this.storageKey();
+    const previous = queues.get(key) || Promise.resolve();
+    const task = previous.catch(() => void 0).then(async () => {
+      if (!canUseBlob(this.forceLocal)) {
+        const data = normalizeData(await this.readLocal());
+        const result = await mutation(data);
+        if (mutationRejected(result)) return result;
+        await this.writeLocal(data);
+        return result;
+      }
+      for (let attempt = 0; attempt < WRITE_ATTEMPTS; attempt += 1) {
+        const { data: raw, etag } = await this.readBlob();
+        const data = normalizeData(raw);
+        const result = await mutation(data);
+        if (mutationRejected(result)) return result;
+        try {
+          await this.writeBlob(data, etag);
+          return result;
+        } catch (error) {
+          if (!(error instanceof BlobPreconditionFailedError) || attempt === WRITE_ATTEMPTS - 1) throw error;
+        }
+      }
+      throw new Error("Operations storage could not be updated.");
+    });
+    queues.set(key, task);
+    try {
+      return await task;
+    } finally {
+      if (queues.get(key) === task) queues.delete(key);
+    }
+  }
+  requireWrite(actor) {
+    return isOperationsSuperAdmin(actor.email) ? { ok: true } : { ok: false, error: "Only the three Operations super admins can change this workspace." };
+  }
+  appendActivity(data, actorEmail, action, detail) {
+    data.activity.unshift({
+      id: randomId("activity"),
+      actorEmail: actorEmail.toLowerCase(),
+      action: cleanText(action, 100),
+      detail: cleanText(detail, 500),
+      createdAt: this.now().toISOString()
+    });
+    data.activity = data.activity.slice(0, 250);
+  }
+  syncEscalation(data, memberEmail, actorEmail) {
+    const activeCount = Object.values(data.strikes).filter((strike) => strike.memberEmail === memberEmail && strike.status === "active").length;
+    const open = Object.values(data.escalations).find((escalation) => escalation.memberEmail === memberEmail && escalation.status === "open");
+    const createdAt = this.now().toISOString();
+    if (activeCount >= policy.escalationAt && !open) {
+      const due = new Date(this.now());
+      due.setUTCDate(due.getUTCDate() + 7);
+      const escalation = {
+        id: randomId("escalation"),
+        memberEmail,
+        ownerEmail: "sbodine@umich.edu",
+        dueAt: due.toISOString(),
+        status: "open",
+        openedAt: createdAt,
+        resolvedAt: "",
+        resolutionNote: "",
+        history: [{
+          id: randomId("escalation-history"),
+          action: "opened",
+          activeStrikeCount: activeCount,
+          actorEmail: actorEmail.toLowerCase(),
+          note: "Three active strikes triggered a standing review with Sam, Alexa, and Cooper.",
+          createdAt
+        }],
+        updatedAt: createdAt
+      };
+      data.escalations[escalation.id] = escalation;
+      return;
+    }
+    if (activeCount < policy.escalationAt && open) {
+      open.status = "resolved";
+      open.resolvedAt = createdAt;
+      open.resolutionNote = "Automatically resolved when the active strike count dropped below three.";
+      open.updatedAt = createdAt;
+      open.history.unshift({
+        id: randomId("escalation-history"),
+        action: "resolved",
+        activeStrikeCount: activeCount,
+        actorEmail: actorEmail.toLowerCase(),
+        note: open.resolutionNote,
+        createdAt
+      });
+    }
+  }
+  async workspace(actor) {
+    const data = await this.readData();
+    const email = actor.email.toLowerCase();
+    const role = accountRoleFor(data, actor);
+    if (role === "inactive") {
+      throw new OperationsAccessError("This Operations account is inactive.");
+    }
+    const activeStrikes = Object.values(data.strikes).filter((strike) => strike.status === "active");
+    return {
+      viewer: {
+        memberId: actor.memberId,
+        name: actor.displayName || data.accounts[email]?.name || email,
+        email,
+        role,
+        canWrite: isOperationsSuperAdmin(email)
+      },
+      accounts: Object.values(data.accounts),
+      events: Object.values(data.events).map((event) => ({
+        ...event,
+        status: operationsEventStatus(event, this.now())
+      })),
+      attendance: Object.values(data.attendance),
+      strikes: Object.values(data.strikes),
+      strikeSummary: Object.values(data.accounts).map((account) => {
+        const activeCount = activeStrikes.filter((strike) => strike.memberEmail === account.email).length;
+        return { memberEmail: account.email, activeCount, escalationRequired: activeCount >= policy.escalationAt };
+      }),
+      escalations: Object.values(data.escalations),
+      documents: Object.values(data.documents),
+      reviews: Object.values(data.reviews),
+      activity: data.activity,
+      policy
+    };
+  }
+  async updateAttendance(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      if (!data.events[input.eventId]) return { ok: false, error: "Event was not found." };
+      const memberEmail = input.memberEmail.toLowerCase();
+      if (!data.accounts[memberEmail]) return { ok: false, error: "Member was not found." };
+      const existing = Object.values(data.attendance).find((record) => record.eventId === input.eventId && record.memberEmail === memberEmail);
+      if (!existing) return { ok: false, error: "Attendance record was not found." };
+      if (!existing.invited) {
+        return { ok: false, error: "This person was not on the meeting invite; attendance cannot imply an absence." };
+      }
+      if (input.status && Object.keys(ATTENDANCE_STATUS_LABELS).includes(input.status)) {
+        existing.status = input.status;
+      }
+      if (typeof input.noticeAt === "string") existing.noticeAt = cleanText(input.noticeAt, 80);
+      if (typeof input.notes === "string") existing.notes = cleanText(input.notes, 800);
+      existing.updatedAt = this.now().toISOString();
+      existing.updatedBy = actor.email.toLowerCase();
+      this.appendActivity(data, actor.email, "Attendance updated", `${memberEmail}: ${existing.status}`);
+      return { ok: true, attendance: { ...existing } };
+    });
+  }
+  async createStrike(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      const memberEmail = input.memberEmail.toLowerCase();
+      if (!data.accounts[memberEmail]) return { ok: false, error: "Member was not found." };
+      if (!Object.keys(STRIKE_REASON_LABELS).includes(input.reason)) return { ok: false, error: "Choose a valid strike reason." };
+      const detail = cleanText(input.detail, 800);
+      if (!detail) return { ok: false, error: "Document the evidence before adding a strike." };
+      if (input.eventId && !data.events[input.eventId]) return { ok: false, error: "Event was not found." };
+      const createdAt = this.now().toISOString();
+      const strike = {
+        id: randomId("strike"),
+        memberEmail,
+        reason: input.reason,
+        detail,
+        eventId: cleanText(input.eventId, 120),
+        status: "active",
+        issuedAt: createdAt,
+        issuedBy: actor.email.toLowerCase(),
+        updatedAt: createdAt,
+        audit: [{
+          id: randomId("audit"),
+          action: "created",
+          fromStatus: "",
+          toStatus: "active",
+          note: detail,
+          actorEmail: actor.email.toLowerCase(),
+          createdAt
+        }]
+      };
+      data.strikes[strike.id] = strike;
+      this.syncEscalation(data, memberEmail, actor.email);
+      this.appendActivity(data, actor.email, "Strike added", `${memberEmail}: ${STRIKE_REASON_LABELS[strike.reason]}`);
+      return { ok: true, strike };
+    });
+  }
+  async updateStrikeStatus(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      const strike = data.strikes[input.id];
+      if (!strike) return { ok: false, error: "Strike was not found." };
+      if (!Object.keys(STRIKE_STATUS_LABELS).includes(input.status)) return { ok: false, error: "Choose a valid strike status." };
+      const note = cleanText(input.note, 800);
+      if (!note) return { ok: false, error: "Add an audit note for this status change." };
+      const previous = strike.status;
+      const createdAt = this.now().toISOString();
+      strike.status = input.status;
+      strike.updatedAt = createdAt;
+      strike.audit.unshift({
+        id: randomId("audit"),
+        action: previous === input.status ? "note_added" : "status_changed",
+        fromStatus: previous,
+        toStatus: input.status,
+        note,
+        actorEmail: actor.email.toLowerCase(),
+        createdAt
+      });
+      this.syncEscalation(data, strike.memberEmail, actor.email);
+      this.appendActivity(data, actor.email, "Strike reviewed", `${strike.memberEmail}: ${STRIKE_STATUS_LABELS[input.status]}`);
+      return { ok: true, strike: { ...strike } };
+    });
+  }
+  async updateAccount(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      const email = input.email.toLowerCase();
+      const account = data.accounts[email];
+      if (!account) return { ok: false, error: "Account was not found." };
+      if (isOperationsSuperAdmin(email)) {
+        if (input.role !== "super_admin") return { ok: false, error: "The three fixed super-admin accounts cannot be demoted here." };
+      } else if (!["officer", "member", "inactive"].includes(input.role)) {
+        return { ok: false, error: "Only the fixed allowlist can hold the super-admin role." };
+      }
+      account.role = isOperationsSuperAdmin(email) ? "super_admin" : input.role;
+      account.updatedAt = this.now().toISOString();
+      account.updatedBy = actor.email.toLowerCase();
+      this.appendActivity(data, actor.email, "Account role updated", `${email}: ${account.role}`);
+      return { ok: true, account: { ...account } };
+    });
+  }
+  async updateDocument(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      const document = data.documents[input.id];
+      if (!document) return { ok: false, error: "Document was not found." };
+      if (input.category && Object.keys(DOCUMENT_CATEGORY_LABELS).includes(input.category)) document.category = input.category;
+      if (input.currentStatus && Object.keys(DOCUMENT_STATUS_LABELS).includes(input.currentStatus)) {
+        document.currentStatus = input.currentStatus;
+      }
+      if (input.sourceStatus && ["verified", "unverified"].includes(input.sourceStatus)) {
+        document.sourceStatus = input.sourceStatus;
+      }
+      if (typeof input.driveUrl === "string") document.driveUrl = validDocumentDriveUrl(input.driveUrl);
+      if (typeof input.sourceNote === "string") document.sourceNote = cleanText(input.sourceNote, 1e3);
+      if (input.ownerEmail && data.accounts[input.ownerEmail.toLowerCase()]) document.ownerEmail = input.ownerEmail.toLowerCase();
+      if (document.sourceStatus === "verified" && !document.driveUrl) {
+        return { ok: false, error: "A verified document needs a valid Drive link." };
+      }
+      document.lastVerifiedAt = document.sourceStatus === "verified" ? this.now().toISOString() : "";
+      document.updatedAt = this.now().toISOString();
+      document.updatedBy = actor.email.toLowerCase();
+      this.appendActivity(data, actor.email, "Document updated", `${document.title}: ${document.currentStatus}`);
+      return { ok: true, document: { ...document } };
+    });
+  }
+  async updateReview(actor, input) {
+    const authorized = this.requireWrite(actor);
+    if (!authorized.ok) return authorized;
+    return this.updateData((data) => {
+      const review = data.reviews[input.id];
+      if (!review) return { ok: false, error: "Review was not found." };
+      const note = cleanText(input.note, 1200);
+      const createdAt = this.now().toISOString();
+      if (input.reviewerEmail) {
+        const reviewerEmail = input.reviewerEmail.toLowerCase();
+        if (!["draft", "changes_requested"].includes(review.stage)) {
+          return { ok: false, error: "Reviewer assignment is frozen after the artifact is submitted for review." };
+        }
+        if (actor.email.toLowerCase() === review.ownerEmail) {
+          return { ok: false, error: "The artifact owner cannot assign or replace the independent reviewer." };
+        }
+        if (!isOperationsSuperAdmin(reviewerEmail)) {
+          return { ok: false, error: "The assigned reviewer must be one of the three privileged reviewers." };
+        }
+        if (reviewerEmail === review.ownerEmail) {
+          return { ok: false, error: "The reviewer must be independent from the artifact owner." };
+        }
+        const previousReviewer = review.reviewerEmail;
+        review.reviewerEmail = reviewerEmail;
+        review.independentReviewer = true;
+        review.history.unshift({
+          id: randomId("review-history"),
+          action: "assigned",
+          fromStage: review.stage,
+          toStage: review.stage,
+          actorEmail: actor.email.toLowerCase(),
+          note: note || `Reviewer changed from ${previousReviewer} to ${reviewerEmail}.`,
+          createdAt
+        });
+      }
+      if (input.decision) {
+        const transitions = {
+          submit: { from: ["draft", "changes_requested"], to: "ready_for_review" },
+          start_review: { from: ["ready_for_review"], to: "in_review", reviewerOnly: true },
+          approve: { from: ["in_review"], to: "approved", reviewerOnly: true },
+          request_changes: { from: ["in_review"], to: "changes_requested", reviewerOnly: true },
+          reopen: { from: ["approved"], to: "draft" }
+        };
+        const transition = transitions[input.decision];
+        if (!transition.from.includes(review.stage)) return { ok: false, error: `This review cannot ${input.decision.replaceAll("_", " ")} from ${REVIEW_STAGE_LABELS[review.stage]}.` };
+        if (transition.reviewerOnly && actor.email.toLowerCase() !== review.reviewerEmail) {
+          return { ok: false, error: "Only the assigned independent reviewer can take that action." };
+        }
+        if (["approve", "request_changes"].includes(input.decision) && !note) {
+          return { ok: false, error: "The reviewer must record a review note with the decision." };
+        }
+        if (review.ownerEmail === review.reviewerEmail) {
+          return { ok: false, error: "Independent review requires a reviewer other than the artifact owner." };
+        }
+        const fromStage = review.stage;
+        review.stage = transition.to;
+        review.independentReviewer = review.ownerEmail !== review.reviewerEmail;
+        review.history.unshift({
+          id: randomId("review-history"),
+          action: input.decision,
+          fromStage,
+          toStage: review.stage,
+          actorEmail: actor.email.toLowerCase(),
+          note,
+          createdAt
+        });
+      }
+      if (note) {
+        review.reviewNotes.unshift({
+          id: randomId("review-note"),
+          authorEmail: actor.email.toLowerCase(),
+          note,
+          createdAt
+        });
+      }
+      review.updatedAt = createdAt;
+      this.appendActivity(data, actor.email, "Review updated", `${review.title}: ${REVIEW_STAGE_LABELS[review.stage]}`);
+      return { ok: true, review: { ...review } };
+    });
+  }
+};
+var createOperationsStore = (dataPath, options) => new OperationsStore(dataPath, options);
 
-// src/lib/speakerOps.ts
+// server/speakerOpsService.js
+import { ConvexHttpClient } from "convex/browser";
+import { makeFunctionReference } from "convex/server";
+import { ConvexError } from "convex/values";
+import {
+  SignJWT,
+  createRemoteJWKSet,
+  exportJWK,
+  importPKCS8,
+  jwtVerify
+} from "jose";
+import { randomBytes as randomBytes2 } from "node:crypto";
+import { mkdir as mkdir2, readFile as readFile2, rename as rename2, writeFile as writeFile2 } from "node:fs/promises";
+import path2 from "node:path";
+import { BlobPreconditionFailedError as BlobPreconditionFailedError2, get as get2, put as put2 } from "@vercel/blob";
+var CONVEX_TOKEN_TTL_SECONDS = 5 * 60;
+var LOGTO_CLOCK_TOLERANCE_SECONDS = 10;
+var LOGTO_MAX_TOKEN_AGE_SECONDS = 2 * 60 * 60;
+var LOGTO_JWKS_TIMEOUT_MS = 5e3;
+var LOGTO_JWKS_COOLDOWN_MS = 3e4;
+var LOGTO_JWKS_CACHE_MAX_AGE_MS = 10 * 60 * 1e3;
+var MAX_CONVEX_PUBLIC_KEYS = 3;
+var acceptedLogtoAlgorithms = ["ES384", "RS256"];
+var AuthBridgeTokenError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthBridgeTokenError";
+  }
+};
+var required = (environment, name) => {
+  const value = environment[name]?.trim();
+  if (!value) throw new Error(`Missing ${name}.`);
+  return value;
+};
+var privateJwkParameters = ["d", "p", "q", "dp", "dq", "qi", "oth", "k"];
+var parsePublicJwks = (raw) => {
+  const parsed = JSON.parse(raw);
+  const keys = Array.isArray(parsed.keys) ? parsed.keys : [];
+  if (keys.length < 1 || keys.length > MAX_CONVEX_PUBLIC_KEYS) {
+    throw new Error(`CONVEX_AUTH_PUBLIC_JWKS must contain 1-${MAX_CONVEX_PUBLIC_KEYS} public RS256 signing keys.`);
+  }
+  const publicKeys = keys.map((key) => {
+    const valid = key?.kty === "RSA" && key?.alg === "RS256" && key?.use === "sig" && typeof key?.kid === "string" && Boolean(key.kid.trim()) && typeof key?.n === "string" && Boolean(key.n) && typeof key?.e === "string" && Boolean(key.e) && privateJwkParameters.every((parameter) => !(parameter in key));
+    if (!valid) {
+      throw new Error("CONVEX_AUTH_PUBLIC_JWKS contains an invalid or private signing key.");
+    }
+    return {
+      kty: "RSA",
+      use: "sig",
+      alg: "RS256",
+      kid: String(key.kid).trim(),
+      n: String(key.n),
+      e: String(key.e)
+    };
+  });
+  if (new Set(publicKeys.map(({ kid }) => kid)).size !== publicKeys.length) {
+    throw new Error("CONVEX_AUTH_PUBLIC_JWKS signing key IDs must be unique.");
+  }
+  return { keys: publicKeys };
+};
+var normalizedAllowedOrigin = (raw) => {
+  let url;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    throw new Error("CONVEX_AUTH_ALLOWED_ORIGINS contains an invalid origin.");
+  }
+  const localHttp = url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  if (url.protocol !== "https:" && !localHttp || url.username || url.password || url.pathname !== "/" && url.pathname !== "" || url.search || url.hash) {
+    throw new Error("CONVEX_AUTH_ALLOWED_ORIGINS must contain exact HTTPS origins.");
+  }
+  return url.origin;
+};
+var authBridgeConfig = (environment = process.env) => {
+  const logtoIssuer = required(environment, "LOGTO_ISSUER").replace(/\/$/, "");
+  return {
+    logtoIssuer,
+    logtoAppId: required(environment, "LOGTO_APP_ID"),
+    logtoJwksUrl: `${logtoIssuer}/jwks`,
+    bridgeIssuer: required(environment, "CONVEX_AUTH_ISSUER").replace(/\/$/, ""),
+    bridgeAppId: required(environment, "CONVEX_AUTH_APP_ID"),
+    signingPrivateKey: required(environment, "CONVEX_AUTH_SIGNING_PRIVATE_KEY"),
+    publicJwks: parsePublicJwks(required(environment, "CONVEX_AUTH_PUBLIC_JWKS")),
+    allowedOrigins: new Set(
+      required(environment, "CONVEX_AUTH_ALLOWED_ORIGINS").split(",").map((origin) => origin.trim()).filter(Boolean).map(normalizedAllowedOrigin)
+    )
+  };
+};
+var stringClaim = (payload, name) => {
+  const value = payload[name];
+  return typeof value === "string" && value.trim() ? value.trim() : void 0;
+};
+var verifiedLogtoIdentity = (payload) => {
+  const subject = stringClaim(payload, "sub");
+  const email = stringClaim(payload, "email")?.toLowerCase();
+  if (!subject || !email || payload.email_verified !== true) {
+    throw new AuthBridgeTokenError("The Logto identity must contain a verified email address.");
+  }
+  return {
+    subject,
+    email,
+    emailVerified: true,
+    name: stringClaim(payload, "name"),
+    picture: stringClaim(payload, "picture")
+  };
+};
+var remoteKeySets = /* @__PURE__ */ new Map();
+var remoteKeySet = (url) => {
+  const existing = remoteKeySets.get(url);
+  if (existing) return existing;
+  const created = createRemoteJWKSet(new URL(url), {
+    timeoutDuration: LOGTO_JWKS_TIMEOUT_MS,
+    cooldownDuration: LOGTO_JWKS_COOLDOWN_MS,
+    cacheMaxAge: LOGTO_JWKS_CACHE_MAX_AGE_MS
+  });
+  remoteKeySets.set(url, created);
+  return created;
+};
+var validateLogtoTokenClaims = (payload, logtoAppId) => {
+  const audiences = Array.isArray(payload.aud) ? payload.aud : typeof payload.aud === "string" ? [payload.aud] : [];
+  const authorizedParty = stringClaim(payload, "azp");
+  if (audiences.length > 1 && !authorizedParty) {
+    throw new AuthBridgeTokenError("A multi-audience Logto ID token must identify its authorized party.");
+  }
+  if (authorizedParty && authorizedParty !== logtoAppId) {
+    throw new AuthBridgeTokenError("The Logto ID token authorized party does not match this application.");
+  }
+  if (typeof payload.iat !== "number" || typeof payload.exp !== "number" || payload.exp <= payload.iat || payload.exp - payload.iat > LOGTO_MAX_TOKEN_AGE_SECONDS) {
+    throw new AuthBridgeTokenError("The Logto ID token has an invalid validity window.");
+  }
+};
+var cachedPrivateKeySource = "";
+var cachedPrivateKey = null;
+var cachedPublicKeyFingerprint = "";
+var cachedSigningKeyMatch = null;
+var signingKey = async (privateKey, publicJwks) => {
+  const publicKeyFingerprint = publicJwks.keys.map((key) => `${key.kid || ""}:${key.n || ""}:${key.e || ""}`).join("|");
+  if (!cachedPrivateKey || cachedPrivateKeySource !== privateKey) {
+    cachedPrivateKey = await importPKCS8(privateKey, "RS256", { extractable: true });
+    cachedPrivateKeySource = privateKey;
+    cachedSigningKeyMatch = null;
+  }
+  if (cachedPublicKeyFingerprint !== publicKeyFingerprint) {
+    cachedPublicKeyFingerprint = publicKeyFingerprint;
+    cachedSigningKeyMatch = null;
+  }
+  cachedSigningKeyMatch ||= (async () => {
+    const derived = await exportJWK(cachedPrivateKey);
+    const matches = publicJwks.keys.filter((published) => derived.kty === "RSA" && derived.n === published.n && derived.e === published.e);
+    if (matches.length !== 1 || !matches[0]?.kid) {
+      throw new Error("The auth bridge signing key must match exactly one public JWKS key.");
+    }
+    return { key: cachedPrivateKey, kid: matches[0].kid };
+  })();
+  return await cachedSigningKeyMatch;
+};
+var exchangeLogtoIdTokenWithIdentity = async (idToken, config, keySet = remoteKeySet(config.logtoJwksUrl)) => {
+  const { payload } = await jwtVerify(idToken, keySet, {
+    issuer: config.logtoIssuer,
+    audience: config.logtoAppId,
+    algorithms: [...acceptedLogtoAlgorithms],
+    requiredClaims: ["sub", "iat", "exp"],
+    clockTolerance: LOGTO_CLOCK_TOLERANCE_SECONDS,
+    maxTokenAge: LOGTO_MAX_TOKEN_AGE_SECONDS
+  });
+  validateLogtoTokenClaims(payload, config.logtoAppId);
+  const identity = verifiedLogtoIdentity(payload);
+  const activeSigningKey = await signingKey(config.signingPrivateKey, config.publicJwks);
+  const token = await new SignJWT({
+    email: identity.email,
+    email_verified: identity.emailVerified,
+    ...identity.name ? { name: identity.name } : {},
+    ...identity.picture ? { picture: identity.picture } : {}
+  }).setProtectedHeader({ alg: "RS256", kid: activeSigningKey.kid, typ: "JWT" }).setIssuer(config.bridgeIssuer).setAudience(config.bridgeAppId).setSubject(identity.subject).setIssuedAt().setExpirationTime(`${CONVEX_TOKEN_TTL_SECONDS}s`).sign(activeSigningKey.key);
+  return {
+    identity,
+    token,
+    expiresIn: CONVEX_TOKEN_TTL_SECONDS
+  };
+};
 var SPEAKER_OPS_MEMBERS = [
   { name: "Alex Forstner", email: "alexfors@umich.edu", title: "VP Education" },
   { name: "Alexa Chiang", email: "atchiang@umich.edu", title: "Co-President" },
@@ -68,17 +904,15 @@ var PROGRAM_SLOT_STATUS_LABELS = {
   "room-approved": "Room approved",
   confirmed: "Confirmed"
 };
-
-// server/speakerOpsStore.ts
-var BLOB_PATH = "speaker-ops/state.json";
-var WRITE_ATTEMPTS = 5;
-var queues = /* @__PURE__ */ new Map();
-var defaultDataPath = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE ? path.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE) : path.join(process.cwd(), ".ublda-local-data", "speaker-ops.json");
+var BLOB_PATH2 = "speaker-ops/state.json";
+var WRITE_ATTEMPTS2 = 5;
+var queues2 = /* @__PURE__ */ new Map();
+var defaultDataPath2 = () => process.env.UBLDA_SPEAKER_OPS_DATA_FILE ? path2.resolve(process.env.UBLDA_SPEAKER_OPS_DATA_FILE) : path2.join(process.cwd(), ".ublda-local-data", "speaker-ops.json");
 var isoNow = () => (/* @__PURE__ */ new Date()).toISOString();
-var cleanText = (value, max = 500) => value.replace(/[<>]/g, "").trim().slice(0, max);
-var randomId = (prefix) => `${prefix}_${randomBytes(10).toString("base64url")}`;
-var canUseBlob = (forceLocal) => !forceLocal && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-var mutationRejected = (result) => Boolean(
+var cleanText2 = (value, max = 500) => value.replace(/[<>]/g, "").trim().slice(0, max);
+var randomId2 = (prefix) => `${prefix}_${randomBytes2(10).toString("base64url")}`;
+var canUseBlob2 = (forceLocal) => !forceLocal && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+var mutationRejected2 = (result) => Boolean(
   result && typeof result === "object" && "ok" in result && result.ok === false
 );
 var hydrateLead = (lead) => ({
@@ -117,18 +951,18 @@ var cleanUrl = (value) => {
     return "";
   }
 };
-var cleanStringList = (value, maxItems = 12) => Array.isArray(value) ? value.filter((item) => typeof item === "string").slice(0, maxItems).map((item) => cleanText(item, 240)).filter(Boolean) : [];
+var cleanStringList = (value, maxItems = 12) => Array.isArray(value) ? value.filter((item) => typeof item === "string").slice(0, maxItems).map((item) => cleanText2(item, 240)).filter(Boolean) : [];
 var cleanProposedSlots = (value) => Array.isArray(value) ? value.slice(0, 8).flatMap((item, index) => {
   if (!item || typeof item !== "object") return [];
   const raw = item;
-  const startAt = typeof raw.startAt === "string" ? cleanText(raw.startAt, 80) : "";
+  const startAt = typeof raw.startAt === "string" ? cleanText2(raw.startAt, 80) : "";
   if (!startAt) return [];
   return [{
-    id: typeof raw.id === "string" && raw.id ? cleanText(raw.id, 80) : `slot-${index + 1}`,
+    id: typeof raw.id === "string" && raw.id ? cleanText2(raw.id, 80) : `slot-${index + 1}`,
     startAt,
-    eventTimezone: typeof raw.eventTimezone === "string" ? cleanText(raw.eventTimezone, 80) : "America/Detroit",
+    eventTimezone: typeof raw.eventTimezone === "string" ? cleanText2(raw.eventTimezone, 80) : "America/Detroit",
     status: raw.status && Object.keys(PROPOSED_SLOT_STATUS_LABELS).includes(raw.status) ? raw.status : "idea",
-    evidence: typeof raw.evidence === "string" ? cleanText(raw.evidence, 500) : ""
+    evidence: typeof raw.evidence === "string" ? cleanText2(raw.evidence, 500) : ""
   }];
 }) : [];
 var cleanResearchLinks = (value) => Array.isArray(value) ? value.slice(0, 12).flatMap((item) => {
@@ -136,25 +970,25 @@ var cleanResearchLinks = (value) => Array.isArray(value) ? value.slice(0, 12).fl
   const raw = item;
   const url = cleanUrl(raw.url);
   if (!url) return [];
-  return [{ label: typeof raw.label === "string" ? cleanText(raw.label, 120) : "", url }];
+  return [{ label: typeof raw.label === "string" ? cleanText2(raw.label, 120) : "", url }];
 }) : [];
 var cleanEducation = (value) => Array.isArray(value) ? value.slice(0, 8).flatMap((item) => {
   if (!item || typeof item !== "object") return [];
   const raw = item;
-  const school = typeof raw.school === "string" ? cleanText(raw.school, 160) : "";
+  const school = typeof raw.school === "string" ? cleanText2(raw.school, 160) : "";
   if (!school) return [];
   return [{
     school,
-    degree: typeof raw.degree === "string" ? cleanText(raw.degree, 120) : "",
-    year: typeof raw.year === "string" ? cleanText(raw.year, 20) : "",
+    degree: typeof raw.degree === "string" ? cleanText2(raw.degree, 120) : "",
+    year: typeof raw.year === "string" ? cleanText2(raw.year, 20) : "",
     evidenceUrl: cleanUrl(raw.evidenceUrl)
   }];
 }) : [];
 var normalizeLead = (id, raw, seed) => {
   const base = seed || hydrateLead({
     id,
-    name: typeof raw.name === "string" ? cleanText(raw.name, 120) : "Unverified speaker",
-    organization: typeof raw.organization === "string" ? cleanText(raw.organization, 160) : "Organization to verify",
+    name: typeof raw.name === "string" ? cleanText2(raw.name, 120) : "Unverified speaker",
+    organization: typeof raw.organization === "string" ? cleanText2(raw.organization, 160) : "Organization to verify",
     stage: "prospect",
     term: "later",
     format: "unknown",
@@ -169,8 +1003,8 @@ var normalizeLead = (id, raw, seed) => {
   return {
     ...base,
     ...merged,
-    name: cleanText(String(merged.name || base.name), 120),
-    organization: cleanText(String(merged.organization || base.organization), 160),
+    name: cleanText2(String(merged.name || base.name), 120),
+    organization: cleanText2(String(merged.organization || base.organization), 160),
     stage: SPEAKER_STAGES.includes(merged.stage) ? merged.stage : base.stage,
     term: ["fall-2026", "winter-2027", "later"].includes(String(merged.term)) ? merged.term : base.term,
     format: Object.keys(SPEAKER_FORMAT_LABELS).includes(String(merged.format)) ? merged.format : base.format,
@@ -178,32 +1012,32 @@ var normalizeLead = (id, raw, seed) => {
     confidence: Object.keys(SPEAKER_CONFIDENCE_LABELS).includes(String(merged.confidence)) ? merged.confidence : base.confidence,
     recommendation: Object.keys(SPEAKER_RECOMMENDATION_LABELS).includes(String(merged.recommendation)) ? merged.recommendation : base.recommendation,
     recommendationRank: cleanOptionalNumber(merged.recommendationRank, 99),
-    selectionRationale: cleanText(String(merged.selectionRationale || ""), 500),
-    shortBio: cleanText(String(merged.shortBio || ""), 800),
+    selectionRationale: cleanText2(String(merged.selectionRationale || ""), 500),
+    shortBio: cleanText2(String(merged.shortBio || ""), 800),
     education: cleanEducation(merged.education),
     credentials: cleanStringList(merged.credentials),
     qualifications: cleanStringList(merged.qualifications),
-    whyTheyMatter: cleanText(String(merged.whyTheyMatter || ""), 500),
-    speakerTimezone: cleanText(String(merged.speakerTimezone || ""), 80),
+    whyTheyMatter: cleanText2(String(merged.whyTheyMatter || ""), 500),
+    speakerTimezone: cleanText2(String(merged.speakerTimezone || ""), 80),
     proposedSlots: cleanProposedSlots(merged.proposedSlots),
     drawScore: cleanScore(merged.drawScore),
-    drawRationale: cleanText(String(merged.drawRationale || ""), 500),
+    drawRationale: cleanText2(String(merged.drawRationale || ""), 500),
     missionFitScore: cleanScore(merged.missionFitScore),
-    missionFitRationale: cleanText(String(merged.missionFitRationale || ""), 500),
-    logisticsNotes: cleanText(String(merged.logisticsNotes || ""), 500),
+    missionFitRationale: cleanText2(String(merged.missionFitRationale || ""), 500),
+    logisticsNotes: cleanText2(String(merged.logisticsNotes || ""), 500),
     travelRequired: Object.keys(SPEAKER_TRAVEL_LABELS).includes(String(merged.travelRequired)) ? merged.travelRequired : base.travelRequired,
     costStatus: Object.keys(SPEAKER_COST_STATUS_LABELS).includes(String(merged.costStatus)) ? merged.costStatus : base.costStatus,
     quotedFee: cleanOptionalNumber(merged.quotedFee, 1e6),
-    fundingPlan: cleanText(String(merged.fundingPlan || ""), 500),
-    nextAction: cleanText(String(merged.nextAction || ""), 240),
-    evidence: cleanText(String(merged.evidence || ""), 800),
-    blocker: cleanText(String(merged.blocker || ""), 500),
+    fundingPlan: cleanText2(String(merged.fundingPlan || ""), 500),
+    nextAction: cleanText2(String(merged.nextAction || ""), 240),
+    evidence: cleanText2(String(merged.evidence || ""), 800),
+    blocker: cleanText2(String(merged.blocker || ""), 500),
     researchLinks: cleanResearchLinks(merged.researchLinks),
-    researchNotes: cleanText(String(
+    researchNotes: cleanText2(String(
       merged.researchNotes === "Public profile research has not been completed." && seed ? seed.researchNotes : merged.researchNotes || ""
     ), 1200),
-    lastContactAt: cleanText(String(merged.lastContactAt || ""), 80),
-    updatedAt: cleanText(String(merged.updatedAt || base.updatedAt), 80)
+    lastContactAt: cleanText2(String(merged.lastContactAt || ""), 80),
+    updatedAt: cleanText2(String(merged.updatedAt || base.updatedAt), 80)
   };
 };
 var leadSeeds = () => {
@@ -703,7 +1537,7 @@ var roomSeeds = () => slotSeeds().map((slot) => ({
   roomName: "",
   updatedAt: "2026-08-14T16:00:00.000Z"
 }));
-var emptyData = () => ({
+var emptyData2 = () => ({
   version: 4,
   leads: Object.fromEntries(leadSeeds().map((lead) => [lead.id, lead])),
   slots: Object.fromEntries(slotSeeds().map((slot) => [slot.id, slot])),
@@ -717,7 +1551,7 @@ var emptyData = () => ({
   }]
 });
 var migrateData = (raw) => {
-  const seeded = emptyData();
+  const seeded = emptyData2();
   const rawLeads = { ...raw.leads || {} };
   if (rawLeads["scott-fiedor"] && !rawLeads["scott-fedor"]) {
     rawLeads["scott-fedor"] = {
@@ -877,35 +1711,35 @@ var memberForActor = (actor) => {
 var SpeakerOpsStore = class {
   dataPath;
   forceLocal;
-  constructor(dataPath = defaultDataPath(), options = {}) {
+  constructor(dataPath = defaultDataPath2(), options = {}) {
     this.dataPath = dataPath;
     this.forceLocal = Boolean(options.forceLocal);
   }
   storageKey() {
-    return canUseBlob(this.forceLocal) ? BLOB_PATH : this.dataPath;
+    return canUseBlob2(this.forceLocal) ? BLOB_PATH2 : this.dataPath;
   }
   async readLocal() {
     try {
-      return JSON.parse(await readFile(this.dataPath, "utf8"));
+      return JSON.parse(await readFile2(this.dataPath, "utf8"));
     } catch {
-      return emptyData();
+      return emptyData2();
     }
   }
   async writeLocal(data) {
-    await mkdir(path.dirname(this.dataPath), { recursive: true });
-    const tempPath = `${this.dataPath}.${process.pid}.${randomBytes(5).toString("base64url")}.tmp`;
-    await writeFile(tempPath, `${JSON.stringify(data, null, 2)}
+    await mkdir2(path2.dirname(this.dataPath), { recursive: true });
+    const tempPath = `${this.dataPath}.${process.pid}.${randomBytes2(5).toString("base64url")}.tmp`;
+    await writeFile2(tempPath, `${JSON.stringify(data, null, 2)}
 `, { mode: 384 });
-    await rename(tempPath, this.dataPath);
+    await rename2(tempPath, this.dataPath);
   }
   async readBlob() {
-    const blob = await get(BLOB_PATH, { access: "private", useCache: false });
-    if (!blob || blob.statusCode !== 200) return { data: emptyData(), etag: null };
+    const blob = await get2(BLOB_PATH2, { access: "private", useCache: false });
+    if (!blob || blob.statusCode !== 200) return { data: emptyData2(), etag: null };
     const raw = await new Response(blob.stream).text();
     return { data: JSON.parse(raw), etag: blob.blob.etag || null };
   }
   async writeBlob(data, etag) {
-    await put(BLOB_PATH, `${JSON.stringify(data, null, 2)}
+    await put2(BLOB_PATH2, `${JSON.stringify(data, null, 2)}
 `, {
       access: "private",
       addRandomSuffix: false,
@@ -916,49 +1750,49 @@ var SpeakerOpsStore = class {
   }
   async updateData(mutation) {
     const key = this.storageKey();
-    const previous = queues.get(key) || Promise.resolve();
+    const previous = queues2.get(key) || Promise.resolve();
     const task = previous.catch(() => void 0).then(async () => {
-      if (!canUseBlob(this.forceLocal)) {
+      if (!canUseBlob2(this.forceLocal)) {
         const data = migrateData(await this.readLocal());
         const result = await mutation(data);
-        if (mutationRejected(result)) return result;
+        if (mutationRejected2(result)) return result;
         await this.writeLocal(data);
         return result;
       }
-      for (let attempt = 0; attempt < WRITE_ATTEMPTS; attempt += 1) {
+      for (let attempt = 0; attempt < WRITE_ATTEMPTS2; attempt += 1) {
         const { data: rawData, etag } = await this.readBlob();
         const data = migrateData(rawData);
         const result = await mutation(data);
-        if (mutationRejected(result)) return result;
+        if (mutationRejected2(result)) return result;
         try {
           await this.writeBlob(data, etag);
           return result;
         } catch (error) {
-          if (!(error instanceof BlobPreconditionFailedError) || attempt === WRITE_ATTEMPTS - 1) throw error;
+          if (!(error instanceof BlobPreconditionFailedError2) || attempt === WRITE_ATTEMPTS2 - 1) throw error;
         }
       }
       throw new Error("Speaker Ops storage could not be updated.");
     });
-    queues.set(key, task);
+    queues2.set(key, task);
     try {
       return await task;
     } finally {
-      if (queues.get(key) === task) queues.delete(key);
+      if (queues2.get(key) === task) queues2.delete(key);
     }
   }
   appendActivity(data, actorEmail, action, detail) {
     data.activity.unshift({
-      id: randomId("activity"),
+      id: randomId2("activity"),
       actorEmail,
-      action: cleanText(action, 80),
-      detail: cleanText(detail, 300),
+      action: cleanText2(action, 80),
+      detail: cleanText2(detail, 300),
       createdAt: isoNow()
     });
     data.activity = data.activity.slice(0, 250);
   }
   async workspace(actor) {
     const member = memberForActor(actor);
-    const rawData = canUseBlob(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
+    const rawData = canUseBlob2(this.forceLocal) ? (await this.readBlob()).data : await this.readLocal();
     const data = migrateData(rawData);
     if (rawData.version !== 4) {
       await this.updateData((stored) => {
@@ -993,29 +1827,29 @@ var SpeakerOpsStore = class {
       if (leadInput.confidence && Object.keys(SPEAKER_CONFIDENCE_LABELS).includes(leadInput.confidence)) lead.confidence = leadInput.confidence;
       if (leadInput.recommendation && Object.keys(SPEAKER_RECOMMENDATION_LABELS).includes(leadInput.recommendation)) lead.recommendation = leadInput.recommendation;
       if (leadInput.recommendationRank === null || typeof leadInput.recommendationRank === "number") lead.recommendationRank = cleanOptionalNumber(leadInput.recommendationRank, 99);
-      if (typeof leadInput.selectionRationale === "string") lead.selectionRationale = cleanText(leadInput.selectionRationale, 500);
-      if (typeof leadInput.shortBio === "string") lead.shortBio = cleanText(leadInput.shortBio, 800);
+      if (typeof leadInput.selectionRationale === "string") lead.selectionRationale = cleanText2(leadInput.selectionRationale, 500);
+      if (typeof leadInput.shortBio === "string") lead.shortBio = cleanText2(leadInput.shortBio, 800);
       if (Array.isArray(leadInput.education)) lead.education = cleanEducation(leadInput.education);
       if (Array.isArray(leadInput.credentials)) lead.credentials = cleanStringList(leadInput.credentials);
       if (Array.isArray(leadInput.qualifications)) lead.qualifications = cleanStringList(leadInput.qualifications);
-      if (typeof leadInput.whyTheyMatter === "string") lead.whyTheyMatter = cleanText(leadInput.whyTheyMatter, 500);
-      if (typeof leadInput.speakerTimezone === "string") lead.speakerTimezone = cleanText(leadInput.speakerTimezone, 80);
+      if (typeof leadInput.whyTheyMatter === "string") lead.whyTheyMatter = cleanText2(leadInput.whyTheyMatter, 500);
+      if (typeof leadInput.speakerTimezone === "string") lead.speakerTimezone = cleanText2(leadInput.speakerTimezone, 80);
       if (Array.isArray(leadInput.proposedSlots)) lead.proposedSlots = cleanProposedSlots(leadInput.proposedSlots);
       if (leadInput.drawScore === null || typeof leadInput.drawScore === "number") lead.drawScore = cleanScore(leadInput.drawScore);
-      if (typeof leadInput.drawRationale === "string") lead.drawRationale = cleanText(leadInput.drawRationale, 500);
+      if (typeof leadInput.drawRationale === "string") lead.drawRationale = cleanText2(leadInput.drawRationale, 500);
       if (leadInput.missionFitScore === null || typeof leadInput.missionFitScore === "number") lead.missionFitScore = cleanScore(leadInput.missionFitScore);
-      if (typeof leadInput.missionFitRationale === "string") lead.missionFitRationale = cleanText(leadInput.missionFitRationale, 500);
-      if (typeof leadInput.logisticsNotes === "string") lead.logisticsNotes = cleanText(leadInput.logisticsNotes, 500);
+      if (typeof leadInput.missionFitRationale === "string") lead.missionFitRationale = cleanText2(leadInput.missionFitRationale, 500);
+      if (typeof leadInput.logisticsNotes === "string") lead.logisticsNotes = cleanText2(leadInput.logisticsNotes, 500);
       if (leadInput.travelRequired && Object.keys(SPEAKER_TRAVEL_LABELS).includes(leadInput.travelRequired)) lead.travelRequired = leadInput.travelRequired;
       if (leadInput.costStatus && Object.keys(SPEAKER_COST_STATUS_LABELS).includes(leadInput.costStatus)) lead.costStatus = leadInput.costStatus;
       if (leadInput.quotedFee === null || typeof leadInput.quotedFee === "number") lead.quotedFee = cleanOptionalNumber(leadInput.quotedFee, 1e6);
-      if (typeof leadInput.fundingPlan === "string") lead.fundingPlan = cleanText(leadInput.fundingPlan, 500);
-      if (typeof leadInput.nextAction === "string") lead.nextAction = cleanText(leadInput.nextAction, 240);
-      if (typeof leadInput.evidence === "string") lead.evidence = cleanText(leadInput.evidence, 800);
-      if (typeof leadInput.blocker === "string") lead.blocker = cleanText(leadInput.blocker, 500);
+      if (typeof leadInput.fundingPlan === "string") lead.fundingPlan = cleanText2(leadInput.fundingPlan, 500);
+      if (typeof leadInput.nextAction === "string") lead.nextAction = cleanText2(leadInput.nextAction, 240);
+      if (typeof leadInput.evidence === "string") lead.evidence = cleanText2(leadInput.evidence, 800);
+      if (typeof leadInput.blocker === "string") lead.blocker = cleanText2(leadInput.blocker, 500);
       if (Array.isArray(leadInput.researchLinks)) lead.researchLinks = cleanResearchLinks(leadInput.researchLinks);
-      if (typeof leadInput.researchNotes === "string") lead.researchNotes = cleanText(leadInput.researchNotes, 1200);
-      if (typeof leadInput.lastContactAt === "string") lead.lastContactAt = cleanText(leadInput.lastContactAt, 80);
+      if (typeof leadInput.researchNotes === "string") lead.researchNotes = cleanText2(leadInput.researchNotes, 1200);
+      if (typeof leadInput.lastContactAt === "string") lead.lastContactAt = cleanText2(leadInput.lastContactAt, 80);
       lead.updatedAt = isoNow();
       this.appendActivity(data, member.email, "Speaker updated", `${lead.name}: ${lead.nextAction || "No next action"}`);
       return { ok: true, lead: { ...lead } };
@@ -1030,16 +1864,16 @@ var SpeakerOpsStore = class {
       if (!roomStatusTransitionAllowed(request.status, requestedStatus)) {
         return { ok: false, error: `Room request cannot move from ${request.status} to ${requestedStatus}.` };
       }
-      if (typeof input.preferredStart === "string") request.preferredStart = cleanText(input.preferredStart, 80);
-      if (typeof input.backupStart === "string") request.backupStart = cleanText(input.backupStart, 80);
+      if (typeof input.preferredStart === "string") request.preferredStart = cleanText2(input.preferredStart, 80);
+      if (typeof input.backupStart === "string") request.backupStart = cleanText2(input.backupStart, 80);
       if (typeof input.setupMinutes === "number") request.setupMinutes = Math.max(0, Math.min(180, Math.round(input.setupMinutes)));
       if (typeof input.teardownMinutes === "number") request.teardownMinutes = Math.max(0, Math.min(180, Math.round(input.teardownMinutes)));
       if (typeof input.estimatedAttendance === "number") request.estimatedAttendance = Math.max(1, Math.min(500, Math.round(input.estimatedAttendance)));
-      if (typeof input.accessibilityNotes === "string") request.accessibilityNotes = cleanText(input.accessibilityNotes, 500);
-      if (typeof input.equipmentNotes === "string") request.equipmentNotes = cleanText(input.equipmentNotes, 500);
+      if (typeof input.accessibilityNotes === "string") request.accessibilityNotes = cleanText2(input.accessibilityNotes, 500);
+      if (typeof input.equipmentNotes === "string") request.equipmentNotes = cleanText2(input.equipmentNotes, 500);
       if (input.requestedByEmail && isMemberEmail(input.requestedByEmail)) request.requestedByEmail = input.requestedByEmail;
-      if (typeof input.reference === "string") request.reference = cleanText(input.reference, 120);
-      if (typeof input.roomName === "string") request.roomName = cleanText(input.roomName, 120);
+      if (typeof input.reference === "string") request.reference = cleanText2(input.reference, 120);
+      if (typeof input.roomName === "string") request.roomName = cleanText2(input.roomName, 120);
       if (requestedStatus === "approved") {
         if (actor.role !== "admin") return { ok: false, error: "Only a workspace administrator can record Ross approval." };
         if (!request.roomName) return { ok: false, error: "Enter the Ross room before marking the request approved." };
@@ -1072,8 +1906,8 @@ var SpeakerOpsStore = class {
         if (input.leadId && !data.leads[input.leadId]) return { ok: false, error: "Speaker was not found." };
         slot.leadId = input.leadId;
       }
-      if (typeof input.preferredStart === "string") slot.preferredStart = cleanText(input.preferredStart, 80);
-      if (typeof input.backupStart === "string") slot.backupStart = cleanText(input.backupStart, 80);
+      if (typeof input.preferredStart === "string") slot.preferredStart = cleanText2(input.preferredStart, 80);
+      if (typeof input.backupStart === "string") slot.backupStart = cleanText2(input.backupStart, 80);
       if (input.status && Object.keys(PROGRAM_SLOT_STATUS_LABELS).includes(input.status)) {
         const nextStatus = input.status;
         const lead = slot.leadId ? data.leads[slot.leadId] : void 0;
@@ -1109,7 +1943,178 @@ var SpeakerOpsStore = class {
   }
 };
 var createSpeakerOpsStore = (dataPath, options) => new SpeakerOpsStore(dataPath, options);
+var defaultStore = createSpeakerOpsStore();
+var MAX_ID_TOKEN_LENGTH = 24e3;
+var CONVEX_VIEWER_TIMEOUT_MS = 8e3;
+var viewerReference = makeFunctionReference("viewer:current");
+var SpeakerOpsAuthError = class extends Error {
+  status;
+  constructor(status, message) {
+    super(message);
+    this.name = "SpeakerOpsAuthError";
+    this.status = status;
+  }
+};
+var defaultViewerQuery = async (convexToken, convexUrl, timeoutMs = CONVEX_VIEWER_TIMEOUT_MS) => {
+  const fetchWithTimeout = (input, init) => fetch(input, {
+    ...init,
+    signal: AbortSignal.timeout(timeoutMs)
+  });
+  const client = new ConvexHttpClient(convexUrl, {
+    auth: convexToken,
+    logger: false,
+    fetch: fetchWithTimeout
+  });
+  return client.query(viewerReference, {});
+};
+var withTimeout = async (promise, timeoutMs) => {
+  let timeout;
+  const deadline = new Promise((_resolve, reject) => {
+    timeout = setTimeout(() => {
+      const error = new Error("Leadership membership verification timed out.");
+      error.name = "TimeoutError";
+      reject(error);
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([promise, deadline]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+};
+var verifySpeakerOpsIdentity = async (idToken, dependencies = {}) => {
+  if (!idToken || idToken.length > MAX_ID_TOKEN_LENGTH) {
+    throw new SpeakerOpsAuthError(401, "Sign in with your UBLDA leadership account.");
+  }
+  const environment = dependencies.environment || process.env;
+  const convexUrl = environment.CONVEX_URL?.trim() || environment.VITE_CONVEX_URL?.trim();
+  if (!convexUrl) throw new SpeakerOpsAuthError(503, "Leadership authentication is not configured.");
+  let exchange;
+  try {
+    if (dependencies.exchange) {
+      exchange = await dependencies.exchange(idToken);
+    } else {
+      const config = authBridgeConfig(environment);
+      exchange = await exchangeLogtoIdTokenWithIdentity(idToken, config);
+    }
+  } catch (error) {
+    if (error instanceof SpeakerOpsAuthError) throw error;
+    if (!dependencies.exchange && error instanceof Error && error.message.startsWith("Missing ")) {
+      throw new SpeakerOpsAuthError(503, "Leadership authentication is not configured.");
+    }
+    throw new SpeakerOpsAuthError(401, "Your leadership sign-in is invalid or expired.");
+  }
+  let viewer;
+  try {
+    const timeoutMs = dependencies.viewerTimeoutMs ?? CONVEX_VIEWER_TIMEOUT_MS;
+    const viewerPromise = dependencies.queryViewer ? dependencies.queryViewer(exchange.token, convexUrl) : defaultViewerQuery(exchange.token, convexUrl, timeoutMs);
+    viewer = await withTimeout(viewerPromise, timeoutMs);
+  } catch (error) {
+    if (error instanceof ConvexError) {
+      throw new SpeakerOpsAuthError(403, "This account is not approved for the UBLDA leadership workspace.");
+    }
+    throw new SpeakerOpsAuthError(503, "Leadership membership could not be verified.");
+  }
+  if (!viewer || viewer.status !== "active") {
+    throw new SpeakerOpsAuthError(403, "This account is not an active UBLDA leadership member.");
+  }
+  return {
+    memberId: viewer.memberId,
+    displayName: viewer.displayName || exchange.identity.name || exchange.identity.email,
+    email: exchange.identity.email,
+    role: viewer.role
+  };
+};
+
+// server/operationsService.ts
+var defaultStore2 = createOperationsStore();
+var allowedActions = /* @__PURE__ */ new Set([
+  "workspace",
+  "updateAttendance",
+  "createStrike",
+  "updateStrikeStatus",
+  "updateAccount",
+  "updateDocument",
+  "updateReview"
+]);
+var textValue = (body, key) => typeof body[key] === "string" ? body[key].trim() : "";
+var authStatus = (error) => {
+  if (!error || typeof error !== "object" || !("status" in error)) return null;
+  const status = Number(error.status);
+  return [401, 403, 503].includes(status) ? status : null;
+};
+var writeErrorStatus = (error) => /only the three operations super admins/i.test(error) ? 403 : 400;
+var handleOperationsRequest = async (rawBody, _ip = "unknown", options = {}) => {
+  void _ip;
+  const body = rawBody && typeof rawBody === "object" ? rawBody : {};
+  const action = textValue(body, "action");
+  if (!allowedActions.has(action)) return { status: 400, body: { error: "Unknown Operations action." } };
+  const store = options.store || defaultStore2;
+  const verifyIdentity = options.verifyIdentity || verifySpeakerOpsIdentity;
+  try {
+    const actor = await verifyIdentity(textValue(body, "idToken"));
+    if (action === "workspace") {
+      return { status: 200, body: { success: true, workspace: await store.workspace(actor) } };
+    }
+    if (!isOperationsSuperAdmin(actor.email)) {
+      return { status: 403, body: { error: "Only the three Operations super admins can change this workspace." } };
+    }
+    if (action === "updateAttendance") {
+      const attendance = body.attendance && typeof body.attendance === "object" ? body.attendance : null;
+      if (!attendance?.eventId || !attendance.memberEmail) return { status: 400, body: { error: "Event and member are required." } };
+      const result2 = await store.updateAttendance(actor, attendance);
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: writeErrorStatus(result2.error), body: { error: result2.error } };
+    }
+    if (action === "createStrike") {
+      const input = body.strike && typeof body.strike === "object" ? body.strike : null;
+      if (!input?.memberEmail || !input.reason || !input.detail) return { status: 400, body: { error: "Member, reason, and evidence are required." } };
+      const result2 = await store.createStrike(actor, {
+        memberEmail: input.memberEmail,
+        reason: input.reason,
+        detail: input.detail,
+        eventId: input.eventId
+      });
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: writeErrorStatus(result2.error), body: { error: result2.error } };
+    }
+    if (action === "updateStrikeStatus") {
+      const input = body.strike && typeof body.strike === "object" ? body.strike : null;
+      if (!input?.id || !input.status) return { status: 400, body: { error: "Strike and status are required." } };
+      const result2 = await store.updateStrikeStatus(actor, {
+        id: input.id,
+        status: input.status,
+        note: input.note || ""
+      });
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: writeErrorStatus(result2.error), body: { error: result2.error } };
+    }
+    if (action === "updateAccount") {
+      const input = body.account && typeof body.account === "object" ? body.account : null;
+      if (!input?.email || !input.role) return { status: 400, body: { error: "Account and role are required." } };
+      const result2 = await store.updateAccount(actor, { email: input.email, role: input.role });
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: writeErrorStatus(result2.error), body: { error: result2.error } };
+    }
+    if (action === "updateDocument") {
+      const document = body.document && typeof body.document === "object" ? body.document : null;
+      if (!document?.id) return { status: 400, body: { error: "Document is required." } };
+      const result2 = await store.updateDocument(actor, { ...document, id: document.id });
+      return result2.ok ? { status: 200, body: { success: true, ...result2 } } : { status: writeErrorStatus(result2.error), body: { error: result2.error } };
+    }
+    const review = body.review && typeof body.review === "object" ? body.review : null;
+    if (!review?.id) return { status: 400, body: { error: "Review is required." } };
+    const result = await store.updateReview(actor, {
+      id: review.id,
+      decision: review.decision,
+      reviewerEmail: review.reviewerEmail,
+      note: review.note || ""
+    });
+    return result.ok ? { status: 200, body: { success: true, ...result } } : { status: writeErrorStatus(result.error), body: { error: result.error } };
+  } catch (error) {
+    const status = authStatus(error);
+    if (status) return { status, body: { error: error instanceof Error ? error.message : "Leadership sign-in failed." } };
+    if (options.verifyIdentity) return { status: 401, body: { error: "Your leadership sign-in is invalid or expired." } };
+    console.error("operations_request_failed", error instanceof Error ? error.name : "UnknownError");
+    return { status: 500, body: { error: "Operations is temporarily unavailable." } };
+  }
+};
 export {
-  SpeakerOpsStore,
-  createSpeakerOpsStore
+  handleOperationsRequest
 };
