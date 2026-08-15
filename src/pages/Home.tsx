@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import Reveal, { RevealStagger, RevealChild } from '../components/Reveal'
 import './Home.css'
 
@@ -77,46 +76,20 @@ export default function Home() {
       {/* ─── Hero ─── */}
       <section className="hero">
         <div className="container">
-          <motion.div
-            className="hero__content"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.12 } },
-            }}
-          >
-            <motion.h1
-              className="hero__headline"
-              variants={{
-                hidden: { opacity: 0, y: 40 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-              }}
-            >
+          <div className="hero__content">
+            <h1 className="hero__headline hero__entrance hero__entrance--headline">
               Undergraduate Business Leaders{' '}
               <em>for</em>{' '}
               Diverse Abilities
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              className="hero__sub"
-              variants={{
-                hidden: { opacity: 0, y: 24 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
-              }}
-            >
+            <p className="hero__sub hero__entrance hero__entrance--sub">
               Disability inclusion belongs in business. UBLDA brings Michigan Ross
               students together through client work, speaker events, workshops, and
               the BLDA community.
-            </motion.p>
+            </p>
 
-            <motion.div
-              className="hero__actions"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
-              }}
-            >
+            <div className="hero__actions hero__entrance hero__entrance--actions">
               <Link to="/join" className="btn-flip">
                 <span className="btn-flip__inner">
                   <span className="btn-flip__front">
@@ -128,8 +101,8 @@ export default function Home() {
                   </span>
                 </span>
               </Link>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
 
         <div className="hero__gradient" aria-hidden="true" />
@@ -216,19 +189,19 @@ export default function Home() {
             {[...Array(4)].map((_, setIndex) => (
               <div className="community__logo-set" key={setIndex} aria-hidden={setIndex > 0}>
                 <div className="community__logo-item">
-                  <img src="/partners-ross.png" alt="Michigan Ross School of Business" />
+                  <img src="/partners-ross.png" alt="Michigan Ross School of Business" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
-                  <img src="/partners-occb.png" alt="Office of Community, Culture, and Belonging" />
+                  <img src="/partners-occb.png" alt="Office of Community, Culture, and Belonging" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
-                  <img src="/partners-blda.webp" alt="Business Leaders for Diverse Abilities" className="community__logo--blda" />
+                  <img src="/partners-blda.webp" alt="Business Leaders for Diverse Abilities" className="community__logo--blda" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
-                  <img src="/partners-nestidd.png" alt="Nestidd" />
+                  <img src="/partners-nestidd.png" alt="Nestidd" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
-                  <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+                  <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" loading="lazy" decoding="async" />
                 </div>
               </div>
             ))}

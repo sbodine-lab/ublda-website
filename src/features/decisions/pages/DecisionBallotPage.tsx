@@ -270,7 +270,7 @@ function SignedInBallot() {
       <main id="main-content" className="dc-ballot-page">
         <div className="dc-public-topbar">
           <Button variant="ghost" asChild><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> Back to questions</Link></Button>
-          <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link>
+          <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo-64.png" alt="" width="63" height="64" /></Link>
         </div>
         <div className="dc-ballot-document">
           <Empty className="dc-empty-state">
@@ -296,7 +296,7 @@ function SignedInBallot() {
     <main id="main-content" className="dc-ballot-page">
       <div className="dc-public-topbar">
         <Button variant="ghost" asChild><Link to="/decisions"><ArrowLeft data-icon="inline-start" /> Back to questions</Link></Button>
-        <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo.png" alt="" /></Link>
+        <Link to="/decisions" className="dc-logo-lockup" aria-label="Questions"><img src="/logo-64.png" alt="" width="63" height="64" /></Link>
       </div>
 
       <article className="dc-ballot-document">

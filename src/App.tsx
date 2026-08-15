@@ -3,14 +3,15 @@ import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import Home from './pages/Home'
-import About from './pages/About'
-import Events from './pages/Events'
-import Team from './pages/Team'
-import Advisory from './pages/Advisory'
-import Join from './pages/Join'
-import Links from './pages/Links'
-import Brand from './pages/Brand'
-import HousingIntelligence from './pages/HousingIntelligence'
+
+const About = lazy(() => import('./pages/About'))
+const Events = lazy(() => import('./pages/Events'))
+const Team = lazy(() => import('./pages/Team'))
+const Advisory = lazy(() => import('./pages/Advisory'))
+const Join = lazy(() => import('./pages/Join'))
+const Links = lazy(() => import('./pages/Links'))
+const Brand = lazy(() => import('./pages/Brand'))
+const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
 
 const DecisionCenterEntry = lazy(() => (
   import('./features/decisions/DecisionCenterEntry').then((module) => ({
@@ -33,6 +34,14 @@ function ScrollToTop({ enabled }: { enabled: boolean }) {
     window.scrollTo(0, 0)
   }, [enabled, pathname])
   return null
+}
+
+function PageFallback() {
+  return (
+    <main id="main-content" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
+      <p>Opening page…</p>
+    </main>
+  )
 }
 
 export default function App() {
@@ -69,20 +78,22 @@ export default function App() {
       )}
       {!inStandalone && <Nav />}
       <ScrollToTop enabled={!inStandalone} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/team" element={<Team />} />
-        <Route path="/advisory" element={<Advisory />} />
-        <Route path="/join" element={<Join />} />
-        <Route path="/housing-intelligence" element={<HousingIntelligence />} />
-        <Route path="/housing" element={<HousingIntelligence />} />
-        <Route path="/links" element={<Links />} />
-        <Route path="/brand" element={<Brand />} />
-        {/* Unknown retired URLs and typos land on home rather than a blank page. */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/advisory" element={<Advisory />} />
+          <Route path="/join" element={<Join />} />
+          <Route path="/housing-intelligence" element={<HousingIntelligence />} />
+          <Route path="/housing" element={<HousingIntelligence />} />
+          <Route path="/links" element={<Links />} />
+          <Route path="/brand" element={<Brand />} />
+          {/* Unknown retired URLs and typos land on home rather than a blank page. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       {!inStandalone && <Footer />}
     </>
   )

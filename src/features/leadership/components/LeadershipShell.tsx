@@ -87,7 +87,7 @@ export function LeadershipShell({
     <div className="dc-app-shell ws-shell leadership-shell">
       <aside className="leadership-sidebar">
         <Link to="/workspace" className="leadership-brand" aria-label="UBLDA workspace">
-          <img className="leadership-brand__logo" src="/logo.png" alt="" />
+          <img className="leadership-brand__logo" src="/logo-64.png" alt="" width="63" height="64" />
         </Link>
 
         <div className="leadership-sidebar__scroll">
@@ -127,7 +127,7 @@ export function LeadershipShell({
       <div className="leadership-workspace">
         <header className="leadership-topbar" aria-live="polite">
           <Link to="/workspace" className="leadership-mobile-brand" aria-label="UBLDA workspace">
-            <img className="leadership-brand__logo" src="/logo.png" alt="" />
+            <img className="leadership-brand__logo" src="/logo-64.png" alt="" width="63" height="64" />
           </Link>
           <h1 ref={titleRef} tabIndex={-1}>{header.title}</h1>
           {/* The live region announces the route title, not the action. */}
