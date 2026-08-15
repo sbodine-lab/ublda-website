@@ -136,6 +136,18 @@
   flex-direction: column;
   gap: var(--space-6);
   box-shadow: 0 4px 24px rgba(5, 34, 64, 0.06);
+  animation: nav-mobile-enter 0.2s var(--ease-out) both;
+}
+
+@keyframes nav-mobile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .nav__mobile-link {
@@ -221,6 +233,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .nav__mobile {
+    animation: none;
+  }
+
   .nav__link:hover .nav__letter {
     animation: none;
   }

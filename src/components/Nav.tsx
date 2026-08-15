@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
 import './Nav.css'
 
 const publicLinks = [
@@ -55,7 +54,7 @@ export default function Nav() {
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
       <div className="nav__inner container">
         <Link to="/" className="nav__logo">
-          <img src="/logo.png" alt="UBLDA" className="nav__logo-img" />
+          <img src="/logo-64.png" alt="UBLDA" className="nav__logo-img" width="63" height="64" />
           <span className="nav__logo-text">
             <NavLetters text="UBLDA" />
           </span>
@@ -86,15 +85,8 @@ export default function Nav() {
         </button>
       </div>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            className="nav__mobile"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          >
+      {mobileOpen && (
+          <div className="nav__mobile">
             {links.map((link) => (
               <Link
                 key={link.path}
@@ -106,9 +98,8 @@ export default function Nav() {
                 {link.path === '/advisory' && <span aria-hidden="true"> ↗</span>}
               </Link>
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+      )}
     </header>
   )
 }
