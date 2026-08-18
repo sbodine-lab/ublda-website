@@ -87,7 +87,10 @@ test("admin continuity ignores active rows that no longer have a usable login", 
 import { decisionPublicSlug } from "../convex/lib/publicIds.ts";
 import { availabilityPublicSlug } from "../convex/lib/publicIds.ts";
 import {
+  MAX_AVAILABILITY_DURATION_MINUTES,
   availabilityResults,
+  availabilitySlotCapacity,
+  availabilityTimeShapeError,
   normalizeAvailabilitySlots,
   slotKey,
 } from "../convex/lib/availability.ts";
@@ -164,6 +167,65 @@ test("best times require every 15-minute slot in the meeting duration", () => {
       availableMemberIds: ["member-a"],
     },
   ]);
+});
+
+test("scheduling polls accept multi-hour events, not just short meetings", () => {
+  const window = { startMinutes: 17 * 60, endMinutes: 23 * 60 };
+  assert.equal(availabilityTimeShapeError({ ...window, durationMinutes: 45 }), null);
+  assert.equal(availabilityTimeShapeError({ ...window, durationMinutes: 120 }), null);
+  assert.equal(availabilityTimeShapeError({ ...window, durationMinutes: 180 }), null);
+  assert.equal(availabilityTimeShapeError({ ...window, durationMinutes: 300 }), null);
+  assert.equal(
+    availabilityTimeShapeError({ startMinutes: 8 * 60, endMinutes: 20 * 60, durationMinutes: MAX_AVAILABILITY_DURATION_MINUTES }),
+    null,
+  );
+  assert.equal(availabilityTimeShapeError({ startMinutes: 0, endMinutes: 24 * 60, durationMinutes: 180 }), null);
+  assert.match(availabilityTimeShapeError({ ...window, durationMinutes: MAX_AVAILABILITY_DURATION_MINUTES + 15 }) ?? "", /Event length/);
+  assert.match(availabilityTimeShapeError({ ...window, durationMinutes: 100 }) ?? "", /15-minute steps/);
+  assert.match(availabilityTimeShapeError({ ...window, durationMinutes: 0 }) ?? "", /Event length/);
+  assert.match(availabilityTimeShapeError({ ...window, durationMinutes: 7 * 60 }) ?? "", /at least as long as the event/);
+  assert.match(availabilityTimeShapeError({ startMinutes: 20 * 60, endMinutes: 18 * 60, durationMinutes: 60 }) ?? "", /after the earliest/);
+  assert.match(availabilityTimeShapeError({ startMinutes: 17 * 60 + 5, endMinutes: 21 * 60, durationMinutes: 60 }) ?? "", /15-minute marks/);
+  assert.match(availabilityTimeShapeError({ startMinutes: 0, endMinutes: 25 * 60, durationMinutes: 60 }) ?? "", /15-minute marks/);
+});
+
+test("slot capacity follows the poll window instead of a fixed 12-hour cap", () => {
+  const allDay = { dateKeys: ["2026-09-01", "2026-09-02"], startMinutes: 0, endMinutes: 24 * 60, durationMinutes: 180 };
+  assert.equal(availabilitySlotCapacity(allDay), 2 * 96);
+  const evening = { dateKeys: ["2026-09-01"], startMinutes: 17 * 60, endMinutes: 21 * 60, durationMinutes: 45 };
+  assert.equal(availabilitySlotCapacity(evening), 16);
+});
+
+test("best times for a three-hour social require twelve consecutive slots", () => {
+  const shape = {
+    dateKeys: ["2026-09-04"],
+    startMinutes: 17 * 60,
+    endMinutes: 22 * 60,
+    durationMinutes: 180,
+  };
+  const free = (from: number, to: number) => {
+    const keys: string[] = [];
+    for (let minute = from; minute < to; minute += 15) keys.push(slotKey("2026-09-04", minute));
+    return keys;
+  };
+  const result = availabilityResults(shape, [
+    { memberId: "a", availableSlotKeys: free(17 * 60, 22 * 60) },
+    { memberId: "b", availableSlotKeys: free(18 * 60, 22 * 60) },
+    { memberId: "c", availableSlotKeys: free(17 * 60, 19 * 60 + 45) },
+  ]);
+  // Only 17:00–22:00 has 3-hour spans; 9 candidate starts (17:00 … 19:00).
+  assert.equal(result.candidates.length, 9);
+  assert.deepEqual(
+    result.candidates[0],
+    {
+      dateKey: "2026-09-04",
+      startMinutes: 18 * 60,
+      endMinutes: 21 * 60,
+      availableCount: 2,
+      availableMemberIds: ["a", "b"],
+    },
+  );
+  assert.equal(result.candidates.find((c) => c.startMinutes === 17 * 60)?.availableCount, 1);
 });
 
 test("decision time zones default and normalize to canonical IANA identifiers", () => {

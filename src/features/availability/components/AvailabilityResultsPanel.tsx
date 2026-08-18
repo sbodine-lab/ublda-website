@@ -1,11 +1,11 @@
 import { Check, Copy } from "lucide-react"
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { LeadershipSection } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
-import { candidateLabel, dateLabel, minutesLabel } from "../format"
+import { candidateLabel, dateLabel, durationLabel, minutesLabel } from "../format"
 import type { AvailabilityPollDetail } from "../types"
 
 function shareHref(slug: string) {
@@ -51,6 +51,7 @@ export function AvailabilityResultsPanel({
   const { adapter } = useAvailabilityData()
   const results = poll.results
   const top = results?.candidates.slice(0, 3) ?? []
+  const [choosing, setChoosing] = useState<string>()
 
   if (!results) {
     return (
@@ -69,13 +70,16 @@ export function AvailabilityResultsPanel({
     }
   }
 
-  const chooseTopTime = async () => {
-    if (!top[0]) return
+  const chooseTime = async (dateKey: string, startMinutes: number) => {
+    const key = `${dateKey}-${startMinutes}`
+    setChoosing(key)
     try {
-      await adapter.finalizePoll(poll.id, top[0].dateKey, top[0].startMinutes)
+      await adapter.finalizePoll(poll.id, dateKey, startMinutes)
       toast("Time chosen")
-    } catch {
-      toast.error("Time could not be chosen")
+    } catch (caught) {
+      toast.error(caught instanceof Error ? caught.message : "Time could not be chosen")
+    } finally {
+      setChoosing(undefined)
     }
   }
 
@@ -104,7 +108,7 @@ export function AvailabilityResultsPanel({
         )}
       >
         <div className="sched-summary">
-          <span>{results.responseCount} of {results.eligibleCount} responded</span>
+          <span>{results.responseCount} of {results.eligibleCount} responded · {durationLabel(poll.durationMinutes)} event</span>
           {poll.canManage && results.missing?.length ? (
             <span>Missing: {results.missing.map((member) => member.displayName).join(", ")}</span>
           ) : null}
@@ -116,29 +120,43 @@ export function AvailabilityResultsPanel({
 
         {top.length ? (
           <ol className="sched-best">
-            {top.map((candidate, index) => (
-              <li className="sched-best__row" key={`${candidate.dateKey}-${candidate.startMinutes}`}>
-                <span className="sched-best__rank">{index + 1}</span>
-                <span>{candidateLabel(candidate.dateKey, candidate.startMinutes, candidate.endMinutes)}</span>
-                <span className="sched-best__count">{candidate.availableCount} of {results.eligibleCount}</span>
-                <Progress
-                  value={results.eligibleCount ? candidate.availableCount / results.eligibleCount * 100 : 0}
-                  aria-label={`${candidate.availableCount} of ${results.eligibleCount} available`}
-                />
-              </li>
-            ))}
+            {top.map((candidate, index) => {
+              const key = `${candidate.dateKey}-${candidate.startMinutes}`
+              const isChosen = poll.status === "finalized"
+                && poll.finalizedDateKey === candidate.dateKey
+                && poll.finalizedStartMinutes === candidate.startMinutes
+              return (
+                <li className="sched-best__row" key={key}>
+                  <span className="sched-best__rank">{index + 1}</span>
+                  <span>{candidateLabel(candidate.dateKey, candidate.startMinutes, candidate.endMinutes)}</span>
+                  <span className="sched-best__count">{candidate.availableCount} of {results.eligibleCount}</span>
+                  <Progress
+                    value={results.eligibleCount ? candidate.availableCount / results.eligibleCount * 100 : 0}
+                    aria-label={`${candidate.availableCount} of ${results.eligibleCount} available`}
+                  />
+                  {poll.canManage ? (
+                    <Button
+                      className="sched-best__choose"
+                      size="sm"
+                      variant={index === 0 && poll.status !== "finalized" ? "default" : "outline"}
+                      disabled={poll.status === "finalized" || Boolean(choosing)}
+                      aria-label={`Choose ${candidateLabel(candidate.dateKey, candidate.startMinutes, candidate.endMinutes)}`}
+                      onClick={() => void chooseTime(candidate.dateKey, candidate.startMinutes)}
+                    >
+                      {isChosen ? <><Check data-icon="inline-start" /> Chosen</> : choosing === key ? "Choosing…" : "Choose"}
+                    </Button>
+                  ) : null}
+                </li>
+              )
+            })}
           </ol>
         ) : (
-          <p className="sched-empty-line">No complete times yet</p>
+          <p className="sched-empty-line">
+            {results.responseCount > 0
+              ? `Nobody is free for the full ${durationLabel(poll.durationMinutes)} yet`
+              : "No replies yet"}
+          </p>
         )}
-
-        {poll.canManage && top[0] ? (
-          <div className="sched-results-actions">
-            <Button size="sm" disabled={poll.status === "finalized"} onClick={() => void chooseTopTime()}>
-              <Check data-icon="inline-start" /> {poll.status === "finalized" ? "Chosen" : "Choose time"}
-            </Button>
-          </div>
-        ) : null}
       </ResultsSection>
 
       <ResultsSection embedded={embedded} title="Availability">

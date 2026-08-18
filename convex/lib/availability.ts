@@ -1,4 +1,11 @@
 export const AVAILABILITY_SLOT_MINUTES = 15;
+/** Shortest event a poll can schedule: one slot. */
+export const MIN_AVAILABILITY_DURATION_MINUTES = AVAILABILITY_SLOT_MINUTES;
+/** Longest event a poll can schedule. Socials run 1–3 hours; 12 hours leaves
+    room for a retreat or a full-day workshop without letting a typo through. */
+export const MAX_AVAILABILITY_DURATION_MINUTES = 12 * 60;
+/** A poll window may span a whole day. */
+export const MAX_AVAILABILITY_WINDOW_MINUTES = 24 * 60;
 
 export interface AvailabilityShape {
   dateKeys: string[];
@@ -27,6 +34,54 @@ export function validDateKey(value: string): boolean {
   if (!DATE_KEY.test(value)) return false;
   const parsed = new Date(`${value}T00:00:00.000Z`);
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+/**
+ * Returns a human-readable problem with the poll's time shape, or null when the
+ * shape is valid. Shared by the mutation and the tests so the rules live once.
+ */
+export function availabilityTimeShapeError(input: {
+  durationMinutes: number;
+  startMinutes: number;
+  endMinutes: number;
+}): string | null {
+  const { durationMinutes, startMinutes, endMinutes } = input;
+  const slot = AVAILABILITY_SLOT_MINUTES;
+  if (
+    !Number.isInteger(durationMinutes)
+    || durationMinutes < MIN_AVAILABILITY_DURATION_MINUTES
+    || durationMinutes > MAX_AVAILABILITY_DURATION_MINUTES
+    || durationMinutes % slot !== 0
+  ) {
+    return `Event length must be between ${MIN_AVAILABILITY_DURATION_MINUTES} minutes and ${MAX_AVAILABILITY_DURATION_MINUTES / 60} hours, in ${slot}-minute steps.`;
+  }
+  if (
+    !Number.isInteger(startMinutes)
+    || !Number.isInteger(endMinutes)
+    || startMinutes < 0
+    || endMinutes > 24 * 60
+    || startMinutes % slot !== 0
+    || endMinutes % slot !== 0
+  ) {
+    return `Start and end times must be on ${slot}-minute marks.`;
+  }
+  if (endMinutes <= startMinutes) {
+    return "The latest time must be after the earliest time.";
+  }
+  if (endMinutes - startMinutes > MAX_AVAILABILITY_WINDOW_MINUTES) {
+    return `The time window can be at most ${MAX_AVAILABILITY_WINDOW_MINUTES / 60} hours.`;
+  }
+  if (endMinutes - startMinutes < durationMinutes) {
+    return "The time window must be at least as long as the event.";
+  }
+  return null;
+}
+
+/** Number of slot cells a poll exposes across all of its dates. */
+export function availabilitySlotCapacity(shape: AvailabilityShape): number {
+  const slotMinutes = shape.slotMinutes ?? AVAILABILITY_SLOT_MINUTES;
+  const perDay = Math.max(0, Math.ceil((shape.endMinutes - shape.startMinutes) / slotMinutes));
+  return shape.dateKeys.length * perDay;
 }
 
 export function slotKey(dateKey: string, minutes: number): string {

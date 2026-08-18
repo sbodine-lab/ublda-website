@@ -93,3 +93,60 @@ export function nextWeekdays(count: number): string[] {
   }
   return dates
 }
+
+/* Mirrors convex/lib/availability.ts. The Convex source is not part of the
+   app's TypeScript project, so the limits are restated here for the form. */
+export const SLOT_MINUTES = 15
+export const MIN_DURATION_MINUTES = SLOT_MINUTES
+export const MAX_DURATION_MINUTES = 12 * 60
+export const MAX_WINDOW_MINUTES = 24 * 60
+
+/** "45 min", "1 hr", "1 hr 30 min", "2 hr 15 min". */
+export function durationLabel(minutes: number): string {
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  if (!hours) return `${rest} min`
+  return rest ? `${hours} hr ${rest} min` : `${hours} hr`
+}
+
+/** Snap a minute count to the nearest slot boundary, clamped to the day. */
+export function snapToSlot(minutes: number): number {
+  const snapped = Math.round(minutes / SLOT_MINUTES) * SLOT_MINUTES
+  return Math.min(24 * 60, Math.max(0, snapped))
+}
+
+/** Same rules the backend applies, so the form can explain before submitting. */
+export function timeShapeError(input: {
+  durationMinutes: number
+  startMinutes: number
+  endMinutes: number
+}): string | null {
+  const { durationMinutes, startMinutes, endMinutes } = input
+  if (
+    !Number.isInteger(durationMinutes)
+    || durationMinutes < MIN_DURATION_MINUTES
+    || durationMinutes > MAX_DURATION_MINUTES
+    || durationMinutes % SLOT_MINUTES !== 0
+  ) {
+    return `Event length must be between ${MIN_DURATION_MINUTES} minutes and ${MAX_DURATION_MINUTES / 60} hours, in ${SLOT_MINUTES}-minute steps.`
+  }
+  if (!Number.isInteger(startMinutes) || !Number.isInteger(endMinutes)) return "Choose an earliest and latest time."
+  if (endMinutes <= startMinutes) return "The latest time must be after the earliest time."
+  if (endMinutes - startMinutes > MAX_WINDOW_MINUTES) return `The time window can be at most ${MAX_WINDOW_MINUTES / 60} hours.`
+  if (endMinutes - startMinutes < durationMinutes) {
+    return `The window is shorter than the event (${durationLabel(durationMinutes)}). Widen the times or shorten the event.`
+  }
+  return null
+}
+
+/** Calendar date of an ISO instant as seen in the poll's timezone. */
+export function zonedDateKey(iso: string, timezone: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso))
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  return `${value.year}-${value.month}-${value.day}`
+}

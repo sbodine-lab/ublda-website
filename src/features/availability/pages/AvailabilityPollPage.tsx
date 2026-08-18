@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { useAvailabilityData } from "../availabilityDataContext"
-import { dateLabel, dayParts, minutesLabel, timezoneLabel } from "../format"
+import { candidateLabel, dateLabel, dayParts, durationLabel, minutesLabel, timezoneLabel } from "../format"
 import type { AvailabilityPollDetail } from "../types"
 
 type SaveState = "idle" | "saving" | "saved" | "error"
@@ -151,12 +151,12 @@ function AvailabilityPollContent({ poll }: { poll: AvailabilityPollDetail }) {
 
       <article className="sched-public-body">
         {poll.note ? <p className="sched-note">{poll.note}</p> : null}
-        <p className="sched-meta">{timezoneLabel(poll.timezone)}</p>
+        <p className="sched-meta">{durationLabel(poll.durationMinutes)} · {timezoneLabel(poll.timezone)}</p>
 
         {poll.status === "finalized" && poll.finalizedDateKey && poll.finalizedStartMinutes !== undefined ? (
           <p className="sched-final">
             <Check aria-hidden="true" />
-            {dateLabel(poll.finalizedDateKey, { weekday: "short", month: "short", day: "numeric" })} · {minutesLabel(poll.finalizedStartMinutes)}
+            {candidateLabel(poll.finalizedDateKey, poll.finalizedStartMinutes, poll.finalizedStartMinutes + poll.durationMinutes)}
           </p>
         ) : (
           <>

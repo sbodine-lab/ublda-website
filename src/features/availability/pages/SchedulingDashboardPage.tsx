@@ -20,7 +20,7 @@ import {
 import { useDecisionData } from "@/features/decisions/decisionDataContext"
 import { LeadershipPage, LeadershipSurface } from "@/features/leadership/components/LeadershipPage"
 import { useAvailabilityData } from "../availabilityDataContext"
-import { dateLabel } from "../format"
+import { dateLabel, zonedDateKey } from "../format"
 import type { AvailabilityPollSummary } from "../types"
 
 type StatusTone = "open" | "responded" | "closed"
@@ -96,7 +96,7 @@ export function SchedulingDashboardPage() {
                       {poll.responseCount} of {poll.eligibleCount}
                     </TableCell>
                     <TableCell className="sched-table__due">
-                      {poll.deadline ? dateLabel(poll.deadline.slice(0, 10)) : "—"}
+                      {poll.deadline ? dateLabel(zonedDateKey(poll.deadline, poll.timezone)) : "—"}
                     </TableCell>
                     <TableCell className="sched-table__action">
                       <Button variant="outline" size="sm" asChild>
