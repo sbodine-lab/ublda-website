@@ -423,7 +423,7 @@
 
 .sched-best__row {
   display: grid;
-  grid-template-columns: 24px minmax(140px, 1fr) auto minmax(88px, 28%);
+  grid-template-columns: 24px minmax(140px, 1fr) auto minmax(88px, 28%) auto;
   align-items: center;
   gap: 12px;
   min-height: 44px;
@@ -476,13 +476,6 @@
 .sched-empty-line {
   color: var(--lx-muted);
   font-size: 13px;
-}
-
-.sched-results-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
 }
 
 .sched-heat-wrap {
@@ -565,6 +558,26 @@
   color: var(--lx-faint);
 }
 
+.sched-custom-length {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sched-custom-length [data-slot="input"] {
+  max-width: 120px;
+}
+
+.sched-optional {
+  color: var(--lx-faint);
+  font-weight: 500;
+}
+
+.sched-best__choose {
+  justify-self: end;
+}
+
 .sched-static {
   color: var(--lx-ink);
   font-size: 13px;
@@ -611,6 +624,16 @@
 
   .sched-best__row [data-slot="progress"] {
     grid-column: 2 / -1;
+  }
+
+  /* With a Choose button, the bar shares the second line with it. */
+  .sched-best__row:has(.sched-best__choose) [data-slot="progress"] {
+    grid-column: 2 / 3;
+  }
+
+  .sched-best__choose {
+    grid-column: 3;
+    grid-row: 2;
   }
 
   .sched-grid {

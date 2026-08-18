@@ -15,6 +15,8 @@ import { canonicalDecisionTimeZone } from "./lib/timezones";
 import {
   AVAILABILITY_SLOT_MINUTES,
   availabilityResults,
+  availabilitySlotCapacity,
+  availabilityTimeShapeError,
   normalizeAvailabilitySlots,
   validDateKey,
 } from "./lib/availability";
@@ -53,27 +55,8 @@ function validateTimeShape(input: {
   startMinutes: number;
   endMinutes: number;
 }) {
-  const { durationMinutes, startMinutes, endMinutes } = input;
-  assert(
-    Number.isInteger(durationMinutes)
-    && durationMinutes >= 15
-    && durationMinutes <= 180
-    && durationMinutes % AVAILABILITY_SLOT_MINUTES === 0,
-    "VALIDATION_ERROR",
-    "Meeting length must be 15 to 180 minutes in 15-minute steps.",
-  );
-  assert(
-    Number.isInteger(startMinutes)
-    && Number.isInteger(endMinutes)
-    && startMinutes >= 0
-    && endMinutes <= 24 * 60
-    && startMinutes % AVAILABILITY_SLOT_MINUTES === 0
-    && endMinutes % AVAILABILITY_SLOT_MINUTES === 0
-    && endMinutes - startMinutes >= durationMinutes
-    && endMinutes - startMinutes <= 12 * 60,
-    "VALIDATION_ERROR",
-    "Choose a valid time window no longer than 12 hours.",
-  );
+  const problem = availabilityTimeShapeError(input);
+  assert(problem === null, "VALIDATION_ERROR", problem ?? "Choose a valid time window.");
 }
 
 async function pollElectorate(ctx: QueryCtx | MutationCtx, pollId: Doc<"availabilityPolls">["_id"]) {
@@ -307,7 +290,7 @@ export const saveResponse = mutation({
       .unique();
     assert(eligible, "FORBIDDEN", "You are not included in this scheduling poll.");
     const availableSlotKeys = normalizeAvailabilitySlots(poll, args.availableSlotKeys);
-    assert(availableSlotKeys.length <= 14 * 48, "VALIDATION_ERROR", "Too many availability slots.");
+    assert(availableSlotKeys.length <= availabilitySlotCapacity(poll), "VALIDATION_ERROR", "Too many availability slots.");
     const existing = await ctx.db
       .query("availabilityResponses")
       .withIndex("by_poll_and_member", (q) =>
@@ -342,6 +325,7 @@ export const finalize = mutation({
     const poll = await ctx.db.get("availabilityPolls", args.pollId);
     assert(poll, "NOT_FOUND", "Scheduling poll not found.");
     requireDecisionManager(actor, poll);
+    assert(validDateKey(args.dateKey) && Number.isInteger(args.startMinutes), "VALIDATION_ERROR", "Choose a valid start time.");
     const normalized = normalizeAvailabilitySlots(poll, [
       `${args.dateKey}@${args.startMinutes}`,
     ]);
