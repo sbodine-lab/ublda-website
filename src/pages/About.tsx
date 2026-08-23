@@ -28,12 +28,9 @@ export default function About() {
     <main id="main-content" className="about">
       <section className="about__hero">
         <div className="container">
-          <Reveal>
-            <p className="section__label">About UBLDA</p>
-          </Reveal>
           <Reveal delay={0.1}>
             <h1 className="about__headline">
-              Making business <em>accessible.</em> Starting at Ross.
+              Making business accessible. Starting at Ross.
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
@@ -155,12 +152,9 @@ export default function About() {
 
       <section className="section about__values">
         <div className="container">
-          <Reveal>
-            <p className="section__label">Our Values</p>
-          </Reveal>
           <Reveal delay={0.1}>
             <h2 className="about__values-headline">
-              The principles behind the work.
+              The principles behind the work
             </h2>
           </Reveal>
           <RevealStagger className="about__values-grid">
@@ -175,7 +169,7 @@ export default function About() {
       </section>
 
       <section className="section about__cta">
-        <div className="container container--narrow" style={{ textAlign: 'center' }}>
+        <div className="container">
           <Reveal>
             <h2 className="about__cta-headline">
               There's room for you here.

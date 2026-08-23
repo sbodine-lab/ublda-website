@@ -1,51 +1,75 @@
 import { Link } from 'react-router-dom'
-import Reveal from '../components/Reveal'
 import { buildGCalUrl } from '../lib/calendarLinks'
 import './Events.css'
 
 interface Event {
+  /** "September 2, 2026" */
   date: string
-  month: string
-  day: string
+  /** ISO date for <time dateTime>, e.g. "2026-09-02" */
+  iso: string
+  /** Optional second day for multi-day listings, e.g. "2026-09-09" */
+  isoEnd?: string
+  /** Display date when it differs from `date`, e.g. "Sept 8–9, 2026" */
+  dateLabel?: string
   time?: string
   title: string
   host?: string
   description: string
   location: string
-  tags?: string[]
   past?: boolean
   rsvpUrl?: string
+  link?: { href: string; label: string }
 }
 
 const events: Event[] = [
   {
+    date: 'September 2, 2026',
+    iso: '2026-09-02',
+    time: '3:00 PM - 8:00 PM',
+    title: 'Festifall Central',
+    host: 'Center for Campus Involvement',
+    description:
+      'The all-campus student organization fair. Come find the UBLDA table, meet the e-board, and sign up in person. Sessions run 3–5 PM and 6–8 PM.',
+    location: 'The Diag, Central Campus',
+    link: { href: 'https://campusinvolvement.umich.edu/attending-festifall', label: 'Festifall details' },
+  },
+  {
+    date: 'September 8, 2026',
+    iso: '2026-09-08',
+    isoEnd: '2026-09-09',
+    dateLabel: 'September 8–9, 2026',
+    time: '5:30 PM - 7:30 PM',
+    title: 'BBA Meet the Clubs',
+    host: 'Ross BBA Program',
+    description:
+      'The Ross club fair that opens fall recruiting. Stop by our table to hear about general membership, the speaker series, and UBLDA Advisory, our consulting program.',
+    location: 'Ross School of Business',
+  },
+  {
     date: 'April 16, 2026',
-    month: 'Apr',
-    day: '16',
+    iso: '2026-04-16',
     time: '6:00 PM - 7:00 PM',
     title: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores',
     description:
-      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with intellectual and developmental disabilities. He grew employees with IDD from 10 to 350+ under his leadership. Joining us live from Colorado while we gather in person at Ross. Dinner catered — come hungry.',
+      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with intellectual and developmental disabilities. He grew employees with IDD from 10 to 350+ under his leadership. Joined us live from Colorado while we gathered in person at Ross.',
     location: 'Ross R1240, Ross School of Business',
     past: true,
   },
   {
     date: 'March 11, 2026',
-    month: 'Mar',
-    day: '11',
+    iso: '2026-03-11',
     time: '7:00 PM - 8:00 PM',
     title: 'Fireside Chat with Andrew Parker, CEO & Co-Founder of Nestidd',
     description:
-      'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. Hear how he did it and why mission-driven business wins. Raising Cane\'s provided.',
+      'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. How he did it and why mission-driven business wins.',
     location: 'Ross B0560, Ross School of Business',
     past: true,
   },
   {
     date: 'February 13, 2026',
-    month: 'Feb',
-    day: '13',
+    iso: '2026-02-13',
     title: '2nd Annual RossAbilities Conference',
-    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
+    host: 'BLDA (MBA). UBLDA members attended.',
     description:
       'A full day of speakers, panels, and real conversations on disability inclusion and what accessible business actually looks like.',
     location: 'Tauber Colloquium, Ross School of Business',
@@ -53,11 +77,10 @@ const events: Event[] = [
   },
   {
     date: 'January 17, 2026',
-    month: 'Jan',
-    day: '17',
+    iso: '2026-01-17',
     time: '12:00 PM - 2:00 PM',
     title: 'Adaptive Basketball Event',
-    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
+    host: 'BLDA (MBA). UBLDA members attended.',
     description:
       'Wheelchair basketball against the medical school. No experience needed. We ran chair skills and drills before tip-off.',
     location: 'Sports Coliseum, 701 Tappan Street, Ann Arbor, MI 48109',
@@ -73,121 +96,123 @@ export default function Events() {
     <main id="main-content" className="events-page">
       <section className="events-page__hero">
         <div className="container">
-          <Reveal>
-            <p className="section__label">Events</p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h1 className="events-page__headline">
-              What we've <em>been up to.</em>
-            </h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="events-page__intro">
-              Speaker series, conferences, and hands-on experiences.
-              See what's next and what we've done so far.
-            </p>
-          </Reveal>
+          <h1 className="events-page__headline">Events</h1>
+          <p className="events-page__intro">
+            Speaker series, conferences, and hands-on experiences. Everything is open
+            to the campus community unless noted.
+          </p>
         </div>
       </section>
 
-      {upcoming.length > 0 && (
-        <section className="section">
-          <div className="container">
-            <Reveal>
-              <h2 className="events-page__section-title">Upcoming</h2>
-            </Reveal>
-            <div className="events-page__list">
-              {upcoming.map((event, i) => (
-                <Reveal key={event.title} delay={i * 0.1}>
-                  <EventCard event={event} />
-                </Reveal>
+      <section className="events-page__section">
+        <div className="container">
+          <h2 className="events-page__section-title">Upcoming</h2>
+          {upcoming.length > 0 ? (
+            <div className="ev-table" role="list">
+              {upcoming.map((event) => (
+                <EventRow key={event.title} event={event} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <p className="events-page__empty">
+              Nothing scheduled right now. Members hear about new events first, so{' '}
+              <Link to="/join" className="events-page__inline-link">join the mailing list</Link>.
+            </p>
+          )}
+        </div>
+      </section>
 
-      <section className="section">
+      <section className="events-page__section">
         <div className="container">
-          <Reveal>
-            <h2 className="events-page__section-title">Past Events</h2>
-          </Reveal>
-          <div className="events-page__list">
-            {past.map((event, i) => (
-              <Reveal key={event.title} delay={i * 0.1}>
-                <EventCard event={event} />
-              </Reveal>
+          <h2 className="events-page__section-title">Past events</h2>
+          <div className="ev-table ev-table--past" role="list">
+            {past.map((event) => (
+              <EventRow key={event.title} event={event} />
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section events-page__cta">
-        <div className="container container--narrow" style={{ textAlign: 'center' }}>
-          <Reveal>
-            <h2 className="events-page__cta-headline">
-              Don't miss the next one.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p className="events-page__cta-sub">
-              Members get priority access to all UBLDA events, plus exclusive workshops and networking sessions you won't find on the public calendar.
-            </p>
-          </Reveal>
-          <Reveal delay={0.2}>
+      <section className="events-page__cta">
+        <div className="container">
+          <div className="events-page__cta-layout">
+            <div>
+              <h2 className="events-page__cta-headline">Don't miss the next one.</h2>
+              <p className="events-page__cta-sub">
+                Members get priority access to all UBLDA events, plus workshops and
+                networking sessions that don't go on the public calendar.
+              </p>
+            </div>
             <Link to="/join" className="btn btn--primary btn--lg">
               Join UBLDA
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
     </main>
   )
 }
 
-function EventCard({ event }: { event: Event }) {
+function EventRow({ event }: { event: Event }) {
+  const [weekday, monthDay, year] = formatDate(event.iso)
+  const weekdayLabel = event.isoEnd
+    ? `${weekday.slice(0, 3)}–${formatDate(event.isoEnd)[0].slice(0, 3)}`
+    : weekday
   return (
-    <article className={`ev-card ${event.past ? 'ev-card--past' : ''}`}>
-      <div className="ev-card__date-block">
-        <span className="ev-card__month">{event.month}</span>
-        <span className="ev-card__day">{event.day}</span>
+    <article className="ev-row" role="listitem">
+      <div className="ev-row__date">
+        <time dateTime={event.isoEnd ? `${event.iso}/${event.isoEnd}` : event.iso}>
+          <span className="ev-row__weekday">{weekdayLabel}</span>
+          <span className="ev-row__day">{event.dateLabel ? event.dateLabel.replace(`, ${year}`, '') : monthDay}</span>
+          <span className="ev-row__year">{year}</span>
+        </time>
       </div>
-      <div className="ev-card__body">
-        {event.time && <p className="ev-card__time">{event.time}</p>}
-        <h3 className="ev-card__title">{event.title}</h3>
-        {event.host && <p className="ev-card__host">Hosted by {event.host}</p>}
-        <p className="ev-card__desc">{event.description}</p>
-        <div className="ev-card__footer">
-          <span className="ev-card__location">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>
-            {event.location}
-          </span>
-          <div className="ev-card__actions">
-            {!event.past && event.rsvpUrl && (
-              <a
-                href={event.rsvpUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ev-card__gcal"
-              >
+
+      <div className="ev-row__body">
+        <h3 className="ev-row__title">{event.title}</h3>
+        {event.host && <p className="ev-row__host">Hosted by {event.host}</p>}
+        <p className="ev-row__desc">{event.description}</p>
+        {!event.past && (
+          <div className="ev-row__actions">
+            {event.rsvpUrl && (
+              <a href={event.rsvpUrl} target="_blank" rel="noopener noreferrer" className="ev-row__action ev-row__action--primary">
                 RSVP
               </a>
             )}
-            {!event.past && (
-              <a
-                href={buildGCalUrl(event)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ev-card__gcal"
-              >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
-                Add to Google Calendar
+            <a href={buildGCalUrl(event)} target="_blank" rel="noopener noreferrer" className="ev-row__action">
+              Add to Google Calendar
+            </a>
+            {event.link && (
+              <a href={event.link.href} target="_blank" rel="noopener noreferrer" className="ev-row__action">
+                {event.link.label}
               </a>
             )}
           </div>
-        </div>
+        )}
       </div>
+
+      <dl className="ev-row__meta">
+        {event.time && (
+          <div className="ev-row__meta-item">
+            <dt>Time</dt>
+            <dd>{event.time.replace(' - ', '–')}</dd>
+          </div>
+        )}
+        <div className="ev-row__meta-item">
+          <dt>Location</dt>
+          <dd>{event.location}</dd>
+        </div>
+      </dl>
     </article>
   )
+}
+
+/** "2026-09-02" → ["Wednesday", "September 2", "2026"]. Parsed as local time so the weekday doesn't shift. */
+function formatDate(iso: string): [string, string, string] {
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' })
+  const monthDay = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  return [weekday, monthDay, String(y)]
 }
