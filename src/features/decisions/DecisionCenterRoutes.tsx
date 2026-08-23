@@ -11,6 +11,7 @@ import { AvailabilityPollPage } from "@/features/availability/pages/Availability
 import { AvailabilityResultsPage } from "@/features/availability/pages/AvailabilityResultsPage"
 import { CreateAvailabilityPollPage } from "@/features/availability/pages/CreateAvailabilityPollPage"
 import { SchedulingDashboardPage } from "@/features/availability/pages/SchedulingDashboardPage"
+import { CraftNightAdminPage } from "@/features/craftnight/CraftNightAdminPage"
 import { ClubCalendarPage } from "@/features/workspace/pages/ClubCalendarPage"
 import { PeoplePage } from "@/features/workspace/pages/PeoplePage"
 import { ProjectsPage } from "@/features/workspace/pages/ProjectsPage"
@@ -51,6 +52,7 @@ export function DecisionCenterRoutes({ logtoCallback = false }: { logtoCallback?
         <Route path="/decisions/integrations" element={<DecisionIntegrationsPage />} />
         <Route path="/decisions/:slug/results" element={<DecisionResultsPage />} />
         <Route path="/scheduling" element={<SchedulingDashboardPage />} />
+        <Route path="/scheduling/craft-night" element={<CraftNightAdminPage />} />
         <Route path="/scheduling/new" element={<CreateAvailabilityPollPage />} />
         <Route path="/scheduling/:slug/results" element={<AvailabilityResultsPage workspace />} />
         <Route path="/calendar" element={<ClubCalendarPage />} />

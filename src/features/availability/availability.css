@@ -237,6 +237,29 @@
   white-space: nowrap;
 }
 
+.sched-craft-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sched-craft-link__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sched-craft-link__title {
+  font-weight: 600;
+}
+
+.sched-craft-link__meta {
+  font-size: var(--type-sm);
+  color: var(--color-gray-600);
+}
+
 .sched-skeleton {
   display: flex;
   flex-direction: column;

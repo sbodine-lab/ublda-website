@@ -70,6 +70,7 @@ const routeHeaders: Array<{
     header: { title: "Results" },
   },
   { matches: (pathname) => pathname === "/scheduling/new", header: { title: "New poll" } },
+  { matches: (pathname) => pathname === "/scheduling/craft-night", header: { title: "Craft night" } },
   {
     matches: (pathname) => pathname.startsWith("/scheduling/") && pathname.includes("/results"),
     header: { title: "Scheduling results" },

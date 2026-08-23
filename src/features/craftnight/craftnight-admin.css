@@ -1,0 +1,46 @@
+/* Craft night admin page. Rides on the leadership workspace shell styles. */
+
+.craftadmin__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.craftadmin__time {
+  display: block;
+  font-size: var(--type-sm);
+  color: var(--color-gray-600);
+}
+
+.craftadmin__missing,
+.craftadmin__times {
+  font-size: var(--type-sm);
+  color: var(--color-gray-600);
+}
+
+.craftadmin__cell-action {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.craftadmin__count {
+  font-size: var(--type-sm);
+  font-weight: 600;
+  color: var(--color-gray-600);
+}
+
+.craftadmin__error {
+  color: #C4483B;
+  font-size: var(--type-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.craftadmin__footnote {
+  font-size: var(--type-sm);
+  color: var(--color-gray-600);
+  line-height: var(--leading-normal);
+}
+
+.craftadmin tr[data-final] td {
+  background: rgba(43, 186, 176, 0.07);
+}

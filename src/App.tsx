@@ -12,6 +12,7 @@ const Join = lazy(() => import('./pages/Join'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
 const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
+const CraftNight = lazy(() => import('./pages/CraftNight'))
 
 const DecisionCenterEntry = lazy(() => (
   import('./features/decisions/DecisionCenterEntry').then((module) => ({
@@ -20,7 +21,7 @@ const DecisionCenterEntry = lazy(() => (
 ))
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
-const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory']
+const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory', '/craft-night']
 const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/operations', '/signin', '/dashboard', '/members']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />
           <Route path="/links" element={<Links />} />
+          <Route path="/craft-night" element={<CraftNight />} />
           <Route path="/brand" element={<Brand />} />
           {/* Unknown retired URLs and typos land on home rather than a blank page. */}
           <Route path="*" element={<Navigate to="/" replace />} />
