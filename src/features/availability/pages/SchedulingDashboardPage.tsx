@@ -47,6 +47,15 @@ export function SchedulingDashboardPage() {
         </Button>
       ) : null}
     >
+      <LeadershipSurface contentClassName="sched-craft-link">
+        <div className="sched-craft-link__body">
+          <span className="sched-craft-link__title">Craft night</span>
+          <span className="sched-craft-link__meta">Availability poll at ublda.org/craft-night</span>
+        </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/scheduling/craft-night">Manage</Link>
+        </Button>
+      </LeadershipSurface>
       {snapshot.loading ? (
         <LeadershipSurface contentClassName="sched-skeleton">
           <Skeleton />

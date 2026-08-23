@@ -10,6 +10,7 @@ import {
 } from './server/speakerOpsService.ts'
 import { handleOperationsRequest } from './server/operationsService.ts'
 import { getLocalWeather } from './server/weatherService.ts'
+import { getCraftNightState, handleCraftNightAction } from './server/craftNightService.ts'
 
 const LOCAL_LEADERSHIP_PREVIEW_TOKEN = 'ublda-local-leadership-preview'
 const verifyLocalSpeakerOpsIdentity: SpeakerOpsIdentityVerifier = async (idToken) => {
@@ -69,6 +70,32 @@ const devApiPlugin = () => ({
       } catch (error) {
         console.error('Local weather unavailable', error)
         sendJson(res, 503, { error: 'Local weather is temporarily unavailable.' })
+      }
+    })
+
+    server.middlewares.use('/api/craft-night', async (req: IncomingMessage, res: ServerResponse) => {
+      try {
+        if (req.method === 'GET') {
+          const result = await getCraftNightState()
+          sendJson(res, result.status, result.body)
+          return
+        }
+        if (req.method !== 'POST') {
+          sendJson(res, 405, { error: 'Method not allowed' })
+          return
+        }
+        const body = await readJsonBody(req)
+        if (typeof body.website === 'string' && body.website.trim().length > 0) {
+          sendJson(res, 200, { success: true })
+          return
+        }
+        const result = await handleCraftNightAction(body, {
+          verifyIdentity: async (idToken: string) => verifyLocalSpeakerOpsIdentity(idToken),
+        })
+        sendJson(res, result.status, result.body)
+      } catch (error) {
+        console.error('Craft night dev API failed', error)
+        sendJson(res, 500, { error: 'Something went wrong — try again in a minute.' })
       }
     })
 
