@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import Reveal, { RevealStagger, RevealChild } from '../components/Reveal'
 import './Home.css'
 
 const pillars = [
@@ -7,31 +6,28 @@ const pillars = [
     title: 'Advocacy & Community',
     description:
       'Students with disabilities, allies, and anyone who thinks inclusion belongs in business. We show up for each other and push for a business world that includes all of us.',
-    icon: '01',
   },
   {
     title: 'Career Preparation',
     description:
       'Programs built around disability-focused business: accessibility consulting, stock pitches, and entrepreneurship tracks that give members real work to point to.',
-    icon: '02',
   },
   {
     title: 'Networking',
     description:
       'We connect members with employers, professionals, and students across Ross and the industry, so you\'re not building a career in this space on your own.',
-    icon: '03',
   },
 ]
 
 const benefits = [
-  { label: 'Networking', icon: '→' },
-  { label: 'Career Development', icon: '→' },
-  { label: 'Speaker Sessions', icon: '→' },
-  { label: 'Workshops', icon: '→' },
-  { label: 'Mentorship', icon: '→' },
-  { label: 'Hands-on Consulting', icon: '→' },
-  { label: 'Community Events', icon: '→' },
-  { label: 'Education & Awareness', icon: '→' },
+  'Networking',
+  'Career Development',
+  'Speaker Sessions',
+  'Workshops',
+  'Mentorship',
+  'Hands-on Consulting',
+  'Community Events',
+  'Education & Awareness',
 ]
 
 const upcoming = [
@@ -49,38 +45,47 @@ const upcoming = [
   },
 ]
 
+const partners = [
+  { src: '/partners-ross.png', alt: 'Michigan Ross School of Business', height: 44 },
+  { src: '/partners-occb.png', alt: 'Office of Community, Culture, and Belonging', height: 54 },
+  { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities', height: 50, className: 'community__logo--blda' },
+  { src: '/partners-nestidd.png', alt: 'Nestidd', height: 38 },
+  { src: '/partners-arc-thrift.png', alt: 'Arc Thrift Stores', height: 62 },
+]
+
 const exec = [
-  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Leads speaker events and campus partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
-  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Connects disability advocacy with Ross and keeps accessibility in the room.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
-  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
+  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
+  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
+  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', linkedin: 'https://www.linkedin.com/in/cooperry/' },
 ]
 
 const vps = [
-  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
-  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
-  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
-  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Leads the voice, visibility, and storytelling that help UBLDA reach more students across campus.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
-  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with campus partners, employers, and community organizations that move the mission forward.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
-  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Creates thoughtful programming and event experiences that bring members together around disability inclusion.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
+  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
+  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
+  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
+  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
+  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
+  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
 ]
 
 const LinkedInIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="person-card__linkedin-icon">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="person-card__linkedin-icon" aria-hidden="true">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
+)
+
+const ArrowIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
 )
 
 export default function Home() {
   return (
     <main id="main-content" className="home">
-      {/* ─── Hero ─── */}
       <section className="hero">
         <div className="container">
           <div className="hero__content">
             <h1 className="hero__headline hero__entrance hero__entrance--headline">
-              Undergraduate Business Leaders{' '}
-              <em>for</em>{' '}
-              Diverse Abilities
+              Undergraduate Business Leaders for Diverse Abilities
             </h1>
 
             <p className="hero__sub hero__entrance hero__entrance--sub">
@@ -90,219 +95,182 @@ export default function Home() {
             </p>
 
             <div className="hero__actions hero__entrance hero__entrance--actions">
-              <Link to="/join" className="btn-flip">
-                <span className="btn-flip__inner">
-                  <span className="btn-flip__front">
-                    Join UBLDA
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </span>
-                  <span className="btn-flip__back">
-                    Let's build this together
-                  </span>
-                </span>
+              <Link to="/join" className="btn btn--primary btn--lg">
+                Join UBLDA
+                <ArrowIcon />
+              </Link>
+              <Link to="/events" className="btn btn--ghost btn--lg">
+                See upcoming events
               </Link>
             </div>
           </div>
         </div>
-
-        <div className="hero__gradient" aria-hidden="true" />
       </section>
 
-      {/* ─── Mission ─── */}
       <section className="section mission">
         <div className="container">
-          <Reveal>
-            <h2 className="mission__headline">
-              We think disability inclusion should be built into business, not bolted on.{' '}
-              <em>That starts here, at Ross.</em>
-            </h2>
-          </Reveal>
+          <h2 className="mission__headline">
+            We think disability inclusion should be built into business, not bolted on.
+            That starts here, at Ross.
+          </h2>
         </div>
       </section>
 
-      {/* ─── Pillars ─── */}
       <section className="section pillars">
         <div className="container">
-          <Reveal>
-            <p className="section__label">What We Do</p>
-          </Reveal>
-          <RevealStagger className="pillars__grid">
+          <h2 className="pillars__headline">What we do</h2>
+          <div className="pillars__grid">
             {pillars.map((pillar) => (
-              <RevealChild key={pillar.title} className="pillar-card">
-                <span className="pillar-card__number">{pillar.icon}</span>
-                <h3 className="pillar-card__title">{pillar.title}</h3>
-                <p className="pillar-card__desc">{pillar.description}</p>
-              </RevealChild>
-            ))}
-          </RevealStagger>
-        </div>
-      </section>
-
-      {/* ─── Partnership + Benefits ─── */}
-      <section className="section partnership">
-        <div className="container">
-          <div className="partnership__layout">
-            <div className="partnership__info">
-              <Reveal>
-                <p className="section__label">Our Network</p>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <h2 className="partnership__headline">
-                  Partnered with <em>BLDA</em> at Ross
-                </h2>
-              </Reveal>
-              <Reveal delay={0.2}>
-                <p className="partnership__desc">
-                  We're the undergraduate chapter of Business Leaders for Diverse Abilities (BLDA),
-                  Ross's MBA disability advocacy organization. Members tap into BLDA's MBA network,
-                  mentorship, and guidance that most Ross undergrads never touch.
-                </p>
-              </Reveal>
-            </div>
-            <div className="partnership__benefits">
-              <Reveal delay={0.15}>
-                <p className="partnership__benefits-label">What members get</p>
-              </Reveal>
-              <RevealStagger className="benefits__grid">
-                {benefits.map((b) => (
-                  <RevealChild key={b.label} className="benefit-tag">
-                    {b.label}
-                  </RevealChild>
-                ))}
-              </RevealStagger>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Our Community ─── */}
-      <section className="section community">
-        <div className="container">
-          <Reveal delay={0.1}>
-            <h2 className="community__headline">
-              Who we work with
-            </h2>
-          </Reveal>
-        </div>
-        <div className="community__marquee" aria-label="Partner organizations">
-          <div className="community__track">
-            {[...Array(4)].map((_, setIndex) => (
-              <div className="community__logo-set" key={setIndex} aria-hidden={setIndex > 0}>
-                <div className="community__logo-item">
-                  <img src="/partners-ross.png" alt="Michigan Ross School of Business" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
-                  <img src="/partners-occb.png" alt="Office of Community, Culture, and Belonging" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
-                  <img src="/partners-blda.webp" alt="Business Leaders for Diverse Abilities" className="community__logo--blda" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
-                  <img src="/partners-nestidd.png" alt="Nestidd" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
-                  <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" loading="lazy" decoding="async" />
-                </div>
+              <div key={pillar.title} className="pillar">
+                <h3 className="pillar__title">{pillar.title}</h3>
+                <p className="pillar__desc">{pillar.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Coming Fall 2026 ─── */}
+      <section className="section partnership">
+        <div className="container">
+          <div className="partnership__layout">
+            <div className="partnership__info">
+              <h2 className="partnership__headline">
+                Partnered with BLDA at Ross
+              </h2>
+              <p className="partnership__desc">
+                We're the undergraduate chapter of Business Leaders for Diverse Abilities (BLDA),
+                Ross's MBA disability advocacy organization. Members tap into BLDA's MBA network,
+                mentorship, and guidance that most Ross undergrads never touch.
+              </p>
+            </div>
+            <div className="partnership__benefits">
+              <h3 className="partnership__benefits-title">What members get</h3>
+              <ul className="benefits__list">
+                {benefits.map((label) => (
+                  <li key={label} className="benefits__item">{label}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section community">
+        <div className="container">
+          <h2 className="community__headline">Who we work with</h2>
+          <ul className="community__logos" aria-label="Partner organizations">
+            {partners.map((p) => (
+              <li key={p.src} className="community__logo-item">
+                <img
+                  src={p.src}
+                  alt={p.alt}
+                  className={p.className}
+                  style={{ '--logo-h': `${p.height}px` } as React.CSSProperties}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="section advisory-callout">
+        <div className="container">
+          <div className="advisory-callout__layout">
+            <div className="advisory-callout__info">
+              <h2 className="advisory-callout__headline">UBLDA Advisory</h2>
+              <p className="advisory-callout__desc">
+                Our consulting program. Small teams of members work with a real client on a
+                scoped accessibility project over the semester, with weekly deliverables and a
+                final presentation to the client.
+              </p>
+              <Link to="/advisory" className="link-arrow">
+                Learn about Advisory
+                <ArrowIcon />
+              </Link>
+            </div>
+            <div className="advisory-callout__notice">
+              <p className="advisory-callout__notice-title">Fall 2026 recruitment</p>
+              <p className="advisory-callout__notice-desc">
+                Application details and dates are coming soon. Members on the mailing list
+                hear first.
+              </p>
+              <Link to="/join" className="advisory-callout__notice-link">
+                Join the mailing list
+                <ArrowIcon />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section upcoming-programs">
         <div className="container">
-          <Reveal>
-            <p className="section__label">Coming Fall 2026</p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="upcoming__headline">
-              New programs, <em>new momentum.</em>
-            </h2>
-          </Reveal>
-          <RevealStagger className="upcoming__grid">
+          <h2 className="upcoming__headline">Coming Fall 2026</h2>
+          <div className="upcoming__list">
             {upcoming.map((item) => (
-              <RevealChild key={item.title} className="upcoming-card">
-                <h3 className="upcoming-card__title">{item.title}</h3>
-                <p className="upcoming-card__desc">{item.desc}</p>
-              </RevealChild>
+              <div key={item.title} className="upcoming-item">
+                <h3 className="upcoming-item__title">{item.title}</h3>
+                <p className="upcoming-item__desc">{item.desc}</p>
+              </div>
             ))}
-          </RevealStagger>
+          </div>
         </div>
       </section>
 
-      {/* ─── Leadership ─── */}
       <section className="section leadership">
         <div className="container">
-          <Reveal>
-            <h2 className="leadership__headline">
-              The people behind the mission.
-            </h2>
-          </Reveal>
+          <div className="leadership__head">
+            <h2 className="leadership__headline">The people behind the mission</h2>
+            <Link to="/team" className="link-arrow">
+              Meet the full team
+              <ArrowIcon />
+            </Link>
+          </div>
 
-          <RevealStagger className="leadership__grid">
-            {exec.map((person) => (
-              <RevealChild key={person.name} className="person-card">
-                <div className="person-card__avatar">
+          <ul className="leadership__grid">
+            {[...exec, ...vps].map((person) => (
+              <li key={person.name} className="person-card">
+                <div className="person-card__avatar" aria-hidden="true">
                   {person.initials}
                 </div>
-                <h4 className="person-card__name">{person.name}</h4>
-                <p className="person-card__role">{person.role}</p>
+                <div className="person-card__info">
+                  <p className="person-card__name">{person.name}</p>
+                  <p className="person-card__role">{person.role}</p>
+                </div>
                 <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="person-card__linkedin" aria-label={`${person.name} on LinkedIn`}>
                   <LinkedInIcon />
                 </a>
-              </RevealChild>
+              </li>
             ))}
-          </RevealStagger>
-
-          <RevealStagger className="leadership__grid">
-            {vps.map((person) => (
-              <RevealChild key={person.name} className="person-card">
-                <div className="person-card__avatar">
-                  {person.initials}
-                </div>
-                <h4 className="person-card__name">{person.name}</h4>
-                <p className="person-card__role">{person.role}</p>
-                <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="person-card__linkedin" aria-label={`${person.name} on LinkedIn`}>
-                  <LinkedInIcon />
-                </a>
-              </RevealChild>
-            ))}
-          </RevealStagger>
+          </ul>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="section cta">
+      <section className="cta">
         <div className="container">
-          <div className="cta__card">
-            <Reveal>
+          <div className="cta__layout">
+            <div>
               <h2 className="cta__headline">
-                Business gets better when more people are in the room.<br />
-                <em>Come be in the room.</em>
+                Business gets better when more people are in the room.
+                Come be in the room.
               </h2>
-            </Reveal>
-            <Reveal delay={0.15}>
               <p className="cta__sub">
                 Students with disabilities, allies, and future business leaders who
                 want impact built into their careers. 30 seconds to sign up.
                 Join 30+ Ross students already here.
               </p>
-            </Reveal>
-            <Reveal delay={0.25}>
-              <div className="cta__actions">
-                <Link
-                  to="/join"
-                  className="btn btn--primary btn--lg"
-                >
-                  Become a member
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </Link>
-                <a href="mailto:sbodine@umich.edu,atchiang@umich.edu,cooperry@umich.edu" className="btn btn--ghost">
-                  Contact us
-                </a>
-              </div>
-            </Reveal>
+            </div>
+            <div className="cta__actions">
+              <Link to="/join" className="btn btn--primary btn--lg">
+                Become a member
+                <ArrowIcon />
+              </Link>
+              <a href="mailto:sbodine@umich.edu,atchiang@umich.edu,cooperry@umich.edu" className="btn btn--ghost btn--lg">
+                Contact us
+              </a>
+            </div>
           </div>
         </div>
       </section>

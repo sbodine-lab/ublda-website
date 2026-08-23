@@ -1,5 +1,5 @@
 .join-page__hero {
-  padding: var(--space-40) 0 var(--space-20);
+  padding: calc(var(--space-32) + var(--space-8)) 0 var(--space-16);
 }
 
 .join-page__headline {
@@ -7,11 +7,6 @@
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: var(--space-6);
-}
-
-.join-page__headline em {
-  font-style: italic;
-  color: var(--color-teal);
 }
 
 .join-page__intro {
@@ -69,13 +64,13 @@
   font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--color-navy);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
   outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .join-form__input::placeholder {
@@ -83,34 +78,30 @@
 }
 
 .join-form__input:focus {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(43, 186, 176, 0.45);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.1);
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px var(--color-teal-soft);
 }
 
 .join-form__email-wrapper {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
   width: fit-content;
   max-width: 100%;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .join-form__email-wrapper:focus-within {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(43, 186, 176, 0.45);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.1);
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px var(--color-teal-soft);
 }
 
 .join-form__input--email {
   border: none;
   background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   width: 12ch;
   min-width: 8ch;
   flex: 0 1 auto;
@@ -126,7 +117,7 @@
 .join-form__email-suffix {
   font-family: var(--font-body);
   font-size: var(--text-base);
-  color: var(--color-gray-500);
+  color: var(--color-gray-600);
   padding-right: var(--space-3);
   white-space: nowrap;
   user-select: none;
@@ -153,14 +144,9 @@
 
 /* Success state */
 .join-form__success {
-  text-align: center;
-  padding: var(--space-16) var(--space-8);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 2px 16px rgba(5, 34, 64, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  padding: var(--space-10) 0;
+  border-top: 1px solid var(--color-navy);
+  border-bottom: 1px solid var(--color-gray-200);
 }
 
 .join-form__success-icon {
@@ -172,7 +158,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-6);
+  margin-bottom: var(--space-6);
 }
 
 .join-form__success-title {
@@ -184,8 +170,7 @@
 .join-form__success-desc {
   font-size: var(--text-lg);
   color: var(--color-gray-600);
-  max-width: 400px;
-  margin: 0 auto;
+  max-width: 440px;
   line-height: var(--leading-normal);
 }
 
@@ -201,38 +186,70 @@
 
 .join-reasons__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-  align-items: stretch;
-}
-
-.join-reasons__grid > * {
-  display: flex;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-10);
 }
 
 .reason-card {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-lg);
-  padding: var(--space-10);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  border-top: 1px solid var(--color-navy);
+  padding-top: var(--space-6);
 }
 
 .reason-card__title {
-  font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-base);
   color: var(--color-navy);
   margin-bottom: var(--space-3);
 }
 
 .reason-card__desc {
+  font-size: var(--text-base);
+  color: var(--color-gray-600);
+  line-height: var(--leading-normal);
+  text-wrap: pretty;
+}
+
+/* Advisory pointer */
+.join-advisory {
+  border-top: 1px solid var(--color-gray-100);
+}
+
+.join-advisory__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-10);
+  align-items: end;
+}
+
+.join-advisory__title {
+  font-size: var(--type-lg);
+  margin-bottom: var(--space-4);
+}
+
+.join-advisory__desc {
   font-size: var(--text-lg);
   color: var(--color-gray-600);
   line-height: var(--leading-normal);
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.join-advisory__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 500;
+  color: var(--color-navy);
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--color-gray-200);
+  transition: text-decoration-color var(--duration-fast) var(--ease-out);
+}
+
+.join-advisory__link:hover {
+  text-decoration-color: currentColor;
 }
 
 /* FAQ */
@@ -248,21 +265,17 @@
 .join-faq__list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  border-top: 1px solid var(--color-navy);
 }
 
 .join-faq__item {
-  padding: var(--space-6) var(--space-8);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-lg);
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--color-gray-200);
 }
 
 .join-faq__question {
   font-family: var(--font-body);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--color-navy);
   margin-bottom: var(--space-2);
@@ -272,6 +285,8 @@
   font-size: var(--text-base);
   color: var(--color-gray-600);
   line-height: var(--leading-normal);
+  max-width: 62ch;
+  text-wrap: pretty;
 }
 
 /* Contact */
@@ -285,18 +300,23 @@
 }
 
 .join-contact__desc {
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   color: var(--color-gray-600);
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 560px;
   line-height: var(--leading-normal);
+  text-wrap: pretty;
 }
 
 .join-contact__email {
-  color: var(--color-teal);
+  color: var(--color-navy);
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgba(43, 186, 176, 0.3);
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--color-gray-200);
+  transition: text-decoration-color var(--duration-fast) var(--ease-out);
+}
+
+.join-contact__email:hover {
+  text-decoration-color: currentColor;
 }
 
 @media (max-width: 768px) {
@@ -332,7 +352,17 @@
   }
 
   .join-form__success {
-    padding: var(--space-10) var(--space-6);
+    padding: var(--space-8) 0;
+  }
+
+  .join-advisory__layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .join-advisory__desc {
+    font-size: var(--text-base);
   }
 
   .join-form__success-title {
@@ -349,19 +379,7 @@
 
   .join-reasons__grid {
     grid-template-columns: 1fr;
-    gap: var(--space-3);
-  }
-
-  .reason-card {
-    padding: var(--space-6);
-  }
-
-  .reason-card__title {
-    font-size: var(--text-xl);
-  }
-
-  .reason-card__desc {
-    font-size: var(--text-base);
+    gap: var(--space-6);
   }
 
   .join-faq__title {
@@ -369,7 +387,7 @@
   }
 
   .join-faq__item {
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-5) 0;
   }
 
   .join-faq__question {

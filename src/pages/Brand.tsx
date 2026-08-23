@@ -177,11 +177,9 @@ export default function Brand() {
           </div>
 
           <div className="brand-tip">
-            <strong>Teal italic pattern:</strong> On the website, we style select words in <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}>teal italic</em> using Instrument Serif
-            to add emphasis. Use this same pattern in social posts and slides for key words like
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> inclusion</em>,
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> belonging</em>,
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> for everyone</em>.
+            <strong>Headlines stay upright.</strong> Set headings in Instrument Serif, regular weight, roman.
+            Don't italicize single words for emphasis; if a word needs to stand out, give it weight
+            or set it in teal. Keep italics for body copy only (titles of works, a quoted phrase).
           </div>
         </div>
       </section>

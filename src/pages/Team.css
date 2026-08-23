@@ -1,5 +1,5 @@
 .team-page__hero {
-  padding: var(--space-40) 0 var(--space-20);
+  padding: calc(var(--space-32) + var(--space-8)) 0 var(--space-16);
 }
 
 .team-page__headline {
@@ -7,11 +7,8 @@
   line-height: 1.08;
   letter-spacing: -0.03em;
   margin-bottom: var(--space-6);
-}
-
-.team-page__headline em {
-  font-style: italic;
-  color: var(--color-teal);
+  max-width: 640px;
+  text-wrap: balance;
 }
 
 .team-page__intro {
@@ -26,54 +23,35 @@
   border-top: 1px solid var(--color-gray-100);
 }
 
-/* Divider label */
+/* Section title */
 .team-section__divider {
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wider);
+  font-size: var(--text-base);
+  font-weight: 600;
   color: var(--color-navy);
   padding-bottom: var(--space-4);
-  margin-bottom: var(--space-2);
-  margin-top: var(--space-8);
-  border-bottom: 1px solid var(--color-gray-100);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  border-bottom: 1px solid var(--color-navy);
 }
 
-.team-section__divider::before {
-  content: '';
-  width: 14px;
-  height: 2px;
-  background: var(--color-teal);
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-
-.team-section__divider:first-child {
-  margin-top: 0;
-}
-
-/* Grid - uniform 3-col */
+/* Grid: 3 columns of hairline rows */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--space-10);
 }
 
-/* Card - seamless, no border/bg */
 .team-card {
-  padding: var(--space-8);
-  text-align: center;
-  position: relative;
-  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--color-gray-200);
+  min-width: 0;
 }
 
 .team-card__avatar {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--color-navy);
   color: var(--color-white);
@@ -83,34 +61,46 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: var(--text-sm);
-  letter-spacing: var(--tracking-wide);
-  margin: 0 auto var(--space-5);
+  flex-shrink: 0;
+}
+
+.team-card__info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-3);
 }
 
 .team-card__name {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: var(--text-lg);
+  font-weight: 600;
+  font-size: var(--text-base);
   color: var(--color-navy);
-  margin-bottom: var(--space-1);
+  line-height: var(--leading-snug);
 }
 
 .team-card__role {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--color-gray-600);
-  margin-bottom: var(--space-3);
+  line-height: var(--leading-snug);
+  grid-row: 2;
 }
-
 
 .team-card__linkedin {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
   color: var(--color-gray-400);
+  grid-row: 1 / span 2;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .team-card__linkedin:hover {
-  color: var(--color-teal);
+  color: var(--color-navy);
 }
 
 /* Contact */
@@ -128,31 +118,11 @@
   }
 
   .team-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
-  }
-
-  .team-card {
-    padding: var(--space-6);
-  }
-
-  .team-card__avatar {
-    width: 52px;
-    height: 52px;
-  }
-
-  .team-card__name {
-    font-size: var(--text-base);
-  }
-
-  .team-card__role {
-    font-size: var(--text-sm);
-  }
-
-}
-
-@media (max-width: 400px) {
-  .team-grid {
     grid-template-columns: 1fr;
+  }
+
+  .team-contact .btn {
+    width: 100%;
+    justify-content: center;
   }
 }

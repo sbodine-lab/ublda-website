@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import './Join.css'
 
@@ -98,13 +99,9 @@ export default function Join() {
     <main id="main-content" className="join-page">
       <section className="join-page__hero">
         <div className="container">
-          <Reveal>
-            <p className="section__label">Get Involved</p>
-          </Reveal>
           <Reveal delay={0.1}>
             <h1 className="join-page__headline">
-              Your seat at<br />
-              <em>the table.</em>
+              Your seat at the table
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
@@ -246,6 +243,26 @@ export default function Join() {
         </div>
       </section>
 
+      <section className="section join-advisory">
+        <div className="container">
+          <div className="join-advisory__layout">
+            <div>
+              <h2 className="join-advisory__title">Looking for UBLDA Advisory?</h2>
+              <p className="join-advisory__desc">
+                Advisory is our selective consulting program: small member teams working with a
+                real client on an accessibility project over the semester. Fall 2026 recruitment
+                details are coming soon. General membership is open to everyone, and members hear
+                about Advisory applications first.
+              </p>
+            </div>
+            <Link to="/advisory" className="join-advisory__link">
+              About UBLDA Advisory
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section join-reasons">
         <div className="container">
           <Reveal>
@@ -283,7 +300,7 @@ export default function Join() {
       </section>
 
       <section className="section join-contact">
-        <div className="container container--narrow" style={{ textAlign: 'center' }}>
+        <div className="container">
           <Reveal>
             <h2 className="join-contact__title">Have questions first?</h2>
           </Reveal>

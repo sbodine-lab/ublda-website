@@ -33,13 +33,9 @@ export default function Team() {
     <main id="main-content" className="team-page">
       <section className="team-page__hero">
         <div className="container">
-          <Reveal>
-            <p className="section__label">Our Team</p>
-          </Reveal>
           <Reveal delay={0.1}>
             <h1 className="team-page__headline">
-              Meet the people<br />
-              <em>making it happen.</em>
+              Meet the people making it happen
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
@@ -54,7 +50,7 @@ export default function Team() {
       <section className="section team-section">
         <div className="container">
           <Reveal>
-            <div className="team-section__divider">Executive Board</div>
+            <h2 className="team-section__divider">Executive Board</h2>
           </Reveal>
           <RevealStagger className="team-grid">
             {board.map((m) => (
@@ -67,7 +63,7 @@ export default function Team() {
       </section>
 
       <section className="section team-contact">
-        <div className="container container--narrow" style={{ textAlign: 'center' }}>
+        <div className="container">
           <Reveal>
             <Link to="/join" className="btn btn--primary btn--lg">
               Become a member

@@ -70,20 +70,24 @@
   position: relative;
 }
 
-.nav__letter {
-  display: inline-block;
-  transition: transform 0.3s var(--ease-out);
+.nav__link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--duration-normal) var(--ease-out);
 }
 
-@keyframes letter-wave {
-  0%   { transform: translateY(0); }
-  40%  { transform: translateY(-3px); }
-  100% { transform: translateY(0); }
-}
-
-.nav__link:hover .nav__letter {
-  animation: letter-wave 0.4s ease-out both;
-  animation-delay: calc(var(--i, 0) * 0.04s);
+.nav__link:hover::before,
+.nav__link:focus-visible::before,
+.nav__link--active::before {
+  transform: scaleX(1);
+  transform-origin: left center;
 }
 
 .nav__link:hover {
@@ -177,16 +181,7 @@
 }
 
 /* Advisory is the consulting sub-brand and leads to its own site chrome, so it
-   reads differently at rest: heavier weight and a static outbound arrow.
-
-   Its hover is a hairline drawn under the word rather than the letter-wave the
-   other links use — a quieter gesture that suits the sub-brand. The two
-   `transform-origin` values are the point of it: growing from the left on
-   hover and collapsing to the right on leave means the line sweeps through in
-   one direction instead of retracting the way it came.
-
-   The `animation: none` is load-bearing. This link is also a `.nav__link`, so
-   without it the generic letter-wave would apply on top of the underline. */
+   reads differently at rest: heavier weight and a static outbound arrow. */
 .nav__link--advisory {
   color: var(--color-navy);
   font-weight: 600;
@@ -200,33 +195,6 @@
   transform: translateY(-2px);
 }
 
-.nav__link--advisory::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform var(--duration-normal) var(--ease-out);
-}
-
-.nav__link--advisory:hover::before,
-.nav__link--advisory:focus-visible::before {
-  transform: scaleX(1);
-  transform-origin: left center;
-}
-
-.nav__link--advisory:hover .nav__letter {
-  animation: none;
-}
-
-.nav__link--advisory:hover {
-  color: var(--color-navy);
-}
-
 .nav__mobile-link--advisory {
   color: var(--color-navy);
   font-weight: 600;
@@ -237,12 +205,8 @@
     animation: none;
   }
 
-  .nav__link:hover .nav__letter {
-    animation: none;
-  }
-
   /* Keep the underline as a state change, drop the travel. */
-  .nav__link--advisory::before {
+  .nav__link::before {
     transition: none;
   }
 }

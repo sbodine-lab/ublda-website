@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
+import AnnouncementBanner from './components/AnnouncementBanner'
 import Home from './pages/Home'
 
 const About = lazy(() => import('./pages/About'))
@@ -76,6 +77,7 @@ export default function App() {
           Skip to main content
         </a>
       )}
+      {!inStandalone && <AnnouncementBanner />}
       {!inStandalone && <Nav />}
       <ScrollToTop enabled={!inStandalone} />
       <Suspense fallback={<PageFallback />}>
