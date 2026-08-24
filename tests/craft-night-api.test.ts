@@ -51,12 +51,13 @@ const fakeResponse = (): FakeResponse => {
   return res as unknown as FakeResponse
 }
 
-test('a board member can save and revise their availability', async (t) => {
+test('a board member can save and revise their availability with a favorite', async (t) => {
   await fixture(t)
   const first = await handleCraftNightAction({
     action: 'respond',
     email: sam.email,
     available: [firstOption, secondOption],
+    favorite: firstOption,
     note: 'might run late',
   })
   assert.equal(first.status, 200)
@@ -65,15 +66,33 @@ test('a board member can save and revise their availability', async (t) => {
     action: 'respond',
     email: sam.email.toUpperCase(),
     available: [secondOption],
+    favorite: secondOption,
     note: '',
   })
   assert.equal(revised.status, 200)
 
   const state = await getCraftNightState()
-  const poll = state.body.poll as { responses: Array<{ email: string; available: string[]; note: string }> }
+  const poll = state.body.poll as {
+    responses: Array<{ email: string; available: string[]; favorite: string | null; note: string }>
+  }
   assert.equal(poll.responses.length, 1)
   assert.deepEqual(poll.responses[0].available, [secondOption])
+  assert.equal(poll.responses[0].favorite, secondOption)
   assert.equal(poll.responses[0].note, '')
+})
+
+test('a favorite outside the selected times is rejected', async (t) => {
+  await fixture(t)
+  const mismatched = await handleCraftNightAction({
+    action: 'respond',
+    email: sam.email,
+    available: [firstOption],
+    favorite: secondOption,
+  })
+  assert.equal(mismatched.status, 400)
+
+  const state = await getCraftNightState()
+  assert.equal((state.body.poll as { responses: unknown[] }).responses.length, 0)
 })
 
 test('rejects names off the roster and options off the ballot', async (t) => {

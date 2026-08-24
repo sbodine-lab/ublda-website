@@ -148,6 +148,7 @@ export function CraftNightAdminPage() {
                 <TableRow>
                   <TableHead>Option</TableHead>
                   <TableHead>Can make it</TableHead>
+                  <TableHead>Favorites</TableHead>
                   <TableHead>Missing</TableHead>
                   <TableHead><span className="sched-sr">Finalize</span></TableHead>
                 </TableRow>
@@ -167,6 +168,9 @@ export function CraftNightAdminPage() {
                         <span className="craftadmin__time">{option.time}</span>
                       </TableCell>
                       <TableCell>{canMake.length} of {CRAFT_NIGHT_ROSTER.length}</TableCell>
+                      <TableCell>
+                        {responses.filter((response) => response.favorite === option.id).length || "0"}
+                      </TableCell>
                       <TableCell className="craftadmin__missing">
                         {missing.length === 0 ? "Nobody" : missing.map((member) => member.name.split(" ")[0]).join(", ")}
                       </TableCell>
@@ -216,8 +220,13 @@ export function CraftNightAdminPage() {
                         ) : response.available.length === 0 ? (
                           "None of the options"
                         ) : (
-                          response.available.map(shortLabel).join(", ")
+                          response.available
+                            .map((id) => (id === response.favorite ? `★ ${shortLabel(id)}` : shortLabel(id)))
+                            .join(", ")
                         )}
+                        {response?.note ? (
+                          <span className="craftadmin__note">{response.note}</span>
+                        ) : null}
                       </TableCell>
                       <TableCell className="craftadmin__cell-action">
                         {response ? (

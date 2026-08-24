@@ -48,6 +48,9 @@ const normalizeData = (raw: unknown): StoredData => {
       name: member.name,
       email: member.email,
       available: [...new Set(available)],
+      favorite: typeof response.favorite === 'string' && available.includes(response.favorite)
+        ? response.favorite
+        : null,
       note: typeof response.note === 'string' ? response.note.slice(0, CRAFT_NIGHT_NOTE_MAX) : '',
       updatedAt: typeof response.updatedAt === 'string' ? response.updatedAt : new Date(0).toISOString(),
     }
@@ -177,6 +180,10 @@ export const handleCraftNightAction = async (
       return { status: 400, body: { error: 'One of those time options does not exist.' } }
     }
     const note = cleanNote(body.note)
+    const favorite = typeof body.favorite === 'string' && body.favorite ? body.favorite : null
+    if (favorite && !available.includes(favorite)) {
+      return { status: 400, body: { error: 'Your favorite has to be one of the times you picked.' } }
+    }
     return updateData((data) => {
       if (data.status !== 'open') {
         return { status: 409, body: { error: 'This poll is closed.' } }
@@ -185,6 +192,7 @@ export const handleCraftNightAction = async (
         name: member.name,
         email: member.email,
         available,
+        favorite,
         note,
         updatedAt: now().toISOString(),
       }

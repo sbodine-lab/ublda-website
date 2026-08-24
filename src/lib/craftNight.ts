@@ -1,7 +1,7 @@
 export const CRAFT_NIGHT = {
   title: 'Board Craft Night',
   description:
-    'Craft night at Sam and Andrew’s place with dinner, drinks, and group pics while we make the Festifall poster board.',
+    'Craft night at Sam and Andrew’s place with dinner, drinks, and group pics while we make the Festifall poster board. Drop in and leave whenever.',
 } as const
 
 export type CraftNightOption = {
@@ -24,18 +24,18 @@ export const CRAFT_NIGHT_GROUPS: CraftNightGroup[] = [
     id: 'before-festifall',
     label: 'Craft night · before Festifall',
     options: [
-      { id: 'fri-aug-28', weekday: 'Friday', month: 'Aug', day: '28', time: '6:00 – 8:30 PM' },
-      { id: 'sat-aug-29', weekday: 'Saturday', month: 'Aug', day: '29', time: '5:30 – 8:30 PM' },
-      { id: 'sun-aug-30', weekday: 'Sunday', month: 'Aug', day: '30', time: '5:00 – 7:30 PM' },
+      { id: 'fri-aug-28', weekday: 'Friday', month: 'Aug', day: '28', time: 'Starts 6:00 PM' },
+      { id: 'sat-aug-29', weekday: 'Saturday', month: 'Aug', day: '29', time: 'Starts 4:30 PM' },
+      { id: 'sun-aug-30', weekday: 'Sunday', month: 'Aug', day: '30', time: 'Starts 4:00 PM' },
     ],
   },
   {
     id: 'before-mtc',
     label: 'Round two · before BBA Meet the Clubs',
     options: [
-      { id: 'thu-sep-3', weekday: 'Thursday', month: 'Sep', day: '3', time: '5:30 – 8:00 PM' },
-      { id: 'sun-sep-6', weekday: 'Sunday', month: 'Sep', day: '6', time: '5:00 – 7:30 PM' },
-      { id: 'mon-sep-7', weekday: 'Monday', month: 'Sep', day: '7', time: '5:00 – 7:30 PM', tag: 'Labor Day — no classes' },
+      { id: 'thu-sep-3', weekday: 'Thursday', month: 'Sep', day: '3', time: 'Starts 5:30 PM' },
+      { id: 'sun-sep-6', weekday: 'Sunday', month: 'Sep', day: '6', time: 'Starts 4:00 PM' },
+      { id: 'mon-sep-7', weekday: 'Monday', month: 'Sep', day: '7', time: 'Starts 4:00 PM', tag: 'Labor Day, no classes' },
     ],
   },
 ]
@@ -62,6 +62,7 @@ export type CraftNightResponse = {
   name: string
   email: string
   available: string[]
+  favorite: string | null
   note: string
   updatedAt: string
 }
