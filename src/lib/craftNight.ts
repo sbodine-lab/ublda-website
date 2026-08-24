@@ -1,7 +1,7 @@
 export const CRAFT_NIGHT = {
   title: 'Board Craft Night',
   description:
-    'Craft night at Sam and Andrew’s place with dinner, drinks, and group pics while we make the Festifall poster board. Drop in and leave whenever.',
+    'Craft night at Sam and Andrew’s place with dinner, drinks, and group pics while we build the board we use for both Festifall and BBA Meet the Clubs. Drop in and leave whenever.',
   location: 'Z West, 4th floor, Room 408',
 } as const
 
@@ -23,7 +23,7 @@ export type CraftNightGroup = {
 export const CRAFT_NIGHT_GROUPS: CraftNightGroup[] = [
   {
     id: 'before-festifall',
-    label: 'Craft night · before Festifall',
+    label: 'Before Festifall',
     options: [
       { id: 'fri-aug-28', weekday: 'Friday', month: 'Aug', day: '28', time: 'Starts 6:00 PM' },
       { id: 'sat-aug-29', weekday: 'Saturday', month: 'Aug', day: '29', time: 'Starts 4:30 PM' },
@@ -32,7 +32,7 @@ export const CRAFT_NIGHT_GROUPS: CraftNightGroup[] = [
   },
   {
     id: 'before-mtc',
-    label: 'Round two · before BBA Meet the Clubs',
+    label: 'After Festifall, before Meet the Clubs',
     options: [
       { id: 'thu-sep-3', weekday: 'Thursday', month: 'Sep', day: '3', time: 'Starts 5:30 PM' },
       { id: 'sun-sep-6', weekday: 'Sunday', month: 'Sep', day: '6', time: 'Starts 4:00 PM' },
