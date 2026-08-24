@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   CRAFT_NIGHT,
   CRAFT_NIGHT_GROUPS,
+  CRAFT_NIGHT_NOTE_MAX,
   CRAFT_NIGHT_ROSTER,
   type CraftNightPollState,
 } from '../lib/craftNight'
@@ -18,6 +19,8 @@ export default function CraftNight() {
   const [loadError, setLoadError] = useState(false)
   const [selectedEmail, setSelectedEmail] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [favorite, setFavorite] = useState('')
+  const [note, setNote] = useState('')
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -46,6 +49,8 @@ export default function CraftNight() {
     setErrorMessage('')
     const existing = responses.find((response) => response.email === email)
     setSelected(new Set(existing?.available ?? []))
+    setFavorite(existing?.favorite ?? '')
+    setNote(existing?.note ?? '')
   }
 
   const toggleOption = (optionId: string) => {
@@ -53,11 +58,17 @@ export default function CraftNight() {
     setSaveState('idle')
     setSelected((current) => {
       const next = new Set(current)
-      if (next.has(optionId)) next.delete(optionId)
-      else next.add(optionId)
+      if (next.has(optionId)) {
+        next.delete(optionId)
+        setFavorite((currentFavorite) => (currentFavorite === optionId ? '' : currentFavorite))
+      } else {
+        next.add(optionId)
+      }
       return next
     })
   }
+
+  const effectiveFavorite = selected.size === 1 ? [...selected][0] : favorite
 
   const submit = async () => {
     if (!selectedEmail || saveState === 'saving') return
@@ -71,6 +82,8 @@ export default function CraftNight() {
           action: 'respond',
           email: selectedEmail,
           available: [...selected],
+          favorite: effectiveFavorite || null,
+          note,
           website: '',
         }),
       })
@@ -167,6 +180,47 @@ export default function CraftNight() {
                   </div>
                 </div>
               ))}
+
+              {selected.size >= 2 && (
+                <div className="craft__favorite" role="group" aria-label="Your favorite time">
+                  <h3 className="craft__group-label">Your favorite</h3>
+                  <div className="craft__favorite-chips">
+                    {[...selected].sort().map((optionId) => {
+                      const option = optionById.get(optionId)
+                      if (!option) return null
+                      return (
+                        <button
+                          key={optionId}
+                          type="button"
+                          className={`craft__favorite-chip${effectiveFavorite === optionId ? ' is-selected' : ''}`}
+                          aria-pressed={effectiveFavorite === optionId}
+                          onClick={() => {
+                            setSaveState('idle')
+                            setFavorite((current) => (current === optionId ? '' : optionId))
+                          }}
+                        >
+                          {option.weekday.slice(0, 3)} {option.month} {option.day}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {selectedEmail && (
+                <input
+                  type="text"
+                  className="craft__note"
+                  value={note}
+                  maxLength={CRAFT_NIGHT_NOTE_MAX}
+                  aria-label="Anything else"
+                  placeholder="Prefer another time? Say it here"
+                  onChange={(event) => {
+                    setNote(event.target.value)
+                    setSaveState('idle')
+                  }}
+                />
+              )}
             </section>
 
             {selectedEmail && (
