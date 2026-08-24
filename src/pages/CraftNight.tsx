@@ -108,6 +108,7 @@ export default function CraftNight() {
           <img src="/logo.png" alt="UBLDA" className="craft__logo" />
           <h1 className="craft__title">{CRAFT_NIGHT.title}</h1>
           <p className="craft__description">{CRAFT_NIGHT.description}</p>
+          <p className="craft__location">{CRAFT_NIGHT.location}</p>
         </header>
 
         {loadError && (

@@ -2,6 +2,7 @@ export const CRAFT_NIGHT = {
   title: 'Board Craft Night',
   description:
     'Craft night at Sam and Andrew’s place with dinner, drinks, and group pics while we make the Festifall poster board. Drop in and leave whenever.',
+  location: 'Z West, 4th floor, Room 408',
 } as const
 
 export type CraftNightOption = {
