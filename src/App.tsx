@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import Home from './pages/Home'
+import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 
 const About = lazy(() => import('./pages/About'))
 const Events = lazy(() => import('./pages/Events'))
@@ -47,6 +48,7 @@ function PageFallback() {
 
 export default function App() {
   const { pathname } = useLocation()
+  useTabEasterEgg()
   const inStandalone = matchesPrefix(pathname, STANDALONE_PREFIXES)
   const inDecisionCenter = matchesPrefix(pathname, DECISION_PREFIXES)
   // `/links` has a <main> with no id; everywhere else the global link has a real
