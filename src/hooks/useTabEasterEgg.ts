@@ -2,11 +2,15 @@ import { useEffect } from 'react'
 
 const AWAY_TITLE = 'See you soon 👋'
 const WELCOME_TITLE = 'Welcome back 👋'
+const GREETING_MS = 2000
 
 /**
- * Swaps the tab title while the page sits in a background tab. The title the
- * page was wearing on the way out is what comes back, so pages that set their
- * own title (the Decision Center) survive the round trip.
+ * Flashes a greeting in the tab title on the way out and on the way back. Both
+ * greetings are brief: the title the page was wearing beforehand is what comes
+ * back, so pages that set their own title (the Decision Center) survive the
+ * round trip. Browsers clamp timers in hidden tabs to about one tick a second,
+ * so the goodbye can linger a moment longer than the welcome. Nobody is looking
+ * at a tab they just left.
  *
  * Only someone who actually left gets welcomed back: a page that loads in a
  * background or unfocused tab becomes visible through this same event, and
@@ -20,20 +24,24 @@ export function useTabEasterEgg() {
 
     const isGreeting = (title: string) => title === AWAY_TITLE || title === WELCOME_TITLE
 
+    function greet(title: string) {
+      document.title = title
+      timeout = setTimeout(() => {
+        document.title = pageTitle
+      }, GREETING_MS)
+    }
+
     function handleVisibilityChange() {
       clearTimeout(timeout)
       if (document.hidden) {
         if (!isGreeting(document.title)) pageTitle = document.title
-        document.title = AWAY_TITLE
         hasLeft = true
+        greet(AWAY_TITLE)
         return
       }
       if (!hasLeft) return
       hasLeft = false
-      document.title = WELCOME_TITLE
-      timeout = setTimeout(() => {
-        document.title = pageTitle
-      }, 2000)
+      greet(WELCOME_TITLE)
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
