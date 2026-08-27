@@ -272,24 +272,52 @@ export default function Consulting() {
           </h2>
           <p className="adv-lead">
             UBLDA Consulting recruitment info is coming soon. Until then,
-            come meet the team on campus this fall.
+            here is where to find us and how joining will work.
           </p>
+
+          <h3 className="adv-subhead">Meet us on campus</h3>
           <ul className="adv-events">
             <li className="adv-event">
               <span className="adv-event__when">Wed, Sep 2 &middot; 3&ndash;5 PM</span>
               <div>
-                <h3 className="adv-event__name">Festifall Central</h3>
+                <h4 className="adv-event__name">Festifall Central</h4>
                 <p className="adv-event__where">The Diag &middot; Table C43</p>
               </div>
             </li>
             <li className="adv-event">
               <span className="adv-event__when">Tue, Sep 8 &middot; 5:30&ndash;7:30 PM</span>
               <div>
-                <h3 className="adv-event__name">BBA Meet the Clubs</h3>
+                <h4 className="adv-event__name">BBA Meet the Clubs</h4>
                 <p className="adv-event__where">Ross School of Business &middot; Winter Garden</p>
               </div>
             </li>
           </ul>
+
+          <h3 className="adv-subhead">How joining works</h3>
+          <ol className="adv-steps">
+            <li className="adv-step">
+              <span className="adv-step__num" aria-hidden="true">01</span>
+              <div>
+                <h4 className="adv-step__name">
+                  Application
+                  <span className="adv-step__tag">Due date TBD</span>
+                </h4>
+                <p className="adv-step__note">
+                  A written application opens later this fall. We will post the
+                  deadline here as soon as it is set.
+                </p>
+              </div>
+            </li>
+            <li className="adv-step">
+              <span className="adv-step__num" aria-hidden="true">02</span>
+              <div>
+                <h4 className="adv-step__name">Interviews</h4>
+                <p className="adv-step__note">
+                  Interviews follow once the application closes.
+                </p>
+              </div>
+            </li>
+          </ol>
         </section>
 
         {/* Benefits */}

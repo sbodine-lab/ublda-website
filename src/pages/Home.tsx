@@ -255,6 +255,18 @@ export default function Home() {
             </RevealChild>
           </RevealStagger>
           <Reveal delay={0.2}>
+            <ol className="recruiting-steps">
+              <li className="recruiting-step">
+                <span className="recruiting-step__name">Application</span>
+                <span className="recruiting-step__detail">Due date TBD</span>
+              </li>
+              <li className="recruiting-step">
+                <span className="recruiting-step__name">Interviews</span>
+                <span className="recruiting-step__detail">After the application closes</span>
+              </li>
+            </ol>
+          </Reveal>
+          <Reveal delay={0.25}>
             <p className="recruiting-events__note">
               UBLDA Consulting recruitment info coming soon.{' '}
               <Link to="/consulting" className="recruiting-events__link">Learn about UBLDA Consulting</Link>
