@@ -8,7 +8,7 @@ import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 const About = lazy(() => import('./pages/About'))
 const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
-const Advisory = lazy(() => import('./pages/Advisory'))
+const Consulting = lazy(() => import('./pages/Consulting'))
 const Join = lazy(() => import('./pages/Join'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
@@ -22,7 +22,7 @@ const DecisionCenterEntry = lazy(() => (
 ))
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
-const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/advisory', '/craft-night']
+const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/consulting', '/advisory', '/craft-night']
 const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/operations', '/signin', '/dashboard', '/members']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
@@ -87,7 +87,9 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/events" element={<Events />} />
           <Route path="/team" element={<Team />} />
-          <Route path="/advisory" element={<Advisory />} />
+          <Route path="/consulting" element={<Consulting />} />
+          {/* The consulting arm used to live at /advisory; keep old links working. */}
+          <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />

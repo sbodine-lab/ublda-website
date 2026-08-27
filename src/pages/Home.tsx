@@ -231,6 +231,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── Fall Recruiting ─── */}
+      <section className="section recruiting-events">
+        <div className="container">
+          <Reveal>
+            <p className="section__label">Fall Recruiting</p>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <h2 className="recruiting-events__headline">
+              Come find us <em>on campus.</em>
+            </h2>
+          </Reveal>
+          <RevealStagger className="recruiting-events__grid">
+            <RevealChild className="recruiting-event-card">
+              <p className="recruiting-event-card__when">Wednesday, September 2 &middot; 3&ndash;5 PM</p>
+              <h3 className="recruiting-event-card__title">Festifall Central</h3>
+              <p className="recruiting-event-card__where">The Diag &middot; Table C43</p>
+            </RevealChild>
+            <RevealChild className="recruiting-event-card">
+              <p className="recruiting-event-card__when">Tuesday, September 8 &middot; 5:30&ndash;7:30 PM</p>
+              <h3 className="recruiting-event-card__title">BBA Meet the Clubs</h3>
+              <p className="recruiting-event-card__where">Ross School of Business &middot; Winter Garden</p>
+            </RevealChild>
+          </RevealStagger>
+          <Reveal delay={0.2}>
+            <p className="recruiting-events__note">
+              UBLDA Consulting recruitment info coming soon.{' '}
+              <Link to="/consulting" className="recruiting-events__link">Learn about UBLDA Consulting</Link>
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ─── Leadership ─── */}
       <section className="section leadership">
         <div className="container">
