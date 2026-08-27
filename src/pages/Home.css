@@ -487,6 +487,79 @@
 }
 
 /* ═══════════════════════════════════════
+   FALL RECRUITING EVENTS
+   ═══════════════════════════════════════ */
+
+.recruiting-events {
+  padding: var(--space-32) 0;
+  background: var(--color-cream);
+  border-top: 1px solid var(--color-gray-100);
+}
+
+.recruiting-events__headline {
+  font-size: var(--type-lg);
+  color: var(--color-navy);
+  margin-bottom: var(--space-12);
+}
+
+.recruiting-events__headline em {
+  font-style: italic;
+  color: var(--color-teal);
+}
+
+.recruiting-events__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.recruiting-event-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10);
+}
+
+.recruiting-event-card__when {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-teal);
+  margin-bottom: var(--space-3);
+}
+
+.recruiting-event-card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--color-navy);
+  margin-bottom: var(--space-3);
+}
+
+.recruiting-event-card__where {
+  font-size: var(--text-lg);
+  color: var(--color-gray-600, #55636e);
+}
+
+.recruiting-events__note {
+  margin-top: var(--space-8);
+  font-size: var(--text-lg);
+  color: var(--color-navy);
+}
+
+.recruiting-events__link {
+  color: var(--color-teal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.recruiting-events__link:hover,
+.recruiting-events__link:focus-visible {
+  color: var(--color-navy);
+}
+
+/* ═══════════════════════════════════════
    FEATURED EVENT
    ═══════════════════════════════════════ */
 
@@ -921,6 +994,15 @@
   .upcoming__grid {
     grid-template-columns: 1fr;
     gap: var(--space-3);
+  }
+
+  .recruiting-events__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .recruiting-event-card {
+    padding: var(--space-6);
   }
 
   .upcoming-card {

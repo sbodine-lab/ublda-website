@@ -4,7 +4,7 @@ import { useReducedMotion } from 'framer-motion'
 import { MeshGradient } from '@paper-design/shaders-react'
 import Lenis from 'lenis'
 import { Mail } from 'lucide-react'
-import './Advisory.css'
+import './Consulting.css'
 
 const SHADER_COLORS = ['#0B1F2F', '#14374E', '#2BBAB0', '#091E2A']
 
@@ -101,10 +101,10 @@ const leaders = [
   },
 ]
 
-/* The Advisory sub-brand runs on its own chrome — separate nav and footer —
+/* The Consulting sub-brand runs on its own chrome — separate nav and footer —
    so entering it reads as stepping into a standalone site. The wordmark is
    the way back to the parent site. */
-function AdvisoryNav() {
+function ConsultingNav() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -117,20 +117,21 @@ function AdvisoryNav() {
   return (
     <header className={`adv-nav ${scrolled ? 'adv-nav--scrolled' : ''}`}>
       <div className="adv-nav__inner">
-        <Link to="/" className="adv-nav__lockup" aria-label="UBLDA Advisory — return to the main UBLDA site">
+        <Link to="/" className="adv-nav__lockup" aria-label="UBLDA Consulting — return to the main UBLDA site">
           <span className="adv-nav__wordmark">
             <strong>UBLDA</strong>
             <span className="adv-nav__divider" aria-hidden="true" />
-            Advisory
+            Consulting
           </span>
         </Link>
-        <nav className="adv-nav__links" aria-label="Advisory sections">
-          <a href="#advisory-services" className="adv-nav__link">Services</a>
-          <a href="#advisory-clients" className="adv-nav__link">Clients</a>
-          <a href="#advisory-leaders" className="adv-nav__link">Leaders</a>
+        <nav className="adv-nav__links" aria-label="Consulting sections">
+          <a href="#consulting-recruiting" className="adv-nav__link">Recruiting</a>
+          <a href="#consulting-services" className="adv-nav__link">Services</a>
+          <a href="#consulting-clients" className="adv-nav__link">Clients</a>
+          <a href="#consulting-leaders" className="adv-nav__link">Leaders</a>
         </nav>
         <a
-          href="mailto:sbodine@umich.edu?subject=UBLDA%20Advisory%20inquiry"
+          href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry"
           className="adv-nav__cta"
         >
           <span className="adv-nav__cta-full">Start a conversation</span>
@@ -142,14 +143,14 @@ function AdvisoryNav() {
   )
 }
 
-function AdvisoryFooter() {
+function ConsultingFooter() {
   return (
     <footer className="adv-footer">
       <div className="adv-body">
         <div className="adv-footer__grid">
           <div className="adv-footer__brand">
             <span className="adv-footer__wordmark">
-              <strong>UBLDA</strong> Advisory
+              <strong>UBLDA</strong> Consulting
             </span>
             <p className="adv-footer__tagline">
               Accessibility consulting by the Undergraduate Business Leaders
@@ -157,11 +158,12 @@ function AdvisoryFooter() {
             </p>
           </div>
           <div className="adv-footer__col">
-            <h4 className="adv-footer__heading">Advisory</h4>
-            <a href="#advisory-services" className="adv-footer__link">Services</a>
-            <a href="#advisory-clients" className="adv-footer__link">Clients</a>
-            <a href="#advisory-leaders" className="adv-footer__link">Leaders</a>
-            <a href="mailto:sbodine@umich.edu?subject=UBLDA%20Advisory%20inquiry" className="adv-footer__link">Contact us</a>
+            <h4 className="adv-footer__heading">Consulting</h4>
+            <a href="#consulting-recruiting" className="adv-footer__link">Recruiting</a>
+            <a href="#consulting-services" className="adv-footer__link">Services</a>
+            <a href="#consulting-clients" className="adv-footer__link">Clients</a>
+            <a href="#consulting-leaders" className="adv-footer__link">Leaders</a>
+            <a href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry" className="adv-footer__link">Contact us</a>
           </div>
           <div className="adv-footer__col">
             <h4 className="adv-footer__heading">UBLDA</h4>
@@ -172,14 +174,14 @@ function AdvisoryFooter() {
           </div>
         </div>
         <div className="adv-footer__bottom">
-          <p>&copy; {new Date().getFullYear()} UBLDA Advisory &middot; Part of UBLDA, University of Michigan &middot; Stephen M. Ross School of Business</p>
+          <p>&copy; {new Date().getFullYear()} UBLDA Consulting &middot; Part of UBLDA, University of Michigan &middot; Stephen M. Ross School of Business</p>
         </div>
       </div>
     </footer>
   )
 }
 
-export default function Advisory() {
+export default function Consulting() {
   const reducedMotion = useReducedMotion()
   const speed = reducedMotion ? 0 : 0.2
 
@@ -213,7 +215,7 @@ export default function Advisory() {
 
   return (
     <div className="adv-site">
-      <AdvisoryNav />
+      <ConsultingNav />
       <main id="main-content" className="adv">
       {/* Full-bleed shader hero, title bottom-left */}
       <section className="adv-hero">
@@ -229,7 +231,7 @@ export default function Advisory() {
         <div className="adv-hero__lockup">
           <h1 className="adv-hero__title">
             <span className="adv-hero__parent">UBLDA</span><br />
-            <span className="adv-hero__sub">Advisory</span>
+            <span className="adv-hero__sub">Consulting</span>
           </h1>
         </div>
       </section>
@@ -255,12 +257,39 @@ export default function Advisory() {
             Our mission,<br />your access
           </h2>
           <p className="adv-lead">
-            UBLDA Advisory is the accessibility consulting practice of UBLDA
+            UBLDA Consulting is the accessibility consulting arm of UBLDA
             at Michigan Ross. We work with organizations on the barriers that
             keep disabled people out of their websites, their documents, their
             events, and their hiring. Our consultants include disabled
             students, which shapes what we notice and what we push on.
           </p>
+        </section>
+
+        {/* Fall recruiting */}
+        <section className="adv-section" id="consulting-recruiting">
+          <h2 className="adv-h2 adv-h2--accent">
+            Fall 2026<br />recruiting
+          </h2>
+          <p className="adv-lead">
+            UBLDA Consulting recruitment info is coming soon. Until then,
+            come meet the team on campus this fall.
+          </p>
+          <ul className="adv-events">
+            <li className="adv-event">
+              <span className="adv-event__when">Wed, Sep 2 &middot; 3&ndash;5 PM</span>
+              <div>
+                <h3 className="adv-event__name">Festifall Central</h3>
+                <p className="adv-event__where">The Diag &middot; Table C43</p>
+              </div>
+            </li>
+            <li className="adv-event">
+              <span className="adv-event__when">Tue, Sep 8 &middot; 5:30&ndash;7:30 PM</span>
+              <div>
+                <h3 className="adv-event__name">BBA Meet the Clubs</h3>
+                <p className="adv-event__where">Ross School of Business &middot; Winter Garden</p>
+              </div>
+            </li>
+          </ul>
         </section>
 
         {/* Benefits */}
@@ -282,7 +311,7 @@ export default function Advisory() {
         </section>
 
         {/* Services */}
-        <section className="adv-section" id="advisory-services">
+        <section className="adv-section" id="consulting-services">
           <h2 className="adv-h2 adv-h2--accent">
             For every barrier,<br />a practical fix
           </h2>
@@ -302,10 +331,10 @@ export default function Advisory() {
       </div>
 
       {/* Clients — dark full-width band */}
-      <section className="adv-dark" id="advisory-clients">
+      <section className="adv-dark" id="consulting-clients">
         <div className="adv-body">
           <h2 className="adv-h2 adv-h2--light">
-            Advisory services<br />in action
+            Consulting services<br />in action
           </h2>
           <div className="adv-clients">
             <article className="adv-client">
@@ -346,7 +375,7 @@ export default function Advisory() {
                 hear from you.
               </p>
               <a
-                href="mailto:sbodine@umich.edu?subject=UBLDA%20Advisory%20inquiry"
+                href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry"
                 className="adv-pill adv-client__pill"
               >
                 Get in touch
@@ -358,7 +387,7 @@ export default function Advisory() {
 
       <div className="adv-body">
         {/* Leaders */}
-        <section className="adv-section" id="advisory-leaders">
+        <section className="adv-section" id="consulting-leaders">
           <h2 className="adv-h2 adv-h2--accent">
             Get in touch with<br />our leaders today
           </h2>
@@ -398,7 +427,7 @@ export default function Advisory() {
             one confident statement, three concrete numbers, one door in. */}
         <section className="adv-section adv-manifesto">
           <p className="adv-manifesto__text">
-            We started UBLDA Advisory because accessibility kept landing last
+            We started UBLDA Consulting because accessibility kept landing last
             on every roadmap. Our consultants live with the consequences.
             We put it first.
           </p>
@@ -422,7 +451,7 @@ export default function Advisory() {
         </section>
       </div>
       </main>
-      <AdvisoryFooter />
+      <ConsultingFooter />
     </div>
   )
 }

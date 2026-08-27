@@ -1,5 +1,5 @@
 /* ============================================================================
-   UBLDA Advisory — sub-brand page.
+   UBLDA Consulting — sub-brand page.
    Deliberately its own visual system (grotesque sans, white canvas,
    monochrome navy) distinct from the marketing site's serif/cream language, the way a
    private-bank sub-brand sits inside a parent brand. Scoped under .adv.
@@ -51,7 +51,7 @@
 }
 
 /* Premium scrollbar for the sub-brand: thin, rounded, brand-inked. Applied to
-   <html> while the Advisory page is mounted. */
+   <html> while the Consulting page is mounted. */
 html.adv-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--color-navy) #eef1f2;
@@ -298,7 +298,8 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
 }
 
 .adv-h2 {
-  font-size: 1.75rem;
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  letter-spacing: -0.01em;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: var(--space-8);
@@ -421,6 +422,11 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   color: var(--adv-muted);
   letter-spacing: 0.06em;
   padding-top: 5px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.adv-benefit:hover .adv-benefit__num {
+  color: var(--adv-accent);
 }
 
 .adv-benefit__title {
@@ -443,6 +449,13 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
 .adv-service {
   padding: var(--space-6) 0;
   border-bottom: 1px solid var(--adv-hairline);
+  transition: padding-left var(--duration-normal) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .adv-service:hover {
+    padding-left: var(--space-3);
+  }
 }
 
 .adv-service__name {
@@ -467,6 +480,17 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
 .adv-clients {
   display: grid;
   gap: var(--space-6);
+}
+
+@media (min-width: 760px) {
+  .adv-clients {
+    grid-template-columns: 3fr 2fr;
+    align-items: stretch;
+  }
+
+  .adv-client--open {
+    min-height: 0;
+  }
 }
 
 .adv-client {
@@ -598,6 +622,17 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   border-radius: var(--radius-md);
   padding: var(--space-8) var(--space-6);
   text-align: center;
+  transition: border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .adv-person:hover {
+    border-color: var(--adv-accent);
+    box-shadow: 0 12px 32px rgba(15, 43, 60, 0.1);
+    transform: translateY(-3px);
+  }
 }
 
 .adv-person__avatar {
@@ -689,6 +724,41 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   color: var(--adv-ink);
 }
 
+/* ─── Fall recruiting events ─── */
+.adv-events {
+  border-top: 1px solid var(--adv-hairline);
+}
+
+.adv-event {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-6);
+  align-items: baseline;
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--adv-hairline);
+}
+
+.adv-event__when {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adv-muted);
+  white-space: nowrap;
+}
+
+.adv-event__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.adv-event__where {
+  margin-top: var(--space-1);
+  font-size: 1rem;
+  color: var(--adv-muted);
+  max-width: none;
+}
+
 /* Last section needs breathing room above the footer. */
 .adv > .adv-body:last-child {
   padding-bottom: var(--space-20);
@@ -739,5 +809,10 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
 
   .adv-client {
     min-height: 340px;
+  }
+
+  .adv-event {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
   }
 }
