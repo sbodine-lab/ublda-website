@@ -541,6 +541,38 @@
   color: var(--color-gray-600, #55636e);
 }
 
+.recruiting-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  list-style: none;
+  padding: 0;
+}
+
+.recruiting-step {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex: 1 1 260px;
+  border-top: 1px solid var(--color-gray-100);
+  padding-top: var(--space-4);
+}
+
+.recruiting-step__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-navy);
+  white-space: nowrap;
+}
+
+.recruiting-step__detail {
+  font-size: var(--text-base);
+  color: var(--color-gray-600, #55636e);
+}
+
 .recruiting-events__note {
   margin-top: var(--space-8);
   font-size: var(--text-lg);
@@ -1003,6 +1035,10 @@
 
   .recruiting-event-card {
     padding: var(--space-6);
+  }
+
+  .recruiting-step {
+    flex: 1 1 100%;
   }
 
   .upcoming-card {

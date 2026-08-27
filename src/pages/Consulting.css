@@ -724,7 +724,21 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   color: var(--adv-ink);
 }
 
-/* ─── Fall recruiting events ─── */
+/* ─── Fall recruiting: events + application steps ─── */
+.adv-subhead {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adv-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* Steps follow the events list, so they need air above the label. */
+.adv-events + .adv-subhead {
+  margin-top: var(--space-10);
+}
+
 .adv-events {
   border-top: 1px solid var(--adv-hairline);
 }
@@ -757,6 +771,55 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   font-size: 1rem;
   color: var(--adv-muted);
   max-width: none;
+}
+
+.adv-steps {
+  border-top: 1px solid var(--adv-hairline);
+}
+
+.adv-step {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--adv-hairline);
+}
+
+.adv-step__num {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--adv-muted);
+  letter-spacing: 0.06em;
+  padding-top: 5px;
+}
+
+.adv-step__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+/* "Due date TBD" reads as a status, so it gets a chip rather than body text. */
+.adv-step__tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adv-muted);
+  border: 1px solid var(--adv-hairline);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-3);
+  white-space: nowrap;
+}
+
+.adv-step__note {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--adv-ink);
+  max-width: 60ch;
 }
 
 /* Last section needs breathing room above the footer. */
