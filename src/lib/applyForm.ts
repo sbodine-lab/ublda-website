@@ -3,7 +3,20 @@
    Convex mutation in convex/applications.ts re-checks the same caps. */
 
 export const APPLY_TERM_LABEL = 'Fall 2026'
-export const APPLY_DEADLINE_LABEL = 'Sunday, September 13 at 11:59 PM ET'
+export const APPLY_OPENS_LABEL = 'Wednesday, September 9'
+export const APPLY_DEADLINE_LABEL = 'Sunday, September 20 at 11:59 PM ET'
+
+/* The application opens the morning after BBA Meet the Clubs (Sep 8) so both
+   tabling events feed the same window, and closes Sunday Sep 20 at 11:59 PM ET
+   with a small server-side grace period. Times below are UTC. */
+export const APPLY_OPENS_AT_MS = Date.UTC(2026, 8, 9, 4, 0, 0) // Sep 9, 12:00 AM ET
+export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 21, 8, 0, 0) // Sep 21, 4:00 AM ET
+
+export type ApplyWindow = 'before' | 'open' | 'closed'
+
+export const applyWindow = (now: number): ApplyWindow => (
+  now < APPLY_OPENS_AT_MS ? 'before' : now < APPLY_CLOSES_AT_MS ? 'open' : 'closed'
+)
 
 export const APPLY_YEARS = ['Freshman', 'Sophomore', 'Junior', 'Senior'] as const
 

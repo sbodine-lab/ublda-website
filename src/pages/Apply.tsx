@@ -1,26 +1,40 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import {
   APPLY_DEADLINE_LABEL,
   APPLY_ESSAY_WORD_TARGET,
   APPLY_LIMITS,
+  APPLY_OPENS_LABEL,
   APPLY_ROLE_OPTIONS,
   APPLY_YEARS,
+  applyWindow,
   countWords,
   resumeUrlOk,
   type ApplyRoleInterest,
+  type ApplyWindow,
 } from '../lib/applyForm'
 import './Join.css'
 import './Apply.css'
 
 const steps = [
-  { name: 'Apply', detail: 'Due Sunday, Sept 13 · 11:59 PM ET' },
-  { name: 'Interview', detail: 'Sept 15–17 · 30 minutes, at Ross' },
-  { name: 'Offers', detail: 'By Saturday, Sept 19' },
-  { name: 'Kickoff', detail: 'Week of Sept 21' },
+  { name: 'Apply', detail: 'Sept 9–20 · closes 11:59 PM ET' },
+  { name: 'Interview', detail: 'Sept 22–24 · 30 minutes, at Ross' },
+  { name: 'Offers', detail: 'By Saturday, Sept 26' },
+  { name: 'Kickoff', detail: 'Week of Sept 28' },
 ]
 
+/* ?preview=open|closed lets the team see the other states before the window
+   flips; the API still enforces the real dates. */
+const currentWindow = (): ApplyWindow => {
+  const preview = new URLSearchParams(window.location.search).get('preview')
+  if (preview === 'open' || preview === 'closed') return preview
+  if (preview === 'before') return 'before'
+  return applyWindow(Date.now())
+}
+
 export default function Apply() {
+  const [window_] = useState<ApplyWindow>(currentWindow)
   const [submitted, setSubmitted] = useState(false)
   const [resubmission, setResubmission] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -121,7 +135,9 @@ export default function Apply() {
           </Reveal>
           <Reveal delay={0.3}>
             <p className="apply-deadline" role="note">
-              Applications close {APPLY_DEADLINE_LABEL}.
+              {window_ === 'before' && <>Applications open {APPLY_OPENS_LABEL}.</>}
+              {window_ === 'open' && <>Applications close {APPLY_DEADLINE_LABEL}.</>}
+              {window_ === 'closed' && <>Fall 2026 applications closed September 20.</>}
             </p>
           </Reveal>
         </div>
@@ -146,7 +162,38 @@ export default function Apply() {
             <h2 className="join-form__title">Fall 2026 Application</h2>
           </Reveal>
 
-          {submitted ? (
+          {window_ !== 'open' ? (
+            <Reveal>
+              <div className="apply-notice">
+                {window_ === 'before' ? (
+                  <>
+                    <h3 className="apply-notice__title">Opens {APPLY_OPENS_LABEL}</h3>
+                    <p className="apply-notice__desc">
+                      Come meet the team first: Festifall on Wednesday, Sept 2
+                      (Table C43, the Diag) and BBA Meet the Clubs on Tuesday,
+                      Sept 8. The application goes live here the next morning
+                      and takes about ten minutes.
+                    </p>
+                    <p className="apply-notice__desc">
+                      <Link to="/join" className="join-contact__email">Join the mailing list</Link>
+                      {' '}and we'll email you the moment it opens.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="apply-notice__title">Applications closed September 20</h3>
+                    <p className="apply-notice__desc">
+                      Missed it? Email{' '}
+                      <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>
+                      {' '}— late applications are read if seats remain — or{' '}
+                      <Link to="/join" className="join-contact__email">join the mailing list</Link>
+                      {' '}for the winter cycle.
+                    </p>
+                  </>
+                )}
+              </div>
+            </Reveal>
+          ) : submitted ? (
             <Reveal>
               <div className="join-form__success" role="alert" aria-live="polite">
                 <div className="join-form__success-icon">
@@ -159,7 +206,7 @@ export default function Apply() {
                   {resubmission
                     ? 'We already had an application from you; this newest one is the one we read. '
                     : ''}
-                  Interview invites go out Monday, September 14. Questions before then:{' '}
+                  Interview invites go out Monday, September 21. Questions before then:{' '}
                   <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>.
                 </p>
               </div>
@@ -317,7 +364,7 @@ export default function Apply() {
                     required
                   />
                   <span>
-                    I can make a 30-minute interview September 15–17 (evenings) and roughly
+                    I can make a 30-minute interview September 22–24 (evenings) and roughly
                     4–5 hours a week for the fall project.
                   </span>
                 </label>
@@ -368,6 +415,7 @@ export default function Apply() {
         </div>
       </section>
 
+      {window_ !== 'closed' && (
       <section className="section join-contact">
         <div className="container container--narrow" style={{ textAlign: 'center' }}>
           <Reveal>
@@ -382,6 +430,7 @@ export default function Apply() {
           </Reveal>
         </div>
       </section>
+      )}
     </main>
   )
 }

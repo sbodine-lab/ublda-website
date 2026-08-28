@@ -13,6 +13,7 @@ import {
   APPLY_LIMITS,
   APPLY_ROLE_OPTIONS,
   APPLY_YEARS,
+  applyWindow,
   emailFormatOk,
   isUmichEmail,
   resumeUrlOk,
@@ -39,6 +40,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Bots that fill every field trip the honeypot; answer as if it worked.
   if (acceptsHoneypot(req.body)) {
     return res.status(200).json({ success: true })
+  }
+
+  const window = applyWindow(Date.now())
+  if (window === 'before') {
+    return res.status(400).json({ error: 'Applications open September 9.' })
+  }
+  if (window === 'closed') {
+    return res.status(400).json({ error: 'Applications closed September 20. Email sbodine@umich.edu about late submissions.' })
   }
 
   const body = bodyRecord(req.body)

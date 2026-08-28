@@ -271,8 +271,9 @@ export default function Consulting() {
             Fall 2026<br />recruiting
           </h2>
           <p className="adv-lead">
-            Applications for the Fall 2026 team are open through Sunday,
-            September 13. Here is where to find us and how joining works.
+            Applications for the Fall 2026 team open Wednesday, September 9
+            and close Sunday, September 20. Here is where to find us and how
+            joining works.
           </p>
 
           <h3 className="adv-subhead">Meet us on campus</h3>
@@ -300,12 +301,12 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">
                   Application
-                  <span className="adv-step__tag">Due Sun, Sept 13</span>
+                  <span className="adv-step__tag">Sept 9&ndash;20</span>
                 </h4>
                 <p className="adv-step__note">
-                  About ten minutes at <Link to="/apply" className="adv-link">ublda.org/apply</Link>:
-                  two short answers, a resume link if you have one, done. Closes
-                  Sunday, September 13 at 11:59 PM ET.
+                  Opens Wednesday, September 9 at <Link to="/apply" className="adv-link">ublda.org/apply</Link>{' '}
+                  and takes about ten minutes: two short answers, a resume link
+                  if you have one, done. Closes Sunday, September 20 at 11:59 PM ET.
                 </p>
               </div>
             </li>
@@ -314,9 +315,9 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">Interviews</h4>
                 <p className="adv-step__note">
-                  A 30-minute conversation at Ross, September 15&ndash;17 in the
-                  evenings. Offers go out by September 19 and the team kicks off
-                  the week of September 21.
+                  A 30-minute conversation at Ross, September 22&ndash;24 in the
+                  evenings. Offers go out by September 26 and the team kicks off
+                  the week of September 28.
                 </p>
               </div>
             </li>
