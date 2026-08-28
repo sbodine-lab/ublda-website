@@ -10,6 +10,7 @@ const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
 const Consulting = lazy(() => import('./pages/Consulting'))
 const Join = lazy(() => import('./pages/Join'))
+const Apply = lazy(() => import('./pages/Apply'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
 const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
@@ -91,6 +92,7 @@ export default function App() {
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
+          <Route path="/apply" element={<Apply />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />
           <Route path="/links" element={<Links />} />

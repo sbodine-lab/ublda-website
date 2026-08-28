@@ -271,8 +271,8 @@ export default function Consulting() {
             Fall 2026<br />recruiting
           </h2>
           <p className="adv-lead">
-            UBLDA Consulting recruitment info is coming soon. Until then,
-            here is where to find us and how joining will work.
+            Applications for the Fall 2026 team are open through Sunday,
+            September 13. Here is where to find us and how joining works.
           </p>
 
           <h3 className="adv-subhead">Meet us on campus</h3>
@@ -300,11 +300,12 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">
                   Application
-                  <span className="adv-step__tag">Due date TBD</span>
+                  <span className="adv-step__tag">Due Sun, Sept 13</span>
                 </h4>
                 <p className="adv-step__note">
-                  A written application opens later this fall. We will post the
-                  deadline here as soon as it is set.
+                  About ten minutes at <Link to="/apply" className="adv-link">ublda.org/apply</Link>:
+                  two short answers, a resume link if you have one, done. Closes
+                  Sunday, September 13 at 11:59 PM ET.
                 </p>
               </div>
             </li>
@@ -313,11 +314,18 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">Interviews</h4>
                 <p className="adv-step__note">
-                  Interviews follow once the application closes.
+                  A 30-minute conversation at Ross, September 15&ndash;17 in the
+                  evenings. Offers go out by September 19 and the team kicks off
+                  the week of September 21.
                 </p>
               </div>
             </li>
           </ol>
+
+          <Link to="/apply" className="adv-pill adv-pill--wide">
+            Apply for Fall 2026
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
         </section>
 
         {/* Benefits */}

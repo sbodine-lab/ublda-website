@@ -37,7 +37,7 @@ const benefits = [
 const upcoming = [
   {
     title: 'Accessibility Consulting',
-    desc: 'A selective program pairing members with real businesses and campus orgs to audit and improve their accessibility practices.',
+    desc: 'Live now: a selective analyst team working with a real client on a real engagement this fall. Applications close September 13; the winter client is announced in October.',
   },
   {
     title: 'Mentorship & Education',
@@ -258,17 +258,19 @@ export default function Home() {
             <ol className="recruiting-steps">
               <li className="recruiting-step">
                 <span className="recruiting-step__name">Application</span>
-                <span className="recruiting-step__detail">Due date TBD</span>
+                <span className="recruiting-step__detail">Due Sun, Sept 13 &middot; 11:59 PM ET</span>
               </li>
               <li className="recruiting-step">
                 <span className="recruiting-step__name">Interviews</span>
-                <span className="recruiting-step__detail">After the application closes</span>
+                <span className="recruiting-step__detail">Sept 15&ndash;17 &middot; at Ross</span>
               </li>
             </ol>
           </Reveal>
           <Reveal delay={0.25}>
             <p className="recruiting-events__note">
-              UBLDA Consulting recruitment info coming soon.{' '}
+              Applications for the Fall 2026 consulting team are open.{' '}
+              <Link to="/apply" className="recruiting-events__link">Apply now</Link>
+              {' '}&middot;{' '}
               <Link to="/consulting" className="recruiting-events__link">Learn about UBLDA Consulting</Link>
             </p>
           </Reveal>

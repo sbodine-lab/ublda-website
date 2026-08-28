@@ -822,6 +822,19 @@ html.adv-scroll::-webkit-scrollbar-thumb:hover {
   max-width: 60ch;
 }
 
+.adv-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.adv-link:hover,
+.adv-link:focus-visible {
+  color: var(--color-teal);
+}
+
 /* Last section needs breathing room above the footer. */
 .adv > .adv-body:last-child {
   padding-bottom: var(--space-20);
