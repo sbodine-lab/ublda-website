@@ -1,0 +1,198 @@
+/* Apply page — extends the Join page form styles (Join.css is imported first). */
+
+.apply-deadline {
+  display: inline-block;
+  margin-top: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-teal-muted);
+  border-radius: var(--radius-full);
+  background: var(--color-teal-soft);
+  color: var(--color-navy);
+  font-size: var(--type-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+}
+
+.apply-steps-section {
+  padding-top: 0;
+}
+
+.apply-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: apply-step;
+}
+
+.apply-step {
+  counter-increment: apply-step;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.apply-step__name {
+  display: block;
+  font-weight: 700;
+  color: var(--color-navy);
+  font-size: var(--type-md);
+}
+
+.apply-step__name::before {
+  content: counter(apply-step, decimal-leading-zero) ' ';
+  color: var(--color-teal);
+  font-size: var(--type-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wider);
+}
+
+.apply-step__detail {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-gray-600);
+  font-size: var(--type-sm);
+  line-height: var(--leading-snug);
+}
+
+.apply-roles {
+  display: grid;
+  gap: var(--space-3);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.apply-role {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.apply-role:hover {
+  border-color: var(--color-teal-muted);
+}
+
+.apply-role--selected {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 1px var(--color-teal);
+}
+
+.apply-role__input {
+  margin-top: 0.3em;
+  accent-color: var(--color-teal);
+}
+
+.apply-role__input:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+.apply-role__label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.apply-role__detail {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-gray-600);
+  font-size: var(--type-sm);
+}
+
+.apply-textarea {
+  resize: vertical;
+  min-height: 7.5rem;
+  line-height: var(--leading-normal);
+}
+
+.apply-wordcount,
+.apply-hint {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-gray-600);
+  font-size: var(--type-sm);
+}
+
+.apply-optional {
+  color: var(--color-gray-600);
+  font-weight: 400;
+}
+
+.apply-check {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-gray-50);
+  color: var(--color-gray-800);
+  font-size: var(--type-sm);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+}
+
+.apply-check input {
+  margin-top: 0.25em;
+  accent-color: var(--color-teal);
+}
+
+.apply-check input:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+/* Off-screen, not display:none, so autofill bots still see and fill it. */
+.apply-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.apply-notice {
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.apply-notice__title {
+  font-family: var(--font-display);
+  font-size: var(--type-lg);
+  color: var(--color-navy);
+  line-height: var(--leading-tight);
+}
+
+.apply-notice__desc {
+  margin: var(--space-4) auto 0;
+  max-width: 46ch;
+  color: var(--color-gray-600);
+  line-height: var(--leading-normal);
+}
+
+.apply-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #C4462E40;
+  border-radius: var(--radius-md);
+  background: #C4462E12;
+  color: #8A2F1D;
+  font-size: var(--type-sm);
+}

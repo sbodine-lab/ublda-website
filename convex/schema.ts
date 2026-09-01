@@ -84,6 +84,11 @@ export const projectTaskPriority = v.union(
   v.literal("medium"),
   v.literal("high"),
 );
+export const applicationRoleInterest = v.union(
+  v.literal("analyst"),
+  v.literal("analyst_future_pm"),
+);
+
 export const agentScope = v.union(
   v.literal("decisions:read"),
   v.literal("decisions:write"),
@@ -318,6 +323,26 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_member", ["memberId"]),
+
+  /* Public consulting-program applications submitted from ublda.org/apply.
+     Written through api/apply.ts (honeypot + validation) via applications:submit;
+     read back by admins only. */
+  consultingApplications: defineTable({
+    term: v.string(),
+    fullName: v.string(),
+    email: v.string(),
+    year: v.string(),
+    schoolMajor: v.string(),
+    roleInterest: applicationRoleInterest,
+    whyJoin: v.string(),
+    experience: v.string(),
+    resumeUrl: v.optional(v.string()),
+    availabilityConfirmed: v.boolean(),
+    accommodations: v.optional(v.string()),
+    submittedAt: v.number(),
+  })
+    .index("by_term", ["term", "submittedAt"])
+    .index("by_term_and_email", ["term", "email"]),
 
   agentKeys: defineTable({
     name: v.string(),

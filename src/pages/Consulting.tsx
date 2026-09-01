@@ -271,8 +271,9 @@ export default function Consulting() {
             Fall 2026<br />recruiting
           </h2>
           <p className="adv-lead">
-            UBLDA Consulting recruitment info is coming soon. Until then,
-            here is where to find us and how joining will work.
+            Applications for the Fall 2026 team open Wednesday, September 9
+            and close Tuesday, September 22. Here is where to find us and how
+            joining works.
           </p>
 
           <h3 className="adv-subhead">Meet us on campus</h3>
@@ -300,11 +301,14 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">
                   Application
-                  <span className="adv-step__tag">Due date TBD</span>
+                  <span className="adv-step__tag">Sept 9&ndash;22</span>
                 </h4>
                 <p className="adv-step__note">
-                  A written application opens later this fall. We will post the
-                  deadline here as soon as it is set.
+                  Opens Wednesday, September 9 at <Link to="/apply" className="adv-link">ublda.org/apply</Link>{' '}
+                  and takes about ten minutes: two short answers, a resume link
+                  if you have one, done. Closes Tuesday, September 22 at 11:59 PM ET.
+                  Applying also signs you up as a UBLDA member &mdash; one form
+                  covers both.
                 </p>
               </div>
             </li>
@@ -313,11 +317,18 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">Interviews</h4>
                 <p className="adv-step__note">
-                  Interviews follow once the application closes.
+                  Two 30-minute conversations at Ross &mdash; one behavioral, one
+                  technical &mdash; September 25&ndash;27. Offers go out by
+                  September 29 and the team kicks off the week of October 5.
                 </p>
               </div>
             </li>
           </ol>
+
+          <Link to="/apply" className="adv-pill adv-pill--wide">
+            Apply for Fall 2026
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
         </section>
 
         {/* Benefits */}
