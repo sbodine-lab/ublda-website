@@ -18,7 +18,7 @@ import './Join.css'
 import './Apply.css'
 
 const steps = [
-  { name: 'Apply', detail: 'Sept 9–22 · closes 11:59 PM ET' },
+  { name: 'Apply', detail: 'Sept 2–20 · closes 11:30 PM ET' },
   { name: 'Interviews', detail: 'Sept 25–27 · behavioral + technical' },
   { name: 'Offers', detail: 'By Tuesday, Sept 29' },
   { name: 'Kickoff', detail: 'Week of Oct 5' },
@@ -137,7 +137,7 @@ export default function Apply() {
             <p className="apply-deadline" role="note">
               {window_ === 'before' && <>Applications open {APPLY_OPENS_LABEL}.</>}
               {window_ === 'open' && <>Applications close {APPLY_DEADLINE_LABEL}.</>}
-              {window_ === 'closed' && <>Fall 2026 applications closed September 22.</>}
+              {window_ === 'closed' && <>Fall 2026 applications closed September 20.</>}
             </p>
           </Reveal>
         </div>
@@ -169,10 +169,10 @@ export default function Apply() {
                   <>
                     <h3 className="apply-notice__title">Opens {APPLY_OPENS_LABEL}</h3>
                     <p className="apply-notice__desc">
-                      Come meet the team first: Festifall on Wednesday, Sept 2
-                      (Table C43, the Diag) and BBA Meet the Clubs on Tuesday,
-                      Sept 8. The application goes live here the next morning
-                      and takes about ten minutes.
+                      The application goes live here Wednesday, September 2 at
+                      12 PM ET and takes about ten minutes. Come meet the team
+                      too: Festifall on Wednesday, Sept 2 (Table C43, the Diag)
+                      and BBA Meet the Clubs on Tuesday, Sept 8.
                     </p>
                     <p className="apply-notice__desc">
                       <Link to="/join" className="join-contact__email">Join the mailing list</Link>
@@ -181,7 +181,7 @@ export default function Apply() {
                   </>
                 ) : (
                   <>
-                    <h3 className="apply-notice__title">Applications closed September 22</h3>
+                    <h3 className="apply-notice__title">Applications closed September 20</h3>
                     <p className="apply-notice__desc">
                       Missed it? Email{' '}
                       <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>

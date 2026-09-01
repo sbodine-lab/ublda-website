@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MEMBERSHIP_OPENS_AT_MS, MEMBERSHIP_OPENS_LABEL } from '../lib/applyForm'
 import Reveal from '../components/Reveal'
 import './Join.css'
 
@@ -47,6 +48,7 @@ const faqs = [
 const years = ['Freshman', 'Sophomore', 'Junior', 'Senior']
 
 export default function Join() {
+  const joinOpen = Date.now() >= MEMBERSHIP_OPENS_AT_MS
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({
@@ -128,7 +130,18 @@ export default function Join() {
             </p>
           </Reveal>
 
-          {submitted ? (
+          {!joinOpen ? (
+            <Reveal>
+              <div className="join-form__success" role="note">
+                <h3 className="join-form__success-title">Sign-up opens {MEMBERSHIP_OPENS_LABEL}</h3>
+                <p className="join-form__success-desc">
+                  Membership is free and open to all U-M students. Come find us
+                  at Festifall that afternoon (Table C43, the Diag) or sign up
+                  right here once the form opens.
+                </p>
+              </div>
+            </Reveal>
+          ) : submitted ? (
             <Reveal>
               <div className="join-form__success" role="alert" aria-live="polite">
                 <div className="join-form__success-icon">
