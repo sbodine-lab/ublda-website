@@ -1,24 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import './AnnouncementBanner.css'
 
-const RSVP_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOzfhOfoWDXJYMY_7H-r_tjrKrZfYBATXSoWnBhzMpcecwSw/viewform'
-const EVENT_DATE = new Date('2026-04-16T18:00:00-04:00') // April 16, 2026 6 PM ET
-const STORAGE_KEY = 'ublda-lloyd-lewis-rsvp-dismissed'
+import { APPLY_CLOSES_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
 
-const GCAL_URL = (() => {
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores — UBLDA',
-    dates: '20260416T220000Z/20260416T230000Z', // 6–7 PM ET = 22:00–23:00 UTC
-    details: 'Lloyd Lewis, CEO of Arc Thrift Stores of Colorado, joins us live from Colorado for a fireside chat on running a mission-driven enterprise. Dinner catered. UBLDA event at Ross School of Business.',
-    location: 'Ross School of Business, Room R1240, Ann Arbor, MI 48109',
-  })
-  return `https://calendar.google.com/calendar/render?${params.toString()}`
-})()
+const APPLY_PAGE = '/consulting'
+const STORAGE_KEY = 'ublda-fall-2026-consulting-banner-dismissed'
 
 function getTimeLeft() {
-  const now = new Date()
-  const diff = EVENT_DATE.getTime() - now.getTime()
+  const now = Date.now()
+  if (now < APPLY_OPENS_AT_MS) return null
+  const diff = APPLY_CLOSES_AT_MS - now
   if (diff <= 0) return null
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
@@ -85,7 +76,7 @@ export default function AnnouncementBanner() {
     <div className="announcement" ref={bannerRef} role="banner">
       <div className="announcement__inner container">
         <div className="announcement__text">
-          <span>Fireside Chat with Lloyd Lewis, CEO of Arc Thrift — Apr 16, 6 PM</span>
+          <span>UBLDA Consulting applications are open. Due Sept 22 at 11:30 PM.</span>
           <span className="announcement__countdown">
             <span className="announcement__countdown-unit">
               <span className="announcement__countdown-num">{timeLeft.days}</span>d
@@ -99,18 +90,11 @@ export default function AnnouncementBanner() {
           </span>
         </div>
         <div className="announcement__actions">
-          <a href={RSVP_URL} target="_blank" rel="noopener noreferrer" className="announcement__rsvp">
-            RSVP Now
-          </a>
-          <a href={GCAL_URL} target="_blank" rel="noopener noreferrer" className="announcement__gcal" aria-label="Add to Google Calendar">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-              <path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-            </svg>
-            Add to calendar
+          <a href={APPLY_PAGE} className="announcement__rsvp">
+            Apply now
           </a>
           <button onClick={handleDismiss} className="announcement__dismiss">
-            I already RSVP'd
+            Hide
           </button>
         </div>
       </div>

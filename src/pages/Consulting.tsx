@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CONSULTING_FORM_URL } from '../lib/forms'
 import { useReducedMotion } from 'framer-motion'
 import { MeshGradient } from '@paper-design/shaders-react'
 import Lenis from 'lenis'
@@ -272,7 +273,7 @@ export default function Consulting() {
           </h2>
           <p className="adv-lead">
             Applications for the Fall 2026 team open Wednesday, September 2
-            at noon and close Sunday, September 20. Here is where to find us
+            at noon and close Tuesday, September 22. Here is where to find us
             and how joining works.
           </p>
 
@@ -301,12 +302,12 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">
                   Application
-                  <span className="adv-step__tag">Sept 2&ndash;20</span>
+                  <span className="adv-step__tag">Sept 2&ndash;22</span>
                 </h4>
                 <p className="adv-step__note">
-                  Opens Wednesday, September 2 at 12 PM ET at <Link to="/apply" className="adv-link">ublda.org/apply</Link>{' '}
+                  Opens Wednesday, September 2 at 12 PM ET at <a href={CONSULTING_FORM_URL} className="adv-link" target="_blank" rel="noopener noreferrer">ublda.org/apply</a>{' '}
                   and takes about ten minutes: two short answers, a resume link
-                  if you have one, done. Closes Sunday, September 20 at 11:30 PM ET.
+                  if you have one, done. Closes Tuesday, September 22 at 11:30 PM ET.
                   Applying also signs you up as a UBLDA member &mdash; one form
                   covers both.
                 </p>
@@ -325,10 +326,10 @@ export default function Consulting() {
             </li>
           </ol>
 
-          <Link to="/apply" className="adv-pill adv-pill--wide">
+          <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="adv-pill adv-pill--wide">
             Apply for Fall 2026
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </Link>
+          </a>
         </section>
 
         {/* Benefits */}

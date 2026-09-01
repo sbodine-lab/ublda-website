@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
+import AnnouncementBanner from './components/AnnouncementBanner'
+import { CONSULTING_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
@@ -10,7 +12,6 @@ const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
 const Consulting = lazy(() => import('./pages/Consulting'))
 const Join = lazy(() => import('./pages/Join'))
-const Apply = lazy(() => import('./pages/Apply'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
 const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
@@ -29,6 +30,13 @@ const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisi
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
   prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
 )
+
+function ExternalRedirect({ to }: { to: string }) {
+  useEffect(() => {
+    window.location.replace(to)
+  }, [to])
+  return null
+}
 
 function ScrollToTop({ enabled }: { enabled: boolean }) {
   const { pathname } = useLocation()
@@ -80,6 +88,7 @@ export default function App() {
           Skip to main content
         </a>
       )}
+      {!inStandalone && <AnnouncementBanner />}
       {!inStandalone && <Nav />}
       <ScrollToTop enabled={!inStandalone} />
       <Suspense fallback={<PageFallback />}>
@@ -92,7 +101,7 @@ export default function App() {
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
-          <Route path="/apply" element={<Apply />} />
+          <Route path="/apply" element={<ExternalRedirect to={CONSULTING_FORM_URL} />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />
           <Route path="/links" element={<Links />} />
