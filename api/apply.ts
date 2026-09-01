@@ -9,6 +9,7 @@ import {
   methodNotAllowed,
   setApiSecurityHeaders,
 } from '../server/apiUtils.ts'
+import { postJsonWithTimeout } from '../server/googleScript.ts'
 import {
   APPLY_LIMITS,
   APPLY_ROLE_OPTIONS,
@@ -47,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Applications open September 9.' })
   }
   if (window === 'closed') {
-    return res.status(400).json({ error: 'Applications closed September 20. Email sbodine@umich.edu about late submissions.' })
+    return res.status(400).json({ error: 'Applications closed September 22. Email sbodine@umich.edu about late submissions.' })
   }
 
   const body = bodyRecord(req.body)
@@ -113,6 +114,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       availabilityConfirmed,
       accommodations: accommodations || undefined,
     })
+    // Every applicant is also enrolled as a general member (one form covers both).
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL
+    if (scriptUrl) {
+      const [firstName, ...restName] = fullName.split(/\s+/)
+      try {
+        await postJsonWithTimeout(scriptUrl, {
+          formType: 'generalMember',
+          firstName,
+          lastName: restName.join(' ') || firstName,
+          uniqname: email.replace(/@umich\.edu$/i, ''),
+          year,
+          college: schoolMajor,
+        }, 'Member enrollment failed')
+      } catch {
+        // Best-effort: a member-list hiccup must not fail the application.
+      }
+    }
     return res.status(200).json({ success: true, resubmission: result.resubmission })
   } catch (error) {
     if (error instanceof ConvexError) {

@@ -18,10 +18,10 @@ import './Join.css'
 import './Apply.css'
 
 const steps = [
-  { name: 'Apply', detail: 'Sept 9–20 · closes 11:59 PM ET' },
-  { name: 'Interview', detail: 'Sept 22–24 · 30 minutes, at Ross' },
-  { name: 'Offers', detail: 'By Saturday, Sept 26' },
-  { name: 'Kickoff', detail: 'Week of Sept 28' },
+  { name: 'Apply', detail: 'Sept 9–22 · closes 11:59 PM ET' },
+  { name: 'Interviews', detail: 'Sept 25–27 · behavioral + technical' },
+  { name: 'Offers', detail: 'By Tuesday, Sept 29' },
+  { name: 'Kickoff', detail: 'Week of Oct 5' },
 ]
 
 /* ?preview=open|closed lets the team see the other states before the window
@@ -130,14 +130,14 @@ export default function Apply() {
               This fall a UBLDA analyst team works directly with client leadership on a
               real engagement: strategy, research, and a final deliverable the client
               keeps. No consulting experience required, all majors and years welcome.
-              The form takes about ten minutes.
+              The form takes about ten minutes, and applying also signs you up as a UBLDA member — no separate form needed.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
             <p className="apply-deadline" role="note">
               {window_ === 'before' && <>Applications open {APPLY_OPENS_LABEL}.</>}
               {window_ === 'open' && <>Applications close {APPLY_DEADLINE_LABEL}.</>}
-              {window_ === 'closed' && <>Fall 2026 applications closed September 20.</>}
+              {window_ === 'closed' && <>Fall 2026 applications closed September 22.</>}
             </p>
           </Reveal>
         </div>
@@ -181,7 +181,7 @@ export default function Apply() {
                   </>
                 ) : (
                   <>
-                    <h3 className="apply-notice__title">Applications closed September 20</h3>
+                    <h3 className="apply-notice__title">Applications closed September 22</h3>
                     <p className="apply-notice__desc">
                       Missed it? Email{' '}
                       <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>
@@ -206,7 +206,7 @@ export default function Apply() {
                   {resubmission
                     ? 'We already had an application from you; this newest one is the one we read. '
                     : ''}
-                  Interview invites go out Monday, September 21. Questions before then:{' '}
+                  You're also signed up as a UBLDA member — no separate form needed. Interview invites go out Wednesday, September 23. Questions before then:{' '}
                   <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>.
                 </p>
               </div>
@@ -364,7 +364,7 @@ export default function Apply() {
                     required
                   />
                   <span>
-                    I can make a 30-minute interview September 22–24 (evenings) and roughly
+                    I can make two short interview rounds September 25–27 and roughly
                     4–5 hours a week for the fall project.
                   </span>
                 </label>

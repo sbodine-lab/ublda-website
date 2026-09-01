@@ -272,7 +272,7 @@ export default function Consulting() {
           </h2>
           <p className="adv-lead">
             Applications for the Fall 2026 team open Wednesday, September 9
-            and close Sunday, September 20. Here is where to find us and how
+            and close Tuesday, September 22. Here is where to find us and how
             joining works.
           </p>
 
@@ -301,12 +301,14 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">
                   Application
-                  <span className="adv-step__tag">Sept 9&ndash;20</span>
+                  <span className="adv-step__tag">Sept 9&ndash;22</span>
                 </h4>
                 <p className="adv-step__note">
                   Opens Wednesday, September 9 at <Link to="/apply" className="adv-link">ublda.org/apply</Link>{' '}
                   and takes about ten minutes: two short answers, a resume link
-                  if you have one, done. Closes Sunday, September 20 at 11:59 PM ET.
+                  if you have one, done. Closes Tuesday, September 22 at 11:59 PM ET.
+                  Applying also signs you up as a UBLDA member &mdash; one form
+                  covers both.
                 </p>
               </div>
             </li>
@@ -315,9 +317,9 @@ export default function Consulting() {
               <div>
                 <h4 className="adv-step__name">Interviews</h4>
                 <p className="adv-step__note">
-                  A 30-minute conversation at Ross, September 22&ndash;24 in the
-                  evenings. Offers go out by September 26 and the team kicks off
-                  the week of September 28.
+                  Two 30-minute conversations at Ross &mdash; one behavioral, one
+                  technical &mdash; September 25&ndash;27. Offers go out by
+                  September 29 and the team kicks off the week of October 5.
                 </p>
               </div>
             </li>

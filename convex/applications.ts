@@ -14,7 +14,7 @@ const CURRENT_TERM = "fall-2026";
 // Same window as src/lib/applyForm.ts; re-checked here so a direct client
 // call cannot submit outside it. Open Sep 9 12:00 AM ET, grace to Sep 21 4 AM ET.
 const OPENS_AT_MS = Date.UTC(2026, 8, 9, 4, 0, 0);
-const CLOSES_AT_MS = Date.UTC(2026, 8, 21, 8, 0, 0);
+const CLOSES_AT_MS = Date.UTC(2026, 8, 23, 8, 0, 0); // Sep 23, 4:00 AM ET
 
 const MAX_NAME = 120;
 const MAX_EMAIL = 254;
@@ -48,7 +48,7 @@ export const submit = mutation({
       fail("VALIDATION_ERROR", "Applications open September 9.");
     }
     if (now >= CLOSES_AT_MS) {
-      fail("VALIDATION_ERROR", "Applications closed September 20.");
+      fail("VALIDATION_ERROR", "Applications closed September 22.");
     }
 
     const fullName = clean(args.fullName);
