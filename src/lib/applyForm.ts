@@ -3,14 +3,18 @@
    Convex mutation in convex/applications.ts re-checks the same caps. */
 
 export const APPLY_TERM_LABEL = 'Fall 2026'
-export const APPLY_OPENS_LABEL = 'Wednesday, September 9'
-export const APPLY_DEADLINE_LABEL = 'Tuesday, September 22 at 11:59 PM ET'
+export const APPLY_OPENS_LABEL = 'Wednesday, September 2 at 12:00 PM ET'
+export const APPLY_DEADLINE_LABEL = 'Sunday, September 20 at 11:30 PM ET'
 
-/* The application opens the morning after BBA Meet the Clubs (Sep 8) so both
-   tabling events feed the same window, and closes Tuesday Sep 22 at 11:59 PM ET (two weeks after BBA Meet the Clubs)
-   with a small server-side grace period. Times below are UTC. */
-export const APPLY_OPENS_AT_MS = Date.UTC(2026, 8, 9, 4, 0, 0) // Sep 9, 12:00 AM ET
-export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 23, 8, 0, 0) // Sep 23, 4:00 AM ET
+/* The application and membership sign-up both open Wednesday Sep 2 at 12 PM ET
+   (ahead of Festifall that afternoon), and the application closes Sunday Sep 20
+   at 11:30 PM ET with a small server-side grace period. Times below are UTC. */
+export const APPLY_OPENS_AT_MS = Date.UTC(2026, 8, 2, 16, 0, 0) // Sep 2, 12:00 PM ET
+export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 21, 3, 59, 0) // Sep 20, 11:59 PM ET (grace past the 11:30 label)
+
+/* Membership (the /join form) opens at the same moment as the application. */
+export const MEMBERSHIP_OPENS_AT_MS = APPLY_OPENS_AT_MS
+export const MEMBERSHIP_OPENS_LABEL = 'Wednesday, September 2 at 12:00 PM ET'
 
 export type ApplyWindow = 'before' | 'open' | 'closed'
 

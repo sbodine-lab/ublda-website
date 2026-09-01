@@ -5,6 +5,7 @@ import {
   methodNotAllowed,
   setApiSecurityHeaders,
 } from '../server/apiUtils.ts'
+import { MEMBERSHIP_OPENS_AT_MS } from '../src/lib/applyForm.ts'
 import { postJsonWithTimeout } from '../server/googleScript.ts'
 
 const uniqnamePattern = /^[a-z0-9._-]{2,32}$/
@@ -18,6 +19,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return methodNotAllowed(res)
+  }
+
+  if (Date.now() < MEMBERSHIP_OPENS_AT_MS) {
+    return res.status(400).json({ error: 'Membership sign-up opens September 2 at noon ET.' })
   }
 
   const body = bodyRecord(req.body)
