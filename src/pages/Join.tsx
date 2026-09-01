@@ -157,11 +157,10 @@ export default function Join() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="join-contact__desc">
-              No pressure. Reach out to any of our exec team and we'll get back to you:{' '}
-              <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>,{' '}
-              <a href="mailto:atchiang@umich.edu" className="join-contact__email">atchiang@umich.edu</a>,{' '}
-              <a href="mailto:cooperry@umich.edu" className="join-contact__email">cooperry@umich.edu</a>.{' '}
-              Feel free to also reach out to any additional members on our e-board!
+              No pressure. Email Cooper Perry, our Executive VP, and they'll get back to you:{' '}
+              <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="join-contact__email">cooperry@umich.edu</a>.{' '}
+              Questions about consulting go to our project managers on the{' '}
+              <a href="/consulting#consulting-leaders" className="join-contact__email">consulting page</a>.
             </p>
           </Reveal>
         </div>
