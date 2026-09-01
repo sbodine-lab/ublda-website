@@ -221,3 +221,9 @@
     transform: none;
   }
 }
+
+.footer__contact-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}

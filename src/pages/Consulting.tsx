@@ -69,36 +69,20 @@ const services = [
 
 const leaders = [
   {
-    name: 'Sam Bodine',
-    role: 'Co-President',
+    name: 'Alex Forstner',
+    role: 'VP of Education \u00b7 Project Manager',
     location: 'Ann Arbor',
-    initials: 'SB',
-    linkedin: 'https://www.linkedin.com/in/samuelbodine/',
-    email: 'sbodine@umich.edu',
-  },
-  {
-    name: 'Alexa Chiang',
-    role: 'Co-President',
-    location: 'Ann Arbor',
-    initials: 'AC',
-    linkedin: 'https://www.linkedin.com/in/alexa-chiang/',
-    email: 'atchiang@umich.edu',
-  },
-  {
-    name: 'Cooper Perry',
-    role: 'Executive VP',
-    location: 'Ann Arbor',
-    initials: 'CP',
-    linkedin: 'https://www.linkedin.com/in/cooperry/',
-    email: 'cooperry@umich.edu',
+    initials: 'AF',
+    linkedin: 'https://www.linkedin.com/in/alex-forstner/',
+    email: 'alexfors@umich.edu',
   },
   {
     name: 'Solomon DeYoung',
-    role: 'VP Outreach & Partnerships',
+    role: 'VP Outreach and Partnerships \u00b7 Project Manager',
     location: 'Ann Arbor',
     initials: 'SD',
     linkedin: 'https://www.linkedin.com/in/solomon-deyoung/',
-    email: null,
+    email: 'sdeyoun@umich.edu',
   },
 ]
 
@@ -132,7 +116,7 @@ function ConsultingNav() {
           <a href="#consulting-leaders" className="adv-nav__link">Leaders</a>
         </nav>
         <a
-          href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry"
+          href="mailto:alexfors@umich.edu,sdeyoun@umich.edu?subject=UBLDA%20Consulting%20inquiry"
           className="adv-nav__cta"
         >
           <span className="adv-nav__cta-full">Start a conversation</span>
@@ -164,7 +148,7 @@ function ConsultingFooter() {
             <a href="#consulting-services" className="adv-footer__link">Services</a>
             <a href="#consulting-clients" className="adv-footer__link">Clients</a>
             <a href="#consulting-leaders" className="adv-footer__link">Leaders</a>
-            <a href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry" className="adv-footer__link">Contact us</a>
+            <a href="mailto:alexfors@umich.edu,sdeyoun@umich.edu?subject=UBLDA%20Consulting%20inquiry" className="adv-footer__link">Contact us</a>
           </div>
           <div className="adv-footer__col">
             <h4 className="adv-footer__heading">UBLDA</h4>
@@ -415,7 +399,7 @@ export default function Consulting() {
                 hear from you.
               </p>
               <a
-                href="mailto:sbodine@umich.edu?subject=UBLDA%20Consulting%20inquiry"
+                href="mailto:alexfors@umich.edu,sdeyoun@umich.edu?subject=UBLDA%20Consulting%20inquiry"
                 className="adv-pill adv-client__pill"
               >
                 Get in touch
@@ -429,8 +413,12 @@ export default function Consulting() {
         {/* Leaders */}
         <section className="adv-section" id="consulting-leaders">
           <h2 className="adv-h2 adv-h2--accent">
-            Get in touch with<br />our leaders today
+            Questions? Ask our<br />project managers
           </h2>
+          <p className="adv-lead">
+            Alex and Solomon run the Fall 2026 engagement. Email either of
+            them about the program, the application, or a project idea.
+          </p>
           <div className="adv-people">
             {leaders.map((p) => (
               <div className="adv-person" key={p.name}>
