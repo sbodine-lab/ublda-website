@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Applications open September 2 at noon.' })
   }
   if (window === 'closed') {
-    return res.status(400).json({ error: 'Applications closed September 20. Email sbodine@umich.edu about late submissions.' })
+    return res.status(400).json({ error: 'Applications closed September 22. Email sbodine@umich.edu about late submissions.' })
   }
 
   const body = bodyRecord(req.body)
