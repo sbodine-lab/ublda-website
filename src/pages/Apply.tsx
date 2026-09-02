@@ -2,39 +2,51 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import {
+  APPLY_CLOSES_AT_MS,
+  APPLY_CLOSE_TIME_SHORT,
   APPLY_DEADLINE_LABEL,
   APPLY_ESSAY_WORD_TARGET,
   APPLY_LIMITS,
+  APPLY_OPENS_AT_MS,
   APPLY_OPENS_LABEL,
   APPLY_ROLE_OPTIONS,
+  APPLY_WINDOW_SHORT,
   APPLY_YEARS,
+  INTERVIEW_WINDOW_SHORT,
+  KICKOFF_SHORT,
+  OFFERS_SHORT,
   applyWindow,
   countWords,
   resumeUrlOk,
   type ApplyRoleInterest,
   type ApplyWindow,
 } from '../lib/applyForm'
+import { useClock } from '../lib/useClock'
 import './Join.css'
 import './Apply.css'
 
 const steps = [
-  { name: 'Apply', detail: 'Sept 2–22 · closes 11:30 PM ET' },
-  { name: 'Interviews', detail: 'Sept 25–27 · behavioral + technical' },
-  { name: 'Offers', detail: 'By Tuesday, Sept 29' },
-  { name: 'Kickoff', detail: 'Week of Oct 5' },
+  { name: 'Apply', detail: `${APPLY_WINDOW_SHORT} · ${APPLY_CLOSE_TIME_SHORT}` },
+  { name: 'Interviews', detail: `${INTERVIEW_WINDOW_SHORT} · behavioral + technical` },
+  { name: 'Offers', detail: OFFERS_SHORT },
+  { name: 'Kickoff', detail: KICKOFF_SHORT },
 ]
 
 /* ?preview=open|closed lets the team see the other states before the window
    flips; the API still enforces the real dates. */
-const currentWindow = (): ApplyWindow => {
+const previewWindow = (): ApplyWindow | null => {
   const preview = new URLSearchParams(window.location.search).get('preview')
-  if (preview === 'open' || preview === 'closed') return preview
-  if (preview === 'before') return 'before'
-  return applyWindow(Date.now())
+  if (preview === 'open' || preview === 'closed' || preview === 'before') return preview
+  return null
 }
 
 export default function Apply() {
-  const [window_] = useState<ApplyWindow>(currentWindow)
+  const [preview] = useState<ApplyWindow | null>(previewWindow)
+  // Without the clock a tab already sitting on /apply keeps showing the closed
+  // state after the window opens. The hook runs unconditionally; `??` would
+  // short-circuit past it whenever ?preview= is set.
+  const now = useClock(APPLY_OPENS_AT_MS, APPLY_CLOSES_AT_MS)
+  const window_ = preview ?? applyWindow(now)
   const [submitted, setSubmitted] = useState(false)
   const [resubmission, setResubmission] = useState(false)
   const [submitting, setSubmitting] = useState(false)

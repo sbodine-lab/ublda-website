@@ -16,6 +16,19 @@ export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 23, 3, 59, 0) // Sep 22, 11:
 export const MEMBERSHIP_OPENS_AT_MS = APPLY_OPENS_AT_MS
 export const MEMBERSHIP_OPENS_LABEL = 'Wednesday, September 2 at 12:00 PM ET'
 
+/* Labels for the Fall 2026 recruiting timeline. Home, /apply, and the
+   consulting sub-site all render these. They drifted apart once — the homepage
+   kept advertising Sept 9–20 and an 11:59 PM close after the dates moved — so
+   every surface reads them from here instead of hardcoding its own copy. */
+export const APPLY_WINDOW_SHORT = 'Sept 2–22'
+export const APPLY_WINDOW_PROSE = 'September 2–22'
+export const APPLY_OPENS_PROSE = 'September 2'
+export const APPLY_CLOSES_PROSE = 'September 22'
+export const APPLY_CLOSE_TIME_SHORT = 'closes 11:30 PM ET'
+export const INTERVIEW_WINDOW_SHORT = 'Sept 25–27'
+export const OFFERS_SHORT = 'By Tuesday, Sept 29'
+export const KICKOFF_SHORT = 'Week of Oct 5'
+
 export type ApplyWindow = 'before' | 'open' | 'closed'
 
 export const applyWindow = (now: number): ApplyWindow => (

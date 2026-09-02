@@ -72,6 +72,11 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
   const register = () => {
     mm.add(
       {
+        /* `all` always matches. Without it GSAP skips the callback entirely
+           when none of the three below match - a phone with Reduce Motion on -
+           and the page never leaves motion mode, leaving the client section
+           invisible and the service rows stuck shut. */
+        all: 'all',
         desktop: '(min-width: 768px)',
         motion: '(prefers-reduced-motion: no-preference)',
         hover: '(hover: hover)',

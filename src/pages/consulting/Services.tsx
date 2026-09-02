@@ -47,7 +47,7 @@ const APPROACH = [
 
 const FAQ = [
   { q: 'Is it really free?', a: 'Yes. We ask for a sponsor, a scoped brief, a kickoff call, and four to five hours of your time across the semester.' },
-  { q: 'Who does the work?', a: 'Four to six undergraduate analysts and two co-project managers, selected by application and interview. Our consultants include disabled students.' },
+  { q: 'Who does the work?', a: 'Four to six undergraduate analysts and two co-project managers, selected by application and interview. Our consultants include disabled students, students who have worked on this for years, and students who arrived curious and learned it here.' },
   { q: 'Who reviews it?', a: 'Advisors from BLDA, our MBA counterpart at Michigan Ross, review deliverables before they reach you.' },
   { q: 'Do you certify ADA or WCAG compliance?', a: 'No. We find barriers, rank them, and help you fix them. Certification is a job for lawyers and specialist auditors.' },
   { q: 'How long is an engagement?', a: 'One semester. Fall 2026 kicks off the week of October 5 and closes with a final presentation at the end of the semester.' },

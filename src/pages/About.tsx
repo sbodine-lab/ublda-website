@@ -39,8 +39,8 @@ export default function About() {
           <Reveal delay={0.2}>
             <p className="about__intro">
               UBLDA is a student-led organization at Michigan Ross dedicated to
-              disability inclusion in business. We bring together students, with and
-              without disabilities, to advocate, educate, and build a professional
+              disability inclusion in business. We bring together disabled and
+              non-disabled students to advocate, educate, and build a professional
               world that doesn't leave anyone out.
             </p>
           </Reveal>

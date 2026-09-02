@@ -206,14 +206,7 @@ function HomeBody() {
       </section>
 
       {/* 5 · Client */}
-      <section
-        className="pc-client"
-        id="consulting-clients"
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest('a')) return
-          window.open(CLIENT.url, '_blank', 'noopener')
-        }}
-      >
+      <section className="pc-client" id="consulting-clients">
         <div className="pc-client__stage">
           <div className="pc-client__media" aria-hidden="true">
             <MeshGradient colors={shaderColors} distortion={0.85} swirl={0.55} speed={shaderSpeed} style={{ width: '100%', height: '100%' }} />

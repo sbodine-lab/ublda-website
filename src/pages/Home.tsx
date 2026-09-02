@@ -1,12 +1,24 @@
 import { Link } from 'react-router-dom'
 import Reveal, { RevealStagger, RevealChild } from '../components/Reveal'
+import {
+  APPLY_CLOSES_AT_MS,
+  APPLY_CLOSES_PROSE,
+  APPLY_CLOSE_TIME_SHORT,
+  APPLY_OPENS_AT_MS,
+  APPLY_OPENS_PROSE,
+  APPLY_WINDOW_PROSE,
+  APPLY_WINDOW_SHORT,
+  INTERVIEW_WINDOW_SHORT,
+  applyWindow,
+} from '../lib/applyForm'
+import { useClock } from '../lib/useClock'
 import './Home.css'
 
 const pillars = [
   {
     title: 'Advocacy & Community',
     description:
-      'Students with disabilities, allies, and anyone who thinks inclusion belongs in business. We show up for each other and push for a business world that includes all of us.',
+      'Disabled students, allies, and anyone who thinks inclusion belongs in business. We show up for each other and push for a business world that includes all of us.',
     icon: '01',
   },
   {
@@ -37,7 +49,7 @@ const benefits = [
 const upcoming = [
   {
     title: 'Accessibility Consulting',
-    desc: 'Live now: a selective analyst team working with a real client on a real engagement this fall. Applications run September 9–20; the winter client is announced in October.',
+    desc: `Live now: a selective analyst team working with a real client on a real engagement this fall. No consulting experience needed. Applications run ${APPLY_WINDOW_PROSE}; the winter client is announced in October.`,
   },
   {
     title: 'Mentorship & Education',
@@ -71,6 +83,7 @@ const LinkedInIcon = () => (
 )
 
 export default function Home() {
+  const applyState = applyWindow(useClock(APPLY_OPENS_AT_MS, APPLY_CLOSES_AT_MS))
   return (
     <main id="main-content" className="home">
       {/* ─── Hero ─── */}
@@ -201,7 +214,6 @@ export default function Home() {
                   <img src="/partners-nestidd.png" alt="Nestidd" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
-                  <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" loading="lazy" decoding="async" />
                 </div>
               </div>
             ))}
@@ -258,18 +270,27 @@ export default function Home() {
             <ol className="recruiting-steps">
               <li className="recruiting-step">
                 <span className="recruiting-step__name">Application</span>
-                <span className="recruiting-step__detail">Sept 9&ndash;20 &middot; closes 11:59 PM ET</span>
+                <span className="recruiting-step__detail">{APPLY_WINDOW_SHORT} &middot; {APPLY_CLOSE_TIME_SHORT}</span>
               </li>
               <li className="recruiting-step">
                 <span className="recruiting-step__name">Interviews</span>
-                <span className="recruiting-step__detail">Sept 22&ndash;24 &middot; at Ross</span>
+                <span className="recruiting-step__detail">{INTERVIEW_WINDOW_SHORT} &middot; at Ross</span>
               </li>
             </ol>
           </Reveal>
           <Reveal delay={0.25}>
             <p className="recruiting-events__note">
-              Applications for the Fall 2026 consulting team open September 9.{' '}
-              <Link to="/apply" className="recruiting-events__link">Application details</Link>
+              {applyState === 'before'
+                ? `Applications for the Fall 2026 consulting team open ${APPLY_OPENS_PROSE}.`
+                : applyState === 'open'
+                  ? `Applications for the Fall 2026 consulting team are open through ${APPLY_CLOSES_PROSE}.`
+                  : 'Applications for the Fall 2026 consulting team are closed for the fall.'}{' '}
+              {/* /apply is a redirect straight out to the Google Form, so the
+                  link has to say so rather than promise a details page. */}
+              <Link to="/apply" className="recruiting-events__link">
+                Open the application form
+                <span className="sr-only"> (Google Form, leaves ublda.org)</span>
+              </Link>
               {' '}&middot;{' '}
               <Link to="/consulting" className="recruiting-events__link">Learn about UBLDA Consulting</Link>
             </p>
@@ -330,7 +351,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={0.15}>
               <p className="cta__sub">
-                Students with disabilities, allies, and future business leaders who
+                Disabled students, allies, and future business leaders who
                 want impact built into their careers. 30 seconds to sign up.
                 Join 30+ Ross students already here.
               </p>

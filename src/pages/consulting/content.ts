@@ -66,6 +66,8 @@ export interface Step {
   tone: 'navy' | 'teal' | 'gold' | 'cream'
 }
 
+/* Dates here must match src/lib/applyForm.ts, which is the source of truth for
+   the application window and drives the labels on Home and /apply. */
 export const STEPS: Step[] = [
   {
     num: '01',
@@ -78,7 +80,7 @@ export const STEPS: Step[] = [
     num: '02',
     title: 'Apply',
     when: 'Sep 2 to Sep 22',
-    desc: 'Opens Sep 2 at noon ET, closes Sep 22 at 11:30 PM ET. Two short answers and an optional resume link.',
+    desc: 'Opens Sep 2 at noon ET, closes Sep 22 at 11:30 PM ET. Three short answers and an optional resume link. No consulting experience needed.',
     tone: 'navy',
   },
   {

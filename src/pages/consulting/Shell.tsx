@@ -157,7 +157,7 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
 
         {disc && (
           <>
-            <div className="pc-disc" aria-hidden="true">
+            <div className="pc-disc" aria-hidden="true" inert>
               <ConsultingNav theme={theme} onToggleTheme={toggleTheme} motionOff={motionOff} onToggleMotion={toggleMotion} menuOpen={menuOpen} onToggleMenu={toggleMenu} ghost />
               <div className="pc-disc__inner">{disc}</div>
             </div>
