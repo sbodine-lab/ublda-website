@@ -1,5 +1,7 @@
+import { Link } from 'react-router-dom'
 import { MEMBERSHIP_OPENS_AT_MS, MEMBERSHIP_OPENS_LABEL } from '../lib/applyForm'
 import { MEMBERSHIP_FORM_URL } from '../lib/forms'
+import { useClock } from '../lib/useClock'
 import Reveal from '../components/Reveal'
 import './Join.css'
 
@@ -22,7 +24,12 @@ const faqs = [
   {
     question: 'Do I need to have a disability to join?',
     answer:
-      "No. UBLDA is for students with disabilities, allies, and anyone who wants real impact as part of their business career. Headed into consulting, finance, product, or anywhere else? If impact matters to you, you belong here.",
+      "No. You do not need a disability, and you do not need to have worked with disabled people before. Our members include disabled students, students who have cared about this for years, and students who showed up curious and impact-minded. All three belong here. Headed into consulting, finance, product, or anywhere else? If impact matters to you, you belong here.",
+  },
+  {
+    question: 'Do I need consulting experience to apply for the consulting team?',
+    answer:
+      "No, and you do not need to know anything about accessibility either. The application is three short answers, and we are reading how you think rather than what you already know. We teach the consulting skills: scoping a problem, running the research, ranking what you find, and building the business case. Bring the analytical foundation your coursework has already built.",
   },
   {
     question: "What's the time commitment?",
@@ -46,7 +53,7 @@ const faqs = [
 ]
 
 export default function Join() {
-  const joinOpen = Date.now() >= MEMBERSHIP_OPENS_AT_MS
+  const joinOpen = useClock(MEMBERSHIP_OPENS_AT_MS) >= MEMBERSHIP_OPENS_AT_MS
   return (
     <main id="main-content" className="join-page">
       <section className="join-page__hero">
@@ -160,7 +167,7 @@ export default function Join() {
               No pressure. Email Cooper Perry, our Executive VP, and they'll get back to you:{' '}
               <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="join-contact__email">cooperry@umich.edu</a>.{' '}
               Questions about consulting go to our project managers on the{' '}
-              <a href="/consulting#consulting-leaders" className="join-contact__email">consulting page</a>.
+              <Link to="/consulting/contact" className="join-contact__email">consulting contact page</Link>.
             </p>
           </Reveal>
         </div>

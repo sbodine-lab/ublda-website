@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import './AnnouncementBanner.css'
 
 import { APPLY_CLOSES_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
@@ -95,9 +96,9 @@ export default function AnnouncementBanner() {
             Join UBLDA
             <span className="sr-only"> (interest form, opens in a new tab)</span>
           </a>
-          <a href={CONSULTING_PAGE} className="announcement__gcal">
-            Consulting application
-          </a>
+          <Link to={CONSULTING_PAGE} className="announcement__gcal">
+            UBLDA Consulting
+          </Link>
           <button onClick={handleDismiss} className="announcement__dismiss">
             Hide
           </button>
