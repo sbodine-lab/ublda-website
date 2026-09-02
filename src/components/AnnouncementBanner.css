@@ -105,9 +105,19 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Mobile: hide banner entirely so it doesn't obstruct content */
+/* Mobile: one compact row; the countdown goes, the two links stay. */
 @media (max-width: 768px) {
-  .announcement {
+  .announcement__inner {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+    justify-content: space-between;
+  }
+
+  .announcement__countdown {
     display: none;
+  }
+
+  .announcement__text {
+    font-size: var(--text-xs);
   }
 }

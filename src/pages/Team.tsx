@@ -87,7 +87,7 @@ function TeamCard({ member }: { member: Member }) {
         {member.initials}
       </div>
       <div className="team-card__info">
-        <h3 className="team-card__name">{member.name}</h3>
+        <h2 className="team-card__name">{member.name}</h2>
         <p className="team-card__role">{member.role}</p>
         <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="team-card__linkedin" aria-label={`${member.name} on LinkedIn`}>
           <LinkedInIcon />

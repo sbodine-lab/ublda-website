@@ -27,7 +27,7 @@
   margin-top: var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-  color: var(--color-gray-400);
+  color: #a8a59e; /* 6.4:1 on navy-deep; gray-400 was 2.9:1 */
 }
 
 .footer__cta {
@@ -98,6 +98,10 @@
   overflow: visible;
 }
 
+.footer__brand-mark span::after {
+  content: attr(data-text);
+}
+
 .footer__brand-mark span {
   display: block;
   font-family: var(--font-body);
@@ -117,7 +121,7 @@
   padding-top: var(--space-6);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: var(--text-xs);
-  color: var(--color-gray-400);
+  color: #a8a59e;
 }
 
 .footer__bottom > p:first-child {
@@ -135,7 +139,7 @@
 }
 
 .footer__affiliation {
-  color: var(--color-gray-400);
+  color: #a8a59e;
   text-align: center;
 }
 

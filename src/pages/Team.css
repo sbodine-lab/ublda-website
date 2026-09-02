@@ -11,7 +11,7 @@
 
 .team-page__headline em {
   font-style: italic;
-  color: var(--color-teal);
+  color: var(--color-teal-text);
 }
 
 .team-page__intro {
@@ -110,7 +110,7 @@
 }
 
 .team-card__linkedin:hover {
-  color: var(--color-teal);
+  color: var(--color-teal-text);
 }
 
 /* Contact */

@@ -54,7 +54,7 @@ export default function Nav() {
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
       <div className="nav__inner container">
         <Link to="/" className="nav__logo">
-          <img src="/logo-64.png" alt="UBLDA" className="nav__logo-img" width="63" height="64" />
+          <img src="/logo-64.png" alt="" className="nav__logo-img" width="63" height="64" />
           <span className="nav__logo-text">
             <NavLetters text="UBLDA" />
           </span>

@@ -12,7 +12,7 @@
 
 .events-page__headline em {
   font-style: italic;
-  color: var(--color-teal);
+  color: var(--color-teal-text);
 }
 
 .events-page__intro {
@@ -53,7 +53,10 @@
 }
 
 .ev-card--past {
-  opacity: 0.7;
+  /* Muted without lowering opacity, which dropped every past card's text
+     below the 4.5:1 contrast floor. */
+  filter: grayscale(0.5);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .ev-card__date-block {
@@ -156,13 +159,13 @@
 }
 
 .ev-card__gcal:hover {
-  color: var(--color-teal);
+  color: var(--color-teal-text);
 }
 
 .ev-card__tag {
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--color-teal);
+  color: var(--color-teal-text);
   background: var(--color-teal-soft);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);

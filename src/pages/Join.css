@@ -11,7 +11,7 @@
 
 .join-page__headline em {
   font-style: italic;
-  color: var(--color-teal);
+  color: var(--color-teal-text);
 }
 
 .join-page__intro {
@@ -168,7 +168,7 @@
   height: 64px;
   border-radius: 50%;
   background: var(--color-teal-soft);
-  color: var(--color-teal);
+  color: var(--color-teal-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,7 +293,7 @@
 }
 
 .join-contact__email {
-  color: var(--color-teal);
+  color: var(--color-teal-text);
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: rgba(43, 186, 176, 0.3);

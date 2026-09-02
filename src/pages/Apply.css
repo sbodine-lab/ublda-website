@@ -45,7 +45,7 @@
 
 .apply-step__name::before {
   content: counter(apply-step, decimal-leading-zero) ' ';
-  color: var(--color-teal);
+  color: var(--color-teal-text);
   font-size: var(--type-sm);
   font-weight: 600;
   letter-spacing: var(--tracking-wider);
