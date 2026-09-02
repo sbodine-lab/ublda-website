@@ -20,7 +20,7 @@ export default function Footer() {
 
           <div className="footer__grid">
             <div className="footer__col">
-              <h4 className="footer__heading">Navigate</h4>
+              <h3 className="footer__heading">Navigate</h3>
               <Link to="/about" className="footer__link">About</Link>
               <Link to="/events" className="footer__link">Events</Link>
               <Link to="/team" className="footer__link">Team</Link>
@@ -29,7 +29,7 @@ export default function Footer() {
             </div>
 
             <div className="footer__col">
-              <h4 className="footer__heading">Connect</h4>
+              <h3 className="footer__heading">Connect</h3>
               <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="footer__link">Email us</a>
               <p className="footer__contact-note">General questions: Cooper Perry, Executive VP</p>
               <a href="https://www.instagram.com/michiganublda/" target="_blank" rel="noopener noreferrer" className="footer__link footer__link--social">
@@ -43,7 +43,7 @@ export default function Footer() {
         </div>
 
         <div className="footer__brand-mark" aria-hidden="true">
-          <span>UBLDA</span>
+          <span data-text="UBLDA" />
         </div>
 
         <div className="footer__bottom">

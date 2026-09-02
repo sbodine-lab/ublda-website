@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import './AnnouncementBanner.css'
 
 import { APPLY_CLOSES_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
+import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 
-const APPLY_PAGE = '/consulting'
+const CONSULTING_PAGE = '/consulting'
 const STORAGE_KEY = 'ublda-fall-2026-consulting-banner-dismissed'
 
 function getTimeLeft() {
@@ -73,10 +74,10 @@ export default function AnnouncementBanner() {
   }
 
   return (
-    <div className="announcement" ref={bannerRef} role="banner">
+    <div className="announcement" ref={bannerRef} role="region" aria-label="Fall 2026 sign-up">
       <div className="announcement__inner container">
         <div className="announcement__text">
-          <span>UBLDA Consulting applications are open. Due Sept 22 at 11:30 PM.</span>
+          <span>Fall 2026 membership sign-up is open. Consulting applications close Sept 22.</span>
           <span className="announcement__countdown">
             <span className="announcement__countdown-unit">
               <span className="announcement__countdown-num">{timeLeft.days}</span>d
@@ -90,8 +91,12 @@ export default function AnnouncementBanner() {
           </span>
         </div>
         <div className="announcement__actions">
-          <a href={APPLY_PAGE} className="announcement__rsvp">
-            Apply now
+          <a href={MEMBERSHIP_FORM_URL} target="_blank" rel="noopener noreferrer" className="announcement__rsvp">
+            Join UBLDA
+            <span className="sr-only"> (interest form, opens in a new tab)</span>
+          </a>
+          <a href={CONSULTING_PAGE} className="announcement__gcal">
+            Consulting application
           </a>
           <button onClick={handleDismiss} className="announcement__dismiss">
             Hide

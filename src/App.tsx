@@ -10,6 +10,11 @@ const About = lazy(() => import('./pages/About'))
 const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
 const Consulting = lazy(() => import('./pages/Consulting'))
+const ConsultingPractice = lazy(() => import('./pages/consulting/Practice'))
+const ConsultingWork = lazy(() => import('./pages/consulting/Work'))
+const ConsultingServices = lazy(() => import('./pages/consulting/Services'))
+const ConsultingPartners = lazy(() => import('./pages/consulting/Partners'))
+const ConsultingContact = lazy(() => import('./pages/consulting/Contact'))
 const Join = lazy(() => import('./pages/Join'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
@@ -96,6 +101,11 @@ export default function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/team" element={<Team />} />
           <Route path="/consulting" element={<Consulting />} />
+          <Route path="/consulting/practice" element={<ConsultingPractice />} />
+          <Route path="/consulting/work" element={<ConsultingWork />} />
+          <Route path="/consulting/services" element={<ConsultingServices />} />
+          <Route path="/consulting/partners" element={<ConsultingPartners />} />
+          <Route path="/consulting/contact" element={<ConsultingContact />} />
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />

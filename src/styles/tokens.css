@@ -4,6 +4,7 @@
   --color-navy-deep:  #091E2A;
   --color-navy-light: #1A3D52;
   --color-teal:       #2BBAB0;
+  --color-teal-text:  #0B6F68;  /* teal as text on cream: 5.8:1 (the accent itself is 2.3:1) */
   --color-teal-soft:  #2BBAB018;
   --color-teal-muted: #2BBAB040;
   --color-gold:       #D4A034;

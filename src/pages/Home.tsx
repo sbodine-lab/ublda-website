@@ -292,7 +292,7 @@ export default function Home() {
                 <div className="person-card__avatar">
                   {person.initials}
                 </div>
-                <h4 className="person-card__name">{person.name}</h4>
+                <h3 className="person-card__name">{person.name}</h3>
                 <p className="person-card__role">{person.role}</p>
                 <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="person-card__linkedin" aria-label={`${person.name} on LinkedIn`}>
                   <LinkedInIcon />
@@ -307,7 +307,7 @@ export default function Home() {
                 <div className="person-card__avatar">
                   {person.initials}
                 </div>
-                <h4 className="person-card__name">{person.name}</h4>
+                <h3 className="person-card__name">{person.name}</h3>
                 <p className="person-card__role">{person.role}</p>
                 <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="person-card__linkedin" aria-label={`${person.name} on LinkedIn`}>
                   <LinkedInIcon />

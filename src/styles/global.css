@@ -48,6 +48,9 @@ body {
   color: var(--color-gray-800);
   background: var(--color-cream);
   overflow-x: hidden;
+  /* The fixed announcement bar sets --announcement-h while it is showing,
+     so page content starts below it instead of underneath the nav. */
+  padding-top: var(--announcement-h, 0px);
 }
 
 img, video, svg {
