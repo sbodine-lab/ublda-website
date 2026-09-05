@@ -138,15 +138,29 @@ const buildWork: Builder = (root, { lenis }) => {
     e.preventDefault()
     goTo(index + dir, dir)
   }
+  /* Touch: the browser decides on the first touchmove whether a gesture
+     scrolls, so that is where the stage claims it. While a slide remains in
+     the swipe's direction the page holds still and the swipe changes the
+     slide; otherwise the swipe scrolls the page as normal. */
   let touchY = 0
+  let touchOwned = false
+  let touchDone = false
   const onTouchStart = (e: TouchEvent) => {
     touchY = e.touches[0].clientY
+    touchOwned = false
+    touchDone = false
   }
-  const onTouchEnd = (e: TouchEvent) => {
-    const dy = touchY - e.changedTouches[0].clientY
-    if (Math.abs(dy) < 40) return
+  const onTouchMove = (e: TouchEvent) => {
+    const dy = touchY - e.touches[0].clientY
     const dir: 1 | -1 = dy > 0 ? 1 : -1
-    if (wants(dir)) goTo(index + dir, dir)
+    if (!touchOwned) {
+      if (!wants(dir)) return
+      touchOwned = true
+    }
+    if (e.cancelable) e.preventDefault()
+    if (touchDone || busy || Math.abs(dy) < 40) return
+    touchDone = true
+    goTo(index + dir, dir)
   }
   const onPrev = () => goTo(index - 1, -1)
   const onNext = () => goTo(index + 1, 1)
@@ -158,7 +172,7 @@ const buildWork: Builder = (root, { lenis }) => {
   window.addEventListener('wheel', onWheel, { passive: false, capture: true })
   window.addEventListener('keydown', onKey)
   stage.addEventListener('touchstart', onTouchStart, { passive: true })
-  stage.addEventListener('touchend', onTouchEnd)
+  stage.addEventListener('touchmove', onTouchMove, { passive: false })
   const prev = one(root, '.pcw-ui__prev')
   const next = one(root, '.pcw-ui__next')
   const listBtn = one(root, '.pcw-ui__list')
@@ -170,7 +184,7 @@ const buildWork: Builder = (root, { lenis }) => {
     window.removeEventListener('wheel', onWheel, { capture: true })
     window.removeEventListener('keydown', onKey)
     stage.removeEventListener('touchstart', onTouchStart)
-    stage.removeEventListener('touchend', onTouchEnd)
+    stage.removeEventListener('touchmove', onTouchMove)
     prev.removeEventListener('click', onPrev)
     next.removeEventListener('click', onNext)
     listBtn.removeEventListener('click', onList)

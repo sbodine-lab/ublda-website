@@ -1,10 +1,11 @@
 /* Shared motion engine for the Consulting sub-site.
 
    Every page runs the same loop: Lenis for the wheel, GSAP ScrollTrigger for
-   scroll-driven timelines, one build function per page that only runs on
-   desktop for people who have not asked for reduced motion. Below 768px or
-   with reduced motion the page reports `static` and the CSS fallback takes
-   over. */
+   scroll-driven timelines, one build function per page that runs for anyone
+   who has not asked for reduced motion. Phones get the same choreography
+   with phone-sized geometry (builders read `mobile` from the context) and
+   native touch scrolling. With reduced motion the page reports `static` and
+   the CSS fallback takes over. */
 
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -12,6 +13,12 @@ import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import Lenis from 'lenis'
 
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin)
+
+/* The mobile address bar showing and hiding is a vertical resize; refreshing
+   every pinned timeline on each one makes the page jump mid-scroll. Pinned
+   sections are sized in 100vh, which is the collapsed-bar height, so their
+   pixel size never changes. */
+ScrollTrigger.config({ ignoreMobileResize: true })
 
 export type MotionMode = 'full' | 'static'
 
@@ -22,6 +29,8 @@ export interface MotionHandle {
 
 export interface BuildContext {
   hover: boolean
+  /* Viewport under 768px: builders use phone geometry and shorter pins. */
+  mobile: boolean
   vw: (n: number) => number
   vh: (n: number) => number
   lenis: Lenis | undefined
@@ -50,6 +59,7 @@ export type MotionStarter = (root: HTMLElement, onMode: (mode: MotionMode) => vo
 
 export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => void, build: Builder, opts: StartOptions = {}): MotionHandle {
   const reduce = Boolean(opts.reduce) || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const coarse = window.matchMedia('(hover: none)').matches
   let lenis: Lenis | undefined
   let tick: ((time: number) => void) | undefined
 
@@ -59,6 +69,9 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
       easing: (t) => 1 - Math.pow(1 - t, 3),
       wheelMultiplier: 0.8,
       touchMultiplier: 1.2,
+      /* Touch stays native: momentum, overscroll, and the address bar all
+         behave as people expect, and ScrollTrigger reads the real scroll. */
+      syncTouch: false,
       anchors: true,
     })
     lenis.on('scroll', ScrollTrigger.update)
@@ -73,23 +86,24 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
     mm.add(
       {
         /* `all` always matches. Without it GSAP skips the callback entirely
-           when none of the three below match - a phone with Reduce Motion on -
+           when none of the others match - a desktop with Reduce Motion on -
            and the page never leaves motion mode, leaving the client section
            invisible and the service rows stuck shut. */
         all: 'all',
-        desktop: '(min-width: 768px)',
+        mobile: '(max-width: 767px)',
         motion: '(prefers-reduced-motion: no-preference)',
         hover: '(hover: hover)',
       },
       (ctx) => {
-        const c = ctx.conditions as { desktop: boolean; motion: boolean; hover: boolean }
-        if (!c.desktop || !c.motion || reduce) {
+        const c = ctx.conditions as { mobile: boolean; motion: boolean; hover: boolean }
+        if (!c.motion || reduce) {
           onMode('static')
           return
         }
         onMode('full')
         const cleanup = build(root, {
           hover: c.hover,
+          mobile: c.mobile,
           vw: (n) => (window.innerWidth * n) / 100,
           vh: (n) => (window.innerHeight * n) / 100,
           lenis,
@@ -101,7 +115,8 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
   }
 
   // Layout-dependent numbers are measured at build time, so build once the
-  // web fonts are in and rebuild when the width changes.
+  // web fonts are in and rebuild when the width changes. On touch devices a
+  // height-only resize is the address bar or the keyboard, so it is ignored.
   let alive = true
   if (document.fonts && document.fonts.status !== 'loaded') {
     document.fonts.ready.then(() => {
@@ -124,7 +139,7 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
       if (window.innerWidth !== lastWidth) {
         lastWidth = window.innerWidth
         rebuild()
-      } else {
+      } else if (!coarse) {
         ScrollTrigger.refresh()
       }
     }, 200)
