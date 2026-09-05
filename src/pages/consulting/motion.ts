@@ -9,7 +9,7 @@ import { all, buildCursor, buildWordmark, gsap, one, startMotion, ScrollTrigger,
 
 export type { MotionHandle, MotionMode } from './engine'
 
-export const buildHome: Builder = (root, { hover, vw }) => {
+export const buildHome: Builder = (root, { hover, mobile, vw }) => {
   const orb = one(root, '.pc-orb')
   const disc = one(root, '.pc-disc')
   const hero = one(root, '.pc-hero')
@@ -19,8 +19,15 @@ export const buildHome: Builder = (root, { hover, vw }) => {
   const journey = one(root, '.pc-journey')
   const client = one(root, '.pc-client')
 
-  gsap.set(orb, { xPercent: -50, yPercent: -50, top: '88%', left: '50%', width: '1.5vw', height: '1.5vw', opacity: 0, '--pc-orb-fill': 1 })
-  gsap.set(disc, { clipPath: 'circle(100vw at 50% 88%)', opacity: 0 })
+  /* The orb is drawn in vw so it scales with the page; a phone is a third
+     the width of a laptop, so its orb is three times the vw to stay the
+     same physical size. The disc's opening radius is 100vmax so it covers a
+     portrait screen too. */
+  const k = mobile ? 3 : 1
+  const size = (n: number) => `${n * k}vw`
+
+  gsap.set(orb, { xPercent: -50, yPercent: -50, top: '88%', left: '50%', width: size(1.5), height: size(1.5), opacity: 0, '--pc-orb-fill': 1 })
+  gsap.set(disc, { clipPath: 'circle(100vmax at 50% 88%)', opacity: 0 })
 
   buildWordmark(root, hero)
 
@@ -47,12 +54,14 @@ export const buildHome: Builder = (root, { hover, vw }) => {
     .to(words(statementGhost, 1), { opacity: 1, stagger: 0.2 }, 'w1')
     .to(words(statement, 2), { opacity: 1, stagger: 0.2 }, 'w2')
     .to(words(statementGhost, 2), { opacity: 1, stagger: 0.2 }, 'w2')
-    .to(disc, { clipPath: 'circle(0.75vw at 50% 88%)', duration: 8, ease: 'none' }, 'shrink')
+    .to(disc, { clipPath: `circle(${size(0.75)} at 50% 88%)`, duration: 8, ease: 'none' }, 'shrink')
     .to(orb, { opacity: 1, duration: 0.05 }, 'hand')
     .to(disc, { opacity: 0, duration: 0.05 }, 'hand')
 
   /* Services: the orb glides to the first row, then steps down the list as
-     each description opens under scroll. */
+     each description opens under scroll. Desktop opens each row to a fixed
+     8vw; a phone measures the paragraph so nothing is cut off. Touch
+     scrolling covers ground faster than a wheel, so the pin is shorter. */
   const rows = all(root, '.pc-acc')
   const heads = rows.map((r) => one(r, '.pc-acc__head'))
   const decs = rows.map((r) => one(r, '.pc-acc__dec'))
@@ -61,7 +70,8 @@ export const buildHome: Builder = (root, { hover, vw }) => {
   const firstRect = heads[0].getBoundingClientRect()
   const rowStep = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0
   const orbTop = firstRect.top - servicesRect.top + firstRect.height / 2
-  const orbLeft = firstRect.left - vw(2.5)
+  const orbLeft = firstRect.left - vw(mobile ? 5.25 : 2.5)
+  const openHeight = (i: number) => (mobile ? (decs[i].firstElementChild as HTMLElement).offsetHeight + 16 : '8vw')
 
   gsap.set(cirs, { scale: 0 })
 
@@ -70,11 +80,11 @@ export const buildHome: Builder = (root, { hover, vw }) => {
     .to(orb, { top: orbTop, left: orbLeft, duration: 3, overwrite: 'auto' })
 
   const tlServices = gsap.timeline({
-    scrollTrigger: { trigger: services, start: 'top top', end: `+=${rows.length * 500}`, scrub: true, pin: true },
+    scrollTrigger: { trigger: services, start: 'top top', end: `+=${rows.length * (mobile ? 320 : 500)}`, scrub: true, pin: true },
   })
   rows.forEach((_, i) => {
     const label = `row${i}`
-    tlServices.to(decs[i], { height: '8vw', duration: 0.5 }, label).to(heads[i], { opacity: 1, duration: 0.5 }, label)
+    tlServices.to(decs[i], { height: openHeight(i), duration: 0.5 }, label).to(heads[i], { opacity: 1, duration: 0.5 }, label)
     if (i > 0) {
       tlServices
         .to(decs[i - 1], { height: 0, duration: 0.5 }, label)
@@ -95,35 +105,41 @@ export const buildHome: Builder = (root, { hover, vw }) => {
   gsap
     .timeline({ scrollTrigger: { trigger: journey, start: 'top 100%', end: 'top 63%', scrub: true } })
     .to(orb, { top: '50%', left: '50%', scale: 1, duration: 2.3, overwrite: 'auto' }, 'oc')
-    .to(orb, { width: '0.65vw', height: '0.65vw', '--pc-orb-fill': 0, duration: 0.6 })
+    .to(orb, { width: size(0.65), height: size(0.65), '--pc-orb-fill': 0, duration: 0.6 })
 
   const track = one(root, '.pc-journey__track')
   const distance = Math.max(0, track.scrollWidth - window.innerWidth)
+  /* The track is much longer than the screen on a phone, so the pin length
+     follows the distance instead of a fixed number of screens. */
+  const journeyEnd = mobile ? `+=${Math.round(distance * 0.8)}` : 'top -180%'
   gsap
-    .timeline({ scrollTrigger: { trigger: journey, start: 'top top', end: 'top -180%', scrub: 1, pin: true } })
+    .timeline({ scrollTrigger: { trigger: journey, start: 'top top', end: journeyEnd, scrub: 1, pin: true } })
     .to(all(root, '.pc-card__art'), { x: -5, duration: 1.5, ease: 'power2.out' }, 'sl')
     .to(track, { x: -distance, duration: 1.5, ease: 'none' }, 'sl')
-    .to(orb, { top: '50%', left: '50%', scale: 1, width: '2.5vw', height: '2.5vw', '--pc-orb-fill': 1, duration: 0.2 }, 's')
+    .to(orb, { top: '50%', left: '50%', scale: 1, width: size(2.5), height: size(2.5), '--pc-orb-fill': 1, duration: 0.2 }, 's')
     .to(one(root, '.pc-journey__end'), { opacity: 0, duration: 0.2, delay: 0.1 })
 
   /* Client: a circular mask opens from the orb's position, the stage unclips
-     upward, tilts in 3D while the fact chips drift past, and settles flat. */
+     upward, tilts in 3D while the fact chips drift past, and settles flat.
+     The tilt is gentler on a phone so the lockup stays legible, and the mask
+     grows to 300% of the width to cover a tall portrait screen. */
   const stage = one(root, '.pc-client__stage')
   const over = one(root, '.pc-client__over')
+  const tilt = mobile ? { far: 0.82, farther: 0.74, turn: 12 } : { far: 0.6, farther: 0.5, turn: 20 }
   gsap.set(client, { '--pc-mask': '1.4%', opacity: 0 })
   gsap.set(stage, { xPercent: -50, yPercent: -50, clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' })
   gsap.set(over, { top: '100%' })
 
   const tlClient = gsap
-    .timeline({ scrollTrigger: { trigger: client, start: 'top 0%', end: 'top -350%', scrub: true, pin: true } })
+    .timeline({ scrollTrigger: { trigger: client, start: 'top 0%', end: mobile ? 'top -300%' : 'top -350%', scrub: true, pin: true } })
     .to(orb, { opacity: 0, duration: 0.15 }, 0)
     .to(client, { opacity: 1, duration: 0.6 }, 0)
-    .to(client, { '--pc-mask': '280%', duration: 2.5 })
+    .to(client, { '--pc-mask': mobile ? '300%' : '280%', duration: 2.5 })
     .to(stage, { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', duration: 0.6 })
-    .to(stage, { scale: 0.6, rotateY: -20, rotateX: -2, duration: 1.5 })
-    .to(stage, { scale: 0.5, rotateY: 20, rotateX: 2, duration: 1.5 })
+    .to(stage, { scale: tilt.far, rotateY: -tilt.turn, rotateX: -2, duration: 1.5 })
+    .to(stage, { scale: tilt.farther, rotateY: tilt.turn, rotateX: 2, duration: 1.5 })
     .to(over, { top: '-300%', duration: 4 })
-    .to(stage, { scale: 0.6, rotateY: -20, rotateX: -2, duration: 1.5 })
+    .to(stage, { scale: tilt.far, rotateY: -tilt.turn, rotateX: -2, duration: 1.5 })
     .to(stage, { scale: 1, rotateY: 0, rotateX: 0, duration: 1.5 })
 
   const nav = one(root, '.pc-nav:not(.pc-nav--ghost)')

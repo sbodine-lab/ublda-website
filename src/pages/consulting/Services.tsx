@@ -55,7 +55,7 @@ const FAQ = [
   { q: 'How do we start?', a: 'Email Alex Forstner or Solomon DeYoung, or use the form on the connect page. We will set up a scoping call and follow up with a written scope within a week.' },
 ]
 
-const buildServices: Builder = (root, { vw, vh }) => {
+const buildServices: Builder = (root, { mobile, vw, vh }) => {
   const hero = one(root, '.pcs-hero')
   buildWordmark(root, hero)
   gsap.to(one(root, '.pcs-hero__lockup'), { y: -80, opacity: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.8 } })
@@ -65,20 +65,22 @@ const buildServices: Builder = (root, { vw, vh }) => {
   buildReveals(root)
 
   /* Winding path: the track slides left while a glowing dot rides the curve
-     and each step lights up as the dot reaches it. */
+     and each step lights up as the dot reaches it. A phone's track is longer
+     (each step needs most of the width) and the crests sit lower so the
+     step copy clears the nav. */
   const journey = one(root, '.pcs-journey')
   const track = one(journey, '.pcs-journey__track')
   const svg = one<HTMLElement>(journey, '.pcs-journey__svg')
   const path = svg.querySelector('path') as SVGPathElement
   const dot = one(journey, '.pcs-journey__dot')
   const steps = all(journey, '.pcs-journey__step')
-  const width = vw(300)
+  const width = vw(mobile ? 520 : 300)
   const height = vh(100)
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
   const n = steps.length
   const seg = width / n
-  const top = height * 0.3
-  const bottom = height * 0.72
+  const top = height * (mobile ? 0.42 : 0.3)
+  const bottom = height * (mobile ? 0.68 : 0.72)
   let d = `M 0 ${height / 2}`
   for (let i = 0; i < n; i++) {
     const x0 = i * seg
@@ -103,7 +105,7 @@ const buildServices: Builder = (root, { vw, vh }) => {
       scrollTrigger: {
         trigger: journey,
         start: 'top top',
-        end: '+=350%',
+        end: mobile ? '+=300%' : '+=350%',
         scrub: 1,
         pin: true,
         onUpdate: (self) => {

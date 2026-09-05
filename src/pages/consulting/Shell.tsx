@@ -134,8 +134,19 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenuOpen(false)
     }
+    /* iOS keeps scrolling the page under an open overlay whatever the
+       html overflow says, so swipes outside the menu are swallowed. */
+    const onTouch = (e: TouchEvent) => {
+      const menu = menuRef.current
+      if (menu && menu.contains(e.target as Node)) return
+      if (e.cancelable) e.preventDefault()
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    document.addEventListener('touchmove', onTouch, { passive: false })
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('touchmove', onTouch)
+    }
   }, [menuOpen])
 
   const toggleTheme = useCallback(() => setTheme((t) => (t === 'dark' ? 'light' : 'dark')), [])

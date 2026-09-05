@@ -3,7 +3,8 @@
 
    A dark, editorial single-page site in UBLDA navy, cream, and teal. Scroll
    choreography lives in consulting/motion.ts; this file owns layout, type,
-   the two themes, and the static fallback used below 768px and for
+   the two themes, the phone layout of the animated sections (the `.pc--motion`
+   rules in the mobile blocks), and the static fallback used for
    reduced-motion visitors. Everything is scoped under .pc.
    ========================================================================== */
 
@@ -688,7 +689,7 @@ html.pc-root::-webkit-scrollbar-thumb {
   z-index: 4;
   background: var(--pc-fg);
   color: var(--pc-bg);
-  clip-path: circle(100vw at 50% 88%);
+  clip-path: circle(100vmax at 50% 88%);
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
@@ -1742,10 +1743,12 @@ html.pc-menu-open .pc-cursor {
     font-size: 0.66rem;
   }
 
-  .pc-word > .pc-word__sep,
-  .pc-word > .pc-word__c,
   .pc-word > .pc-word__sep ~ .pc-word__rest {
     display: none;
+  }
+
+  .pc-word__sep {
+    margin: 0 0.45em 0 0.3em;
   }
 
   .pc-nav__left,
@@ -1773,6 +1776,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-hero {
+    height: 100svh;
     padding: 6vw;
   }
 
@@ -1794,17 +1798,45 @@ html.pc-menu-open .pc-cursor {
     padding: 28vw 7vw 16vw;
   }
 
+  .pc--motion .pc-statement {
+    padding: 0 7vw;
+  }
+
   .pc-statement__p {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .pc-statement__p1 {
     margin-bottom: 1.5rem;
   }
 
+  .pc--motion .pc-services {
+    padding: 22vw 7vw 0;
+  }
+
+  .pc--motion .pc-services__right {
+    padding-left: 7.5vw;
+  }
+
   .pc-services__inner {
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .pc-orb {
+    width: 4.5vw;
+    height: 4.5vw;
+  }
+
+  .pc-acc__cir {
+    left: -7.5vw;
+    width: 4.5vw;
+    height: 4.5vw;
+  }
+
+  .pc-acc__dec p {
+    width: 100%;
+    font-size: 0.95rem;
   }
 
   .pc-services__left,
@@ -1833,6 +1865,59 @@ html.pc-menu-open .pc-cursor {
     width: 100%;
   }
 
+  /* Horizontal journey on a phone: one card fills most of the width and the
+     end link stacks its label under the circle so the orb lands dead centre. */
+  .pc--motion .pc-journey__track {
+    padding: 0 7vw;
+    gap: 6vw;
+  }
+
+  .pc--motion .pc-card {
+    width: 74vw;
+    height: 94vw;
+    gap: 0.5rem;
+    margin-top: 0;
+  }
+
+  .pc--motion .pc-card__label {
+    height: 1.7rem;
+  }
+
+  .pc--motion .pc-card__frame {
+    height: calc(100% - 2.2rem);
+  }
+
+  .pc-card__body {
+    padding: 1.2rem;
+  }
+
+  .pc--motion .pc-journey__spacer {
+    width: 10vw;
+  }
+
+  .pc--motion .pc-journey__endwrap {
+    width: 100vw;
+    align-items: center;
+  }
+
+  .pc--motion .pc-journey__end {
+    height: auto;
+    gap: 0;
+  }
+
+  .pc--motion .pc-journey__end-cir {
+    width: 7.5vw;
+    height: 7.5vw;
+  }
+
+  .pc--motion .pc-journey__end-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 1rem;
+  }
+
   .pc-card__label h3 {
     font-size: 1.1rem;
   }
@@ -1858,9 +1943,29 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 1rem;
   }
 
+  .pc-client__lockup {
+    max-width: 100%;
+    padding: 0 7vw;
+  }
+
+  .pc-client__desc {
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .pc-chip {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.7rem;
+  }
+
   .pc--static .pc-client__stage {
     padding: 16vw 6vw;
     min-height: 60vh;
+  }
+
+  .pc--motion .pc-partners {
+    height: auto;
+    padding-bottom: 14vw;
   }
 
   .pc-partners__wrap {
@@ -1907,12 +2012,16 @@ html.pc-menu-open .pc-cursor {
   .pc-menu {
     padding: 22vw 7vw 8vw;
     gap: 2.5rem;
+    justify-content: flex-start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .pc-menu__top {
     flex-direction: column;
     align-items: flex-start;
     gap: 2rem;
+    margin-top: auto;
   }
 
   .pc-menu__link {
@@ -3700,6 +3809,190 @@ html.pc-menu-open .pc-cursor {
     display: inline;
   }
 
+  .pcp-hero,
+  .pcb-hero,
+  .pcc-hero,
+  .pcs-hero,
+  .pcw {
+    height: 100svh;
+  }
+
+  .pcp-hero__art,
+  .pcb-hero__art {
+    filter: none;
+  }
+
+  .pc--motion .pcp-hero__over,
+  .pc--motion .pcb-hero__over,
+  .pc--motion .pcc-hero__over {
+    left: 7vw;
+    right: 7vw;
+    bottom: 12vh;
+    max-width: none;
+  }
+
+  .pcp-prose__lead {
+    max-width: none !important;
+  }
+
+  .pcp-member__tile {
+    font-size: 22vw;
+  }
+
+  /* Work: the frame sits above the copy instead of beside it. */
+  .pc--motion .pcw-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    padding: 16vh 7vw 14vh;
+  }
+
+  .pcw-slide__bg {
+    filter: blur(24px);
+  }
+
+  .pc--motion .pcw-slide__frame {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 56vw;
+    height: 56vw;
+    margin: 0 auto;
+    transform: none;
+    flex-shrink: 0;
+  }
+
+  .pc--motion .pcw-slide__text {
+    position: static;
+    order: 1;
+    transform: none;
+    max-width: none;
+  }
+
+  .pcw-slide__num {
+    font-size: 22vw;
+    right: 1rem;
+    top: 0.2rem;
+  }
+
+  .pcw-slide__status {
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .pcw-slide__tag {
+    margin-top: 0.6rem;
+  }
+
+  .pcw-slide__dec {
+    margin-top: 0.5rem;
+  }
+
+  .pcw-slide__cta {
+    margin-top: 0.9rem;
+  }
+
+  .pcw-ui {
+    width: 86vw;
+    bottom: 4vh;
+  }
+
+  .pcw-ui__arrows {
+    gap: 0.5rem;
+  }
+
+  /* Services: the winding path gets a longer track and smaller step copy. */
+  .pc--motion .pcs-journey__heading {
+    top: 18vw;
+    left: 7vw;
+  }
+
+  .pcs-journey__dot {
+    width: 4vw;
+    height: 4vw;
+    box-shadow: 0 0 40px 16px rgba(250, 249, 246, 0.16);
+  }
+
+  .pc--light .pcs-journey__dot {
+    box-shadow: 0 0 40px 16px rgba(15, 43, 60, 0.16);
+  }
+
+  .pc--motion .pcs-journey__step {
+    width: 64vw;
+  }
+
+  .pcs-journey__index {
+    margin-bottom: 0.3rem;
+  }
+
+  .pcs-journey__step h3 {
+    font-size: 1.15rem;
+  }
+
+  .pcs-journey__step p {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  .pc--motion .pcs-approach {
+    padding-top: 22vw;
+  }
+
+  .pcs-approach__wrap {
+    width: 100%;
+    margin-top: 2.5rem;
+  }
+
+  .pcs-approach__content {
+    margin-top: 2rem;
+  }
+
+  .pcs-approach__block p {
+    margin-top: 0.6rem;
+  }
+
+  .pcb-selected {
+    padding: 3rem 7vw 2rem;
+  }
+
+  .pcb-selected h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .pcb-index {
+    padding: 3rem 7vw 5rem;
+  }
+
+  .pcb-index__foot {
+    margin-top: 2rem;
+  }
+
+  .pc--motion .pcc-clock {
+    left: 7vw;
+    top: 16svh;
+    width: 34vw;
+    min-width: 0;
+  }
+
+  .pcc-connect__line {
+    left: 7vw;
+  }
+
+  .pcc-connect {
+    padding-bottom: 14vh;
+  }
+
+  .pcc-connect__cols {
+    margin-top: 2.5rem;
+    gap: 1.8rem;
+  }
+
+  .pcc-connect__cols h3 {
+    margin-bottom: 0.4rem;
+  }
+
   .pcp-facts {
     padding: 10vh 7vw 8vh;
     min-height: 0;
@@ -3886,5 +4179,33 @@ html.pc-menu-open .pc-cursor {
 
   .pcc-jobs__title {
     margin-bottom: 1rem;
+  }
+}
+
+/* ─── Touch screens ─────────────────────────────────────────────────────── */
+/* No pointer to follow or hover with: the badge goes, the journey card
+   labels stay up, and the partner tiles show their caption instead of a
+   hover cover. */
+@media (hover: none) {
+  .pc-cursor {
+    display: none;
+  }
+
+  .pc-card__label h3 {
+    transform: none;
+  }
+
+  .pcb-tile__cover {
+    position: static;
+    order: 2;
+    clip-path: none;
+    background: transparent;
+    color: var(--pc-des);
+    padding: 0 1rem 1.2rem;
+    font-size: 0.65rem;
+  }
+
+  .pcb-tile__logo {
+    padding-bottom: 0;
   }
 }

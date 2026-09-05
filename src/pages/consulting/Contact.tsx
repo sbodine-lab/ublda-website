@@ -51,8 +51,19 @@ const buildContact: Builder = (root) => {
   return () => cleanupBlend()
 }
 
+/* Pin the block until the next section has slid one screen over it. On a
+   phone the stacked columns can be taller than the screen; then it pins once
+   its bottom arrives so nothing is hidden before the form covers it. */
 function ScrollTrigger_pin(section: HTMLElement) {
-  gsap.to(section, { scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', pin: true, pinSpacing: false } })
+  gsap.to(section, {
+    scrollTrigger: {
+      trigger: section,
+      start: () => (section.offsetHeight > window.innerHeight + 2 ? 'bottom bottom' : 'top top'),
+      end: () => `+=${window.innerHeight}`,
+      pin: true,
+      pinSpacing: false,
+    },
+  })
 }
 
 const startContact: MotionStarter = (root, onMode, reduce) => startMotion(root, onMode, buildContact, { reduce })
