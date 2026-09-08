@@ -17,7 +17,7 @@ const OPENINGS = [
     facts: ['Experience: none required', 'Location: Ann Arbor', 'Commitment: weekly, October through December'],
     about: 'You notice when something does not work for someone else, and you would rather fix it than explain it away. You do not need consulting experience or a background in accessibility, and you do not need to be disabled. We teach the consulting skills and bring you onto real client work.',
     doing: ['Walk through websites, documents, and processes with real users, including disabled students.', 'Turn what you find into ranked, plain-language findings.', 'Build the business case where the fix needs budget.', 'Present at the midpoint and the final review.'],
-    requirements: ['University of Michigan undergraduate, any major and year.', 'Three short answers. We are reading how you think, not what you already know.', 'Application by Tuesday, September 22 at 11:30 PM ET.', 'Two 30-minute interviews at Ross, September 25 to 27.', 'Offers by September 29, kickoff the week of October 5.'],
+    requirements: ['University of Michigan undergraduate, any major and year.', 'Three short answers. We are reading how you think, not what you already know.', 'Application by Sunday, September 20 at 11:30 PM ET.', 'Two 30-minute interviews at Ross, September 25 to 27.', 'Offers by September 29, kickoff the week of October 5.'],
     cta: { href: CONSULTING_FORM_URL, label: 'Apply', external: true },
   },
   {

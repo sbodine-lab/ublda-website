@@ -149,7 +149,7 @@ export default function Apply() {
             <p className="apply-deadline" role="note">
               {window_ === 'before' && <>Applications open {APPLY_OPENS_LABEL}.</>}
               {window_ === 'open' && <>Applications close {APPLY_DEADLINE_LABEL}.</>}
-              {window_ === 'closed' && <>Fall 2026 applications closed September 22.</>}
+              {window_ === 'closed' && <>Fall 2026 applications closed September 20.</>}
             </p>
           </Reveal>
         </div>
@@ -193,7 +193,7 @@ export default function Apply() {
                   </>
                 ) : (
                   <>
-                    <h3 className="apply-notice__title">Applications closed September 22</h3>
+                    <h3 className="apply-notice__title">Applications closed September 20</h3>
                     <p className="apply-notice__desc">
                       Missed it? Email{' '}
                       <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>

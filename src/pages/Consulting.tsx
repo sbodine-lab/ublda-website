@@ -72,7 +72,7 @@ function HomeBody() {
           <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
           <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
             Apply for Fall 2026
-            <span className="pc-hero__apply-meta">closes Sep 22</span>
+            <span className="pc-hero__apply-meta">closes Sep 20</span>
             <NewTab />
             <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
           </a>

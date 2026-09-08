@@ -78,7 +78,7 @@ export default function AnnouncementBanner() {
     <div className="announcement" ref={bannerRef} role="region" aria-label="Fall 2026 sign-up">
       <div className="announcement__inner container">
         <div className="announcement__text">
-          <span>Fall 2026 membership sign-up is open. Consulting applications close Sept 22.</span>
+          <span>Fall 2026 membership sign-up is open. Consulting applications close Sept 20.</span>
           <span className="announcement__countdown">
             <span className="announcement__countdown-unit">
               <span className="announcement__countdown-num">{timeLeft.days}</span>d
