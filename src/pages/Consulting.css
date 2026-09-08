@@ -1719,10 +1719,6 @@ html.pc-menu-open .pc-cursor {
     font-size: 0.66rem;
   }
 
-  .pc-word > .pc-word__sep ~ .pc-word__rest {
-    display: none;
-  }
-
   .pc-word__sep {
     margin: 0 0.45em 0 0.3em;
   }
