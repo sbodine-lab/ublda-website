@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MeshGradient } from '@paper-design/shaders-react'
 import { QR_CONSULTING, QR_INSTAGRAM, QR_JOIN, type QrSvg } from './tableQr'
 import './Table.css'
 
-/* Cream, the site's teal-soft accent, sage, a warm gold-soft, and a muted teal.
-   Low speed and distortion: the background should read as paper, not a screensaver. */
 const SHADER_COLORS = ['#FAF9F6', '#E8F6F4', '#D9EAE5', '#F3EAD3', '#9CCBC1']
 
 /** Pause the shader for reduced-motion users and whenever the tab is hidden. */
@@ -24,6 +22,20 @@ function useShaderPaused() {
   return paused
 }
 
+/** Browser full-screen needs a user gesture, so it is a button, hidden once active. */
+function useFullscreen() {
+  const [active, setActive] = useState(false)
+  useEffect(() => {
+    const update = () => setActive(Boolean(document.fullscreenElement))
+    document.addEventListener('fullscreenchange', update)
+    return () => document.removeEventListener('fullscreenchange', update)
+  }, [])
+  const enter = useCallback(() => {
+    document.documentElement.requestFullscreen?.().catch(() => {})
+  }, [])
+  return { active, enter, supported: typeof document !== 'undefined' && 'requestFullscreen' in document.documentElement }
+}
+
 function Qr({ qr, label }: { qr: QrSvg; label: string }) {
   return (
     <svg className="tb-qr" viewBox={qr.viewBox} role="img" aria-label={label} shapeRendering="crispEdges">
@@ -35,9 +47,10 @@ function Qr({ qr, label }: { qr: QrSvg; label: string }) {
 /** Self-serve screen for the laptop at recruiting tables. Standalone: no nav, no footer. */
 export default function Table() {
   const paused = useShaderPaused()
+  const fullscreen = useFullscreen()
 
   useEffect(() => {
-    document.title = 'UBLDA · Sign up and follow'
+    document.title = 'UBLDA · Scan'
   }, [])
 
   return (
@@ -62,61 +75,41 @@ export default function Table() {
           <div className="tb-brand">
             <img src="/logo-1000.png" alt="" width={44} height={44} />
             <span className="tb-brand__name">UBLDA</span>
-            <span className="tb-brand__sub">Undergraduate Business Leaders for Diverse Abilities · Michigan Ross</span>
           </div>
-          <p className="tb-eyebrow">BBA Meet the Clubs · Fall 2026</p>
+          {fullscreen.supported && !fullscreen.active && (
+            <button type="button" className="tb-fullscreen" onClick={fullscreen.enter}>
+              Full screen
+            </button>
+          )}
         </header>
 
-        <div className="tb-lede">
-          <h1 className="tb-title">Disability inclusion belongs in business.</h1>
-          <p className="tb-sub">Scan with your phone camera. Show us the screen, take a treat.</p>
-        </div>
+        <h1 className="tb-title">Disability inclusion belongs in business.</h1>
 
         <div className="tb-grid">
           <section className="tb-card tb-card--primary" aria-labelledby="tb-apply">
-            <p className="tb-card__eyebrow">UBLDA Consulting · Fall 2026</p>
-            <h2 id="tb-apply" className="tb-card__title">Apply for the consulting team</h2>
+            <h2 id="tb-apply" className="tb-card__title">Apply to UBLDA Consulting</h2>
             <div className="tb-qrwrap">
-              <Qr qr={QR_CONSULTING} label="QR code that opens ublda.org/consulting, where the application button is" />
+              <Qr qr={QR_CONSULTING} label="QR code that opens ublda.org/consulting" />
             </div>
-            <p className="tb-card__body">Real clients. Three short answers. No consulting experience needed.</p>
-            <p className="tb-card__meta">
-              <span className="tb-card__deadline">Applications close Sept 20</span>
-              <span>ublda.org/consulting</span>
-            </p>
+            <p className="tb-card__note">Closes Sept 20</p>
           </section>
 
           <section className="tb-card" aria-labelledby="tb-join">
-            <p className="tb-card__eyebrow">Membership</p>
             <h2 id="tb-join" className="tb-card__title">Join UBLDA</h2>
             <div className="tb-qrwrap">
               <Qr qr={QR_JOIN} label="QR code that opens the UBLDA membership sign-up form" />
             </div>
-            <p className="tb-card__body">Free and open to every U-M student. Three fields, about fifteen seconds.</p>
-            <p className="tb-card__meta">
-              <span className="tb-treat">Sour Patch Kids</span>
-              <span>ublda.org/join</span>
-            </p>
+            <p className="tb-card__note tb-treat">Sour Patch Kids</p>
           </section>
 
           <section className="tb-card" aria-labelledby="tb-follow">
-            <p className="tb-card__eyebrow">Follow</p>
-            <h2 id="tb-follow" className="tb-card__title">@michiganublda</h2>
+            <h2 id="tb-follow" className="tb-card__title">Follow @michiganublda</h2>
             <div className="tb-qrwrap">
               <Qr qr={QR_INSTAGRAM} label="QR code that opens the UBLDA Instagram profile" />
             </div>
-            <p className="tb-card__body">Events, deadlines, and client work. Also on LinkedIn as UBLDA.</p>
-            <p className="tb-card__meta">
-              <span className="tb-treat">Poppi</span>
-              <span>instagram.com/michiganublda</span>
-            </p>
+            <p className="tb-card__note tb-treat">Poppi</p>
           </section>
         </div>
-
-        <footer className="tb-foot">
-          <span>ublda.org</span>
-          <a href={QR_JOIN.href}>No phone? Sign up on this laptop</a>
-        </footer>
       </main>
     </div>
   )
