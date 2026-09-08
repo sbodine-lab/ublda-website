@@ -31,6 +31,12 @@ export const buildHome: Builder = (root, { hover, mobile, vw }) => {
 
   buildWordmark(root, hero)
 
+  /* Let the shader drift through the section boundary before the disc
+     takes over. Both directions use scroll progress so reversing stays smooth. */
+  gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.8 } })
+    .to(one(root, '.pc-hero-backdrop__shader'), { scale: 1.12, yPercent: -5, ease: 'none', duration: 1 }, 0)
+    .to(one(root, '.pc-hero-backdrop'), { opacity: 0, ease: 'power1.inOut', duration: 0.6 }, 0.4)
+
   /* Statement: the disc fades in as the section arrives, words light up one
      by one while pinned, then the disc shrinks to a dot and hands over. */
   const ghostInner = one(disc, '.pc-disc__inner')
@@ -41,9 +47,8 @@ export const buildHome: Builder = (root, { hover, mobile, vw }) => {
   gsap.ticker.add(syncGhost)
 
   gsap
-    .timeline({ scrollTrigger: { trigger: statement, start: 'top 20%', end: 'top 0%', scrub: 1 } })
+    .timeline({ scrollTrigger: { trigger: statement, start: 'top 65%', end: 'top 0%', scrub: 0.8 } })
     .to(disc, { opacity: 1, ease: 'power2.out', duration: 1 }, 'a')
-    .to(one(root, '.pc-hero__fade'), { opacity: 0, ease: 'power2.out', duration: 0.1 }, 'a')
 
   const words = (scope: HTMLElement, n: 1 | 2) => all(scope, `.pc-statement__p${n} .pc-w`)
   gsap

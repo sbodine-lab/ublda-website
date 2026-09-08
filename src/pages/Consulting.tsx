@@ -15,8 +15,9 @@ import {
   STEPS,
 } from './consulting/content'
 import { startConsultingMotion } from './consulting/motion'
-import { DotButton, HeroRings, NewTab } from './consulting/parts'
+import { DotButton, NewTab } from './consulting/parts'
 import { ConsultingShell } from './consulting/Shell'
+import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
@@ -57,11 +58,10 @@ function HomeBody() {
 
   return (
     <>
-      {/* 1 · Hero */}
+      {/* The shared backdrop carries the hero into the opening statement. */}
+      <div className="pc-intro">
+      <HeroBackdrop />
       <section className="pc-hero">
-        <div className="pc-hero__art" aria-hidden="true">
-          <HeroRings />
-        </div>
         <div className="pc-hero__text">
           <h1 className="pc-hero__title">
             We consult for disability-focused organizations and accessibility teams.
@@ -75,11 +75,11 @@ function HomeBody() {
             </a>
           </div>
         </div>
-        <div className="pc-hero__fade" aria-hidden="true" />
       </section>
 
       {/* 2 · Statement */}
       <StatementBody />
+      </div>
 
       {/* 3 · Services */}
       <section className="pc-services" id="consulting-services">

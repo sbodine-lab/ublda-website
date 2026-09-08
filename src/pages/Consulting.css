@@ -509,15 +509,40 @@ html.pc-root::-webkit-scrollbar-thumb {
   overflow: hidden;
 }
 
-.pc-hero__art {
+.pc-intro {
+  position: relative;
+  isolation: isolate;
+}
+
+.pc-hero-backdrop {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--pc-fg);
-  opacity: 0.28;
+  z-index: -1;
   pointer-events: none;
+  background: var(--pc-bg);
+}
+
+.pc-hero-backdrop__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 85% 45%, #d9eae5, #faf9f6 75%);
+}
+
+.pc-hero-backdrop__sticky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #faf9f6eb 0%, #faf9f691 45%, #faf9f600 85%);
+}
+
+.pc-hero-backdrop__shader {
+  transform-origin: 65% 50%;
+}
+
+.pc--static .pc-hero-backdrop {
+  mask-image: linear-gradient(#000 60%, transparent);
 }
 
 .pc-hero__rings {
@@ -610,15 +635,6 @@ html.pc-root::-webkit-scrollbar-thumb {
     grid-template-columns: 1fr;
     justify-items: start;
   }
-}
-
-.pc-hero__fade {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4vh;
-  background: linear-gradient(to top, var(--pc-bg), transparent);
 }
 
 /* ─── Statement ─────────────────────────────────────────────────────────── */
@@ -4184,4 +4200,8 @@ html.pc-menu-open .pc-cursor {
   .pcb-tile__logo {
     padding-bottom: 0;
   }
+}
+
+.pc-hero-backdrop--halftone .pc-hero-backdrop__sticky::after {
+  background: linear-gradient(90deg, #faf9f6f5 0%, #faf9f6d9 55%, #faf9f68c 100%);
 }
