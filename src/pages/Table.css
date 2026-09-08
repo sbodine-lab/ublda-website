@@ -71,7 +71,9 @@
 }
 
 .tb-brand__name {
+  font-family: var(--font-body);
   font-weight: 700;
+  line-height: 1;
   font-size: var(--type-sm);
   letter-spacing: 0.16em;
   color: var(--color-navy);
@@ -94,16 +96,6 @@
 .tb-fullscreen:focus-visible {
   outline: 2px solid var(--color-navy);
   outline-offset: 3px;
-}
-
-.tb-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2.2rem, 6vh, 4.6rem);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  color: var(--color-navy);
-  text-wrap: balance;
 }
 
 .tb-grid {
@@ -137,7 +129,7 @@
 .tb-card__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.4rem, 3.6vh, 2.5rem);
+  font-size: clamp(1.6rem, 4vh, 2.8rem);
   line-height: 1.05;
   letter-spacing: -0.01em;
   color: inherit;
