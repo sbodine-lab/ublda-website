@@ -357,7 +357,7 @@ html.pc-root::-webkit-scrollbar-thumb {
 
 .pc-word__u,
 .pc-word__c {
-  font-weight: 700;
+  font-weight: inherit;
 }
 
 .pc-word__sep {
@@ -4206,37 +4206,11 @@ html.pc-menu-open .pc-cursor {
   background: linear-gradient(90deg, #faf9f6f5 0%, #faf9f6d9 55%, #faf9f68c 100%);
 }
 
-/* The heatmap sits beside the headline so the photograph stays a background. */
-.pc-hero__main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.4fr);
-  gap: 3vw;
-  align-items: center;
-}
+/* Keep the headline scale from the photo treatment without a logo column. */
 .pc-hero__main .pc-hero__title {
   font-size: clamp(3.5rem, 5.8vw, 6.5rem);
 }
-.pc-hero__mark {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  overflow: hidden;
-  pointer-events: none;
-}
-.pc-hero__mark-colors {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 165%;
-  height: 165%;
-  max-width: none;
-  object-fit: contain;
-  opacity: 0.85;
-}
 @media (max-width: 767px) {
-  .pc-hero__main { grid-template-columns: 1fr; gap: 12px; }
   .pc-hero__main .pc-hero__title { font-size: clamp(2.6rem, 11.4vw, 5.5rem); }
-  .pc-hero__mark { width: 180px; justify-self: end; }
   .pc-hero__text { gap: 24px; }
 }

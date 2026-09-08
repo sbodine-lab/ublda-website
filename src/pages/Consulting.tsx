@@ -18,7 +18,6 @@ import { startConsultingMotion } from './consulting/motion'
 import { DotButton, NewTab } from './consulting/parts'
 import { ConsultingShell } from './consulting/Shell'
 import { HeroBackdrop } from './consulting/HeroBackdrop'
-import { HeroMark } from './consulting/HeroMark'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
@@ -68,7 +67,6 @@ function HomeBody() {
           <h1 className="pc-hero__title">
             We consult for disability-focused organizations and accessibility teams.
           </h1>
-          <HeroMark />
           </div>
           <div className="pc-hero__details">
             <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
