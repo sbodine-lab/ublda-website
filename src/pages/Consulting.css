@@ -548,19 +548,14 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-hero__title {
+  max-width: 20ch;
+  text-wrap: balance;
   font-family: 'Manrope', var(--font-body);
   font-size: clamp(3.75rem, 7vw, 7.5rem);
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.04em;
   color: var(--pc-fg);
-}
-
-.pc-hero__title > span {
-  display: block;
-  margin-top: 0.22em;
-  max-width: 18ch;
-  color: inherit;
 }
 
 .pc-hero__details {

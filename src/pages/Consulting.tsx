@@ -64,8 +64,7 @@ function HomeBody() {
         </div>
         <div className="pc-hero__text">
           <h1 className="pc-hero__title">
-            Build experience.
-            <span>Advance disability inclusion.</span>
+            Build consulting experience that advances disability inclusion.
           </h1>
           <div className="pc-hero__details">
             <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
