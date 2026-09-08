@@ -287,10 +287,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   color: #fff;
 }
 
-.pc-nav--blend .pc-word__dot {
-  background: #fff;
-}
-
 .pc-nav__right {
   display: flex;
   align-items: center;
@@ -367,18 +363,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   opacity: 0.45;
   margin: 0 0.6em 0 0.4em;
   align-self: center;
-}
-
-.pc-word__dot {
-  position: absolute;
-  left: 50%;
-  bottom: -0.42em;
-  width: 0.28em;
-  height: 0.28em;
-  border-radius: 50%;
-  background: var(--pc-accent);
-  transform: translateX(-50%) scale(0);
-  opacity: 0;
 }
 
 .pc-nav__menu {

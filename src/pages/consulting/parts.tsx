@@ -108,7 +108,6 @@ export function ConsultingNav({ menuOpen, onToggleMenu, ghost = false }: NavProp
       <span className="pc-word__rest pc-word__sep" aria-hidden="true" />
       <span className="pc-word__c">C</span>
       <span className="pc-word__rest">onsulting</span>
-      <span className="pc-word__dot" aria-hidden="true" />
     </span>
   )
   return (
