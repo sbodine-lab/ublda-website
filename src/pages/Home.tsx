@@ -18,19 +18,19 @@ const pillars = [
   {
     title: 'Advocacy & Community',
     description:
-      'Disabled students, allies, and anyone who thinks inclusion belongs in business. We show up for each other and push for a business world that includes all of us.',
+      'Meet students who care about disability inclusion and help plan events that bring that conversation to campus.',
     icon: '01',
   },
   {
     title: 'Career Preparation',
     description:
-      'Programs built around disability-focused business: accessibility consulting, stock pitches, and entrepreneurship tracks that give members real work to point to.',
+      'Learn through client projects and workshops on business strategy and accessibility. UBLDA Consulting selects its analyst team through an application and interview.',
     icon: '02',
   },
   {
     title: 'Networking',
     description:
-      'We connect members with employers, professionals, and students across Ross and the industry, so you\'re not building a career in this space on your own.',
+      'Talk with professionals working in disability-focused businesses and connect with MBA students through BLDA at Michigan Ross.',
     icon: '03',
   },
 ]
@@ -40,7 +40,7 @@ const benefits = [
   { label: 'Career Development', icon: '→' },
   { label: 'Speaker Sessions', icon: '→' },
   { label: 'Workshops', icon: '→' },
-  { label: 'Mentorship', icon: '→' },
+  { label: 'MBA Connections', icon: '→' },
   { label: 'Hands-on Consulting', icon: '→' },
   { label: 'Community Events', icon: '→' },
   { label: 'Education & Awareness', icon: '→' },
@@ -48,32 +48,32 @@ const benefits = [
 
 const upcoming = [
   {
-    title: 'Accessibility Consulting',
-    desc: `Live now: a selective analyst team working with a real client on a real engagement this fall. No consulting experience needed. Applications run ${APPLY_WINDOW_PROSE}; the winter client is announced in October.`,
+    title: 'UBLDA Consulting',
+    desc: `Our first project is a business case for Arc University. Consulting applications run ${APPLY_WINDOW_PROSE}; no consulting experience is required.`,
   },
   {
-    title: 'Mentorship & Education',
-    desc: 'One-on-one mentorship with senior business leaders plus an education track from Alex Forstner covering finance, consulting, and product.',
+    title: 'Education & Mentorship Plans',
+    desc: 'We’re developing business workshops and a peer mentorship program with BLDA’s MBA students. We’ll share details with members as plans are confirmed.',
   },
   {
-    title: 'Expanded Speaker Series',
-    desc: 'Monthly fireside chats with disability advocates, startup founders, and industry executives who\'ve built inclusive organizations firsthand.',
+    title: 'Speaker Series',
+    desc: 'Hear from business leaders about disability in their work. Past speakers include Lloyd Lewis of Arc Thrift Stores and Andrew Parker of Nestidd.',
   },
 ]
 
 const exec = [
-  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Leads speaker events and campus partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
-  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Connects disability advocacy with Ross and keeps accessibility in the room.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
-  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
+  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Coordinates club strategy and external partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
+  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Coordinates club planning and relationships at Michigan Ross.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
+  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Coordinates the executive board and tracks project progress.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
 ]
 
 const vps = [
-  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
-  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
-  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
-  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Leads the voice, visibility, and storytelling that help UBLDA reach more students across campus.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
-  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with campus partners, employers, and community organizations that move the mission forward.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
-  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Creates thoughtful programming and event experiences that bring members together around disability inclusion.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
+  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Manages meeting logistics and member operations.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
+  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Manages the budget, funding requests, and reimbursements.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
+  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Plans educational programming and consulting training.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
+  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Manages communications and promotes club events.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
+  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with speakers and prospective project partners.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
+  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Organizes club events and coordinates program logistics.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
 ]
 
 const LinkedInIcon = () => (
@@ -97,9 +97,9 @@ export default function Home() {
             </h1>
 
             <p className="hero__sub hero__entrance hero__entrance--sub">
-              Disability inclusion belongs in business. UBLDA brings Michigan Ross
-              students together through client work, speaker events, workshops, and
-              the BLDA community.
+              UBLDA is a student organization at Michigan Ross focused on disability
+              inclusion in business. Join us for speaker events and workshops or
+              apply for our pro bono consulting team. All U-M students are welcome.
             </p>
 
             <div className="hero__actions hero__entrance hero__entrance--actions">
@@ -110,7 +110,7 @@ export default function Home() {
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </span>
                   <span className="btn-flip__back">
-                    Let's build this together
+                    Join UBLDA
                   </span>
                 </span>
               </Link>
@@ -126,8 +126,8 @@ export default function Home() {
         <div className="container">
           <Reveal>
             <h2 className="mission__headline">
-              We think disability inclusion should be built into business, not bolted on.{' '}
-              <em>That starts here, at Ross.</em>
+              Disability belongs in the conversation about how businesses operate.{' '}
+              <em>We bring that conversation to Ross.</em>
             </h2>
           </Reveal>
         </div>
@@ -167,14 +167,14 @@ export default function Home() {
               <Reveal delay={0.2}>
                 <p className="partnership__desc">
                   We're the undergraduate chapter of Business Leaders for Diverse Abilities (BLDA),
-                  Ross's MBA disability advocacy organization. Members tap into BLDA's MBA network,
-                  mentorship, and guidance that most Ross undergrads never touch.
+                  the MBA disability advocacy organization at Michigan Ross. The connection
+                  brings undergraduate and MBA students together around disability in business.
                 </p>
               </Reveal>
             </div>
             <div className="partnership__benefits">
               <Reveal delay={0.15}>
-                <p className="partnership__benefits-label">What members get</p>
+                <p className="partnership__benefits-label">Ways to take part</p>
               </Reveal>
               <RevealStagger className="benefits__grid">
                 {benefits.map((b) => (
@@ -221,15 +221,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Coming Fall 2026 ─── */}
+      {/* ─── Fall 2026 ─── */}
       <section className="section upcoming-programs">
         <div className="container">
           <Reveal>
-            <p className="section__label">Coming Fall 2026</p>
+            <p className="section__label">Fall 2026</p>
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="upcoming__headline">
-              New programs, <em>new momentum.</em>
+              What we’re <em>working on.</em>
             </h2>
           </Reveal>
           <RevealStagger className="upcoming__grid">
@@ -284,7 +284,7 @@ export default function Home() {
                 ? `Applications for the Fall 2026 consulting team open ${APPLY_OPENS_PROSE}.`
                 : applyState === 'open'
                   ? `Applications for the Fall 2026 consulting team are open through ${APPLY_CLOSES_PROSE}.`
-                  : 'Applications for the Fall 2026 consulting team are closed for the fall.'}{' '}
+                  : 'Applications for the Fall 2026 consulting team are closed.'}{' '}
               {/* /apply is a redirect straight out to the Google Form, so the
                   link has to say so rather than promise a details page. */}
               <Link to="/apply" className="recruiting-events__link">
@@ -303,7 +303,7 @@ export default function Home() {
         <div className="container">
           <Reveal>
             <h2 className="leadership__headline">
-              The people behind the mission.
+              Meet our executive board.
             </h2>
           </Reveal>
 
@@ -345,15 +345,14 @@ export default function Home() {
           <div className="cta__card">
             <Reveal>
               <h2 className="cta__headline">
-                Business gets better when more people are in the room.<br />
-                <em>Come be in the room.</em>
+                Get involved in<br />
+                <em>disability inclusion at Ross.</em>
               </h2>
             </Reveal>
             <Reveal delay={0.15}>
               <p className="cta__sub">
-                Disabled students, allies, and future business leaders who
-                want impact built into their careers. 30 seconds to sign up.
-                Join 30+ Ross students already here.
+                Membership is free and open to all U-M students. Sign up for
+                event updates and opportunities to get involved.
               </p>
             </Reveal>
             <Reveal delay={0.25}>
@@ -362,7 +361,7 @@ export default function Home() {
                   to="/join"
                   className="btn btn--primary btn--lg"
                 >
-                  Become a member
+                  Join UBLDA
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
                 <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="btn btn--ghost">

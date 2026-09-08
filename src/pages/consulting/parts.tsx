@@ -2,6 +2,7 @@ import { forwardRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../../lib/forms'
+import { APPLY_CLOSES_PROSE } from '../../lib/applyForm'
 import { CONTACT_MAILTO, LEADERS, PAGE_LINKS, SOCIAL } from './content'
 
 export type Theme = 'dark' | 'light'
@@ -128,7 +129,7 @@ export function ConsultingNav({ menuOpen, onToggleMenu, ghost = false }: NavProp
         ) : (
           <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-nav__apply">
             Apply
-            <span className="sr-only"> for the Fall 2026 consulting team, closes September 20</span>
+            <span className="sr-only"> for the Fall 2026 consulting team, closes {APPLY_CLOSES_PROSE}</span>
             <NewTab />
             <ArrowUpRight size={12} strokeWidth={2.2} aria-hidden="true" />
           </a>
@@ -176,7 +177,7 @@ export const ConsultingMenu = forwardRef<HTMLDivElement, MenuProps>(function Con
           </Link>
         </nav>
         <DotButton href={CONTACT_MAILTO} className="pc-menu__cta pc-dotbtn--big" onClick={onClose}>
-          start a conversation
+          Discuss a project
         </DotButton>
       </div>
       <div className="pc-menu__bottom">
@@ -226,7 +227,7 @@ export function ConsultingFooter() {
             ))}
             <Link to="/about">ABOUT</Link>
             <Link to="/events">EVENTS</Link>
-            <Link to="/join">JOIN</Link>
+            <Link to="/join">JOIN UBLDA</Link>
           </div>
           <div className="pc-footer__col pc-footer__col--contact">
             <p className="pc-footer__big">Partner with us</p>

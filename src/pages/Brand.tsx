@@ -111,7 +111,7 @@ export default function Brand() {
       <section className="brand-section brand-section--alt" id="typography">
         <div className="brand-container">
           <h2 className="brand-section__title">Typography</h2>
-          <p className="brand-section__desc">Two fonts. Use them consistently and never substitute.</p>
+          <p className="brand-section__desc">Plus Jakarta Sans and Instrument Serif are the main site fonts. The consulting homepage uses Manrope for its hero headline.</p>
 
           <div className="brand-type-pair">
             <div className="brand-type-card">
@@ -154,8 +154,8 @@ export default function Brand() {
 
           <h3 className="brand-subsection">Type Scale</h3>
           <p className="brand-section__desc">
-            Three sizes, everywhere. Nothing on the site renders at a fourth. Within a tier,
-            hierarchy comes from typeface, weight and colour &mdash; never from another size.
+            These shared sizes cover the main site. The consulting pages use their own
+            responsive headline sizes.
           </p>
           <div className="brand-type-scale">
             {[
@@ -190,7 +190,7 @@ export default function Brand() {
       <section className="brand-section" id="logo">
         <div className="brand-container">
           <h2 className="brand-section__title">Logo</h2>
-          <p className="brand-section__desc">Our logo is a custom mark. Always use the official PNG files - never recreate it.</p>
+          <p className="brand-section__desc">Use the supplied logo assets. Choose the SVG for scalable artwork or a PNG when vector files aren’t supported.</p>
 
           <div className="brand-logo-grid">
             <div className="brand-logo-card">
@@ -214,7 +214,7 @@ export default function Brand() {
               <span className="brand-logo-lockup__text">UBLDA</span>
             </div>
             <p className="brand-logo-lockup__note">
-              When using the logo with text, use Plus Jakarta Sans Bold, uppercase, with 0.1em letter-spacing.
+              Use Plus Jakarta Sans for the wordmark. The consulting header uses a consistent medium weight across every letter.
             </p>
           </div>
 
@@ -223,7 +223,7 @@ export default function Brand() {
             <div className="brand-rule brand-rule--do">
               <span className="brand-rule__badge">Do</span>
               <ul>
-                <li>Use the original PNG with transparent background</li>
+                <li>Use the supplied SVG or transparent PNG</li>
                 <li>Maintain proportions when scaling</li>
                 <li>Give the logo adequate breathing room (min 16px)</li>
                 <li>Use on solid cream, white, or navy backgrounds</li>
@@ -232,7 +232,7 @@ export default function Brand() {
             <div className="brand-rule brand-rule--dont">
               <span className="brand-rule__badge">Don't</span>
               <ul>
-                <li>Recreate or redraw the logo as SVG or vector</li>
+                <li>Redraw the mark instead of using the supplied files</li>
                 <li>Stretch, rotate, or skew the logo</li>
                 <li>Place on busy photos without overlay</li>
                 <li>Change the logo colors</li>
@@ -297,8 +297,8 @@ export default function Brand() {
           <h3 className="brand-subsection">Teal Italic Accent</h3>
           <div className="brand-accent-demo">
             <h3 className="brand-accent-demo__text">
-              Business gets better when more people are{' '}
-              <em>in the room</em>.
+              A student community focused on{' '}
+              <em>disability in business</em>.
             </h3>
             <code>Instrument Serif italic in teal (#2BBAB0) for emphasized words within navy headlines</code>
           </div>
@@ -362,7 +362,7 @@ export default function Brand() {
                   <h3>Fireside Chat<br /><em>with Andrew Parker</em></h3>
                   <div className="brand-ig-mock__details">
                     <span>Mar 11, 2026</span>
-                    <span>Ross R1230</span>
+                    <span>Ross B0560</span>
                   </div>
                 </div>
                 <div className="brand-ig-mock__footer">
@@ -386,7 +386,7 @@ export default function Brand() {
             <div className="brand-ig-template">
               <div className="brand-ig-mock brand-ig-mock--quote">
                 <div className="brand-ig-mock__body">
-                  <h3>"Disability inclusion should be built into business - <em>not bolted on</em>."</h3>
+                  <h3>"Disability belongs in the conversation about <em>how businesses operate</em>."</h3>
                 </div>
                 <div className="brand-ig-mock__footer">
                   <img src="/logo.png" alt="" className="brand-ig-mock__logo" />
@@ -453,7 +453,7 @@ export default function Brand() {
                   <li>Teal italic for key phrase</li>
                   <li>"Swipe" indicator in Plus Jakarta Sans</li>
                   <li>Interior slides: one idea per slide, numbered</li>
-                  <li>Final slide: CTA ("Follow @ublda for more")</li>
+                  <li>Final slide: CTA ("Follow @michiganublda for event updates")</li>
                 </ul>
               </div>
             </div>
@@ -546,14 +546,14 @@ export default function Brand() {
                   RSVP at the link in bio.
                 </p>
                 <p className="brand-caption-example__tags">
-                  #DisabilityInclusion #AccessibleBusiness #RossSchool #UBLDA #UMich
+                  #UBLDA #DisabilityInclusion
                 </p>
               </div>
               <ul className="brand-caption-example__rules">
-                <li><strong>Tone:</strong> Warm, confident, mission-driven. Not corporate, not overly casual.</li>
-                <li><strong>Structure:</strong> Hook line (bold if possible) → Context → CTA</li>
-                <li><strong>Length:</strong> 2-4 short paragraphs. Break up walls of text.</li>
-                <li><strong>Hashtags:</strong> 5-8 relevant tags. Always include #UBLDA #UMich</li>
+                <li><strong>Tone:</strong> Direct and welcoming. Use specific details about the event and how to attend.</li>
+                <li><strong>Structure:</strong> Name the event, give the details, and explain how to attend.</li>
+                <li><strong>Length:</strong> Keep only the information a reader needs.</li>
+                <li><strong>Hashtags:</strong> Use up to two relevant tags.</li>
                 <li><strong>Emojis:</strong> Sparingly - 1-2 max. Never in place of words.</li>
                 <li><strong>CTA:</strong> Always include a clear call to action</li>
               </ul>
@@ -632,7 +632,7 @@ export default function Brand() {
             <div className="brand-slide-mock brand-slide-mock--closing">
               <div className="brand-slide-mock__content">
                 <h3>Thank You</h3>
-                <p>ublda@umich.edu</p>
+                <p>cooperry@umich.edu</p>
                 <img src="/logo.png" alt="" className="brand-slide-mock__logo" />
               </div>
               <span className="brand-slide-mock__label">Closing Slide</span>
@@ -674,13 +674,13 @@ export default function Brand() {
       <section className="brand-section brand-section--alt" id="voice">
         <div className="brand-container">
           <h2 className="brand-section__title">Brand Voice</h2>
-          <p className="brand-section__desc">How UBLDA sounds across all communications.</p>
+          <p className="brand-section__desc">Explain what we do and who can take part. Name the project or activity instead of promising impact. Describe unconfirmed programs as plans.</p>
 
           <div className="brand-voice-grid">
             <div className="brand-voice-card">
-              <h4>Confident, Not Aggressive</h4>
+              <h4>State What We Do</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "We're building a business world where disability inclusion is the standard."
+                <span className="brand-voice-card__yes">Yes:</span> "We consult for disability-focused organizations and accessibility teams."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "It's time to DEMAND that business includes disabled people!!!"
@@ -688,9 +688,9 @@ export default function Brand() {
             </div>
 
             <div className="brand-voice-card">
-              <h4>Warm, Not Casual</h4>
+              <h4>Make Joining Clear</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "Join our community of students working toward inclusive business practices."
+                <span className="brand-voice-card__yes">Yes:</span> "Membership is free and open to all U-M students."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "Come hang!! We're super chill and love having a good time lol"
@@ -698,9 +698,9 @@ export default function Brand() {
             </div>
 
             <div className="brand-voice-card">
-              <h4>Mission-Driven, Not Preachy</h4>
+              <h4>Use Specific Examples</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "Disability inclusion should be built into business - not bolted on."
+                <span className="brand-voice-card__yes">Yes:</span> "Our first project is a business case for Arc University."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "If you don't think about disability inclusion, you're part of the problem."
@@ -708,9 +708,9 @@ export default function Brand() {
             </div>
 
             <div className="brand-voice-card">
-              <h4>Professional, Not Corporate</h4>
+              <h4>Use Plain Language</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "We partner with organizations to create actionable accessibility solutions."
+                <span className="brand-voice-card__yes">Yes:</span> "We research the client’s question and recommend what to do next."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "We provide dynamic solutions for every stakeholder."
@@ -722,8 +722,8 @@ export default function Brand() {
           <div className="brand-phrases">
             {[
               'Disability inclusion in business',
-              'Built into business - not bolted on',
-              'Business gets better when more people are in the room',
+              'Business strategy and accessibility',
+              'Pro bono student consulting',
               'Undergraduate Business Leaders for Diverse Abilities',
               'Advocacy, consulting, and professional development',
               'Ross School of Business, University of Michigan',
@@ -746,14 +746,14 @@ export default function Brand() {
               <h4>Organization Name</h4>
               <p>
                 Full name on first reference: "Undergraduate Business Leaders for Diverse Abilities (UBLDA)."
-                After that, "UBLDA" is fine. Never "U.B.L.D.A." with periods.
+                After that, use "UBLDA." The consulting program is "UBLDA Consulting."
               </p>
             </div>
             <div className="brand-language__item">
               <h4>University References</h4>
               <p>
                 "Ross School of Business" or "Michigan Ross" - never just "Ross" without context.
-                "University of Michigan" or "UMich" - never "U of M" or "UM."
+                Use "University of Michigan" or "U-M" in public copy.
               </p>
             </div>
           </div>
@@ -806,10 +806,10 @@ export default function Brand() {
               <h4>Contact</h4>
               <table>
                 <tbody>
-                  <tr><td>General</td><td>ublda@umich.edu</td></tr>
+                  <tr><td>General</td><td>cooperry@umich.edu</td></tr>
                   <tr><td>Sam Bodine</td><td>sbodine@umich.edu</td></tr>
                   <tr><td>Alexa Chiang</td><td>achiang@umich.edu</td></tr>
-                  <tr><td>Instagram</td><td>@ublda</td></tr>
+                  <tr><td>Instagram</td><td>@michiganublda</td></tr>
                   <tr><td>LinkedIn</td><td>/company/ublda</td></tr>
                   <tr><td>Website</td><td>ublda.org</td></tr>
                 </tbody>

@@ -8,9 +8,9 @@ export default function Footer() {
       <div className="container">
         <div className="footer__top">
           <div className="footer__brand">
-            <p className="footer__intro">Where disability and business meet.</p>
+            <p className="footer__intro">Disability inclusion in business.</p>
             <p className="footer__tagline">
-              Built by students at Michigan Ross.
+              A student organization at Michigan Ross.
             </p>
             <Link to="/join" className="footer__cta">
               Join UBLDA
@@ -25,7 +25,7 @@ export default function Footer() {
               <Link to="/events" className="footer__link">Events</Link>
               <Link to="/team" className="footer__link">Team</Link>
               <Link to="/consulting" className="footer__link">Consulting</Link>
-              <Link to="/join" className="footer__link">Join Us</Link>
+              <Link to="/join" className="footer__link">Join UBLDA</Link>
             </div>
 
             <div className="footer__col">

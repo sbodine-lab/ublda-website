@@ -25,7 +25,7 @@ const events: Event[] = [
     time: '6:00 PM - 7:00 PM',
     title: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores',
     description:
-      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with intellectual and developmental disabilities. Under his leadership the company went from 10 employees with IDD to more than 350. Joining us live from Colorado while we gather in person at Ross. Dinner catered — come hungry.',
+      'Lloyd Lewis joined us remotely from Colorado to discuss Arc Thrift Stores and its employment of people with intellectual and developmental disabilities. Students gathered at Ross for the conversation.',
     location: 'Ross R1240, Ross School of Business',
     past: true,
   },
@@ -36,7 +36,7 @@ const events: Event[] = [
     time: '7:00 PM - 8:00 PM',
     title: 'Fireside Chat with Andrew Parker, CEO & Co-Founder of Nestidd',
     description:
-      'Andrew Parker (Ross alum) built Nestidd into an 800+ property housing platform for people with intellectual and developmental disabilities. Hear how he did it and why mission-driven business wins. Raising Cane\'s provided.',
+      'Ross alum Andrew Parker discussed building Nestidd, a housing company serving people with intellectual and developmental disabilities, at our first fireside chat.',
     location: 'Ross B0560, Ross School of Business',
     past: true,
   },
@@ -45,9 +45,9 @@ const events: Event[] = [
     month: 'Feb',
     day: '13',
     title: '2nd Annual RossAbilities Conference',
-    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
+    host: 'BLDA (MBA); UBLDA members attended',
     description:
-      'A full day of speakers, panels, and real conversations on disability inclusion and what accessible business actually looks like.',
+      'UBLDA members attended BLDA’s annual conference on disability inclusion in business.',
     location: 'Tauber Colloquium, Ross School of Business',
     past: true,
   },
@@ -57,9 +57,9 @@ const events: Event[] = [
     day: '17',
     time: '12:00 PM - 2:00 PM',
     title: 'Adaptive Basketball Event',
-    host: 'Hosted by BLDA (MBA) — UBLDA members attended',
+    host: 'BLDA (MBA); UBLDA members attended',
     description:
-      'Wheelchair basketball against the medical school. No experience needed. We ran chair skills and drills before tip-off.',
+      'UBLDA members joined BLDA for wheelchair basketball with medical students, starting with chair skills and drills.',
     location: 'Sports Coliseum, 701 Tappan Street, Ann Arbor, MI 48109',
     past: true,
   },
@@ -83,8 +83,8 @@ export default function Events() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="events-page__intro">
-              Speaker series, conferences, and hands-on experiences.
-              See what's next and what we've done so far.
+              Conversations with business leaders and events with the wider
+              disability community at Michigan Ross.
             </p>
           </Reveal>
         </div>
@@ -131,7 +131,7 @@ export default function Events() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="events-page__cta-sub">
-              Members get priority access to all UBLDA events, plus exclusive workshops and networking sessions you won't find on the public calendar.
+              Join UBLDA to receive event announcements and registration details.
             </p>
           </Reveal>
           <Reveal delay={0.2}>

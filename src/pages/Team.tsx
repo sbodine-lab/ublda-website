@@ -11,15 +11,15 @@ interface Member {
 }
 
 const board: Member[] = [
-  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Leads speaker events and campus partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
-  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Connects disability advocacy with Ross and keeps accessibility in the room.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
-  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Turns big ideas into real programming and keeps the team aligned on what matters.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
-  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Owns logistics and coordination, the reason our events actually run on time.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
-  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Secures funding and manages our budget so we can keep programming ambitious.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
-  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Designs workshops and resources that help Ross students actually understand disability and accessibility.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
-  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Leads the voice, visibility, and storytelling that help UBLDA reach more students across campus.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
-  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with campus partners, employers, and community organizations that move the mission forward.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
-  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Creates thoughtful programming and event experiences that bring members together around disability inclusion.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
+  { name: 'Sam Bodine', role: 'Co-President', initials: 'SB', desc: 'Coordinates club strategy and external partnerships.', linkedin: 'https://www.linkedin.com/in/samuelbodine/' },
+  { name: 'Alexa Chiang', role: 'Co-President', initials: 'AC', desc: 'Coordinates club planning and relationships at Michigan Ross.', linkedin: 'https://www.linkedin.com/in/alexa-chiang/' },
+  { name: 'Cooper Perry', role: 'Executive VP', initials: 'CP', desc: 'Coordinates the executive board and tracks project progress.', linkedin: 'https://www.linkedin.com/in/cooperry/' },
+  { name: 'Lindsey Ye', role: 'VP of Operations', initials: 'LY', desc: 'Manages meeting logistics and member operations.', linkedin: 'https://www.linkedin.com/in/lindsey-ye/' },
+  { name: 'Landon Miller', role: 'VP of Finance', initials: 'LM', desc: 'Manages the budget, funding requests, and reimbursements.', linkedin: 'https://www.linkedin.com/in/landon-miller-064a16258/' },
+  { name: 'Alex Forstner', role: 'VP of Education', initials: 'AF', desc: 'Plans educational programming and consulting training.', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
+  { name: 'Samantha Naber', role: 'VP Marketing and Communications', initials: 'SN', desc: 'Manages communications and promotes club events.', linkedin: 'https://www.linkedin.com/in/samanthanaber/' },
+  { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships', initials: 'SD', desc: 'Builds relationships with speakers and prospective project partners.', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },
+  { name: 'Andrew Sackett', role: 'VP Events and Programming', initials: 'AS', desc: 'Organizes club events and coordinates program logistics.', linkedin: 'https://www.linkedin.com/in/andrew-sackett-a1a5662bb/' },
 ]
 
 const LinkedInIcon = () => (
@@ -38,14 +38,14 @@ export default function Team() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="team-page__headline">
-              Meet the people<br />
-              <em>making it happen.</em>
+              Meet the<br />
+              <em>executive board.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="team-page__intro">
-              Nine students building the disability inclusion movement
-              at Michigan Ross through events, education, and real community.
+              Our student board runs UBLDA’s programs and manages the club
+              at Michigan Ross.
             </p>
           </Reveal>
         </div>
@@ -70,7 +70,7 @@ export default function Team() {
         <div className="container container--narrow" style={{ textAlign: 'center' }}>
           <Reveal>
             <Link to="/join" className="btn btn--primary btn--lg">
-              Become a member
+              Join UBLDA
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Link>
           </Reveal>

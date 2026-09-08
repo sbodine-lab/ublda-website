@@ -3,14 +3,16 @@
    (Lloyd Lewis call, 2026-07-28), the operating model (Outreach Meeting
    Guide), and the project-manager assignment (2026-08-18). */
 
+import { APPLY_WINDOW_SHORT, APPLY_DEADLINE_LABEL } from '../../lib/applyForm'
+
 export const HERO_DESCRIPTION =
   'Work with fellow Michigan students on pro bono client projects in business strategy and accessibility.'
 
 export const STATEMENT_1 =
-  'UBLDA Consulting brings Michigan students together to help organizations make business more inclusive of disabled people. We take on real client projects, pro bono.'
+  'UBLDA Consulting is the pro bono consulting program of Undergraduate Business Leaders for Diverse Abilities at Michigan Ross. Our first client is Arc Thrift Stores of Colorado.'
 
 export const STATEMENT_2 =
-  'As an analyst, you work in a team of four to six with two project managers. Weekly deliverables and advisor feedback build toward a final client presentation.'
+  'As an analyst, you work in a team of four to six with two project managers. You’ll research the client’s business question and develop recommendations for a final presentation.'
 
 export interface Service {
   id: string
@@ -67,8 +69,8 @@ export const STEPS: Step[] = [
   {
     num: '02',
     title: 'Apply',
-    when: 'Sep 2 to Sep 20',
-    desc: 'Opens Sep 2 at noon ET, closes Sep 20 at 11:30 PM ET. Three short answers and an optional resume link. No consulting experience needed.',
+    when: APPLY_WINDOW_SHORT,
+    desc: `Apply by ${APPLY_DEADLINE_LABEL}. Three short answers and an optional resume. No consulting experience needed.`,
     tone: 'navy',
   },
   {
@@ -82,14 +84,14 @@ export const STEPS: Step[] = [
     num: '04',
     title: 'Offers',
     when: 'By Sep 29',
-    desc: 'Decisions by September 29. All majors and years welcome.',
+    desc: 'Receive your application decision by September 29.',
     tone: 'cream',
   },
   {
     num: '05',
     title: 'Kickoff',
     when: 'Week of Oct 5',
-    desc: 'Teams of four to six analysts with two co-project managers.',
+    desc: 'Begin project work with four to six analysts and two project managers.',
     tone: 'teal',
   },
   {
@@ -111,7 +113,7 @@ export const CLIENT = {
 }
 
 export const PARTNER_STATEMENT =
-  'Our home is Michigan Ross. Our work connects students with organizations advancing disability inclusion beyond campus.'
+  'Our connections at Michigan Ross bring students together with people working in disability-focused businesses.'
 
 export const PARTNERS = [
   { src: '/partners-ross.png', alt: 'Michigan Ross School of Business' },
@@ -138,7 +140,7 @@ export const PAGE_LINKS = [
   { label: 'Work', to: '/consulting/work' },
   { label: 'Services', to: '/consulting/services' },
   { label: 'Partners', to: '/consulting/partners' },
-  { label: 'Connect', to: '/consulting/contact' },
+  { label: 'Contact', to: '/consulting/contact' },
 ]
 
 export const ROSS_ADDRESS = ['Stephen M. Ross School of Business', '701 Tappan Avenue', 'Ann Arbor, MI 48109']

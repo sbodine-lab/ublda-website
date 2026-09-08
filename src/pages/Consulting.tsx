@@ -89,7 +89,7 @@ function HomeBody() {
           <div className="pc-services__left">
             <h2 className="pc-services__title">The work you could take on</h2>
             <DotButton to="/consulting/services" className="pc-services__btn">
-              Explore our project areas
+              View project areas
             </DotButton>
           </div>
           <div className="pc-services__right">
@@ -224,23 +224,23 @@ function HomeBody() {
       {/* 7 · Call to action */}
       <section className="pc-cta" id="consulting-contact">
         <h2 className="pc-cta__title">
-          Find your place on the team.
+          Join the Fall 2026
           <br />
-          Apply for Fall 2026.
+          consulting team.
         </h2>
         <div className="pc-cta__btns">
           <DotButton href={CONSULTING_FORM_URL} external className="pc-dotbtn--big">
-            apply for fall 2026
+            Apply for Fall 2026
           </DotButton>
           <DotButton to="/consulting/practice" className="pc-dotbtn--big">
-            meet the practice
+            Meet the team
           </DotButton>
         </div>
         <p className="pc-cta__note">
           Questions? Email {LEADERS[0].name} or {LEADERS[1].name}.
         </p>
         <p className="pc-cta__note">
-          For organizations: we take on scoped, pro bono projects in disability inclusion.{' '}
+          For prospective clients: tell us about your business or accessibility question.{' '}
           <a className="pc-line" href={CONTACT_MAILTO}>Discuss a project with us.</a>
         </p>
       </section>

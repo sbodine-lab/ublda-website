@@ -21,17 +21,17 @@ const PROJECTS: Project[] = [
     id: 'arc',
     title: ['Arc Thrift Stores', 'of Colorado'],
     tag: 'Fall 2026 · Business case',
-    dec: 'Scaling Arc University, a post-secondary program for adults with intellectual and developmental disabilities.',
+    dec: 'Developing a business case to expand Arc University, a post-secondary program for adults with intellectual and developmental disabilities.',
     tone: 'teal',
-    status: 'In progress',
+    status: 'Fall 2026 project',
     details: ['Market sizing and target segments', 'Pricing and revenue model', 'Go-to-market plan', 'Five-year business case', 'Executive recommendation'],
     link: { href: CLIENT.url, label: 'arcthrift.com', external: true },
   },
   {
     id: 'winter',
     title: ['Winter 2027', 'engagement'],
-    tag: 'Chosen in October',
-    dec: 'Our board votes on the next client in October. Discovery calls are under way.',
+    tag: 'Selection planned for October',
+    dec: 'We’re discussing possible projects with organizations for Winter 2027. The board plans to choose the next client in October.',
     tone: 'navy',
     status: 'Scoping',
     details: ['Discovery calls with several organizations', 'A written scope from each candidate', 'A vote of the whole board', 'Kickoff in January'],
@@ -41,10 +41,10 @@ const PROJECTS: Project[] = [
     id: 'you',
     title: ['Your', 'organization'],
     tag: 'Open for scoping',
-    dec: 'One project, one semester, no fee. Tell us where people get stuck.',
+    dec: 'Have a business or accessibility question for a student team? We’re open to discussing future projects.',
     tone: 'gold',
     status: 'Open',
-    details: ['A sponsor who can make decisions', 'A problem you can describe in a paragraph', 'A kickoff call and four to five hours across the semester', 'Willingness to let us talk to real users'],
+    details: ['A client contact who can approve the project scope', 'A business question for the team to investigate', 'Time for a kickoff call and project reviews', 'Access to relevant information and people'],
     link: { href: '/consulting/contact', label: 'Start a conversation' },
   },
 ]
@@ -266,9 +266,9 @@ export default function ConsultingWork() {
       <section className="pcw-list" id="work-list" aria-labelledby="pcw-list-title">
         <div className="pcw-list__head">
           <h2 id="pcw-list-title">
-            Engagements <sup>({PROJECTS.length})</sup>
+            Projects &amp; inquiries <sup>({PROJECTS.length})</sup>
           </h2>
-          <p>One client a semester, chosen by the whole board. Everything else is in the pipeline or waiting on you.</p>
+          <p>Arc Thrift Stores is our Fall 2026 client. Winter projects are still under discussion.</p>
         </div>
         <div className="pcw-list__rows">
           {PROJECTS.map((p, i) => (

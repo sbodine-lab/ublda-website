@@ -8,15 +8,15 @@ import './Join.css'
 const reasons = [
   {
     title: 'Community',
-    desc: 'Join a tight-knit group of students who genuinely care about disability inclusion, and have a great time doing it.',
+    desc: 'Meet disabled and non-disabled students interested in how business affects people’s lives.',
   },
   {
-    title: 'Impact',
-    desc: 'Work on real consulting projects, host standout events, and actually change how Ross thinks about accessibility.',
+    title: 'Getting Involved',
+    desc: 'Help run events or take part in workshops. For client work, apply to UBLDA Consulting through its separate selection process.',
   },
   {
-    title: 'Growth',
-    desc: 'Build leadership skills, tap into our MBA network through BLDA, and walk away with experience most undergrads don\'t get.',
+    title: 'Career Experience',
+    desc: 'Learn from business leaders and connect with BLDA’s MBA students as you explore your career interests.',
   },
 ]
 
@@ -24,17 +24,17 @@ const faqs = [
   {
     question: 'Do I need to have a disability to join?',
     answer:
-      "No. You do not need a disability, and you do not need to have worked with disabled people before. Our members include disabled students, students who have cared about this for years, and students who showed up curious and impact-minded. All three belong here. Headed into consulting, finance, product, or anywhere else? If impact matters to you, you belong here.",
+      "No. Disabled and non-disabled students are welcome. You don’t need experience in disability advocacy to join.",
   },
   {
     question: 'Do I need consulting experience to apply for the consulting team?',
     answer:
-      "No, and you do not need to know anything about accessibility either. The application is three short answers, and we are reading how you think rather than what you already know. We teach the consulting skills: scoping a problem, running the research, ranking what you find, and building the business case. Bring the analytical foundation your coursework has already built.",
+      "No. We welcome applicants without consulting or accessibility experience. The application asks for three short answers; selected analysts learn research and business analysis through the project.",
   },
   {
     question: "What's the time commitment?",
     answer:
-      'Totally flexible. Come to as many or as few events as you want. That said, we do track active attendance for future leadership openings and selective program opportunities launching in Fall 2026.',
+      'General members choose which events to attend. Consulting analysts commit to weekly project work throughout the semester.',
   },
   {
     question: 'Is there a membership fee?',
@@ -63,14 +63,14 @@ export default function Join() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="join-page__headline">
-              Your seat at<br />
-              <em>the table.</em>
+              Join<br />
+              <em>UBLDA.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="join-page__intro">
-              If you care about disability inclusion in business, you belong here.
-              Signing up takes 30 seconds.
+              Membership is free and open to all U-M students interested in
+              disability inclusion in business.
             </p>
           </Reveal>
         </div>
@@ -84,7 +84,7 @@ export default function Join() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="join-form__subtitle">
-              Drop your info below and you're in. We'll add you to our mailing list and keep you in the loop on everything UBLDA.
+              Sign up for event updates and opportunities to get involved.
             </p>
           </Reveal>
 
@@ -102,10 +102,9 @@ export default function Join() {
           ) : (
             <Reveal delay={0.2}>
               <div className="join-form__success">
-                <h3 className="join-form__success-title">Sign up in 30 seconds</h3>
+                <h3 className="join-form__success-title">Become a member</h3>
                 <p className="join-form__success-desc">
-                  Membership is free and open to all U-M students. The form asks
-                  for your name and your umich email. That is it.
+                  The form asks for your name, year, U-M email, and majors or minors.
                 </p>
                 <a
                   className="join-form__submit"
@@ -164,7 +163,7 @@ export default function Join() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="join-contact__desc">
-              No pressure. Email Cooper Perry, our Executive VP, and they'll get back to you:{' '}
+              For general membership questions, email Cooper Perry, our Executive VP, at{' '}
               <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="join-contact__email">cooperry@umich.edu</a>.{' '}
               Questions about consulting go to our project managers on the{' '}
               <Link to="/consulting/contact" className="join-contact__email">consulting contact page</Link>.

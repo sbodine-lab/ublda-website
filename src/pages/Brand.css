@@ -1303,6 +1303,7 @@
 }
 
 .brand-cheat {
+  min-width: 0;
   padding: var(--space-6);
   background: var(--color-white);
   border-radius: var(--radius-lg);
@@ -1334,6 +1335,7 @@
 }
 
 .brand-cheat td:last-child {
+  overflow-wrap: anywhere;
   font-weight: 400;
   color: var(--color-navy);
 }
