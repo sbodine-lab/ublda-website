@@ -1,21 +1,21 @@
-/* /table — self-serve tabling screen. Designed for a 13–16" laptop in full screen,
-   degrades to a single column on phones. Uses the site's tokens and fonts. */
+/* /table — self-serve tabling screen. Fills one laptop screen, no scrolling.
+   Uses the site's tokens and fonts. */
 
 .tb {
   position: relative;
-  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
   isolation: isolate;
   background: var(--color-cream);
   color: var(--color-gray-800);
 }
 
 .tb-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: -1;
 }
 
-/* A light wash over the shader keeps type contrast steady wherever the colors drift. */
 .tb-bg::after {
   content: '';
   position: absolute;
@@ -24,34 +24,30 @@
 }
 
 .tb-sheet {
-  min-height: 100svh;
-  max-width: 1440px;
+  height: 100%;
+  max-width: 1500px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(14px, 2.4vh, 30px);
-  padding: clamp(18px, 3vh, 40px) clamp(20px, 4vw, 64px);
+  gap: clamp(12px, 2.4vh, 28px);
+  padding: clamp(16px, 2.6vh, 32px) clamp(20px, 4vw, 64px) clamp(18px, 3vh, 36px);
 }
 
-/* ─── Header ─── */
 .tb-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-4);
 }
 
 .tb-brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-width: 0;
 }
 
 .tb-brand img {
   width: clamp(36px, 5vh, 48px);
   height: auto;
-  flex: none;
 }
 
 .tb-brand__name {
@@ -61,71 +57,55 @@
   color: var(--color-navy);
 }
 
-.tb-brand__sub {
+.tb-fullscreen {
   font-size: var(--type-sm);
-  color: var(--color-gray-600);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tb-eyebrow,
-.tb-card__eyebrow {
-  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-accent-foreground);
-  white-space: nowrap;
+  color: var(--color-navy);
+  padding: 8px 14px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.7);
 }
 
-/* ─── Lede ─── */
-.tb-lede {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-6);
-  flex-wrap: wrap;
+.tb-fullscreen:hover {
+  background: var(--color-white);
+}
+
+.tb-fullscreen:focus-visible {
+  outline: 2px solid var(--color-navy);
+  outline-offset: 3px;
 }
 
 .tb-title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.4rem, 5.8vh, 4.6rem);
+  font-size: clamp(2.2rem, 6vh, 4.6rem);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--color-navy);
-  max-width: 16ch;
   text-wrap: balance;
 }
 
-.tb-sub {
-  font-size: clamp(0.95rem, 2vh, 1.2rem);
-  line-height: 1.4;
-  color: var(--color-gray-600);
-  max-width: 30ch;
-  text-wrap: balance;
-}
-
-/* ─── Cards ─── */
 .tb-grid {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(12px, 1.8vw, 24px);
-  min-height: 0;
 }
 
 .tb-card {
+  min-height: 0;
   background: var(--color-white);
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
-  padding: clamp(16px, 2.6vh, 30px) clamp(16px, 2vw, 28px);
+  padding: clamp(16px, 2.8vh, 32px) clamp(16px, 2vw, 28px);
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.3vh, 14px);
-  min-height: 0;
+  align-items: center;
+  text-align: center;
+  gap: clamp(8px, 1.6vh, 16px);
 }
 
 .tb-card--primary {
@@ -134,14 +114,10 @@
   color: var(--color-cream);
 }
 
-.tb-card--primary .tb-card__eyebrow {
-  color: var(--color-teal);
-}
-
 .tb-card__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3.4vh, 2.4rem);
+  font-size: clamp(1.4rem, 3.6vh, 2.5rem);
   line-height: 1.05;
   letter-spacing: -0.01em;
   color: inherit;
@@ -149,15 +125,17 @@
 
 .tb-qrwrap {
   flex: 1;
+  min-height: 0;
+  width: 100%;
+  container-type: size;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
-  padding: 4px 0;
 }
 
+/* Square, sized by whichever card dimension is tighter. */
 .tb-qr {
-  width: min(100%, 36vh);
+  width: min(100cqw, 100cqh);
   height: auto;
   aspect-ratio: 1;
   background: var(--color-white);
@@ -168,93 +146,45 @@
   fill: var(--color-navy);
 }
 
-.tb-card__body {
-  font-size: clamp(0.9rem, 1.9vh, 1.08rem);
-  line-height: 1.45;
-  color: var(--color-gray-800);
-  max-width: none;
-}
-
-.tb-card--primary .tb-card__body {
-  color: rgba(250, 249, 246, 0.86);
-}
-
-.tb-card__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-gray-100);
-  font-size: 0.8rem;
-  color: var(--color-gray-600);
-  max-width: none;
-}
-
-.tb-card--primary .tb-card__meta {
-  color: rgba(250, 249, 246, 0.72);
-  border-top-color: rgba(250, 249, 246, 0.18);
-}
-
-.tb-card__deadline {
+.tb-card__note {
+  font-size: clamp(0.95rem, 2.2vh, 1.35rem);
   font-weight: 600;
-  color: var(--color-cream);
+  color: inherit;
+  max-width: none;
 }
 
 .tb-treat {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 600;
+  gap: 10px;
   color: var(--color-navy);
 }
 
 .tb-treat::before {
   content: '';
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--color-gold);
 }
 
-/* ─── Footer ─── */
-.tb-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-4);
-  font-size: var(--type-sm);
-  color: var(--color-gray-600);
-}
-
-.tb-foot a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.tb-foot a:focus-visible {
-  outline: 2px solid var(--color-navy);
-  outline-offset: 4px;
-}
-
 @media (max-width: 900px) {
+  .tb {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .tb-sheet {
+    height: auto;
+  }
+
   .tb-grid {
     grid-template-columns: 1fr;
   }
 
-  .tb-qr {
-    width: min(70vw, 320px);
-  }
-
-  .tb-lede {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .tb-brand__sub {
-    display: none;
-  }
-
-  .tb-sheet {
-    min-height: auto;
+  .tb-qrwrap {
+    height: min(70vw, 320px);
+    flex: none;
   }
 }
