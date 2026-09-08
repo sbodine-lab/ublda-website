@@ -548,10 +548,9 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-hero__title {
-  font-family: 'Bricolage Grotesque', 'Arial', sans-serif;
+  font-family: 'Manrope', var(--font-body);
   font-size: clamp(3.75rem, 7vw, 7.5rem);
   font-weight: 500;
-  font-optical-sizing: auto;
   line-height: 1.02;
   letter-spacing: -0.04em;
   color: var(--pc-fg);
