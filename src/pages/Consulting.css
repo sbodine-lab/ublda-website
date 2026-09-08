@@ -519,11 +519,11 @@ html.pc-root::-webkit-scrollbar-thumb {
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
 .pc-hero {
   position: relative;
-  height: 100vh;
+  min-height: 100svh;
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 2vw 3.8vw;
+  padding: 110px 3.8vw 70px;
   overflow: hidden;
 }
 
@@ -552,10 +552,7 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-hero__text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   z-index: 1;
   width: 100%;
   text-align: center;
@@ -563,40 +560,48 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-hero__lead {
-  font-size: clamp(1.1rem, 2.3vw, 2.4rem);
-  font-weight: 300;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
-  color: var(--pc-heading2);
-  margin-bottom: 0.8vw;
-}
-
-.pc-hero__typed {
-  display: inline-block;
-  min-height: 1.2em;
-  font-size: clamp(1.4rem, 3vw, 3.2rem);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--pc-heading2);
+  margin-bottom: 1.4rem;
+}
+
+.pc-hero__title {
+  font-size: clamp(2rem, 4.5vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
   color: var(--pc-fg);
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
-.pc-hero__caret {
-  display: inline-block;
-  width: 0.06em;
-  height: 0.9em;
-  margin-left: 0.1em;
-  vertical-align: -0.06em;
-  background: var(--pc-accent);
-  animation: pc-blink 1s steps(2, start) infinite;
+.pc-hero__title > span {
+  display: block;
+  color: var(--pc-accent-ink);
 }
 
-@keyframes pc-blink {
-  to {
-    visibility: hidden;
-  }
+.pc-hero__description {
+  max-width: 40rem;
+  margin: 1.5rem auto 0;
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--pc-heading2);
+  text-wrap: pretty;
+}
+
+.pc-hero__welcome {
+  max-width: 30rem;
+  margin: 0.85rem auto 0;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--pc-des);
+}
+
+.pc-hero__explore.pc-dotbtn {
+  margin-top: 1.3rem;
 }
 
 .pc-hero__apply {
@@ -622,6 +627,18 @@ html.pc-root::-webkit-scrollbar-thumb {
   letter-spacing: 0.08em;
   text-transform: none;
   color: var(--pc-des);
+}
+
+@media (max-width: 359px) {
+  .pc-nav__apply {
+    display: none;
+  }
+
+  .pc-hero .pc-hero__apply {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
 }
 
 .pc-hero__apply:hover,
@@ -1776,22 +1793,24 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-hero {
-    height: 100svh;
-    padding: 6vw;
+    padding: 100px 6vw 56px;
+  }
+
+  .pc-hero__text {
+    padding: 0;
   }
 
   .pc-hero__rings {
     height: 150vh;
   }
 
-  .pc-hero__typed {
-    white-space: normal;
-    font-size: clamp(1.25rem, 6.2vw, 1.6rem);
+  .pc-hero__title {
+    font-size: clamp(2rem, 8.5vw, 3rem);
   }
 
   .pc-hero__lead {
-    font-size: 1.1rem;
-    margin-bottom: 0.6rem;
+    font-size: 0.7rem;
+    margin-bottom: 1.2rem;
   }
 
   .pc--static .pc-statement {
