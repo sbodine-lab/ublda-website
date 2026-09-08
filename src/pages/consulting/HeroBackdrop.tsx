@@ -7,7 +7,7 @@ const COLORS = ['#FAF9F6', '#D9EAE5', '#89BBAF', '#E2DBCC']
 
 export function HeroBackdrop() {
   const params = new URLSearchParams(window.location.search)
-  const halftone = params.get('art') === 'halftone'
+  const halftone = params.get('art') !== 'warp'
   const source: RossSource = params.get('source') === 'detail' ? 'detail' : params.get('source') === 'illustration' ? 'illustration' : 'photo'
   const dots = Math.min(0.65, Math.max(0.1, Number(params.get('dots')) || 0.3))
   const { reducedMotion } = useConsultingUi()
