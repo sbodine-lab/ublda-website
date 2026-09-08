@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { MeshGradient } from '@paper-design/shaders-react'
+import { HalftoneCmyk } from '@paper-design/shaders-react'
 import { QR_CONSULTING, QR_INSTAGRAM, QR_JOIN, type QrSvg } from './tableQr'
 import './Table.css'
 
-const SHADER_COLORS = ['#FAF9F6', '#E8F6F4', '#D9EAE5', '#F3EAD3', '#9CCBC1']
 
 /** Pause the shader for reduced-motion users and whenever the tab is hidden. */
 function useShaderPaused() {
@@ -55,19 +54,38 @@ export default function Table() {
 
   return (
     <div className="tb">
-      <div className="tb-bg" aria-hidden="true">
-        <MeshGradient
-          colors={SHADER_COLORS}
-          distortion={0.55}
-          swirl={0.25}
-          grainMixer={0.05}
-          grainOverlay={0.02}
-          speed={paused ? 0 : 0.14}
-          frame={9000}
-          minPixelRatio={1}
-          maxPixelCount={1200000}
-          style={{ width: '100%', height: '100%' }}
-        />
+      {/* Same Ross-exterior halftone as the consulting hero, with the shader's
+          grain animating and a slow drift so the backdrop visibly moves. */}
+      <div className={`tb-bg ${paused ? 'tb-bg--still' : ''}`} aria-hidden="true">
+        <div className="tb-bg__drift">
+          <HalftoneCmyk
+            image="/ross-modern-exterior.jpg"
+            colorBack="#FAF9F6"
+            colorC="#2BBAB0"
+            colorM="#0F2B3C"
+            colorY="#D4A034"
+            colorK="#0F2B3C"
+            size={0.3}
+            type="ink"
+            softness={0.5}
+            contrast={1.05}
+            gridNoise={0.08}
+            floodC={0}
+            gainC={0.12}
+            gainM={-0.25}
+            gainY={-0.4}
+            gainK={-0.12}
+            grainMixer={0.08}
+            grainOverlay={0.03}
+            grainSize={0.25}
+            speed={paused ? 0 : 0.6}
+            frame={4000}
+            fit="cover"
+            minPixelRatio={1}
+            maxPixelCount={1400000}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </div>
       </div>
 
       <main className="tb-sheet" id="main-content">

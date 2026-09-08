@@ -14,13 +14,33 @@
   position: absolute;
   inset: 0;
   z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 85% 45%, #d9eae5, #faf9f6 75%);
 }
 
+/* Slightly oversized so the drift never shows an edge. */
+.tb-bg__drift {
+  position: absolute;
+  inset: -4%;
+  transform-origin: 65% 50%;
+  animation: tb-drift 48s ease-in-out infinite alternate;
+}
+
+.tb-bg--still .tb-bg__drift {
+  animation: none;
+}
+
+@keyframes tb-drift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.08) translate3d(-1.5%, 1%, 0); }
+}
+
+/* Same cream wash as the consulting hero, a touch lighter so the building reads. */
 .tb-bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(250, 249, 246, 0.18) 0%, rgba(250, 249, 246, 0.42) 100%);
+  background: linear-gradient(90deg, #faf9f6e6 0%, #faf9f6b8 50%, #faf9f66e 100%);
 }
 
 .tb-sheet {
