@@ -67,12 +67,14 @@ function HomeBody() {
             Build experience.
             <span>Advance disability inclusion.</span>
           </h1>
-          <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
-          <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
-            Apply for Fall 2026
-            <NewTab />
-            <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
-          </a>
+          <div className="pc-hero__details">
+            <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
+            <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
+              Apply for Fall 2026
+              <NewTab />
+              <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
+            </a>
+          </div>
         </div>
         <div className="pc-hero__fade" aria-hidden="true" />
       </section>

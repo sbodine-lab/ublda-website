@@ -522,8 +522,8 @@ html.pc-root::-webkit-scrollbar-thumb {
   min-height: 100svh;
   width: 100%;
   display: flex;
-  align-items: center;
-  padding: 110px 3.8vw 70px;
+  align-items: stretch;
+  padding: 150px 6vw 64px;
   overflow: hidden;
 }
 
@@ -535,6 +535,7 @@ html.pc-root::-webkit-scrollbar-thumb {
   justify-content: center;
   color: var(--pc-fg);
   opacity: 0.28;
+  pointer-events: none;
 }
 
 .pc-hero__rings {
@@ -554,69 +555,84 @@ html.pc-root::-webkit-scrollbar-thumb {
 .pc-hero__text {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 64px;
   width: 100%;
-  text-align: center;
-  padding: 0 4vw;
+  min-width: 0;
+  padding: 16px 0 0;
+  text-align: left;
 }
 
 .pc-hero__title {
-  font-size: clamp(2rem, 4.5vw, 4.6rem);
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(3.75rem, 7.5vw, 8rem);
+  font-weight: 400;
+  line-height: 0.99;
+  letter-spacing: -0.025em;
   color: var(--pc-fg);
-  text-wrap: balance;
 }
 
 .pc-hero__title > span {
   display: block;
-  color: var(--pc-accent-ink);
+  margin-top: 0.22em;
+  max-width: 18ch;
+  color: inherit;
+}
+
+.pc-hero__details {
+  display: grid;
+  grid-template-columns: minmax(0, 27rem) auto;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--pc-line);
 }
 
 .pc-hero__description {
-  max-width: 40rem;
-  margin: 1.5rem auto 0;
-  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  max-width: 27rem;
+  margin: 0;
+  font-size: clamp(0.9rem, 1.05vw, 1rem);
   line-height: 1.65;
-  color: var(--pc-heading2);
+  color: var(--pc-fg);
   text-wrap: pretty;
 }
 
 .pc-hero__apply {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
-  min-height: 40px;
-  margin-top: 1.8vw;
-  padding: 0 1.3em;
-  border: 1px solid var(--pc-accent-ink);
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--pc-heading2);
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 44px;
+  padding: 10px 0;
+  border-bottom: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--pc-fg);
   text-decoration: none;
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  white-space: nowrap;
 }
 
-@media (max-width: 359px) {
-  .pc-nav__apply {
-    display: none;
-  }
-
-  .pc-hero .pc-hero__apply {
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  }
+.pc-hero__apply svg {
+  transition: transform 180ms ease;
 }
 
-.pc-hero__apply:hover,
+.pc-hero__apply:hover svg {
+  transform: translate(2px, -2px);
+}
+
 .pc-hero__apply:focus-visible {
-  background: var(--pc-fg);
-  border-color: var(--pc-fg);
-  color: var(--pc-bg);
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .pc-hero__details {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
 }
 
 .pc-hero__fade {
@@ -1739,11 +1755,6 @@ html.pc-menu-open .pc-cursor {
     gap: 0.2rem;
   }
 
-  .pc-hero__apply {
-    margin-top: 1.2rem;
-    font-size: 0.72rem;
-  }
-
   .pc-dotbtn {
     gap: 0.6rem;
     margin-top: 1.5rem;
@@ -1759,19 +1770,28 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-hero {
-    padding: 100px 6vw 56px;
+    min-height: 100svh;
+    padding: 130px 6vw 48px;
   }
 
   .pc-hero__text {
     padding: 0;
+    gap: 36px;
+  }
+
+  .pc-hero__title {
+    font-size: clamp(3.3rem, 13.5vw, 6rem);
+  }
+
+  .pc-hero__details {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 16px;
+    padding-top: 20px;
   }
 
   .pc-hero__rings {
     height: 150vh;
-  }
-
-  .pc-hero__title {
-    font-size: clamp(2rem, 8.5vw, 3rem);
   }
 
   .pc--static .pc-statement {
