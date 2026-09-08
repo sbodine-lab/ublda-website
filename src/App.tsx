@@ -5,6 +5,7 @@ import AnnouncementBanner from './components/AnnouncementBanner'
 import { CONSULTING_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 import Home from './pages/Home'
+import Table from './pages/Table'
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 
 const About = lazy(() => import('./pages/About'))
@@ -31,7 +32,7 @@ const DecisionCenterEntry = lazy(() => (
 ))
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
-const STANDALONE_PREFIXES = ['/links', '/housing-intelligence', '/housing', '/consulting', '/advisory', '/craft-night', '/mtc']
+const STANDALONE_PREFIXES = ['/links', '/table', '/table.html', '/housing-intelligence', '/housing', '/consulting', '/advisory', '/craft-night', '/mtc']
 const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/operations', '/signin', '/dashboard', '/members']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
@@ -121,6 +122,9 @@ export default function App() {
           <Route path="/craft-night" element={<CraftNight />} />
           <Route path="/mtc" element={<BbaMtcShifts />} />
           <Route path="/brand" element={<Brand />} />
+        {/* Self-serve screen for the laptop at recruiting tables. */}
+        <Route path="/table" element={<Table />} />
+        <Route path="/table.html" element={<Table />} />
           {/* Unknown retired URLs and typos land on home rather than a blank page. */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
