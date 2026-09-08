@@ -3,26 +3,16 @@
    (Lloyd Lewis call, 2026-07-28), the operating model (Outreach Meeting
    Guide), and the project-manager assignment (2026-08-18). */
 
-export const HERO_LEAD = 'Does your business work for'
+export const HERO_LEAD = 'Student consulting at Michigan'
 
-export const HERO_PHRASES = [
-  'a screen reader user?',
-  'a Deaf applicant?',
-  'a blind shopper?',
-  'an autistic new hire?',
-  'a wheelchair user?',
-  'someone with dyslexia?',
-  'a colorblind customer?',
-  'someone who cannot use a mouse?',
-  'a candidate with ADHD?',
-  'one in four adults?',
-]
+export const HERO_DESCRIPTION =
+  'Join a student team working with real clients on disability inclusion. Put your research and ideas to work on a semester-long project, with guidance from project managers and advisors.'
 
 export const STATEMENT_1 =
-  'UBLDA Consulting is a pro bono accessibility practice run by students at Michigan Ross, inside the Undergraduate Business Leaders for Diverse Abilities.'
+  'UBLDA Consulting brings Michigan students together to help organizations make business more inclusive of disabled people. We take on real client projects, pro bono.'
 
 export const STATEMENT_2 =
-  'A team of four to six analysts takes on one scoped project a semester, with weekly deliverables and advisor review before anything reaches you.'
+  'As an analyst, you work in a team of four to six with two project managers. Weekly deliverables and advisor feedback build toward a final client presentation.'
 
 export interface Service {
   id: string
@@ -34,27 +24,27 @@ export const SERVICES: Service[] = [
   {
     id: 'digital',
     title: 'Websites & apps',
-    desc: 'Where your site or app stops working for disabled visitors, and what to fix first.',
+    desc: 'Investigate where a website or app creates barriers for disabled users and recommend what the client should address first.',
   },
   {
     id: 'documents',
     title: 'Documents & communications',
-    desc: 'PDFs, decks, and newsletters that work the same for a blind reader as for a sighted one.',
+    desc: 'Examine how people access PDFs, presentations, and newsletters, then recommend more accessible ways to share information.',
   },
   {
     id: 'hiring',
     title: 'Hiring & workplace',
-    desc: 'Job posts, interviews, and onboarding where disabled candidates get stuck in ways most teams never see.',
+    desc: 'Study hiring and onboarding to identify barriers for disabled candidates and employees.',
   },
   {
     id: 'events',
     title: 'Events & programs',
-    desc: 'Venues, accommodations, and materials, planned from the invitation onward.',
+    desc: 'Help organizations plan for access throughout an event, including invitations, venues, accommodations, and materials.',
   },
   {
     id: 'strategy',
     title: 'Strategy & business cases',
-    desc: 'For organizations with a disability mission: market sizing, pricing, go-to-market, and the five-year model.',
+    desc: 'Develop market research and financial recommendations for organizations with a disability mission. Our first project is the Arc University business case.',
   },
 ]
 
@@ -123,7 +113,7 @@ export const CLIENT = {
 }
 
 export const PARTNER_STATEMENT =
-  'We work with organizations that already put disabled people at the center, and with companies that want to get there.'
+  'Our home is Michigan Ross. Our work connects students with organizations advancing disability inclusion beyond campus.'
 
 export const PARTNERS = [
   { src: '/partners-ross.png', alt: 'Michigan Ross School of Business' },

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MeshGradient } from '@paper-design/shaders-react'
 import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
@@ -6,7 +6,7 @@ import {
   CLIENT,
   CONTACT_MAILTO,
   HERO_LEAD,
-  HERO_PHRASES,
+  HERO_DESCRIPTION,
   LEADERS,
   PARTNERS,
   PARTNER_STATEMENT,
@@ -23,46 +23,6 @@ import './Consulting.css'
 
 const SHADER_DARK = ['#0B1F2F', '#14374E', '#2BBAB0', '#091E2A']
 const SHADER_LIGHT = ['#FAF9F6', '#E8F6F4', '#2BBAB0', '#D8D6D0']
-
-/* Type a phrase in (50ms a character), hold it, delete it (30ms), move on. */
-function useTypewriter(phrases: string[], enabled: boolean) {
-  const [text, setText] = useState('')
-  useEffect(() => {
-    if (!enabled) return
-    let index = 0
-    let timer = 0
-    let cancelled = false
-    const typeIn = (s: string, k: number, done: () => void) => {
-      if (cancelled) return
-      setText(s.slice(0, k))
-      if (k < s.length) timer = window.setTimeout(() => typeIn(s, k + 1, done), 50)
-      else done()
-    }
-    const typeOut = (s: string, k: number, done: () => void) => {
-      if (cancelled) return
-      setText(s.slice(0, k))
-      if (k > 0) timer = window.setTimeout(() => typeOut(s, k - 1, done), 30)
-      else done()
-    }
-    const cycle = () => {
-      const s = phrases[index]
-      typeIn(s, 0, () => {
-        timer = window.setTimeout(() => {
-          typeOut(s, s.length, () => {
-            index = (index + 1) % phrases.length
-            cycle()
-          })
-        }, 2000)
-      })
-    }
-    cycle()
-    return () => {
-      cancelled = true
-      window.clearTimeout(timer)
-    }
-  }, [phrases, enabled])
-  return enabled ? text : phrases[0]
-}
 
 function Words({ text, className }: { text: string; className: string }) {
   return (
@@ -83,7 +43,7 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
       <Words text={STATEMENT_1} className="pc-statement__p1" />
       <Words text={STATEMENT_2} className="pc-statement__p2" />
       <DotButton to="/consulting/practice" className="pc-statement__btn">
-        The practice
+        How the team works
       </DotButton>
     </section>
   )
@@ -92,7 +52,6 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
 function HomeBody() {
   const { theme, mode, reducedMotion } = useConsultingUi()
   const [openService, setOpenService] = useState<string | null>(null)
-  const typed = useTypewriter(HERO_PHRASES, !reducedMotion)
   const shaderSpeed = reducedMotion ? 0 : 0.2
   const shaderColors = theme === 'dark' ? SHADER_DARK : SHADER_LIGHT
   const isStatic = mode === 'static'
@@ -107,20 +66,20 @@ function HomeBody() {
         <div className="pc-hero__text">
           <p className="pc-hero__lead">{HERO_LEAD}</p>
           <h1 className="pc-hero__title">
-            <span className="sr-only">
-              {HERO_LEAD} {HERO_PHRASES.join(' ')} UBLDA Consulting helps organizations find out.
-            </span>
-            <span className="pc-hero__typed" aria-hidden="true">
-              {typed}
-              <span className="pc-hero__caret" />
-            </span>
+            Build your consulting skills.
+            <span>Make business more inclusive.</span>
           </h1>
+          <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
           <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
             Apply for Fall 2026
             <span className="pc-hero__apply-meta">closes Sep 22</span>
             <NewTab />
             <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
           </a>
+          <p className="pc-hero__welcome">All majors and years welcome. No consulting experience needed.</p>
+          <DotButton to="/consulting/work" className="pc-hero__explore">
+            See the work
+          </DotButton>
         </div>
         <div className="pc-hero__fade" aria-hidden="true" />
       </section>
@@ -132,9 +91,9 @@ function HomeBody() {
       <section className="pc-services" id="consulting-services">
         <div className="pc-services__inner">
           <div className="pc-services__left">
-            <h2 className="pc-services__title">What we work on</h2>
+            <h2 className="pc-services__title">The work you could take on</h2>
             <DotButton to="/consulting/services" className="pc-services__btn">
-              All services
+              Explore our project areas
             </DotButton>
           </div>
           <div className="pc-services__right">
@@ -269,20 +228,24 @@ function HomeBody() {
       {/* 7 · Call to action */}
       <section className="pc-cta" id="consulting-contact">
         <h2 className="pc-cta__title">
-          Have a project in mind?
+          Find your place on the team.
           <br />
-          Or want to be on the team?
+          Apply for Fall 2026.
         </h2>
         <div className="pc-cta__btns">
-          <DotButton href={CONTACT_MAILTO} className="pc-dotbtn--big">
-            start a conversation
-          </DotButton>
           <DotButton href={CONSULTING_FORM_URL} external className="pc-dotbtn--big">
             apply for fall 2026
+          </DotButton>
+          <DotButton to="/consulting/practice" className="pc-dotbtn--big">
+            meet the practice
           </DotButton>
         </div>
         <p className="pc-cta__note">
           Questions? Email {LEADERS[0].name} or {LEADERS[1].name}.
+        </p>
+        <p className="pc-cta__note">
+          For organizations: we take on scoped, pro bono projects in disability inclusion.{' '}
+          <a className="pc-line" href={CONTACT_MAILTO}>Discuss a project with us.</a>
         </p>
       </section>
     </>
