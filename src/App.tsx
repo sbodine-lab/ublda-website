@@ -10,6 +10,7 @@ import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 const About = lazy(() => import('./pages/About'))
 const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
+const ShaderStudy = import.meta.env.DEV ? lazy(() => import('./pages/consulting/ShaderStudy')) : null
 const Consulting = lazy(() => import('./pages/Consulting'))
 const ConsultingPractice = lazy(() => import('./pages/consulting/Practice'))
 const ConsultingWork = lazy(() => import('./pages/consulting/Work'))
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/events" element={<Events />} />
           <Route path="/team" element={<Team />} />
+          {ShaderStudy && <Route path="/consulting/shader-study" element={<ShaderStudy />} />}
           <Route path="/consulting" element={<Consulting />} />
           <Route path="/consulting/practice" element={<ConsultingPractice />} />
           <Route path="/consulting/work" element={<ConsultingWork />} />

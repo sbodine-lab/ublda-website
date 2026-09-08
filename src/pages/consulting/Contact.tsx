@@ -2,12 +2,13 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from '../../lib/forms'
+import { APPLY_DEADLINE_LABEL } from '../../lib/applyForm'
 import { LEADERS, ROSS_ADDRESS, SOCIAL } from './content'
 import { all, buildDrawLine, buildHeroExit, buildNavBlendFor, buildReveals, buildWordmark, gsap, one, startMotion, type Builder, type MotionStarter } from './engine'
 import { DotButton, HeroLines, NewTab } from './parts'
 import { ConsultingShell } from './Shell'
 
-const HELP_OPTIONS = ['Websites & apps', 'Documents & communications', 'Hiring & workplace', 'Events & programs', 'Strategy & business case', 'Not sure yet']
+const HELP_OPTIONS = ['Websites & apps', 'Documents & communications', 'Hiring & workplace', 'Events & programs', 'Strategy & business cases', 'Not sure yet']
 const TIMING_OPTIONS = ['Winter 2027', 'Fall 2027', 'Just exploring']
 
 const OPENINGS = [
@@ -15,19 +16,19 @@ const OPENINGS = [
     title: 'Consulting analyst',
     term: 'Fall 2026',
     facts: ['Experience: none required', 'Location: Ann Arbor', 'Commitment: weekly, October through December'],
-    about: 'You notice when something does not work for someone else, and you would rather fix it than explain it away. You do not need consulting experience or a background in accessibility, and you do not need to be disabled. We teach the consulting skills and bring you onto real client work.',
-    doing: ['Walk through websites, documents, and processes with real users, including disabled students.', 'Turn what you find into ranked, plain-language findings.', 'Build the business case where the fix needs budget.', 'Present at the midpoint and the final review.'],
-    requirements: ['University of Michigan undergraduate, any major and year.', 'Three short answers. We are reading how you think, not what you already know.', 'Application by Sunday, September 20 at 11:30 PM ET.', 'Two 30-minute interviews at Ross, September 25 to 27.', 'Offers by September 29, kickoff the week of October 5.'],
-    cta: { href: CONSULTING_FORM_URL, label: 'Apply', external: true },
+    about: 'Work with a student team on the Arc University business case. You don’t need consulting or accessibility experience to apply. Disabled and non-disabled students from any undergraduate major are welcome.',
+    doing: ['Research the market and potential audiences for Arc University.', 'Compare pricing and revenue options.', 'Help develop a five-year business case.', 'Present at the midpoint and the final review.'],
+    requirements: ['University of Michigan undergraduate, any major and year.', 'Three short answers about your interest and approach to the work.', `Application by ${APPLY_DEADLINE_LABEL}.`, 'Two 30-minute interviews at Ross, September 25 to 27.', 'Offers by September 29, kickoff the week of October 5.'],
+    cta: { href: CONSULTING_FORM_URL, label: 'Apply for Fall 2026', external: true },
   },
   {
     title: 'General member',
     term: 'Rolling',
     facts: ['Experience: none', 'Location: Ann Arbor and online', 'Commitment: as much as you want'],
-    about: 'Speaker events, workshops, and a community of disabled and non-disabled students. No application, just a form.',
-    doing: ['Come to fireside chats with accessibility leaders.', 'Get first look at consulting recruiting each semester.', 'Meet the MBA students at BLDA.'],
+    about: 'Join UBLDA for speaker events and workshops with disabled and non-disabled students. General membership is free and doesn’t require a selection process.',
+    doing: ['Come to fireside chats with accessibility leaders.', 'Receive consulting application announcements.', 'Meet the MBA students at BLDA.'],
     requirements: ['University of Michigan student.'],
-    cta: { href: MEMBERSHIP_FORM_URL, label: 'Join', external: true },
+    cta: { href: MEMBERSHIP_FORM_URL, label: 'Join UBLDA', external: true },
   },
 ]
 
@@ -126,7 +127,7 @@ function ContactForm() {
     const next: Record<string, string> = {}
     if (!values.name.trim()) next.name = 'Your name is required.'
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) next.email = 'A valid email is required.'
-    if (!values.message.trim()) next.message = 'Tell us a little about the problem.'
+    if (!values.message.trim()) next.message = 'Describe your project or question.'
     setErrors(next)
     if (Object.keys(next).length) return
     const body = [
@@ -189,7 +190,7 @@ function ContactForm() {
       {select('timing', 'When?', TIMING_OPTIONS)}
       <div className={`pcc-field pcc-field--area ${errors.message ? 'pcc-field--error' : ''}`}>
         <textarea id="pcc-message" value={values.message} onChange={set('message')} placeholder=" " rows={4} aria-required aria-invalid={!!errors.message} aria-describedby={errors.message ? 'pcc-message-err' : undefined} />
-        <label htmlFor="pcc-message">Tell us where people get stuck*</label>
+        <label htmlFor="pcc-message">Describe your project or question*</label>
         <span className="pcc-field__line" aria-hidden="true" />
         {errors.message && (
           <p className="pcc-field__err" id="pcc-message-err">
@@ -202,7 +203,7 @@ function ContactForm() {
           <span className="pc-dotbtn__dot" aria-hidden="true">
             <ArrowUpRight size={10} strokeWidth={2.2} />
           </span>
-          <span className="pc-dotbtn__label">send it</span>
+          <span className="pc-dotbtn__label">Prepare email</span>
         </button>
         <p className="pcc-form__note">
           Opens a message to Alex and Solomon in your email app. Or write to{' '}
@@ -218,14 +219,14 @@ function ContactForm() {
 export default function ConsultingContact() {
   const [openJob, setOpenJob] = useState<number | null>(0)
   return (
-    <ConsultingShell title="Connect · UBLDA Consulting" motion={startContact}>
+    <ConsultingShell title="Contact · UBLDA Consulting" motion={startContact}>
       <section className="pcc-hero">
         <Clock />
         <div className="pcc-hero__over">
           <h1 className="pcc-hero__title">
-            <HeroLines lines={['We think access is a business problem', 'worth solving well. If you do too,', 'let’s talk.']} />
+            <HeroLines lines={['Talk with us about a project', 'or joining UBLDA Consulting.']} />
           </h1>
-          <DotButton href="#contact-form">Connect</DotButton>
+          <DotButton href="#contact-form">Discuss a project</DotButton>
         </div>
       </section>
 
@@ -288,7 +289,7 @@ export default function ConsultingContact() {
         <div className="pcc-form__wrap">
           <div className="pcc-form__left">
             <h2 id="pcc-form-title">Start a conversation</h2>
-            <p>A paragraph is enough. We reply within a week.</p>
+            <p>Tell us what your organization needs to understand or change.</p>
           </div>
           <div className="pcc-form__right">
             <ContactForm />
@@ -299,7 +300,7 @@ export default function ConsultingContact() {
       <section className="pcc-join" aria-labelledby="pcc-join-title">
         <div className="pcc-join__wrap" data-reveal>
           <h2 id="pcc-join-title">Join the team</h2>
-          <p>All majors and years. Applying for the consulting team also makes you a UBLDA member.</p>
+          <p>Consulting applications are open to U-M undergraduates of all majors and years. Applying also adds you to UBLDA’s general membership.</p>
         </div>
         <div className="pcc-jobs">
           <h2 className="pcc-jobs__title" data-reveal>
@@ -321,7 +322,7 @@ export default function ConsultingContact() {
                       ))}
                       <span>TERM: {job.term.toUpperCase()}</span>
                     </p>
-                    <h3>About you</h3>
+                    <h3>About the role</h3>
                     <p>{job.about}</p>
                     <h3>What you’ll do</h3>
                     <ul>

@@ -6,41 +6,41 @@ import { ConsultingShell } from './Shell'
 
 const FACTS = [
   {
-    title: 'First of its kind at Ross',
-    desc: 'UBLDA is the first disability-focused consulting club at Michigan Ross. The practice launched in Fall 2026 with one client, chosen by the whole board.',
+    title: 'Launching Fall 2026',
+    desc: 'Our first client is Arc Thrift Stores of Colorado. The team will develop a business case for its Arc University program.',
   },
   {
-    title: 'Pro bono, always',
-    desc: 'Our work costs the client nothing. We ask for a sponsor, a scoped brief, a kickoff call, and four to five hours across the semester.',
+    title: 'Pro bono projects',
+    desc: 'We don’t charge clients. Each project needs a point of contact, an agreed scope, and time for check-ins and feedback.',
   },
   {
     title: 'Partnered with BLDA',
-    desc: 'Business Leaders for Diverse Abilities is our MBA counterpart at Ross. Its advisors review our work before it reaches a client.',
+    desc: 'Business Leaders for Diverse Abilities is our MBA counterpart at Michigan Ross. We’re developing opportunities for its members to support our student consultants.',
   },
 ]
 
 const HOW = [
-  { title: 'Scope', desc: 'A scoping call, then a written scope your sponsor signs off on.' },
-  { title: 'Research', desc: 'Interviews, walkthroughs, and desk research, reported weekly.' },
-  { title: 'Test', desc: 'Real people, including disabled students, trying the actual experience.' },
-  { title: 'Recommend', desc: 'Findings ranked by impact, with the fix that matters most first.' },
-  { title: 'Present', desc: 'A midpoint review and a final presentation to your leadership.' },
-  { title: 'Enable', desc: 'Templates, checklists, and training so the fixes outlast us.' },
+  { title: 'Scope', desc: 'Agree on the business question and deliverables with the client.' },
+  { title: 'Research', desc: 'Gather evidence through interviews and research suited to the project.' },
+  { title: 'Analyze', desc: 'Compare options and test the assumptions behind the recommendations.' },
+  { title: 'Recommend', desc: 'Explain what the client should do and the evidence behind it.' },
+  { title: 'Present', desc: 'Share early findings at a midpoint review and present the final recommendations.' },
+  { title: 'Hand over', desc: 'Give the client the research and materials needed to use the recommendations.' },
 ]
 
 const VALUES = [
-  { title: 'Nothing about us without us', desc: 'Our consultants include disabled students. That shapes what we notice and what we push on.' },
-  { title: 'Honest about what we are', desc: 'Students whose work gets advisor review. We never certify anything as compliant, and we say so up front.' },
-  { title: 'Fixes that outlast us', desc: 'We would rather teach your team to catch issues than be the only ones who can.' },
-  { title: 'One project, done well', desc: 'One client a semester, chosen by the whole board, so the team has the capacity to do it right.' },
+  { title: 'Nothing about us without us', desc: 'Disabled students help shape our work. For accessibility projects, we seek input from people who use the product or service.' },
+  { title: 'Clear limits', desc: 'We provide student research and recommendations. We don’t offer legal advice or compliance certification.' },
+  { title: 'Useful recommendations', desc: 'We explain our findings and assumptions so the client can decide what to do next.' },
+  { title: 'Focused scope', desc: 'We agree on a question the team can address within a semester.' },
 ]
 
 const BIOS: Record<string, string> = {
-  'Alex Forstner': 'Runs UBLDA’s speaker series and education programming, and co-leads the Fall 2026 engagement.',
-  'Solomon DeYoung': 'Brings consulting-project experience and the partner relationships behind our client pipeline.',
+  'Alex Forstner': 'Leads UBLDA’s education programming and co-manages the Fall 2026 project.',
+  'Solomon DeYoung': 'Leads outreach and partnerships and co-manages the Fall 2026 project.',
 }
 
-const VALUE_RING = 'ACCESS FIRST · HONEST WORK · FIXES THAT LAST · NOTHING ABOUT US WITHOUT US · '
+const VALUE_RING = 'DISABILITY INCLUSION · STUDENT RESEARCH · BUSINESS STRATEGY · '
 
 const buildPractice: Builder = (root, { hover }) => {
   const hero = one(root, '.pcp-hero')
@@ -89,7 +89,7 @@ export default function ConsultingPractice() {
         </div>
         <div className="pcp-hero__over">
           <h1 className="pcp-hero__title">
-            <HeroLines lines={['Student consultants with lived experience.', 'Business-school rigor behind them.', 'Work your team can carry forward.']} />
+            <HeroLines lines={['Michigan students working on', 'business strategy and accessibility', 'through semester-long client projects.']} />
           </h1>
           <DotButton to="/consulting/work">Our work</DotButton>
         </div>
@@ -115,24 +115,23 @@ export default function ConsultingPractice() {
         <div data-reveal>
           <h2 className="pcp-h2">How we work</h2>
           <p>
-            For most organizations the work is accessibility: where disabled customers, applicants, and employees get
-            stuck, and what to fix first. For organizations with a disability mission, we do general business
-            consulting.
+            We provide business consulting for disability-focused organizations and accessibility consulting for
+            teams within companies. The client’s question determines the research and recommendations.
           </p>
           <p>
-            One scoped project per semester. Four to six analysts and two co-project managers meet your sponsor weekly,
-            present at the midpoint, and close with a final presentation and handoff.
+            Four to six analysts work with two project managers on weekly deliverables. The client reviews
+            early findings at the midpoint and receives a final presentation at the end of the semester.
           </p>
           <a href={CONTACT_MAILTO} className="pc-arrowbtn">
             <span className="pc-arrowbtn__arrow" aria-hidden="true">
               <ArrowUpRight size={14} strokeWidth={2.2} />
               <ArrowUpRight size={14} strokeWidth={2.2} />
             </span>
-            <span className="pc-arrowbtn__label">Let’s talk</span>
+            <span className="pc-arrowbtn__label">Discuss a project</span>
           </a>
         </div>
         <div className="pcp-prose__two" data-reveal>
-          <h2 className="pcp-h2">Two project managers. One team.</h2>
+          <h2 className="pcp-h2">Meet the project managers.</h2>
           <p className="pcp-prose__lead">Alex and Solomon run the Fall 2026 engagement.</p>
         </div>
       </section>
@@ -157,7 +156,7 @@ export default function ConsultingPractice() {
                 <ArrowUpRight size={14} strokeWidth={2.2} />
                 <ArrowUpRight size={14} strokeWidth={2.2} />
               </span>
-              <span className="pc-arrowbtn__label">Connect</span>
+              <span className="pc-arrowbtn__label">Email</span>
             </a>
           </article>
         ))}

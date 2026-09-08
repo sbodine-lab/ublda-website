@@ -8,6 +8,6 @@ export interface ConsultingUi {
   reducedMotion: boolean
 }
 
-export const ConsultingContext = createContext<ConsultingUi>({ theme: 'dark', mode: 'full', reducedMotion: false })
+export const ConsultingContext = createContext<ConsultingUi>({ theme: 'light', mode: 'full', reducedMotion: false })
 
 export const useConsultingUi = () => useContext(ConsultingContext)

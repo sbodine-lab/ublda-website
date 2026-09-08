@@ -5,19 +5,19 @@ import './About.css'
 const values = [
   {
     title: 'Inclusion First',
-    desc: 'Disabled students, allies, and everyone in between. If you believe business should work for everyone, you belong here. That\'s the starting line.',
+    desc: 'Membership is open to disabled and non-disabled students across U-M. You can join with no prior experience in disability advocacy.',
   },
   {
-    title: 'Real-World Impact',
-    desc: 'Awareness is step one. We go further, partnering with organizations, building strategy, and shipping work that actually changes how businesses think about accessibility.',
+    title: 'Client Work',
+    desc: 'Through UBLDA Consulting, students research business questions for disability-focused organizations and accessibility teams. Each project ends with recommendations for the client.',
   },
   {
     title: 'Student Leadership',
-    desc: 'The best time to lead on disability inclusion is before you graduate. We\'re building a generation of business leaders who take access seriously from day one.',
+    desc: 'Students run UBLDA, choose its projects, and organize its events. Members can help shape what the club does next.',
   },
   {
     title: 'Education & Advocacy',
-    desc: 'We run the events and workshops that change how people think about disability in business. Then we push for the changes that make it permanent.',
+    desc: 'Our speakers and workshops examine disability in business, including employment and access to products and services.',
   },
 ]
 
@@ -33,15 +33,15 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="about__headline">
-              Making business <em>accessible.</em> Starting at Ross.
+              A student community focused on <em>disability in business.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="about__intro">
-              UBLDA is a student-led organization at Michigan Ross dedicated to
-              disability inclusion in business. We bring together disabled and
-              non-disabled students to advocate, educate, and build a professional
-              world that doesn't leave anyone out.
+              Undergraduate Business Leaders for Diverse Abilities brings together
+              U-M students interested in disability inclusion in business. Based
+              at Michigan Ross, we run speaker events and workshops alongside
+              our pro bono consulting program.
             </p>
           </Reveal>
         </div>
@@ -160,7 +160,7 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="about__values-headline">
-              The principles behind the work.
+              What guides us.
             </h2>
           </Reveal>
           <RevealStagger className="about__values-grid">
@@ -183,14 +183,14 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="about__cta-sub">
-              Lead a project, help run events, join a workshop, or just show up and
-              learn. More than 30 Ross students work on disability inclusion in business.
+              Come to an event or help organize one. If you’re interested in client
+              work, apply separately for the UBLDA Consulting team.
             </p>
           </Reveal>
           <Reveal delay={0.2}>
             <div className="about__cta-actions">
               <Link to="/join" className="btn btn--primary btn--lg">
-                Become a member
+                Join UBLDA
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </Link>
               <Link to="/events" className="btn btn--ghost">

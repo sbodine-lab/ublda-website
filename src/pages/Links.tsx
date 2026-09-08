@@ -19,7 +19,7 @@ const pastEvents: Event[] = [
     time: '6:00 PM - 7:00 PM',
     title: 'Fireside Chat with Lloyd Lewis, CEO of Arc Thrift Stores',
     description:
-      'Lloyd runs a 1,600-person, 24-store operation with $2.3B in total economic impact on Colorado and has funded $250M+ to nonprofits supporting people with IDD. Dinner catered.',
+      'Lloyd Lewis discussed Arc Thrift Stores and its employment of people with intellectual and developmental disabilities.',
     location: 'Ross R1240, Ross School of Business',
   },
 ]
@@ -139,9 +139,9 @@ export default function Links() {
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
               </div>
-              <h3 className="links__form-success-title">You're in!</h3>
+              <h3 className="links__form-success-title">You’re a member.</h3>
               <p className="links__form-success-desc">
-                Welcome to UBLDA. We'll be in touch soon.
+                Welcome to UBLDA. Watch your U-M email for event updates.
               </p>
             </div>
           ) : (
@@ -174,7 +174,7 @@ export default function Links() {
               </div>
 
               <div className="links__form-field">
-                <label className="links__form-label" htmlFor="links-email">UMich uniqname</label>
+                <label className="links__form-label" htmlFor="links-email">U-M uniqname</label>
                 <div className="links__email-wrapper">
                   <input
                     id="links-email"

@@ -9,7 +9,7 @@ import { useConsultingUi } from './context'
 const AREAS = [
   {
     title: 'Websites & apps',
-    items: ['Screen reader walkthroughs', 'Keyboard and focus review', 'Color and contrast', 'Forms and checkout flows', 'Plain-language findings', 'Fix-first priorities'],
+    items: ['Screen reader walkthroughs', 'Keyboard and focus review', 'Color and contrast', 'Forms and checkout flows', 'Plain-language findings', 'Prioritized recommendations'],
   },
   {
     title: 'Documents & communications',
@@ -30,29 +30,29 @@ const AREAS = [
 ]
 
 const JOURNEY = [
-  { title: 'Scoping call', desc: 'Thirty minutes on what is stuck, who it affects, and what a useful answer would look like.' },
-  { title: 'Written scope', desc: 'One page: the question, the deliverables, the timeline. Your sponsor signs off.' },
-  { title: 'Kickoff', desc: 'The team meets your sponsor, agrees the check-in rhythm, and gets access to what it needs.' },
-  { title: 'Weekly deliverables', desc: 'Something concrete every week, so nothing waits until the end to be wrong.' },
+  { title: 'Scoping call', desc: 'Discuss the question your organization needs to answer and how a student team could help.' },
+  { title: 'Written scope', desc: 'Agree on the research question, deliverables, and timeline with your project contact.' },
+  { title: 'Kickoff', desc: 'Introduce the team and agree on check-ins and access to relevant information.' },
+  { title: 'Weekly deliverables', desc: 'Review the team’s progress and address questions as the research develops.' },
   { title: 'Midpoint review', desc: 'Early findings and a chance to redirect the second half of the semester.' },
-  { title: 'Final presentation', desc: 'Findings, ranked fixes, and the business case, presented to your leadership.' },
-  { title: 'Handoff', desc: 'Templates, checklists, and a walkthrough so your team can keep going without us.' },
+  { title: 'Final presentation', desc: 'Present the research and recommendations to your team.' },
+  { title: 'Handoff', desc: 'Walk through the final materials and explain how your team can use them.' },
 ]
 
 const APPROACH = [
-  { title: 'Findings', desc: 'Where people get stuck, shown rather than asserted, and ranked by how many people it blocks and how hard it is to fix.' },
-  { title: 'Fixes', desc: 'Specific, practical changes your own team can make, written in plain language. Where a fix needs budget, we write the case for it.' },
-  { title: 'Capability', desc: 'Training, templates, and checklists come with every engagement, so your team catches the next issue itself.' },
+  { title: 'Findings', desc: 'Research findings with supporting evidence and clearly stated limitations.' },
+  { title: 'Recommendations', desc: 'Options for what to do next, with the costs and tradeoffs relevant to your question.' },
+  { title: 'Project materials', desc: 'The agreed deliverables, which may include a financial model, research report, or accessibility recommendations.' },
 ]
 
 const FAQ = [
-  { q: 'Is it really free?', a: 'Yes. We ask for a sponsor, a scoped brief, a kickoff call, and four to five hours of your time across the semester.' },
-  { q: 'Who does the work?', a: 'Four to six undergraduate analysts and two co-project managers, selected by application and interview. Our consultants include disabled students, students who have worked on this for years, and students who arrived curious and learned it here.' },
-  { q: 'Who reviews it?', a: 'Advisors from BLDA, our MBA counterpart at Michigan Ross, review deliverables before they reach you.' },
-  { q: 'Do you certify ADA or WCAG compliance?', a: 'No. We find barriers, rank them, and help you fix them. Certification is a job for lawyers and specialist auditors.' },
+  { q: 'What does it cost?', a: 'Our projects are pro bono. We ask for a client contact, access to relevant information, and time for project reviews.' },
+  { q: 'Who does the work?', a: 'Four to six undergraduate analysts work with two project managers. We select analysts through an application and interview; prior consulting experience isn’t required.' },
+  { q: 'Who reviews it?', a: 'Project managers review the team’s work throughout the semester. We’re also developing an advisor role with BLDA, our MBA counterpart at Michigan Ross.' },
+  { q: 'Do you certify ADA or WCAG compliance?', a: 'No. We provide student research and recommendations, not legal advice or compliance certification.' },
   { q: 'How long is an engagement?', a: 'One semester. Fall 2026 kicks off the week of October 5 and closes with a final presentation at the end of the semester.' },
-  { q: 'What kinds of organizations do you work with?', a: 'Nonprofits, community organizations, and companies that want to serve disabled customers and employees better. For organizations with a disability mission, we also do general business consulting.' },
-  { q: 'How do we start?', a: 'Email Alex Forstner or Solomon DeYoung, or use the form on the connect page. We will set up a scoping call and follow up with a written scope within a week.' },
+  { q: 'What kinds of organizations do you work with?', a: 'We provide business consulting for disability-focused organizations and accessibility consulting for teams within companies.' },
+  { q: 'How do we start?', a: 'Email Alex Forstner or Solomon DeYoung, or use the contact page to prepare an email about your project.' },
 ]
 
 const buildServices: Builder = (root, { mobile, vw, vh }) => {
@@ -159,7 +159,7 @@ function ServicesBody() {
         </div>
         <div className="pcs-hero__lockup">
           <p className="pcs-hero__eyebrow">Services</p>
-          <h1 className="pcs-hero__title">Five ways we work with organizations.</h1>
+          <h1 className="pcs-hero__title">Business strategy and accessibility for your organization.</h1>
         </div>
       </section>
 
@@ -180,7 +180,7 @@ function ServicesBody() {
                     <li key={it}>{it}</li>
                   ))}
                 </ul>
-                <DotButton href={CONTACT_MAILTO}>Scope this</DotButton>
+                <DotButton href={CONTACT_MAILTO}>Discuss a project</DotButton>
               </div>
             ))}
           </div>

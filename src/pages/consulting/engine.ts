@@ -51,7 +51,7 @@ export const maybe = <T extends HTMLElement = HTMLElement>(root: ParentNode, sel
   root.querySelector<T>(sel)
 
 export interface StartOptions {
-  /* Visitor asked for reduced motion through the on-page toggle. */
+  /* Respect the visitor’s reduced-motion preference. */
   reduce?: boolean
 }
 
@@ -180,7 +180,6 @@ export function buildWordmark(root: HTMLElement, trigger: Element) {
     .to(all(root, '.pc-word__rest'), { opacity: 0, x: 2, duration: 0.2, ease: 'power1.out' }, 'a')
     .to(all(root, '.pc-word__u'), { x: uDx, duration: 0.4, delay: 0.2 }, 'a')
     .to(all(root, '.pc-word__c'), { x: cDx, duration: 0.4, delay: 0.2 }, 'a')
-    .to(all(root, '.pc-word__dot'), { opacity: 1, scale: 1, duration: 0.2, delay: -0.2 }, 's')
 }
 
 /* Elements marked data-reveal rise into place as they enter. A

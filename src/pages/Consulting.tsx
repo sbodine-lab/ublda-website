@@ -5,7 +5,6 @@ import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
   CLIENT,
   CONTACT_MAILTO,
-  HERO_LEAD,
   HERO_DESCRIPTION,
   LEADERS,
   PARTNERS,
@@ -16,8 +15,9 @@ import {
   STEPS,
 } from './consulting/content'
 import { startConsultingMotion } from './consulting/motion'
-import { DotButton, HeroRings, NewTab } from './consulting/parts'
+import { DotButton, NewTab } from './consulting/parts'
 import { ConsultingShell } from './consulting/Shell'
+import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
@@ -58,34 +58,30 @@ function HomeBody() {
 
   return (
     <>
-      {/* 1 · Hero */}
+      {/* The shared backdrop carries the hero into the opening statement. */}
+      <div className="pc-intro">
+      <HeroBackdrop />
       <section className="pc-hero">
-        <div className="pc-hero__art" aria-hidden="true">
-          <HeroRings />
-        </div>
         <div className="pc-hero__text">
-          <p className="pc-hero__lead">{HERO_LEAD}</p>
+          <div className="pc-hero__main">
           <h1 className="pc-hero__title">
-            Build your consulting skills.
-            <span>Make business more inclusive.</span>
+            We consult for disability-focused organizations and accessibility teams.
           </h1>
-          <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
-          <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
-            Apply for Fall 2026
-            <span className="pc-hero__apply-meta">closes Sep 20</span>
-            <NewTab />
-            <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
-          </a>
-          <p className="pc-hero__welcome">All majors and years welcome. No consulting experience needed.</p>
-          <DotButton to="/consulting/work" className="pc-hero__explore">
-            See the work
-          </DotButton>
+          </div>
+          <div className="pc-hero__details">
+            <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
+            <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
+              Apply for Fall 2026
+              <NewTab />
+              <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
+            </a>
+          </div>
         </div>
-        <div className="pc-hero__fade" aria-hidden="true" />
       </section>
 
       {/* 2 · Statement */}
       <StatementBody />
+      </div>
 
       {/* 3 · Services */}
       <section className="pc-services" id="consulting-services">
@@ -93,7 +89,7 @@ function HomeBody() {
           <div className="pc-services__left">
             <h2 className="pc-services__title">The work you could take on</h2>
             <DotButton to="/consulting/services" className="pc-services__btn">
-              Explore our project areas
+              View project areas
             </DotButton>
           </div>
           <div className="pc-services__right">
@@ -228,23 +224,23 @@ function HomeBody() {
       {/* 7 · Call to action */}
       <section className="pc-cta" id="consulting-contact">
         <h2 className="pc-cta__title">
-          Find your place on the team.
+          Join the Fall 2026
           <br />
-          Apply for Fall 2026.
+          consulting team.
         </h2>
         <div className="pc-cta__btns">
           <DotButton href={CONSULTING_FORM_URL} external className="pc-dotbtn--big">
-            apply for fall 2026
+            Apply for Fall 2026
           </DotButton>
           <DotButton to="/consulting/practice" className="pc-dotbtn--big">
-            meet the practice
+            Meet the team
           </DotButton>
         </div>
         <p className="pc-cta__note">
           Questions? Email {LEADERS[0].name} or {LEADERS[1].name}.
         </p>
         <p className="pc-cta__note">
-          For organizations: we take on scoped, pro bono projects in disability inclusion.{' '}
+          For prospective clients: tell us about your business or accessibility question.{' '}
           <a className="pc-line" href={CONTACT_MAILTO}>Discuss a project with us.</a>
         </p>
       </section>

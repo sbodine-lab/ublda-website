@@ -5,17 +5,17 @@ import { DotButton, HeroLines, HeroRings } from './parts'
 import { ConsultingShell } from './Shell'
 
 const STATS = [
-  { value: '25%', label: 'of adults', desc: 'One in four adults in the US has a disability. Serve them well and you reach people your competitors overlook.' },
-  { value: '1', label: 'client a semester', desc: 'Chosen by the whole board, so the team can do it well.' },
-  { value: '6', label: 'analysts at most', desc: 'Four to six analysts and two co-project managers, with advisor review.' },
-  { value: '$0', label: 'cost to you', desc: 'What our work costs the organizations we serve. Pro bono, always.' },
+  { value: '2', label: 'project managers', desc: 'Alex Forstner and Solomon DeYoung lead the Fall 2026 project.' },
+  { value: '1', label: 'Fall 2026 client', desc: 'Arc Thrift Stores of Colorado, for the Arc University business case.' },
+  { value: '6', label: 'analysts at most', desc: 'Four to six undergraduate analysts work together on the client’s question.' },
+  { value: '$0', label: 'cost to you', desc: 'We don’t charge clients for our consulting projects.' },
 ]
 
 const STATEMENT = [
-  'UBLDA Consulting works with the Ross community,',
-  'University of Michigan offices, disability organizations,',
-  'and companies that want to serve disabled customers',
-  'and employees better than they do today.',
+  'Our network includes Michigan Ross,',
+  'BLDA’s MBA students, and the organizations',
+  'that host projects and share their experience',
+  'with our members.',
 ]
 
 interface Tile {
@@ -29,19 +29,19 @@ const TILES: Tile[] = [
   { name: 'Michigan Ross', kind: 'Home school', src: PARTNERS[0].src },
   { name: 'Community, Culture and Belonging', kind: 'University office', src: PARTNERS[1].src },
   { name: 'BLDA', kind: 'MBA partner chapter', src: PARTNERS[2].src },
-  { name: 'Nestidd', kind: 'Inaugural fireside speaker', src: PARTNERS[3].src },
+  { name: 'Nestidd', kind: 'Speaker’s organization', src: PARTNERS[3].src },
   { name: 'Arc Thrift Stores of Colorado', kind: 'Fall 2026 client' },
   { name: 'Wall Street Oasis', kind: 'Member resources' },
-  { name: 'Nonprofits', kind: 'Who we work with' },
-  { name: 'Community organizations', kind: 'Who we work with' },
-  { name: 'Companies with a disability mission', kind: 'Who we work with' },
+  { name: 'Nonprofits', kind: 'Prospective clients' },
+  { name: 'Community organizations', kind: 'Prospective clients' },
+  { name: 'Corporate accessibility teams', kind: 'Prospective clients' },
   { name: 'Your organization', kind: 'Start a conversation', to: '/consulting/contact' },
 ]
 
 const INDEX = [
   { name: 'Arc Thrift Stores of Colorado', kind: 'Client', note: 'Arc University business case, Fall 2026' },
-  { name: 'Business Leaders for Diverse Abilities', kind: 'MBA chapter', note: 'Advisors, mentors, and the origin of the model' },
-  { name: 'Michigan Ross', kind: 'School', note: 'Where the club lives and where the team meets' },
+  { name: 'Business Leaders for Diverse Abilities', kind: 'MBA chapter', note: 'Our MBA counterpart at Michigan Ross' },
+  { name: 'Michigan Ross', kind: 'School', note: 'UBLDA’s home school' },
   { name: 'Office of Community, Culture and Belonging', kind: 'University office', note: 'Funded the inaugural fireside chat, March 2026' },
   { name: 'Nestidd', kind: 'Speaker', note: 'CEO Andrew Parker spoke at the inaugural fireside, March 2026' },
   { name: 'Wall Street Oasis', kind: 'Resources', note: 'Member perks and materials since June 2026' },
@@ -120,7 +120,7 @@ export default function ConsultingPartners() {
         </div>
         <div className="pcb-hero__over">
           <h1 className="pcb-hero__title">
-            <HeroLines lines={['The organizations we work with', 'already put disabled people', 'at the center. We help them prove it.']} />
+            <HeroLines lines={['Meet the organizations', 'connected to UBLDA’s work', 'at Michigan Ross and beyond.']} />
           </h1>
           <DotButton to="/consulting/services">Our services</DotButton>
         </div>
@@ -160,7 +160,7 @@ export default function ConsultingPartners() {
 
       <section className="pcb-selected" aria-labelledby="pcb-selected-title">
         <h2 id="pcb-selected-title" data-reveal>
-          Selected partners
+          Our network
         </h2>
         <div className="pcb-grid">
           {TILES.map((t) =>
@@ -179,7 +179,7 @@ export default function ConsultingPartners() {
 
       <section className="pcb-index" aria-labelledby="pcb-index-title">
         <h2 id="pcb-index-title" data-reveal>
-          Partner index <sup>({INDEX.length})</sup>
+          Organization directory <sup>({INDEX.length})</sup>
         </h2>
         <div className="pcb-index__head" aria-hidden="true">
           <span>Partner</span>
@@ -197,7 +197,7 @@ export default function ConsultingPartners() {
         </ul>
         <div className="pcb-index__foot" data-reveal>
           <DotButton to="/consulting/contact" className="pc-dotbtn--big">
-            become a partner
+            Discuss a project
           </DotButton>
         </div>
       </section>
