@@ -128,7 +128,7 @@ export function ConsultingNav({ menuOpen, onToggleMenu, ghost = false }: NavProp
         ) : (
           <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-nav__apply">
             Apply
-            <span className="sr-only"> for the Fall 2026 consulting team, closes September 22</span>
+            <span className="sr-only"> for the Fall 2026 consulting team, closes September 20</span>
             <NewTab />
             <ArrowUpRight size={12} strokeWidth={2.2} aria-hidden="true" />
           </a>

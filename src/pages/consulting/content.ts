@@ -67,8 +67,8 @@ export const STEPS: Step[] = [
   {
     num: '02',
     title: 'Apply',
-    when: 'Sep 2 to Sep 22',
-    desc: 'Opens Sep 2 at noon ET, closes Sep 22 at 11:30 PM ET. Three short answers and an optional resume link. No consulting experience needed.',
+    when: 'Sep 2 to Sep 20',
+    desc: 'Opens Sep 2 at noon ET, closes Sep 20 at 11:30 PM ET. Three short answers and an optional resume link. No consulting experience needed.',
     tone: 'navy',
   },
   {
