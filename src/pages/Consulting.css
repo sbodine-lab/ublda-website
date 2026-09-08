@@ -559,16 +559,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   padding: 0 4vw;
 }
 
-.pc-hero__lead {
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pc-heading2);
-  margin-bottom: 1.4rem;
-}
-
 .pc-hero__title {
   font-size: clamp(2rem, 4.5vw, 4.6rem);
   font-weight: 500;
@@ -592,18 +582,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   text-wrap: pretty;
 }
 
-.pc-hero__welcome {
-  max-width: 30rem;
-  margin: 0.85rem auto 0;
-  font-size: 0.78rem;
-  line-height: 1.6;
-  color: var(--pc-des);
-}
-
-.pc-hero__explore.pc-dotbtn {
-  margin-top: 1.3rem;
-}
-
 .pc-hero__apply {
   display: inline-flex;
   align-items: center;
@@ -620,13 +598,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   color: var(--pc-heading2);
   text-decoration: none;
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.pc-hero__apply-meta {
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: none;
-  color: var(--pc-des);
 }
 
 @media (max-width: 359px) {
@@ -646,11 +617,6 @@ html.pc-root::-webkit-scrollbar-thumb {
   background: var(--pc-fg);
   border-color: var(--pc-fg);
   color: var(--pc-bg);
-}
-
-.pc-hero__apply:hover .pc-hero__apply-meta,
-.pc-hero__apply:focus-visible .pc-hero__apply-meta {
-  color: inherit;
 }
 
 .pc-hero__fade {
@@ -1806,11 +1772,6 @@ html.pc-menu-open .pc-cursor {
 
   .pc-hero__title {
     font-size: clamp(2rem, 8.5vw, 3rem);
-  }
-
-  .pc-hero__lead {
-    font-size: 0.7rem;
-    margin-bottom: 1.2rem;
   }
 
   .pc--static .pc-statement {

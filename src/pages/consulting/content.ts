@@ -3,10 +3,8 @@
    (Lloyd Lewis call, 2026-07-28), the operating model (Outreach Meeting
    Guide), and the project-manager assignment (2026-08-18). */
 
-export const HERO_LEAD = 'Student consulting at Michigan'
-
 export const HERO_DESCRIPTION =
-  'Join a student team working with real clients on disability inclusion. Put your research and ideas to work on a semester-long project, with guidance from project managers and advisors.'
+  'Join Michigan students helping organizations grow their impact and make business more accessible to disabled people.'
 
 export const STATEMENT_1 =
   'UBLDA Consulting brings Michigan students together to help organizations make business more inclusive of disabled people. We take on real client projects, pro bono.'

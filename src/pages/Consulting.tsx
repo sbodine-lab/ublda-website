@@ -5,7 +5,6 @@ import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
   CLIENT,
   CONTACT_MAILTO,
-  HERO_LEAD,
   HERO_DESCRIPTION,
   LEADERS,
   PARTNERS,
@@ -64,22 +63,16 @@ function HomeBody() {
           <HeroRings />
         </div>
         <div className="pc-hero__text">
-          <p className="pc-hero__lead">{HERO_LEAD}</p>
           <h1 className="pc-hero__title">
-            Build your consulting skills.
-            <span>Make business more inclusive.</span>
+            Build experience.
+            <span>Advance disability inclusion.</span>
           </h1>
           <p className="pc-hero__description">{HERO_DESCRIPTION}</p>
           <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-hero__apply">
             Apply for Fall 2026
-            <span className="pc-hero__apply-meta">closes Sep 22</span>
             <NewTab />
             <ArrowUpRight size={14} strokeWidth={2.2} aria-hidden="true" />
           </a>
-          <p className="pc-hero__welcome">All majors and years welcome. No consulting experience needed.</p>
-          <DotButton to="/consulting/work" className="pc-hero__explore">
-            See the work
-          </DotButton>
         </div>
         <div className="pc-hero__fade" aria-hidden="true" />
       </section>
