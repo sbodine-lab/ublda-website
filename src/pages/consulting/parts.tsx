@@ -1,6 +1,6 @@
 import { forwardRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, ArrowUpRight, Moon, Pause, Play, Sun } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../../lib/forms'
 import { CONTACT_MAILTO, LEADERS, PAGE_LINKS, SOCIAL } from './content'
 
@@ -92,10 +92,6 @@ export function HeroRings() {
 }
 
 interface NavProps {
-  theme: Theme
-  onToggleTheme: () => void
-  motionOff: boolean
-  onToggleMotion: () => void
   menuOpen: boolean
   onToggleMenu: () => void
   ghost?: boolean
@@ -103,9 +99,7 @@ interface NavProps {
 
 /* The sub-brand nav. `ghost` renders a non-interactive copy inside the
    inverted disc so the wordmark reads correctly while the disc covers it. */
-export function ConsultingNav({ theme, onToggleTheme, motionOff, onToggleMotion, menuOpen, onToggleMenu, ghost = false }: NavProps) {
-  const ThemeIcon = theme === 'dark' ? Sun : Moon
-  const MotionIcon = motionOff ? Play : Pause
+export function ConsultingNav({ menuOpen, onToggleMenu, ghost = false }: NavProps) {
   const wordmark = (
     <span className="pc-word">
       <span className="pc-word__u">U</span>
@@ -118,39 +112,6 @@ export function ConsultingNav({ theme, onToggleTheme, motionOff, onToggleMotion,
   )
   return (
     <header className={`pc-nav ${ghost ? 'pc-nav--ghost' : ''}`} aria-hidden={ghost || undefined}>
-      <div className="pc-nav__left">
-        {ghost ? (
-          <>
-            <span className="pc-nav__mode">
-              <ThemeIcon size={18} strokeWidth={1.6} aria-hidden="true" />
-            </span>
-            <span className="pc-nav__mode">
-              <MotionIcon size={16} strokeWidth={1.6} aria-hidden="true" />
-            </span>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              className="pc-nav__mode"
-              onClick={onToggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              aria-pressed={theme === 'light'}
-            >
-              <ThemeIcon size={18} strokeWidth={1.6} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              className="pc-nav__mode"
-              onClick={onToggleMotion}
-              aria-label={motionOff ? 'Turn animations on' : 'Reduce motion and pause animations'}
-              aria-pressed={motionOff}
-            >
-              <MotionIcon size={16} strokeWidth={1.6} aria-hidden="true" />
-            </button>
-          </>
-        )}
-      </div>
       {ghost ? (
         <span className="pc-nav__logo">{wordmark}</span>
       ) : (

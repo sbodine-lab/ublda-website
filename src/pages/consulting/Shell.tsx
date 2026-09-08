@@ -6,17 +6,6 @@ import type { MotionHandle, MotionMode, MotionStarter } from './engine'
 import { ConsultingFooter, ConsultingMenu, ConsultingNav, type Theme } from './parts'
 import '../Consulting.css'
 
-const THEME_KEY = 'ublda-consulting-theme'
-const MOTION_KEY = 'ublda-consulting-motion'
-
-function readTheme(): Theme {
-  try {
-    return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'
-  } catch {
-    return 'dark'
-  }
-}
-
 interface ShellProps {
   title: string
   motion: MotionStarter
@@ -35,18 +24,17 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
   const menuRef = useRef<HTMLDivElement>(null)
   const menuTl = useRef<gsap.core.Timeline | null>(null)
   const motionRef = useRef<MotionHandle | null>(null)
-  const [theme, setTheme] = useState<Theme>(readTheme)
+  const theme: Theme = 'light'
   const [menuOpen, setMenuOpen] = useState(false)
   const [mode, setMode] = useState<MotionMode>('full')
-  const [prefersReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  const [motionOff, setMotionOff] = useState(() => {
-    try {
-      return localStorage.getItem(MOTION_KEY) === 'reduced'
-    } catch {
-      return false
-    }
-  })
-  const reducedMotion = prefersReduced || motionOff
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(preference.matches)
+    preference.addEventListener('change', update)
+    return () => preference.removeEventListener('change', update)
+  }, [])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -59,25 +47,11 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
 
   useLayoutEffect(() => {
     const html = document.documentElement
-    html.classList.add('pc-root')
-    html.classList.toggle('pc-light', theme === 'light')
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      /* private mode */
-    }
+    html.classList.add('pc-root', 'pc-light')
     return () => {
       html.classList.remove('pc-root', 'pc-light')
     }
-  }, [theme])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(MOTION_KEY, motionOff ? 'reduced' : 'auto')
-    } catch {
-      /* private mode */
-    }
-  }, [motionOff])
+  }, [])
 
   useEffect(() => {
     const root = rootRef.current
@@ -149,8 +123,6 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
     }
   }, [menuOpen])
 
-  const toggleTheme = useCallback(() => setTheme((t) => (t === 'dark' ? 'light' : 'dark')), [])
-  const toggleMotion = useCallback(() => setMotionOff((m) => !m), [])
   const toggleMenu = useCallback(() => setMenuOpen((o) => !o), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
 
@@ -164,12 +136,12 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
         )}
 
         <ConsultingMenu ref={menuRef} open={menuOpen} onClose={closeMenu} />
-        <ConsultingNav theme={theme} onToggleTheme={toggleTheme} motionOff={motionOff} onToggleMotion={toggleMotion} menuOpen={menuOpen} onToggleMenu={toggleMenu} />
+        <ConsultingNav menuOpen={menuOpen} onToggleMenu={toggleMenu} />
 
         {disc && (
           <>
             <div className="pc-disc" aria-hidden="true" inert>
-              <ConsultingNav theme={theme} onToggleTheme={toggleTheme} motionOff={motionOff} onToggleMotion={toggleMotion} menuOpen={menuOpen} onToggleMenu={toggleMenu} ghost />
+              <ConsultingNav menuOpen={menuOpen} onToggleMenu={toggleMenu} ghost />
               <div className="pc-disc__inner">{disc}</div>
             </div>
             <div className="pc-orb-track" aria-hidden="true">

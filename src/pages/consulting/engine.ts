@@ -51,7 +51,7 @@ export const maybe = <T extends HTMLElement = HTMLElement>(root: ParentNode, sel
   root.querySelector<T>(sel)
 
 export interface StartOptions {
-  /* Visitor asked for reduced motion through the on-page toggle. */
+  /* Respect the visitor’s reduced-motion preference. */
   reduce?: boolean
 }
 
