@@ -92,7 +92,7 @@ export default function Table() {
         <header className="tb-head">
           <div className="tb-brand">
             <img src="/logo-1000.png" alt="" width={44} height={44} />
-            <span className="tb-brand__name">UBLDA</span>
+            <h1 className="tb-brand__name">UBLDA</h1>
           </div>
           {fullscreen.supported && !fullscreen.active && (
             <button type="button" className="tb-fullscreen" onClick={fullscreen.enter}>
@@ -100,8 +100,6 @@ export default function Table() {
             </button>
           )}
         </header>
-
-        <h1 className="tb-title">Disability inclusion belongs in business.</h1>
 
         <div className="tb-grid">
           <section className="tb-card tb-card--primary" aria-labelledby="tb-apply">
