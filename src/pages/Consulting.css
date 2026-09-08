@@ -1772,7 +1772,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-hero__title {
-    font-size: clamp(2.6rem, 11.4vw, 5.5rem);
+    font-size: clamp(2.4rem, 10.5vw, 5rem);
   }
 
   .pc-hero__details {
@@ -4206,11 +4206,11 @@ html.pc-menu-open .pc-cursor {
   background: linear-gradient(90deg, #faf9f6f5 0%, #faf9f6d9 55%, #faf9f68c 100%);
 }
 
-/* Keep the headline scale from the photo treatment without a logo column. */
+/* Headline scale for the photo hero. */
 .pc-hero__main .pc-hero__title {
-  font-size: clamp(3.5rem, 5.8vw, 6.5rem);
+  font-size: clamp(3.25rem, 5.3vw, 6rem);
 }
 @media (max-width: 767px) {
-  .pc-hero__main .pc-hero__title { font-size: clamp(2.6rem, 11.4vw, 5.5rem); }
+  .pc-hero__main .pc-hero__title { font-size: clamp(2.4rem, 10.5vw, 5rem); }
   .pc-hero__text { gap: 24px; }
 }
