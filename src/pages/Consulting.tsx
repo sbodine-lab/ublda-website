@@ -64,7 +64,7 @@ function HomeBody() {
         </div>
         <div className="pc-hero__text">
           <h1 className="pc-hero__title">
-            Build consulting experience that advances disability inclusion.
+            We consult for disability-focused organizations and accessibility teams.
           </h1>
           <div className="pc-hero__details">
             <p className="pc-hero__description">{HERO_DESCRIPTION}</p>

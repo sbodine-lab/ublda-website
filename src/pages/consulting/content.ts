@@ -4,7 +4,7 @@
    Guide), and the project-manager assignment (2026-08-18). */
 
 export const HERO_DESCRIPTION =
-  'Join Michigan students helping organizations grow their impact and make business more accessible to disabled people.'
+  'Work with fellow Michigan students on pro bono client projects in business strategy and accessibility.'
 
 export const STATEMENT_1 =
   'UBLDA Consulting brings Michigan students together to help organizations make business more inclusive of disabled people. We take on real client projects, pro bono.'
