@@ -30,7 +30,7 @@ const TILES: Tile[] = [
   { name: 'Community, Culture and Belonging', kind: 'University office', src: PARTNERS[1].src },
   { name: 'BLDA', kind: 'MBA partner chapter', src: PARTNERS[2].src },
   { name: 'Nestidd', kind: 'Speaker’s organization', src: PARTNERS[3].src },
-  { name: 'Arc Thrift Stores of Colorado', kind: 'Fall 2026 client' },
+  { name: 'Arc Thrift Stores of Colorado', kind: 'Fall 2026 client', src: '/partners-arc-thrift.png' },
   { name: 'Wall Street Oasis', kind: 'Member resources' },
   { name: 'Nonprofits', kind: 'Prospective clients' },
   { name: 'Community organizations', kind: 'Prospective clients' },
