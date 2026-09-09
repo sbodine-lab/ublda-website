@@ -13,10 +13,9 @@ export default function ConsultingLeadership() {
         <header className="pcl-leadership__intro">
           <p className="pcl-leadership__eyebrow">Fall 2026</p>
           <h1 id="pcl-title">Consulting leadership</h1>
-          <p>Solomon and Alex lead the consulting team and co-manage our Fall 2026 engagement.</p>
         </header>
         <div className="pcl-leadership__people">
-          {[...LEADERS].reverse().map((leader) => (
+          {LEADERS.map((leader) => (
             <article className="pcl-leadership__person" key={leader.email} data-reveal>
               <span className="pcl-leadership__initials" aria-hidden="true">
                 {leader.name.split(' ').map((name) => name[0]).join('')}
