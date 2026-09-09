@@ -111,24 +111,23 @@ export interface ClientStat {
 export const CLIENT = {
   label: 'Fall 2026 client',
   name: 'Arc Thrift Stores of Colorado',
-  desc: 'Colorado’s nonprofit thrift chain, funding the state’s 15 Arc chapters since 1968 and one of its largest employers of people with intellectual and developmental disabilities (IDD). Its CEO sits on The Arc of the United States Foundation board.',
+  /* Who they are, and where the work ends up. Sam, Sept 9, 2026: the team
+     presents to The Arc's national board at the end of the semester. */
+  desc: 'Colorado’s nonprofit thrift chain funds the state’s Arc chapters and is one of its largest employers of people with intellectual and developmental disabilities. At the end of the semester, the team presents to the national board of The Arc, the largest disability nonprofit in the United States.',
   url: 'https://arcthrift.com',
   /* The two logos read left to right: the national organization first, then
      the Colorado client whose stores fund its local chapters. */
   logos: [
-    { src: '/client-the-arc.svg', alt: 'The Arc', role: 'The Arc of the United States', note: 'National network' },
-    { src: '/partners-arc-thrift.png', alt: 'arc Thrift Stores', role: 'Arc Thrift Stores of Colorado', note: 'Our client' },
+    { src: '/client-the-arc.svg', alt: 'The Arc', role: 'The Arc of the United States' },
+    { src: '/partners-arc-thrift.png', alt: 'arc Thrift Stores', role: 'Arc Thrift Stores of Colorado, our client' },
   ],
   /* Figures under the description. Sources, checked Sept 8, 2026:
-     thearc.org/about-us (549 chapters, founded 1950); The Arc's 2018 data
-     brief (7.3M people with IDD); KJCT Feb 6, 2026 CEO interview (600
-     employees with IDD); lloydlewis.net ($32M to $120M+); arcthrift.com
-     (since 1968). */
+     thearc.org/about-us (549 chapters); KJCT Feb 6, 2026 CEO interview
+     (600 employees with IDD); lloydlewis.net ($120M+ enterprise). */
   stats: [
-    { value: '549', label: 'chapters in The Arc’s network' },
-    { value: '7M+', label: 'people with IDD in the U.S.' },
-    { value: '600', label: 'Arc Thrift employees with IDD' },
-    { value: '$120M+', label: 'social enterprise, from $32M' },
+    { value: '549', label: 'Arc chapters nationwide' },
+    { value: '600', label: 'employees with IDD' },
+    { value: '$120M+', label: 'in revenue' },
   ] as ClientStat[],
 }
 
