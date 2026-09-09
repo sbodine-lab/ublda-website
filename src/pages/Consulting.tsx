@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GrainGradient } from '@paper-design/shaders-react'
+import { Swirl } from '@paper-design/shaders-react'
 import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
@@ -21,11 +21,13 @@ import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
-/* The client section's backdrop: a slow grain gradient in the brand's light
-   tones, so both full-colour logos sit directly on it. */
+/* The client section's backdrop: soft swirl bands in the consulting
+   sub-brand's lighter hues (warm cream, mint, aquamarine, sand gold), their
+   centre pushed off to the lower right so broad arcs sweep behind the
+   lockup while the logos sit on the calm side. */
 const CLIENT_SHADER = {
-  colorBack: '#faf9f6',
-  colors: ['#e3f2ef', '#b6e3dc', '#5cc7bd', '#efe6d4'],
+  colorBack: '#fbf7ef',
+  colors: ['#e2f1ec', '#9edbd1', '#ead6a6', '#cbe9e3'],
 }
 
 function Words({ text, className }: { text: string; className: string }) {
@@ -56,7 +58,7 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
 function HomeBody() {
   const { mode, reducedMotion } = useConsultingUi()
   const [openService, setOpenService] = useState<string | null>(null)
-  const shaderSpeed = reducedMotion ? 0 : 0.35
+  const shaderSpeed = reducedMotion ? 0 : 0.6
   const isStatic = mode === 'static'
 
   return (
@@ -166,14 +168,19 @@ function HomeBody() {
       {/* 5 · Client */}
       <section className="pc-client" id="consulting-clients">
         <div className="pc-client__media" aria-hidden="true">
-          <GrainGradient
+          <Swirl
             colorBack={CLIENT_SHADER.colorBack}
             colors={CLIENT_SHADER.colors}
-            shape="wave"
-            softness={0.75}
-            intensity={0.32}
-            noise={0.22}
-            scale={1.05}
+            bandCount={3}
+            twist={0.14}
+            center={0.35}
+            proportion={0.55}
+            softness={0.85}
+            noise={0.12}
+            noiseFrequency={0.35}
+            offsetX={0.55}
+            offsetY={0.6}
+            scale={1.15}
             speed={shaderSpeed}
             minPixelRatio={1}
             maxPixelCount={1400000}

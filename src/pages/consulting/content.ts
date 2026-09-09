@@ -24,27 +24,27 @@ export const SERVICES: Service[] = [
   {
     id: 'digital',
     title: 'Websites & apps',
-    desc: 'Investigate where a website or app creates barriers for disabled users and recommend what the client should address first.',
+    desc: 'Review how an organization’s websites and apps work for disabled people and recommend improvements.',
   },
   {
     id: 'documents',
     title: 'Documents & communications',
-    desc: 'Examine how people access PDFs, presentations, and newsletters, then recommend more accessible ways to share information.',
+    desc: 'Help an organization share information in ways more people can use.',
   },
   {
     id: 'hiring',
     title: 'Hiring & workplace',
-    desc: 'Study hiring and onboarding to identify barriers for disabled candidates and employees.',
+    desc: 'Look at how an organization recruits, hires, and supports disabled employees, and recommend changes.',
   },
   {
     id: 'events',
     title: 'Events & programs',
-    desc: 'Help organizations plan for access throughout an event, including invitations, venues, accommodations, and materials.',
+    desc: 'Help an organization make its events and programs open to everyone who wants to take part.',
   },
   {
     id: 'strategy',
     title: 'Strategy & business cases',
-    desc: 'Develop market research and financial recommendations for organizations with a disability mission. Our first client is Arc Thrift Stores of Colorado.',
+    desc: 'Research a market or opportunity and recommend a direction for an organization with a disability mission.',
   },
 ]
 
