@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { MeshGradient } from '@paper-design/shaders-react'
+import { GrainGradient } from '@paper-design/shaders-react'
 import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
   CLIENT,
-  type ClientStat,
   CONTACT_MAILTO,
   HERO_DESCRIPTION,
   LEADERS,
@@ -22,8 +21,12 @@ import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
-const SHADER_DARK = ['#0B1F2F', '#14374E', '#2BBAB0', '#091E2A']
-const SHADER_LIGHT = ['#FAF9F6', '#E8F6F4', '#2BBAB0', '#D8D6D0']
+/* The client section's backdrop: a slow grain gradient in the brand's light
+   tones, so both full-colour logos sit directly on it. */
+const CLIENT_SHADER = {
+  colorBack: '#faf9f6',
+  colors: ['#e3f2ef', '#b6e3dc', '#5cc7bd', '#efe6d4'],
+}
 
 function Words({ text, className }: { text: string; className: string }) {
   return (
@@ -35,15 +38,6 @@ function Words({ text, className }: { text: string; className: string }) {
         </span>
       ))}
     </p>
-  )
-}
-
-function Drift({ stat, className }: { stat: ClientStat; className: string }) {
-  return (
-    <div className={`pc-drift ${className}`}>
-      <span className="pc-drift__value">{stat.value}</span>
-      <span className="pc-drift__label">{stat.label}</span>
-    </div>
   )
 }
 
@@ -60,10 +54,9 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
 }
 
 function HomeBody() {
-  const { theme, mode, reducedMotion } = useConsultingUi()
+  const { mode, reducedMotion } = useConsultingUi()
   const [openService, setOpenService] = useState<string | null>(null)
-  const shaderSpeed = reducedMotion ? 0 : 0.2
-  const shaderColors = theme === 'dark' ? SHADER_DARK : SHADER_LIGHT
+  const shaderSpeed = reducedMotion ? 0 : 0.35
   const isStatic = mode === 'static'
 
   return (
@@ -172,49 +165,49 @@ function HomeBody() {
 
       {/* 5 · Client */}
       <section className="pc-client" id="consulting-clients">
-        <div className="pc-client__stage">
-          <div className="pc-client__media" aria-hidden="true">
-            <MeshGradient colors={shaderColors} distortion={0.85} swirl={0.55} speed={shaderSpeed} style={{ width: '100%', height: '100%' }} />
-          </div>
-          <div className="pc-client__lockup">
-            <p className="pc-client__label">{CLIENT.label}</p>
-            <div className="pc-client__logos">
-              {CLIENT.logos.map((l, i) => (
-                <figure className={`pc-client__logo pc-client__logo--${i + 1}`} key={l.src}>
-                  <img src={l.src} alt={l.alt} loading="lazy" decoding="async" />
-                  <figcaption>
-                    <span className="pc-client__logo-note">{l.note}</span>
-                    <span className="pc-sr">{l.role}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-            <h2 className="pc-client__name">{CLIENT.name}</h2>
-            <p className="pc-client__desc">{CLIENT.desc}</p>
-            <ul className="pc-client__stats" aria-label="At a glance">
-              {CLIENT.stats.map((s) => (
-                <li className="pc-client__stat" key={s.value}>
-                  <span className="pc-client__stat-value">{s.value}</span>
-                  <span className="pc-client__stat-label">{s.label}</span>
-                </li>
-              ))}
-            </ul>
-            <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
-              arcthrift.com
-              <NewTab />
-              <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
-            </a>
-          </div>
+        <div className="pc-client__media" aria-hidden="true">
+          <GrainGradient
+            colorBack={CLIENT_SHADER.colorBack}
+            colors={CLIENT_SHADER.colors}
+            shape="wave"
+            softness={0.75}
+            intensity={0.32}
+            noise={0.22}
+            scale={1.05}
+            speed={shaderSpeed}
+            minPixelRatio={1}
+            maxPixelCount={1400000}
+            style={{ width: '100%', height: '100%' }}
+          />
         </div>
-        {/* Decorative figures drift past the tilted stage on wide screens; the
-            stage above carries the same facts for everyone. */}
-        <div className="pc-client__over" aria-hidden="true">
-          {[0, 1, 2].map((row) => (
-            <div className="pc-client__over-row" key={row}>
-              <Drift stat={CLIENT.drift[row * 2]} className={`pc-drift--${row * 2 + 1}`} />
-              <Drift stat={CLIENT.drift[row * 2 + 1]} className={`pc-drift--${row * 2 + 2}`} />
-            </div>
-          ))}
+        <div className="pc-client__lockup">
+          <p className="pc-client__label">{CLIENT.label}</p>
+          <div className="pc-client__logos">
+            {CLIENT.logos.map((l, i) => (
+              <figure className={`pc-client__logo pc-client__logo--${i + 1}`} key={l.src}>
+                <img src={l.src} alt={l.alt} loading="lazy" decoding="async" />
+                <figcaption>
+                  <span className="pc-client__logo-note">{l.note}</span>
+                  <span className="pc-sr">{l.role}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <h2 className="pc-client__name">{CLIENT.name}</h2>
+          <p className="pc-client__desc">{CLIENT.desc}</p>
+          <ul className="pc-client__stats" aria-label="At a glance">
+            {CLIENT.stats.map((st) => (
+              <li className="pc-client__stat" key={st.value}>
+                <span className="pc-client__stat-value">{st.value}</span>
+                <span className="pc-client__stat-label">{st.label}</span>
+              </li>
+            ))}
+          </ul>
+          <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
+            arcthrift.com
+            <NewTab />
+            <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
+          </a>
         </div>
       </section>
 
@@ -282,7 +275,7 @@ function HomeBody() {
 
 export default function Consulting() {
   return (
-    <ConsultingShell title="UBLDA Consulting" motion={startConsultingMotion} disc={<StatementBody ghost />} cursor>
+    <ConsultingShell title="UBLDA Consulting" motion={startConsultingMotion} disc={<StatementBody ghost />}>
       <HomeBody />
     </ConsultingShell>
   )
