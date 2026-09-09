@@ -1,4 +1,4 @@
-.shader-study {background:#faf9f6;color:#0f2b3c;padding:24px 4vw 80px;font-family:var(--font-body);min-height:100vh}
+.shader-study {background:#faf9f6;color:#0A3658;padding:24px 4vw 80px;font-family:var(--font-body);min-height:100vh}
 .shader-study__header,.shader-study__heading {display:flex;align-items:center;justify-content:space-between;gap:24px}
 .shader-study__header {padding-bottom:28px;border-bottom:1px solid #d8d6d0}
 .shader-study a {text-decoration:underline;text-underline-offset:5px}
@@ -8,11 +8,11 @@
 .shader-study h2 {font-family:var(--font-body);font-size:20px;font-weight:500}
 .shader-study__controls {display:flex;align-items:center;flex-wrap:wrap;gap:24px;margin:22px 0}
 .shader-study__controls label {display:flex;align-items:center;gap:8px;font-size:13px}
-.shader-study input {accent-color:#0b6f68}
+.shader-study input {accent-color:#326D69}
 .shader-study__choices {display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}
-.shader-study button {padding:10px 14px!important;min-height:44px;border:1px solid #b8c5c5!important;font-size:13px!important;color:#0f2b3c}
-.shader-study button[aria-pressed=true] {background:#0f2b3c!important;color:#faf9f6}
-.shader-study button:focus-visible {outline:2px solid #0b6f68;outline-offset:3px}
+.shader-study button {padding:10px 14px!important;min-height:44px;border:1px solid #b8c5c5!important;font-size:13px!important;color:#0A3658}
+.shader-study button[aria-pressed=true] {background:#0A3658!important;color:#faf9f6}
+.shader-study button:focus-visible {outline:2px solid #326D69;outline-offset:3px}
 .shader-study__ross {height:clamp(320px,47vw,660px);position:relative;overflow:hidden;background:#faf9f6}
 .shader-study__hero-copy {position:absolute;inset:0;display:flex;align-items:center;padding:5vw;background:linear-gradient(90deg,#faf9f6f0,#faf9f680 65%,transparent)}
 .shader-study__hero-copy h3 {font-family:Manrope,var(--font-body);font-size:clamp(28px,4.8vw,68px);line-height:1.05;max-width:22ch;font-weight:500;letter-spacing:-.035em}

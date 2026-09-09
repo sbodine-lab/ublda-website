@@ -84,8 +84,8 @@
 
 .join-form__input:focus {
   background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(43, 186, 176, 0.45);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.1);
+  border-color: rgba(103, 184, 179, 0.45);
+  box-shadow: 0 0 0 3px rgba(103, 184, 179, 0.1);
 }
 
 .join-form__email-wrapper {
@@ -102,8 +102,8 @@
 
 .join-form__email-wrapper:focus-within {
   background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(43, 186, 176, 0.45);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.1);
+  border-color: rgba(103, 184, 179, 0.45);
+  box-shadow: 0 0 0 3px rgba(103, 184, 179, 0.1);
 }
 
 .join-form__input--email {
@@ -296,7 +296,7 @@
   color: var(--color-teal-text);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(43, 186, 176, 0.3);
+  text-decoration-color: rgba(103, 184, 179, 0.3);
 }
 
 @media (max-width: 768px) {

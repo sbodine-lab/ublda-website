@@ -1,14 +1,15 @@
 :root {
-  /* ─── Color System ─── */
-  --color-navy:       #0F2B3C;
-  --color-navy-deep:  #091E2A;
-  --color-navy-light: #1A3D52;
-  --color-teal:       #2BBAB0;
-  --color-teal-text:  #0B6F68;  /* teal as text on cream: 5.8:1 (the accent itself is 2.3:1) */
-  --color-teal-soft:  #2BBAB018;
-  --color-teal-muted: #2BBAB040;
-  --color-gold:       #D4A034;
-  --color-gold-soft:  #D4A03415;
+  /* Brand primaries sampled from public/logo-mark.svg.
+     Dark teal preserves the logo hue for readable text on light surfaces. */
+  --color-navy:       #0A3658;
+  --color-navy-deep:  #07263E;
+  --color-navy-light: #234D6B;
+  --color-teal:       #67B8B3;
+  --color-teal-text:  #326D69;  /* text on cream; logo teal is reserved for accents */
+  --color-teal-soft:  #67B8B318;
+  --color-teal-muted: #67B8B340;
+  --color-gold:       #D2A54B;
+  --color-gold-soft:  #D2A54B15;
   --color-cream:      #FAF9F6;
   --color-white:      #FFFFFF;
   --color-gray-50:    #F5F4F1;
@@ -82,10 +83,10 @@
   --radius-full: 9999px;
 
   /* ─── Shadows ─── */
-  --shadow-sm:   0 1px 2px rgba(15, 43, 60, 0.04);
-  --shadow-md:   0 4px 16px rgba(15, 43, 60, 0.06);
-  --shadow-lg:   0 8px 32px rgba(15, 43, 60, 0.08);
-  --shadow-xl:   0 16px 48px rgba(15, 43, 60, 0.12);
+  --shadow-sm:   0 1px 2px rgba(10, 54, 88, 0.04);
+  --shadow-md:   0 4px 16px rgba(10, 54, 88, 0.06);
+  --shadow-lg:   0 8px 32px rgba(10, 54, 88, 0.08);
+  --shadow-xl:   0 16px 48px rgba(10, 54, 88, 0.12);
 
   /* ─── Transitions ─── */
   --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);

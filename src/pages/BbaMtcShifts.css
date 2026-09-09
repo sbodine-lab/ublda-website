@@ -11,7 +11,7 @@
   margin-top: var(--space-4);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: rgba(43, 186, 176, 0.09);
+  background: rgba(103, 184, 179, 0.09);
   color: var(--craft-text);
   font-size: var(--type-sm);
   line-height: var(--leading-normal);

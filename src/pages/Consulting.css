@@ -10,16 +10,16 @@
 
 .pc,
 html.pc-root {
-  --pc-bg: #091e2a;
+  --pc-bg: var(--color-navy-deep);
   --pc-fg: #faf9f6;
   --pc-heading: #d8d6d0;
   --pc-heading2: #faf9f6;
   --pc-des: #98a8b1;
   --pc-para: #7f8f98;
   --pc-line: #24404f;
-  --pc-accent: #2bbab0;
-  --pc-accent-ink: #2bbab0;
-  --pc-gold: #d4a034;
+  --pc-accent: var(--color-teal);
+  --pc-accent-ink: var(--color-teal);
+  --pc-gold: var(--color-gold);
   --pc-invert: invert(1);
   --pc-invert-opp: invert(0);
   --pc-font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -29,13 +29,13 @@ html.pc-root {
 .pc--light,
 html.pc-root.pc-light {
   --pc-bg: #faf9f6;
-  --pc-fg: #0f2b3c;
-  --pc-heading: #0f2b3c;
-  --pc-heading2: #091e2a;
+  --pc-fg: var(--color-navy);
+  --pc-heading: var(--color-navy);
+  --pc-heading2: var(--color-navy-deep);
   --pc-des: #3a3832;
   --pc-para: #55636e;
   --pc-line: #d8d6d0;
-  --pc-accent-ink: #0b6f68;
+  --pc-accent-ink: var(--color-teal-text);
   --pc-invert: invert(0);
   --pc-invert-opp: invert(1);
   color-scheme: light;
@@ -106,13 +106,13 @@ html.pc-root::-webkit-scrollbar-thumb {
 
 .pc ::selection {
   background: var(--pc-accent);
-  color: #091e2a;
+  color: #07263E;
 }
 
 /* Focus rings need 3:1 against the ground; teal fails on cream, so light
    contexts switch to the foreground ink. */
 .pc--light :focus-visible {
-  outline-color: #0f2b3c;
+  outline-color: #0A3658;
 }
 
 .pcc-form :focus-visible,
@@ -661,7 +661,7 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-w {
-  opacity: 0.6;
+  opacity: 0.72;
 }
 
 .pc-statement--ghost,
@@ -807,7 +807,7 @@ html.pc-menu-open .pc-cursor {
   font-weight: 300;
   line-height: 1.2;
   color: var(--pc-heading);
-  opacity: 0.5;
+  opacity: 0.72;
   width: 100%;
 }
 
@@ -949,19 +949,19 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-card--navy .pc-card__art {
-  background: radial-gradient(120% 90% at 20% 15%, #1a3d52 0%, #0f2b3c 55%, #091e2a 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #234D6B 0%, #0A3658 55%, #07263E 100%);
 }
 
 .pc-card--teal .pc-card__art {
-  background: radial-gradient(120% 90% at 20% 15%, #2bbab0 0%, #0b5e58 60%, #091e2a 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #67B8B3 0%, #295D59 60%, #07263E 100%);
 }
 
 .pc-card--gold .pc-card__art {
-  background: radial-gradient(120% 90% at 20% 15%, #d4a034 0%, #8f6a1e 60%, #2f2508 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #D2A54B 0%, #8f6a1e 60%, #2f2508 100%);
 }
 
 .pc-card--cream .pc-card__art {
-  background: radial-gradient(120% 90% at 20% 15%, #ffffff 0%, #e8f6f4 55%, #d8d6d0 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #ffffff 0%, #EAF4F2 55%, #d8d6d0 100%);
 }
 
 .pc-card__num {
@@ -976,7 +976,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-card--cream .pc-card__num {
-  color: rgba(15, 43, 60, 0.12);
+  color: rgba(10, 54, 88, 0.12);
 }
 
 .pc-card__ring {
@@ -996,7 +996,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-card--cream .pc-card__ring {
-  border-color: rgba(15, 43, 60, 0.18);
+  border-color: rgba(10, 54, 88, 0.18);
 }
 
 .pc-card__frame::after {
@@ -1034,7 +1034,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-card--cream .pc-card__body {
-  color: #0f2b3c;
+  color: #0A3658;
 }
 
 .pc-card__when {
@@ -1146,7 +1146,7 @@ html.pc-menu-open .pc-cursor {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(9, 30, 42, 0.35) 0%, rgba(9, 30, 42, 0.6) 100%);
+  background: linear-gradient(180deg, rgba(7, 38, 62, 0.35) 0%, rgba(7, 38, 62, 0.6) 100%);
 }
 
 .pc--light .pc-client__media::after {
@@ -1168,7 +1168,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pc-client__lockup {
-  color: #0f2b3c;
+  color: #0A3658;
 }
 
 .pc-client__label {
@@ -1180,7 +1180,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pc-client__label {
-  color: #0b5e58;
+  color: #295D59;
 }
 
 .pc-client__name {
@@ -1239,7 +1239,7 @@ html.pc-menu-open .pc-cursor {
   list-style: none;
   margin: 0;
   padding: 32px 0 0;
-  border-top: 1px solid rgba(15, 43, 60, 0.18);
+  border-top: 1px solid rgba(10, 54, 88, 0.18);
 }
 
 .pc-client__stat {
@@ -1287,7 +1287,7 @@ html.pc-menu-open .pc-cursor {
   top: 12%;
   height: 76%;
   width: 1px;
-  background: rgba(15, 43, 60, 0.18);
+  background: rgba(10, 54, 88, 0.18);
 }
 
 .pc-client__logo img {
@@ -2341,11 +2341,11 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pcp-member__tile--teal {
-  background: radial-gradient(120% 90% at 20% 15%, #2bbab0 0%, #0b5e58 60%, #091e2a 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #67B8B3 0%, #295D59 60%, #07263E 100%);
 }
 
 .pcp-member__tile--gold {
-  background: radial-gradient(120% 90% at 20% 15%, #d4a034 0%, #8f6a1e 60%, #2f2508 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #D2A54B 0%, #8f6a1e 60%, #2f2508 100%);
 }
 
 .pcp-member__ring {
@@ -2532,11 +2532,11 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pcw-slide--teal .pcw-slide__bg {
-  background: radial-gradient(60% 60% at 60% 45%, #0b5e58 0%, transparent 70%);
+  background: radial-gradient(60% 60% at 60% 45%, #295D59 0%, transparent 70%);
 }
 
 .pcw-slide--navy .pcw-slide__bg {
-  background: radial-gradient(60% 60% at 60% 45%, #1a3d52 0%, transparent 70%);
+  background: radial-gradient(60% 60% at 60% 45%, #234D6B 0%, transparent 70%);
 }
 
 .pcw-slide--gold .pcw-slide__bg {
@@ -2618,15 +2618,15 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pcw-slide--teal .pcw-slide__art {
-  background: radial-gradient(120% 90% at 20% 15%, #2bbab0 0%, #0b5e58 60%, #091e2a 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #67B8B3 0%, #295D59 60%, #07263E 100%);
 }
 
 .pcw-slide--navy .pcw-slide__art {
-  background: radial-gradient(120% 90% at 20% 15%, #1a3d52 0%, #0f2b3c 55%, #091e2a 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #234D6B 0%, #0A3658 55%, #07263E 100%);
 }
 
 .pcw-slide--gold .pcw-slide__art {
-  background: radial-gradient(120% 90% at 20% 15%, #d4a034 0%, #8f6a1e 60%, #2f2508 100%);
+  background: radial-gradient(120% 90% at 20% 15%, #D2A54B 0%, #8f6a1e 60%, #2f2508 100%);
 }
 
 .pcw-slide__num {
@@ -2652,7 +2652,7 @@ html.pc-menu-open .pc-cursor {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #faf9f6;
-  background: rgba(9, 30, 42, 0.45);
+  background: rgba(7, 38, 62, 0.45);
 }
 
 .pcw-ui {
@@ -2814,7 +2814,7 @@ html.pc-menu-open .pc-cursor {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(9, 30, 42, 0.2) 0%, rgba(9, 30, 42, 0.65) 100%);
+  background: linear-gradient(180deg, rgba(7, 38, 62, 0.2) 0%, rgba(7, 38, 62, 0.65) 100%);
 }
 
 .pc--light .pcs-hero__media::after {
@@ -2830,7 +2830,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pcs-hero__lockup {
-  color: #0f2b3c;
+  color: #0A3658;
 }
 
 .pcs-hero__eyebrow {
@@ -2976,7 +2976,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pcs-journey__dot {
-  box-shadow: 0 0 60px 30px rgba(15, 43, 60, 0.16);
+  box-shadow: 0 0 60px 30px rgba(10, 54, 88, 0.16);
 }
 
 .pcs-journey__step {
@@ -3564,7 +3564,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pcc-field select option {
-  color: #0f2b3c;
+  color: #0A3658;
   background: #faf9f6;
 }
 
@@ -3938,7 +3938,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc--light .pcs-journey__dot {
-    box-shadow: 0 0 40px 16px rgba(15, 43, 60, 0.16);
+    box-shadow: 0 0 40px 16px rgba(10, 54, 88, 0.16);
   }
 
   .pc--motion .pcs-journey__step {
