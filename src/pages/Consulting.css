@@ -1173,7 +1173,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-client__name {
-  font-size: clamp(2rem, 5.5vw, 6rem);
+  font-size: clamp(2rem, 4.6vw, 5rem);
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -1207,6 +1207,77 @@ html.pc-menu-open .pc-cursor {
   color: inherit;
 }
 
+.pc-client__logos {
+  display: inline-flex;
+  align-items: stretch;
+  margin: 0 auto 1.6vw;
+  padding: 1vw 0.6vw;
+  border-radius: 20px;
+  background: rgba(250, 249, 246, 0.96);
+  border: 1px solid rgba(15, 43, 60, 0.08);
+  box-shadow: 0 24px 60px rgba(9, 30, 42, 0.22);
+}
+
+.pc--light .pc-client__logos {
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(15, 43, 60, 0.12);
+}
+
+.pc-client__logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6vw;
+  margin: 0;
+  padding: 0.4vw 2vw;
+}
+
+.pc-client__logo + .pc-client__logo {
+  border-left: 1px solid rgba(15, 43, 60, 0.12);
+}
+
+.pc-client__logo img {
+  display: block;
+  width: auto;
+}
+
+/* The Arc mark carries its descriptor line; the Arc Thrift PNG has built-in
+   padding, so it is drawn taller to read the same size. */
+.pc-client__logo--1 img {
+  height: clamp(64px, 6.4vw, 100px);
+}
+
+.pc-client__logo--2 img {
+  height: clamp(78px, 7.8vw, 122px);
+  margin: -0.6vw 0;
+}
+
+.pc-client__logo figcaption {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #55636e;
+}
+
+.pc-sr,
+.pc-client__facts {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pc-client__facts {
+  list-style: none;
+}
+
 .pc-client__over {
   position: absolute;
   top: 100%;
@@ -1222,73 +1293,104 @@ html.pc-menu-open .pc-cursor {
   height: 100vh;
 }
 
-.pc-chip {
-  display: inline-block;
-  padding: 0.9vw 1.6vw;
-  border-radius: 999px;
-  font-size: clamp(0.8rem, 1.1vw, 1.2rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+/* Fact cards: a figure about the client or its national network. */
+.pc-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+  width: clamp(15rem, 21vw, 22rem);
+  padding: clamp(1rem, 1.4vw, 1.5rem) clamp(1.1rem, 1.6vw, 1.7rem);
+  border-radius: 20px;
   background: #faf9f6;
   color: #0f2b3c;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  white-space: nowrap;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  text-align: left;
 }
 
-.pc-client__over .pc-chip {
-  position: absolute;
+.pc-fact--wide {
+  width: clamp(18rem, 27vw, 29rem);
 }
 
-.pc-chip--1 {
-  left: 5%;
-  top: 10%;
-  transform: rotate(-8deg);
+.pc-fact__kicker {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.pc-fact__value {
+  font-size: clamp(2rem, 3.4vw, 3.8rem);
+  font-weight: 200;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.pc-fact--wide .pc-fact__value {
+  font-size: clamp(1.6rem, 2.4vw, 2.7rem);
+}
+
+.pc-fact__label {
+  font-size: clamp(0.8rem, 0.92vw, 1rem);
+  font-weight: 500;
+  line-height: 1.4;
+  opacity: 0.88;
+}
+
+.pc-fact--gold {
   background: #d4a034;
   color: #091e2a;
 }
 
-.pc-chip--2 {
-  right: 5%;
-  bottom: 5%;
-  transform: rotate(6deg);
+.pc-fact--teal {
   background: #2bbab0;
   color: #091e2a;
 }
 
-.pc-chip--3 {
-  left: 15%;
-  top: 0;
-  transform: rotate(4deg);
-}
-
-.pc-chip--4 {
-  right: 0;
-  bottom: 0;
-  transform: rotate(-5deg);
+.pc-fact--navy {
   background: #0f2b3c;
   color: #faf9f6;
   border: 1px solid rgba(250, 249, 246, 0.25);
 }
 
-.pc-chip--5 {
-  left: 5%;
-  top: 10%;
-  transform: rotate(7deg);
-  background: #2bbab0;
-  color: #091e2a;
+.pc-client__over .pc-fact {
+  position: absolute;
 }
 
-.pc-chip--6 {
-  right: 5%;
-  bottom: 5%;
+.pc-fact--1 {
+  left: 6%;
+  top: 12%;
   transform: rotate(-4deg);
-  background: #d4a034;
-  color: #091e2a;
 }
 
-.pc-client__chips {
-  display: none;
+.pc-fact--2 {
+  right: 6%;
+  bottom: 8%;
+  transform: rotate(3deg);
+}
+
+.pc-fact--3 {
+  left: 12%;
+  top: 4%;
+  transform: rotate(2deg);
+}
+
+.pc-fact--4 {
+  right: 4%;
+  bottom: 4%;
+  transform: rotate(-3deg);
+}
+
+.pc-fact--5 {
+  left: 5%;
+  top: 14%;
+  transform: rotate(3deg);
+}
+
+.pc-fact--6 {
+  right: 6%;
+  bottom: 10%;
+  transform: rotate(-2deg);
 }
 
 /* ─── Partners ──────────────────────────────────────────────────────────── */
@@ -1680,21 +1782,22 @@ html.pc-menu-open .pc-cursor {
   display: none;
 }
 
-.pc--static .pc-client__chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.7rem;
-  margin-top: 2rem;
-  padding: 0;
-  list-style: none;
+.pc--static .pc-client__facts {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  width: auto;
+  height: auto;
+  margin: 1.2rem 0 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
 }
 
-.pc--static .pc-client__chips .pc-chip {
-  padding: 0.55rem 1rem;
-  font-size: 0.8rem;
+.pc--static .pc-client__facts .pc-fact {
+  width: auto;
   box-shadow: none;
-  white-space: normal;
 }
 
 .pc--static .pc-partners {
@@ -1925,9 +2028,66 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 1.2rem;
   }
 
-  .pc-chip {
-    padding: 0.5rem 0.9rem;
-    font-size: 0.7rem;
+  .pc-client__logos {
+    margin-bottom: 1.1rem;
+    padding: 0.7rem 0.2rem;
+    border-radius: 16px;
+  }
+
+  .pc-client__logo {
+    gap: 0.4rem;
+    padding: 0.2rem 1rem;
+  }
+
+  .pc-client__logo--1 img {
+    height: 46px;
+  }
+
+  .pc-client__logo--2 img {
+    height: 56px;
+    margin: -0.3rem 0;
+  }
+
+  .pc-client__logo figcaption {
+    font-size: 0.55rem;
+  }
+
+  .pc-fact {
+    width: 56vw;
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+  }
+
+  .pc-fact--wide {
+    width: 70vw;
+  }
+
+  .pc-fact__value {
+    font-size: 1.9rem;
+  }
+
+  .pc-fact--wide .pc-fact__value {
+    font-size: 1.35rem;
+  }
+
+  .pc-fact__label {
+    font-size: 0.74rem;
+  }
+
+  .pc-fact--1,
+  .pc-fact--3,
+  .pc-fact--5 {
+    left: 4%;
+  }
+
+  .pc-fact--2,
+  .pc-fact--4,
+  .pc-fact--6 {
+    right: 4%;
+  }
+
+  .pc--static .pc-client__facts {
+    grid-template-columns: 1fr;
   }
 
   .pc--static .pc-client__stage {

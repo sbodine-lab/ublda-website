@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
   CLIENT,
+  type ClientFact,
   CONTACT_MAILTO,
   HERO_DESCRIPTION,
   LEADERS,
@@ -34,6 +35,16 @@ function Words({ text, className }: { text: string; className: string }) {
         </span>
       ))}
     </p>
+  )
+}
+
+function Fact({ fact, className = '', as: Tag = 'div' }: { fact: ClientFact; className?: string; as?: 'div' | 'li' }) {
+  return (
+    <Tag className={`pc-fact pc-fact--${fact.tone} ${fact.wide ? 'pc-fact--wide' : ''} ${className}`}>
+      <span className="pc-fact__kicker">{fact.kicker}</span>
+      <span className="pc-fact__value">{fact.value}</span>
+      <span className="pc-fact__label">{fact.label}</span>
+    </Tag>
   )
 }
 
@@ -168,6 +179,17 @@ function HomeBody() {
           </div>
           <div className="pc-client__lockup">
             <p className="pc-client__label">{CLIENT.label}</p>
+            <div className="pc-client__logos">
+              {CLIENT.logos.map((l, i) => (
+                <figure className={`pc-client__logo pc-client__logo--${i + 1}`} key={l.src}>
+                  <img src={l.src} alt={l.alt} loading="lazy" decoding="async" />
+                  <figcaption>
+                    <span className="pc-client__logo-note">{l.note}</span>
+                    <span className="pc-sr">{l.role}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
             <h2 className="pc-client__name">{CLIENT.name}</h2>
             <p className="pc-client__project">{CLIENT.project}</p>
             <p className="pc-client__desc">{CLIENT.desc}</p>
@@ -178,19 +200,19 @@ function HomeBody() {
             </a>
           </div>
         </div>
+        {/* Decorative copies drift past the tilted stage; the list below is the
+            accessible version and becomes the visible grid without motion. */}
         <div className="pc-client__over" aria-hidden="true">
           {[0, 1, 2].map((row) => (
             <div className="pc-client__over-row" key={row}>
-              <span className={`pc-chip pc-chip--${row * 2 + 1}`}>{CLIENT.chips[row * 2]}</span>
-              <span className={`pc-chip pc-chip--${row * 2 + 2}`}>{CLIENT.chips[row * 2 + 1]}</span>
+              <Fact fact={CLIENT.facts[row * 2]} className={`pc-fact--${row * 2 + 1}`} />
+              <Fact fact={CLIENT.facts[row * 2 + 1]} className={`pc-fact--${row * 2 + 2}`} />
             </div>
           ))}
         </div>
-        <ul className="pc-client__chips" aria-label="Project at a glance">
-          {CLIENT.chips.map((c) => (
-            <li className="pc-chip" key={c}>
-              {c}
-            </li>
+        <ul className="pc-client__facts" aria-label="About the client">
+          {CLIENT.facts.map((f) => (
+            <Fact fact={f} as="li" key={f.value} />
           ))}
         </ul>
       </section>
