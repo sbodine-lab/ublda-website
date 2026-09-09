@@ -24,7 +24,7 @@ const PROJECTS: Project[] = [
     dec: 'Our Fall 2026 engagement is with Arc Thrift Stores of Colorado, the nonprofit thrift chain that funds Colorado’s 15 Arc chapters and is one of the state’s largest employers of people with intellectual and developmental disabilities.',
     tone: 'teal',
     status: 'Fall 2026 client',
-    details: ['Executive sponsor: Arc Thrift’s CEO', 'Two project managers and four to six analysts', 'Weekly working sessions through the semester', 'Final presentation to the client in December'],
+    details: ['Executive sponsor: Arc Thrift’s CEO', 'Two project managers and four to six analysts', 'Weekly working sessions through the semester', 'Final presentation to The Arc’s national board in December'],
     link: { href: CLIENT.url, label: 'arcthrift.com', external: true },
   },
   {

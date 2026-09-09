@@ -186,10 +186,7 @@ function HomeBody() {
             {CLIENT.logos.map((l, i) => (
               <figure className={`pc-client__logo pc-client__logo--${i + 1}`} key={l.src}>
                 <img src={l.src} alt={l.alt} loading="lazy" decoding="async" />
-                <figcaption>
-                  <span className="pc-client__logo-note">{l.note}</span>
-                  <span className="pc-sr">{l.role}</span>
-                </figcaption>
+                <figcaption className="pc-sr">{l.role}</figcaption>
               </figure>
             ))}
           </div>
