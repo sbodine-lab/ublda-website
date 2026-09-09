@@ -151,7 +151,7 @@ export default function ConsultingPractice() {
             <h3 className="pcp-member__name">{p.name}</h3>
             <p className="pcp-member__tag">{p.role}</p>
             <p className="pcp-member__desc">{BIOS[p.name]}</p>
-            <a href={p.linkedin} target="_blank" rel="noopener noreferrer" className="pc-arrowbtn">
+            <a href={`mailto:${p.email}`} className="pc-arrowbtn">
               <span className="pc-arrowbtn__arrow" aria-hidden="true">
                 <ArrowUpRight size={14} strokeWidth={2.2} />
                 <ArrowUpRight size={14} strokeWidth={2.2} />

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useMenuKeyboard } from '../hooks/useMenuKeyboard'
 import './Nav.css'
 
 const publicLinks = [
@@ -28,6 +29,9 @@ function NavLetters({ text }: { text: string }) {
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const rootRef = useRef<HTMLElement>(null)
+  const closeMenu = useCallback(() => setMobileOpen(false), [])
+  useMenuKeyboard(mobileOpen, rootRef, '.nav__mobile', '.nav__burger', closeMenu)
   const location = useLocation()
   const links = publicLinks
   const isCurrent = (path: string) => (
@@ -40,6 +44,15 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 769px)')
+    const onChange = () => {
+      if (desktop.matches) closeMenu()
+    }
+    desktop.addEventListener('change', onChange)
+    return () => desktop.removeEventListener('change', onChange)
+  }, [closeMenu])
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
@@ -51,7 +64,7 @@ export default function Nav() {
   }, [mobileOpen])
 
   return (
-    <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
+    <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`} ref={rootRef}>
       <div className="nav__inner container">
         <Link to="/" className="nav__logo">
           <img src="/logo-64.png" alt="" className="nav__logo-img" width="63" height="64" />
@@ -77,7 +90,8 @@ export default function Nav() {
         <button
           className={`nav__burger ${mobileOpen ? 'nav__burger--open' : ''}`}
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-controls="main-menu"
           aria-expanded={mobileOpen}
         >
           <span />
@@ -86,7 +100,7 @@ export default function Nav() {
       </div>
 
       {mobileOpen && (
-          <div className="nav__mobile">
+          <nav className="nav__mobile" id="main-menu" aria-label="Main pages">
             {links.map((link) => (
               <Link
                 key={link.path}
@@ -98,7 +112,7 @@ export default function Nav() {
                 {link.path === '/consulting' && <span aria-hidden="true"> ↗</span>}
               </Link>
             ))}
-          </div>
+          </nav>
       )}
     </header>
   )

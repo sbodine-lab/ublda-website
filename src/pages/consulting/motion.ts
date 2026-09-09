@@ -129,7 +129,7 @@ export const buildHome: Builder = (root, { mobile, vw }) => {
      for a beat before it releases. The mask grows to 300% of the width to
      cover a tall portrait screen. */
   const lockup = one(root, '.pc-client__lockup')
-  gsap.set(client, { '--pc-mask': '1.4%', opacity: 0 })
+  gsap.set(client, { '--pc-mask': mobile ? '300%' : '1.4%', opacity: mobile ? 1 : 0 })
   gsap.set(lockup, { y: mobile ? 24 : 40, opacity: 0 })
 
   /* The orb's fade is scrubbed, but the opening statement's smoothed scrub
@@ -142,18 +142,26 @@ export const buildHome: Builder = (root, { mobile, vw }) => {
     .timeline({
       scrollTrigger: {
         trigger: client,
-        start: 'top 0%',
-        end: mobile ? 'top -150%' : 'top -180%',
+        start: mobile ? 'top 85%' : 'top 0%',
+        end: mobile ? 'top 35%' : 'top -100%',
         scrub: true,
-        pin: true,
+        // The richer client content scrolls naturally on phones so every
+        // figure remains reachable without waiting through a pinned screen.
+        pin: !mobile,
         onUpdate: (self) => orb.classList.toggle('pc-orb--done', self.progress > 0),
       },
     })
-    .to(orb, { opacity: 0, duration: 0.15 }, 0)
-    .to(client, { opacity: 1, duration: 0.6 }, 0)
-    .to(client, { '--pc-mask': mobile ? '300%' : '280%', duration: 2.5 })
-    .to(lockup, { y: 0, opacity: 1, duration: 1.4, ease: 'power2.out' }, 1.2)
-    .to({}, { duration: 1.2 })
+
+  tlClient.to(orb, { opacity: 0, duration: 0.15 }, 0)
+  if (mobile) {
+    tlClient.to(lockup, { y: 0, opacity: 1, duration: 1, ease: 'power2.out' }, 0)
+  } else {
+    tlClient
+      .to(client, { opacity: 1, duration: 0.6 }, 0)
+      .to(client, { '--pc-mask': '280%', duration: 2.5 })
+      .to(lockup, { y: 0, opacity: 1, duration: 1.4, ease: 'power2.out' }, 1.2)
+      .to({}, { duration: 1.2 })
+  }
 
   const nav = one(root, '.pc-nav:not(.pc-nav--ghost)')
   const clientPin = tlClient.scrollTrigger

@@ -75,8 +75,8 @@ export default function Brand() {
           <h3 className="brand-subsection">Primary Colors</h3>
           <div className="brand-swatch-grid">
             <ColorSwatch name="Navy" hex="#0F2B3C" token="--color-navy" usage="Headings, text, backgrounds, primary buttons" />
-            <ColorSwatch name="Teal" hex="#2BBAB0" token="--color-teal" usage="Accent, CTAs, highlights, italic emphasis" />
-            <ColorSwatch name="Gold" hex="#D4A034" token="--color-gold" usage="Tertiary accent, sparingly for warmth" />
+            <ColorSwatch name="Teal" hex="#2BBAB0" token="--color-teal" usage="Accent, CTAs, highlights, italic emphasis" light />
+            <ColorSwatch name="Gold" hex="#D4A034" token="--color-gold" usage="Tertiary accent, sparingly for warmth" light />
             <ColorSwatch name="Cream" hex="#FAF9F6" token="--color-cream" usage="Page background, light sections" light />
           </div>
 
@@ -84,8 +84,8 @@ export default function Brand() {
           <div className="brand-swatch-grid">
             <ColorSwatch name="Navy Deep" hex="#091E2A" token="--color-navy-deep" usage="Footer, dark sections" />
             <ColorSwatch name="Navy Light" hex="#1A3D52" token="--color-navy-light" usage="Button hover, lighter dark" />
-            <ColorSwatch name="Teal Soft" hex="#2BBAB018" token="--color-teal-soft" usage="Subtle teal tints (10% opacity)" />
-            <ColorSwatch name="Gold Soft" hex="#D4A03415" token="--color-gold-soft" usage="Subtle gold tints (8% opacity)" />
+            <ColorSwatch name="Teal Soft" hex="#2BBAB018" token="--color-teal-soft" usage="Subtle teal tints (10% opacity)" light />
+            <ColorSwatch name="Gold Soft" hex="#D4A03415" token="--color-gold-soft" usage="Subtle gold tints (8% opacity)" light />
           </div>
 
           <h3 className="brand-subsection">Neutrals</h3>
@@ -177,11 +177,11 @@ export default function Brand() {
           </div>
 
           <div className="brand-tip">
-            <strong>Teal italic pattern:</strong> On the website, we style select words in <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}>teal italic</em> using Instrument Serif
+            <strong>Teal italic pattern:</strong> On the website, we style select words in <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}>teal italic</em> using Instrument Serif
             to add emphasis. Use this same pattern in social posts and slides for key words like
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> inclusion</em>,
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> belonging</em>,
-            <em style={{ color: '#2BBAB0', fontFamily: 'var(--font-display)' }}> for everyone</em>.
+            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> inclusion</em>,
+            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> belonging</em>,
+            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> for everyone</em>.
           </div>
         </div>
       </section>
@@ -300,7 +300,7 @@ export default function Brand() {
               A student community focused on{' '}
               <em>disability in business</em>.
             </h3>
-            <code>Instrument Serif italic in teal (#2BBAB0) for emphasized words within navy headlines</code>
+            <code>Instrument Serif italic in text teal (#0B6F68) on light backgrounds; bright teal (#2BBAB0) on navy</code>
           </div>
         </div>
       </section>
@@ -472,7 +472,7 @@ export default function Brand() {
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#FAF9F6', color: '#0F2B3C' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
-                  Cream + <span style={{ color: '#2BBAB0', fontStyle: 'italic' }}>Teal</span>
+                  Cream + <span style={{ color: 'var(--color-teal-text)', fontStyle: 'italic' }}>Teal</span>
                 </span>
               </div>
               <span>Light/clean - quotes, stats</span>
@@ -786,7 +786,7 @@ export default function Brand() {
 
             <div className="brand-cheat">
               <h4>CSS Variables</h4>
-              <pre className="brand-code">{`/* Colors */
+              <pre className="brand-code" tabIndex={0} aria-label="CSS variables">{`/* Colors */
 --color-navy:      #0F2B3C
 --color-teal:      #2BBAB0
 --color-gold:      #D4A034

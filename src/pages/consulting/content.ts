@@ -61,9 +61,9 @@ export interface Step {
 export const STEPS: Step[] = [
   {
     num: '01',
-    title: 'Meet us',
+    title: 'Campus events',
     when: 'Sep 2 & Sep 8',
-    desc: 'Festifall Central, Sep 2, 3 to 5 PM, Diag Table C43. BBA Meet the Clubs, Sep 8, 5:30 to 7:30 PM, Ross Winter Garden.',
+    desc: 'We met students at Festifall on September 2 and BBA Meet the Clubs on September 8. Both events have ended; you can still apply online.',
     tone: 'teal',
   },
   {
@@ -103,17 +103,14 @@ export const STEPS: Step[] = [
   },
 ]
 
-export interface ClientStat {
-  value: string
-  label: string
-}
-
 export const CLIENT = {
   label: 'Fall 2026 client',
-  name: 'Arc Thrift Stores of Colorado',
+  name: 'Arc Thrift Stores',
   /* Who they are, and where the work ends up. Sam, Sept 9, 2026: the team
      presents to The Arc's national board at the end of the semester. */
-  desc: 'Colorado’s nonprofit thrift chain funds the state’s Arc chapters and is one of its largest employers of people with intellectual and developmental disabilities. At the end of the semester, the team presents to the national board of The Arc, the largest disability nonprofit in the United States.',
+  desc: 'One of Colorado’s largest employers of people with intellectual and developmental disabilities, Arc Thrift Stores funds advocacy in Colorado and New Mexico.',
+  presentation: 'This fall, our team presents to The Arc’s national board.',
+  audience: 'The largest community-based disability organization in the U.S.',
   url: 'https://arcthrift.com',
   /* The two logos read left to right: the national organization first, then
      the Colorado client whose stores fund its local chapters. */
@@ -121,14 +118,13 @@ export const CLIENT = {
     { src: '/client-the-arc.svg', alt: 'The Arc', role: 'The Arc of the United States' },
     { src: '/partners-arc-thrift.png', alt: 'arc Thrift Stores', role: 'Arc Thrift Stores of Colorado, our client' },
   ],
-  /* Figures under the description. Sources, checked Sept 8, 2026:
-     thearc.org/about-us (549 chapters); KJCT Feb 6, 2026 CEO interview
-     (600 employees with IDD); lloydlewis.net ($120M+ enterprise). */
+  /* Rechecked Sept 9: thearc.org/about-us (549 chapters), KGNU's April 3,
+     2026 Arc interview (600 employees), lloydlewis.net ($120M+ enterprise). */
   stats: [
-    { value: '549', label: 'Arc chapters nationwide' },
-    { value: '600', label: 'employees with IDD' },
-    { value: '$120M+', label: 'in revenue' },
-  ] as ClientStat[],
+    { value: '549', label: 'The Arc chapters nationwide' },
+    { value: '600', label: 'Arc Thrift employees with IDD' },
+    { value: '$120M+', label: 'Arc Thrift social enterprise' },
+  ],
 }
 
 export const PARTNER_STATEMENT =

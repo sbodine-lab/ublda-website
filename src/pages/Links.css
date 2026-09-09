@@ -139,7 +139,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
-  color: var(--color-teal);
+  color: var(--color-teal-text);
   margin-bottom: var(--space-4);
   align-self: flex-start;
 }

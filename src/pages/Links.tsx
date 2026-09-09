@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 import './Links.css'
 
 interface Event {
@@ -24,56 +24,7 @@ const pastEvents: Event[] = [
   },
 ]
 
-const years = ['Freshman', 'Sophomore', 'Junior', 'Senior']
-
 export default function Links() {
-  const [submitted, setSubmitted] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    major: '',
-    year: '',
-    email: '',
-  })
-
-  const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    let val = e.target.value
-    if (field === 'email') {
-      val = val.replace(/@umich\.edu$/i, '').replace(/@.*$/, '')
-    }
-    setForm({ ...form, [field]: val })
-  }
-
-  const fullEmail = `${form.email.replace(/@umich\.edu$/i, '').replace(/@.*$/, '')}@umich.edu`
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-    try {
-      const res = await fetch('/api/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: form.firstName,
-          lastName: form.lastName,
-          email: fullEmail,
-          major: form.major,
-          year: form.year,
-        }),
-      })
-      if (res.ok) {
-        setSubmitted(true)
-      } else {
-        alert('Something went wrong. Please try again or email us at sbodine@umich.edu.')
-      }
-    } catch {
-      alert('Something went wrong. Please try again or email us at sbodine@umich.edu.')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   return (
     <main className="links-page">
       <div className="links__inner">
@@ -98,7 +49,7 @@ export default function Links() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             LinkedIn
           </a>
-          <a href="mailto:sbodine@umich.edu,atchiang@umich.edu,cooperry@umich.edu" className="links__btn links__btn--secondary">
+          <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="links__btn links__btn--secondary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
             Email Us
           </a>
@@ -129,106 +80,15 @@ export default function Links() {
           )}
         </div>
 
-        {/* Sign-up form */}
         <p className="links__section-label">Join UBLDA</p>
         <div className="links__form-section">
-          {submitted ? (
-            <div className="links__form-success">
-              <div className="links__form-success-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </div>
-              <h3 className="links__form-success-title">You’re a member.</h3>
-              <p className="links__form-success-desc">
-                Welcome to UBLDA. Watch your U-M email for event updates.
-              </p>
-            </div>
-          ) : (
-            <form className="links__form" onSubmit={handleSubmit}>
-              <div className="links__form-row">
-                <div className="links__form-field">
-                  <label className="links__form-label" htmlFor="links-firstName">First name</label>
-                  <input
-                    id="links-firstName"
-                    type="text"
-                    className="links__form-input"
-                    placeholder="First name"
-                    value={form.firstName}
-                    onChange={update('firstName')}
-                    required
-                  />
-                </div>
-                <div className="links__form-field">
-                  <label className="links__form-label" htmlFor="links-lastName">Last name</label>
-                  <input
-                    id="links-lastName"
-                    type="text"
-                    className="links__form-input"
-                    placeholder="Last name"
-                    value={form.lastName}
-                    onChange={update('lastName')}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="links__form-field">
-                <label className="links__form-label" htmlFor="links-email">U-M uniqname</label>
-                <div className="links__email-wrapper">
-                  <input
-                    id="links-email"
-                    type="text"
-                    className="links__form-input links__email-input"
-                    placeholder="uniqname"
-                    value={form.email}
-                    onChange={update('email')}
-                    required
-                  />
-                  <span className="links__email-suffix">@umich.edu</span>
-                </div>
-              </div>
-
-              <div className="links__form-row">
-                <div className="links__form-field">
-                  <label className="links__form-label" htmlFor="links-major">College</label>
-                  <input
-                    id="links-major"
-                    type="text"
-                    className="links__form-input"
-                    placeholder="e.g. Ross, LSA"
-                    value={form.major}
-                    onChange={update('major')}
-                    required
-                  />
-                </div>
-                <div className="links__form-field">
-                  <label className="links__form-label" htmlFor="links-year">Year</label>
-                  <select
-                    id="links-year"
-                    className="links__form-input links__form-select"
-                    value={form.year}
-                    onChange={update('year')}
-                    required
-                  >
-                    <option value="" disabled>Select</option>
-                    {years.map((y) => (
-                      <option key={y} value={y}>{y}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <button type="submit" className="links__form-submit" disabled={submitting}>
-                {submitting ? 'Submitting...' : 'Join UBLDA'}
-                {!submitting && (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </button>
-            </form>
-          )}
+          <p className="links__form-success-desc">
+            Membership is free and open to all U-M students. Sign up for event updates and ways to get involved.
+          </p>
+          <a href={MEMBERSHIP_FORM_URL} target="_blank" rel="noopener noreferrer" className="links__btn links__btn--primary">
+            Join UBLDA
+            <span className="sr-only"> (membership form, opens in a new tab)</span>
+          </a>
         </div>
 
         {/* Footer */}

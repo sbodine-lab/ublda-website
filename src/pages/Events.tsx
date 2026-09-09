@@ -60,7 +60,7 @@ const events: Event[] = [
     host: 'BLDA (MBA); UBLDA members attended',
     description:
       'UBLDA members joined BLDA for wheelchair basketball with medical students, starting with chair skills and drills.',
-    location: 'Sports Coliseum, 701 Tappan Street, Ann Arbor, MI 48109',
+    location: 'Sports Coliseum, 721 S 5th Ave, Ann Arbor, MI',
     past: true,
   },
 ]

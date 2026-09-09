@@ -242,10 +242,9 @@ export function ConsultingFooter() {
             ))}
             <p className="pc-footer__person">
               <span className="pc-footer__small">Prefer a form?</span>
-              <a href={CONSULTING_FORM_URL} target="_blank" rel="noopener noreferrer" className="pc-footer__big pc-line">
-                ublda.org/apply
-                <NewTab />
-              </a>
+              <Link to="/consulting/contact" className="pc-footer__big pc-line">
+                Discuss a project
+              </Link>
             </p>
           </div>
         </div>
