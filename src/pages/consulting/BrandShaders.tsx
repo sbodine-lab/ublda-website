@@ -1,15 +1,29 @@
-import { HalftoneCmyk, Heatmap, LiquidMetal, GemSmoke } from '@paper-design/shaders-react'
+import { FlutedGlass, HalftoneCmyk, Heatmap, LiquidMetal, GemSmoke } from '@paper-design/shaders-react'
 
 export type RossSource = 'photo' | 'detail' | 'illustration'
 export type LogoEffect = 'heatmap' | 'metal' | 'smoke'
 
-export function RossHalftone({ source = 'photo', size = 0.3, gold = true }: { source?: RossSource; size?: number; gold?: boolean }) {
+export function RossGlass() {
+  return <FlutedGlass
+    image="/ross-front-entrance.jpg"
+    colorBack="#FAF9F6" colorShadow="#0F2B3C" colorHighlight="#FAF9F6"
+    shape="lines" distortionShape="prism" angle={0}
+    size={0.64} distortion={0.22} stretch={0} shift={0}
+    blur={0} shadows={0.04} highlights={0.06} edges={0}
+    grainMixer={0} grainOverlay={0}
+    speed={0} fit="cover" minPixelRatio={1} maxPixelCount={1400000}
+    style={{ width: '100%', height: '100%' }}
+  />
+}
+
+export function RossHalftone({ source = 'photo', size = 0.3, gold = true, speed = 0 }: { source?: RossSource; size?: number; gold?: boolean; speed?: number }) {
   return <HalftoneCmyk
     image={source === 'illustration' ? '/ross-illustration.png' : '/ross-modern-exterior.jpg'}
     colorBack="#FAF9F6" colorC="#2BBAB0" colorM="#0F2B3C" colorY={gold ? '#D4A034' : '#2BBAB0'} colorK="#0F2B3C"
     size={size} type="ink" softness={0.5} contrast={1.05} gridNoise={0.08}
     floodC={0} gainC={0.12} gainM={-0.25} gainY={gold ? -0.4 : -0.65} gainK={-0.12}
     grainMixer={0.04} grainOverlay={0.015} grainSize={0.25}
+    speed={speed}
     scale={source === 'detail' ? 1.8 : 1} fit="cover" minPixelRatio={1} maxPixelCount={1400000}
     style={{width:'100%',height:'100%'}}
   />

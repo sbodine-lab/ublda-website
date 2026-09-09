@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import './AnnouncementBanner.css'
 
-import { APPLY_CLOSES_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
+import { APPLY_DEADLINE_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
 import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 
 const CONSULTING_PAGE = '/consulting'
@@ -11,7 +11,7 @@ const STORAGE_KEY = 'ublda-fall-2026-consulting-banner-dismissed'
 function getTimeLeft() {
   const now = Date.now()
   if (now < APPLY_OPENS_AT_MS) return null
-  const diff = APPLY_CLOSES_AT_MS - now
+  const diff = APPLY_DEADLINE_AT_MS - now
   if (diff <= 0) return null
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))

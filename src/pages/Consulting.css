@@ -525,6 +525,23 @@ html.pc-root::-webkit-scrollbar-thumb {
   transform-origin: 65% 50%;
 }
 
+/* A separate inner layer lets ambient drift coexist with scroll motion. */
+.pc-hero-backdrop__drift {
+  width: 100%;
+  height: 100%;
+  transform-origin: 65% 50%;
+  animation: pc-hero-drift 24s ease-in-out -6s infinite alternate;
+}
+
+.pc-hero-backdrop[data-paused='true'] .pc-hero-backdrop__drift {
+  animation-play-state: paused;
+}
+
+@keyframes pc-hero-drift {
+  from { transform: translate3d(-0.6%, 0.4%, 0) scale(1.03); }
+  to { transform: translate3d(0.8%, -0.6%, 0) scale(1.07); }
+}
+
 .pc--static .pc-hero-backdrop {
   mask-image: linear-gradient(#000 60%, transparent);
 }
@@ -549,7 +566,7 @@ html.pc-root::-webkit-scrollbar-thumb {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 64px;
+  gap: clamp(40px, 5vw, 72px);
   width: 100%;
   min-width: 0;
   padding: 16px 0 0;
@@ -560,10 +577,10 @@ html.pc-root::-webkit-scrollbar-thumb {
   max-width: 20ch;
   text-wrap: balance;
   font-family: 'Manrope', var(--font-body);
-  font-size: clamp(3.75rem, 7vw, 7.5rem);
+  font-size: clamp(3rem, 4.65vw, 5.25rem);
   font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
   color: var(--pc-fg);
 }
 
@@ -644,7 +661,7 @@ html.pc-root::-webkit-scrollbar-thumb {
 }
 
 .pc-w {
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
 .pc-statement--ghost,
@@ -1101,13 +1118,14 @@ html.pc-menu-open .pc-cursor {
 .pc-client {
   --pc-mask: 1.4%;
   position: relative;
-  height: 100vh;
+  min-height: min(760px, 100svh);
+  padding: clamp(96px, 12vh, 144px) 8vw;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--pc-fg);
+  background: #faf9f6;
   opacity: 0;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50'/%3E%3C/svg%3E");
@@ -1132,15 +1150,20 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pc-client__media::after {
-  background: radial-gradient(ellipse 62% 58% at 50% 50%, rgba(250, 249, 246, 0.55) 0%, rgba(250, 249, 246, 0.18) 60%, rgba(250, 249, 246, 0) 100%);
+  background: linear-gradient(100deg, #faf9f6c7 0%, #faf9f673 45%, #faf9f600 100%);
 }
 
 .pc-client__lockup {
   position: relative;
   z-index: 1;
-  text-align: center;
-  max-width: 70vw;
-  padding: 0 4vw;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  column-gap: clamp(48px, 8vw, 120px);
+  row-gap: 48px;
+  width: 100%;
+  max-width: 1120px;
+  text-align: left;
   color: #faf9f6;
 }
 
@@ -1149,12 +1172,11 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-client__label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   color: var(--pc-accent-ink);
-  margin-bottom: 1.2vw;
+  margin-bottom: 28px;
 }
 
 .pc--light .pc-client__label {
@@ -1162,39 +1184,90 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-client__name {
-  font-size: clamp(2rem, 4.6vw, 5rem);
-  font-weight: 200;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  margin-bottom: 1vw;
+  max-width: 12ch;
+  font-size: clamp(2.5rem, 4.1vw, 3.75rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  margin-bottom: 24px;
 }
 
 .pc-client__desc {
-  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
-  font-weight: 500;
-  line-height: 1.55;
-  max-width: 50ch;
-  margin: 0 auto 1.5vw;
-  opacity: 0.92;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.75;
+  max-width: 43ch;
+  text-wrap: pretty;
+  opacity: 0.85;
 }
 
 .pc-client__link {
   display: inline-flex;
   align-items: center;
-  gap: 0.3em;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 28px;
   font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: inherit;
+}
+
+.pc-client__presentation {
+  max-width: 43ch;
+  margin-top: 24px;
+}
+
+.pc-client__presentation-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.pc-client__audience {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  opacity: 0.85;
+}
+
+.pc-client__stats {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 32px 0 0;
+  border-top: 1px solid rgba(15, 43, 60, 0.18);
+}
+
+.pc-client__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pc-client__stat-value {
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.pc-client__stat-label {
+  max-width: 24ch;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 
 .pc-client__logos {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  gap: clamp(1.6rem, 3.2vw, 3.6rem);
-  margin: 0 auto 2.2vw;
+  gap: clamp(40px, 4vw, 64px);
+  margin: 0;
 }
 
 .pc-client__logo {
@@ -1210,7 +1283,7 @@ html.pc-menu-open .pc-cursor {
 .pc-client__logo--2::before {
   content: '';
   position: absolute;
-  left: calc(-0.5 * clamp(1.6rem, 3.2vw, 3.6rem));
+  left: calc(-0.5 * clamp(40px, 4vw, 64px));
   top: 12%;
   height: 76%;
   width: 1px;
@@ -1225,12 +1298,11 @@ html.pc-menu-open .pc-cursor {
 /* The Arc mark carries its descriptor line; the Arc Thrift PNG has built-in
    padding, so it is drawn taller to read the same size. */
 .pc-client__logo--1 img {
-  height: clamp(64px, 6.2vw, 96px);
+  height: clamp(72px, 7.2vw, 104px);
 }
 
 .pc-client__logo--2 img {
-  height: clamp(78px, 7.6vw, 118px);
-  margin: -0.6vw 0;
+  height: clamp(88px, 8.8vw, 128px);
 }
 
 .pc-sr {
@@ -1243,45 +1315,6 @@ html.pc-menu-open .pc-cursor {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* Figures under the description, separated by hairlines. */
-.pc-client__stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 1.6vw auto 1.7vw;
-  padding: 0;
-  list-style: none;
-}
-
-.pc-client__stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3em;
-  padding: 0 clamp(1rem, 2vw, 2.2rem);
-  text-align: center;
-}
-
-.pc-client__stat + .pc-client__stat {
-  border-left: 1px solid rgba(15, 43, 60, 0.18);
-}
-
-.pc-client__stat-value {
-  font-size: clamp(1.6rem, 2.6vw, 2.9rem);
-  font-weight: 200;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
-.pc-client__stat-label {
-  max-width: 16ch;
-  font-size: clamp(0.74rem, 0.85vw, 0.92rem);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  line-height: 1.3;
-  opacity: 0.75;
 }
 
 
@@ -1685,15 +1718,9 @@ html.pc-menu-open .pc-cursor {
 
 .pc--static .pc-client {
   height: auto;
-  min-height: 70vh;
   opacity: 1;
   -webkit-mask-image: none;
   mask-image: none;
-  padding: 12vw 6vw;
-}
-
-.pc--static .pc-client__lockup {
-  max-width: 100%;
 }
 
 .pc--static .pc-partners {
@@ -1751,7 +1778,8 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-hero__title {
-    font-size: clamp(2.4rem, 10.5vw, 5rem);
+    font-size: clamp(2rem, 9.5vw, 3rem);
+    line-height: 1.1;
   }
 
   .pc-hero__details {
@@ -1902,72 +1930,59 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 0.4rem;
   }
 
-  .pc-client__name {
-    font-size: 2.2rem;
+  .pc-client {
+    min-height: 0;
+    padding: 104px 7vw 88px;
   }
 
   .pc-client__label {
-    margin-bottom: 0.8rem;
+    margin-bottom: 24px;
   }
 
   .pc-client__lockup {
-    max-width: 100%;
-    padding: 0 7vw;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 480px;
+  }
+
+  .pc-client__stats {
+    gap: 16px;
+    padding-top: 24px;
+  }
+
+  .pc-client__stat-value {
+    font-size: clamp(1.5rem, 6.5vw, 2rem);
+  }
+
+  .pc-client__stat-label {
+    font-size: 0.75rem;
+    line-height: 1.5;
   }
 
   .pc-client__desc {
     font-size: 0.95rem;
-    margin-bottom: 1.2rem;
   }
 
   .pc-client__logos {
-    gap: 1.6rem;
-    margin-bottom: 1.1rem;
-  }
-
-  .pc-client__logo {
-    gap: 0.4rem;
+    justify-content: flex-start;
+    gap: 48px;
   }
 
   .pc-client__logo--2::before {
-    left: -0.8rem;
+    left: -24px;
   }
 
   .pc-client__logo--1 img {
-    height: 52px;
+    height: 64px;
   }
 
   .pc-client__logo--2 img {
-    height: 62px;
-    margin: -0.3rem 0;
-  }
-
-  .pc-client__stats {
-    margin: 1rem auto 1.2rem;
-    row-gap: 0.9rem;
-  }
-
-  .pc-client__stat {
-    flex: 1 1 0;
-    padding: 0 0.5rem;
-  }
-
-  .pc-client__stat-value {
-    font-size: 1.5rem;
-  }
-
-  .pc-client__stat-label {
-    font-size: 0.68rem;
+    height: 80px;
   }
 
   .pc-cta__contacts {
     gap: 1.4rem 2.5rem;
     margin-top: 1.4rem;
-  }
-
-  .pc--static .pc-client {
-    padding: 18vw 6vw;
-    min-height: 60vh;
   }
 
   .pc--motion .pc-partners {
@@ -3110,7 +3125,7 @@ html.pc-menu-open .pc-cursor {
   font-weight: 300;
   line-height: 1.3;
   color: var(--pc-heading);
-  opacity: 0.6;
+  opacity: 0.75;
   transition: opacity 0.3s ease;
 }
 
@@ -4217,15 +4232,20 @@ html.pc-menu-open .pc-cursor {
   }
 }
 
-.pc-hero-backdrop--halftone .pc-hero-backdrop__sticky::after {
-  background: linear-gradient(90deg, #faf9f6f5 0%, #faf9f6d9 55%, #faf9f68c 100%);
+.pc-hero-backdrop--photo .pc-hero-backdrop__sticky::after {
+  /* Keep a quiet ground behind the headline while revealing the building
+     through the center and right of the photograph. */
+  background:
+    linear-gradient(0deg, #faf9f699, #faf9f600 24%),
+    linear-gradient(90deg, #faf9f6f0 0%, #faf9f6c7 40%, #faf9f67a 72%, #faf9f65c 100%);
 }
 
-/* Headline scale for the photo hero. */
-.pc-hero__main .pc-hero__title {
-  font-size: clamp(3.25rem, 5.3vw, 6rem);
-}
 @media (max-width: 767px) {
-  .pc-hero__main .pc-hero__title { font-size: clamp(2.4rem, 10.5vw, 5rem); }
-  .pc-hero__text { gap: 24px; }
+  .pc-hero-backdrop--photo .pc-hero-backdrop__sticky::after {
+    /* On phones the copy spans the photo, so soften the text areas above
+       and below while keeping the central facade visible. */
+    background:
+      linear-gradient(180deg, #faf9f6b3 0%, #faf9f699 32%, #faf9f600 46%, #faf9f600 62%, #faf9f6cc 86%),
+      linear-gradient(90deg, #faf9f6d9, #faf9f65c);
+  }
 }

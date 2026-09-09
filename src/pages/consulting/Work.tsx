@@ -21,7 +21,7 @@ const PROJECTS: Project[] = [
     id: 'arc',
     title: ['Arc Thrift Stores', 'of Colorado'],
     tag: 'Fall 2026 · Client',
-    dec: 'Our Fall 2026 engagement is with Arc Thrift Stores of Colorado, the nonprofit thrift chain that funds Colorado’s 15 Arc chapters and is one of the state’s largest employers of people with intellectual and developmental disabilities.',
+    dec: 'Our Fall 2026 engagement is with Arc Thrift Stores of Colorado, the nonprofit thrift chain that funds disability advocacy in Colorado and New Mexico and is one of Colorado’s largest employers of people with intellectual and developmental disabilities.',
     tone: 'teal',
     status: 'Fall 2026 client',
     details: ['Executive sponsor: Arc Thrift’s CEO', 'Two project managers and four to six analysts', 'Weekly working sessions through the semester', 'Final presentation to The Arc’s national board in December'],

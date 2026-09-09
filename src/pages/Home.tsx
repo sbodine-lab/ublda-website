@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Reveal, { RevealStagger, RevealChild } from '../components/Reveal'
 import {
-  APPLY_CLOSES_AT_MS,
+  APPLY_DEADLINE_AT_MS,
   APPLY_CLOSES_PROSE,
   APPLY_CLOSE_TIME_SHORT,
   APPLY_OPENS_AT_MS,
@@ -83,7 +83,7 @@ const LinkedInIcon = () => (
 )
 
 export default function Home() {
-  const applyState = applyWindow(useClock(APPLY_OPENS_AT_MS, APPLY_CLOSES_AT_MS))
+  const applyState = applyWindow(useClock(APPLY_OPENS_AT_MS, APPLY_DEADLINE_AT_MS), APPLY_DEADLINE_AT_MS)
   return (
     <main id="main-content" className="home">
       {/* ─── Hero ─── */}
@@ -251,17 +251,17 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="recruiting-events__headline">
-              Come find us <em>on campus.</em>
+              Get involved <em>this fall.</em>
             </h2>
           </Reveal>
           <RevealStagger className="recruiting-events__grid">
             <RevealChild className="recruiting-event-card">
-              <p className="recruiting-event-card__when">Wednesday, September 2 &middot; 3&ndash;5 PM</p>
+              <p className="recruiting-event-card__when">Past event &middot; September 2, 2026</p>
               <h3 className="recruiting-event-card__title">Festifall Central</h3>
               <p className="recruiting-event-card__where">The Diag &middot; Table C43</p>
             </RevealChild>
             <RevealChild className="recruiting-event-card">
-              <p className="recruiting-event-card__when">Tuesday, September 8 &middot; 5:30&ndash;7:30 PM</p>
+              <p className="recruiting-event-card__when">Past event &middot; September 8, 2026</p>
               <h3 className="recruiting-event-card__title">BBA Meet the Clubs</h3>
               <p className="recruiting-event-card__where">Ross School of Business &middot; Winter Garden</p>
             </RevealChild>
@@ -287,11 +287,11 @@ export default function Home() {
                   : 'Applications for the Fall 2026 consulting team are closed.'}{' '}
               {/* /apply is a redirect straight out to the Google Form, so the
                   link has to say so rather than promise a details page. */}
-              <Link to="/apply" className="recruiting-events__link">
+              {applyState !== 'closed' && <Link to="/apply" className="recruiting-events__link">
                 Open the application form
                 <span className="sr-only"> (Google Form, leaves ublda.org)</span>
-              </Link>
-              {' '}&middot;{' '}
+              </Link>}
+              {applyState !== 'closed' && <> &middot; </>}
               <Link to="/consulting" className="recruiting-events__link">Learn about UBLDA Consulting</Link>
             </p>
           </Reveal>

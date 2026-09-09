@@ -10,6 +10,7 @@ export const APPLY_DEADLINE_LABEL = 'Sunday, September 20 at 11:30 PM ET'
    (ahead of Festifall that afternoon), and the application closes Sunday Sep 20
    at 11:30 PM ET with a small server-side grace period. Times below are UTC. */
 export const APPLY_OPENS_AT_MS = Date.UTC(2026, 8, 2, 16, 0, 0) // Sep 2, 12:00 PM ET
+export const APPLY_DEADLINE_AT_MS = Date.UTC(2026, 8, 21, 3, 30, 0) // Sep 20, 11:30 PM ET (public deadline)
 export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 21, 3, 59, 0) // Sep 20, 11:59 PM ET (grace past the 11:30 label)
 
 /* Membership (the /join form) opens at the same moment as the application. */
@@ -31,8 +32,8 @@ export const KICKOFF_SHORT = 'Week of Oct 5'
 
 export type ApplyWindow = 'before' | 'open' | 'closed'
 
-export const applyWindow = (now: number): ApplyWindow => (
-  now < APPLY_OPENS_AT_MS ? 'before' : now < APPLY_CLOSES_AT_MS ? 'open' : 'closed'
+export const applyWindow = (now: number, closesAt = APPLY_CLOSES_AT_MS): ApplyWindow => (
+  now < APPLY_OPENS_AT_MS ? 'before' : now < closesAt ? 'open' : 'closed'
 )
 
 export const APPLY_YEARS = ['Freshman', 'Sophomore', 'Junior', 'Senior'] as const

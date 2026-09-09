@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Swirl } from '@paper-design/shaders-react'
+import { MeshGradient } from '@paper-design/shaders-react'
 import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
@@ -21,14 +21,7 @@ import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
-/* The client section's backdrop: soft swirl bands in the consulting
-   sub-brand's lighter hues (warm cream, mint, aquamarine, sand gold), their
-   centre pushed off to the lower right so broad arcs sweep behind the
-   lockup while the logos sit on the calm side. */
-const CLIENT_SHADER = {
-  colorBack: '#fbf7ef',
-  colors: ['#e2f1ec', '#9edbd1', '#ead6a6', '#cbe9e3'],
-}
+const CLIENT_COLORS = ['#faf9f6', '#e5ece5', '#b8cec3', '#ede8dc']
 
 function Words({ text, className }: { text: string; className: string }) {
   return (
@@ -58,7 +51,7 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
 function HomeBody() {
   const { mode, reducedMotion } = useConsultingUi()
   const [openService, setOpenService] = useState<string | null>(null)
-  const shaderSpeed = reducedMotion ? 0 : 0.6
+  const shaderSpeed = reducedMotion ? 0 : 0.12
   const isStatic = mode === 'static'
 
   return (
@@ -166,21 +159,15 @@ function HomeBody() {
       </section>
 
       {/* 5 · Client */}
-      <section className="pc-client" id="consulting-clients">
+      <section className="pc-client" id="consulting-clients" aria-labelledby="pc-client-name">
         <div className="pc-client__media" aria-hidden="true">
-          <Swirl
-            colorBack={CLIENT_SHADER.colorBack}
-            colors={CLIENT_SHADER.colors}
-            bandCount={3}
-            twist={0.14}
-            center={0.35}
-            proportion={0.55}
-            softness={0.85}
-            noise={0.12}
-            noiseFrequency={0.35}
-            offsetX={0.55}
-            offsetY={0.6}
-            scale={1.15}
+          <MeshGradient
+            colors={CLIENT_COLORS}
+            distortion={0.25}
+            swirl={0.08}
+            grainMixer={0}
+            grainOverlay={0.025}
+            scale={0.85}
             speed={shaderSpeed}
             minPixelRatio={1}
             maxPixelCount={1400000}
@@ -188,7 +175,20 @@ function HomeBody() {
           />
         </div>
         <div className="pc-client__lockup">
-          <p className="pc-client__label">{CLIENT.label}</p>
+          <div className="pc-client__copy">
+            <p className="pc-client__label">{CLIENT.label}</p>
+            <h2 className="pc-client__name" id="pc-client-name">{CLIENT.name}</h2>
+            <p className="pc-client__desc">{CLIENT.desc}</p>
+            <div className="pc-client__presentation">
+              <p className="pc-client__presentation-title">{CLIENT.presentation}</p>
+              <p className="pc-client__audience">{CLIENT.audience}</p>
+            </div>
+            <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
+              Meet our client
+              <NewTab />
+              <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+          </div>
           <div className="pc-client__logos">
             {CLIENT.logos.map((l, i) => (
               <figure className={`pc-client__logo pc-client__logo--${i + 1}`} key={l.src}>
@@ -197,21 +197,14 @@ function HomeBody() {
               </figure>
             ))}
           </div>
-          <h2 className="pc-client__name">{CLIENT.name}</h2>
-          <p className="pc-client__desc">{CLIENT.desc}</p>
-          <ul className="pc-client__stats" aria-label="At a glance">
-            {CLIENT.stats.map((st) => (
-              <li className="pc-client__stat" key={st.value}>
-                <span className="pc-client__stat-value">{st.value}</span>
-                <span className="pc-client__stat-label">{st.label}</span>
+          <ul className="pc-client__stats" aria-label="Client and national network at a glance">
+            {CLIENT.stats.map((stat) => (
+              <li className="pc-client__stat" key={stat.value}>
+                <span className="pc-client__stat-value">{stat.value}</span>
+                <span className="pc-client__stat-label">{stat.label}</span>
               </li>
             ))}
           </ul>
-          <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
-            arcthrift.com
-            <NewTab />
-            <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
-          </a>
         </div>
       </section>
 

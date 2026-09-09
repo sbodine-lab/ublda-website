@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { Warp } from '@paper-design/shaders-react'
 import { useConsultingUi } from './context'
-import { RossHalftone, type RossSource } from './BrandShaders'
+import { RossGlass, RossHalftone, type RossSource } from './BrandShaders'
 
 const COLORS = ['#FAF9F6', '#D9EAE5', '#89BBAF', '#E2DBCC']
 
 export function HeroBackdrop() {
   const params = new URLSearchParams(window.location.search)
-  const halftone = params.get('art') !== 'warp'
+  const art = params.get('art') === 'warp' ? 'warp' : params.get('art') === 'halftone' ? 'halftone' : 'glass'
   const source: RossSource = params.get('source') === 'detail' ? 'detail' : params.get('source') === 'illustration' ? 'illustration' : 'photo'
-  const dots = Math.min(0.65, Math.max(0.1, Number(params.get('dots')) || 0.3))
+  const dots = Math.min(0.65, Math.max(0.1, Number(params.get('dots')) || 0.24))
   const { reducedMotion } = useConsultingUi()
   const rootRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(true)
+  const paused = reducedMotion || !active
 
   useEffect(() => {
     const root = rootRef.current
@@ -25,6 +26,7 @@ export function HeroBackdrop() {
     })
     observer.observe(root)
     document.addEventListener('visibilitychange', update)
+    update()
     return () => {
       observer.disconnect()
       document.removeEventListener('visibilitychange', update)
@@ -32,9 +34,15 @@ export function HeroBackdrop() {
   }, [])
 
   return (
-    <div className={`pc-hero-backdrop ${halftone ? 'pc-hero-backdrop--halftone' : ''}`} ref={rootRef} aria-hidden="true">
+    <div className={`pc-hero-backdrop ${art !== 'warp' ? 'pc-hero-backdrop--photo' : ''}`} ref={rootRef} aria-hidden="true" data-paused={paused}>
       <div className="pc-hero-backdrop__sticky">
-        {halftone ? <div className="pc-hero-backdrop__shader" style={{width:'100%',height:'100%'}}><RossHalftone source={source} gold={params.get('gold') === '1'} size={dots}/></div> : <Warp
+        {art !== 'warp' ? (
+          <div className="pc-hero-backdrop__shader" style={{ width: '100%', height: '100%' }}>
+            <div className="pc-hero-backdrop__drift">
+              {art === 'glass' ? <RossGlass /> : <RossHalftone source={source} gold={params.get('gold') === '1'} size={dots} speed={paused ? 0 : 0.35} />}
+            </div>
+          </div>
+        ) : <Warp
           className="pc-hero-backdrop__shader"
           colors={COLORS}
           shape="edge"
@@ -46,7 +54,7 @@ export function HeroBackdrop() {
           distortion={0.22}
           swirl={0.65}
           swirlIterations={6}
-          speed={reducedMotion || !active ? 0 : 0.18}
+          speed={paused ? 0 : 0.18}
           frame={12000}
           minPixelRatio={1}
           maxPixelCount={1200000}

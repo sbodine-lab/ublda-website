@@ -194,7 +194,7 @@ export default function About() {
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </Link>
               <Link to="/events" className="btn btn--ghost">
-                See upcoming events
+                See our events
               </Link>
             </div>
           </Reveal>

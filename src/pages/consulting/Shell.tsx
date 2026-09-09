@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import gsap from 'gsap'
 import { ArrowUpRight } from 'lucide-react'
 import { ConsultingContext } from './context'
+import { useMenuKeyboard } from '../../hooks/useMenuKeyboard'
 import type { MotionHandle, MotionMode, MotionStarter } from './engine'
 import { ConsultingFooter, ConsultingMenu, ConsultingNav, type Theme } from './parts'
 import '../Consulting.css'
@@ -91,7 +92,6 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
       else tl.timeScale(1).play()
       motionRef.current?.lenis?.stop()
       document.documentElement.classList.add('pc-menu-open')
-      window.setTimeout(() => menuRef.current?.querySelector<HTMLElement>('.pc-menu__link')?.focus(), 50)
     } else {
       if (reducedMotion) tl.progress(0)
       else tl.timeScale(1.8).reverse()
@@ -105,9 +105,6 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
 
   useEffect(() => {
     if (!menuOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
     /* iOS keeps scrolling the page under an open overlay whatever the
        html overflow says, so swipes outside the menu are swallowed. */
     const onTouch = (e: TouchEvent) => {
@@ -115,16 +112,16 @@ export function ConsultingShell({ title, motion, disc, cursor = false, cursorLab
       if (menu && menu.contains(e.target as Node)) return
       if (e.cancelable) e.preventDefault()
     }
-    window.addEventListener('keydown', onKey)
     document.addEventListener('touchmove', onTouch, { passive: false })
     return () => {
-      window.removeEventListener('keydown', onKey)
+      document.documentElement.classList.remove('pc-menu-open')
       document.removeEventListener('touchmove', onTouch)
     }
   }, [menuOpen])
 
   const toggleMenu = useCallback(() => setMenuOpen((o) => !o), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
+  useMenuKeyboard(menuOpen, rootRef, '.pc-menu', '.pc-nav:not(.pc-nav--ghost) .pc-nav__menu', closeMenu)
 
   return (
     <ConsultingContext.Provider value={{ theme, mode, reducedMotion }}>
