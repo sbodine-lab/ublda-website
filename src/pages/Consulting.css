@@ -699,6 +699,10 @@ html.pc-root::-webkit-scrollbar-thumb {
   opacity: 0;
 }
 
+.pc-orb--done {
+  visibility: hidden;
+}
+
 .pc-cursor {
   position: fixed;
   top: 0;
@@ -1102,7 +1106,6 @@ html.pc-menu-open .pc-cursor {
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 4000px;
   overflow: hidden;
   background: var(--pc-fg);
   opacity: 0;
@@ -1114,20 +1117,6 @@ html.pc-menu-open .pc-cursor {
   mask-position: center;
   -webkit-mask-size: var(--pc-mask);
   mask-size: var(--pc-mask);
-}
-
-.pc-client__stage {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 100%;
-  height: 100%;
-  transform-origin: center center;
-  background: #0b1f2f;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .pc-client__media {
@@ -1143,14 +1132,14 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc--light .pc-client__media::after {
-  background: linear-gradient(180deg, rgba(250, 249, 246, 0.35) 0%, rgba(250, 249, 246, 0.6) 100%);
+  background: radial-gradient(ellipse 62% 58% at 50% 50%, rgba(250, 249, 246, 0.55) 0%, rgba(250, 249, 246, 0.18) 60%, rgba(250, 249, 246, 0) 100%);
 }
 
 .pc-client__lockup {
   position: relative;
   z-index: 1;
   text-align: center;
-  max-width: 64vw;
+  max-width: 70vw;
   padding: 0 4vw;
   color: #faf9f6;
 }
@@ -1303,95 +1292,6 @@ html.pc-menu-open .pc-cursor {
   opacity: 0.75;
 }
 
-.pc-client__over {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  height: 300vh;
-  pointer-events: none;
-}
-
-.pc-client__over-row {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
-
-/* Typographic figures in the gutters beside the tilted stage: no boxes, a
-   short accent rule, a large light numeral and a caption. */
-.pc-drift {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35em;
-  max-width: 21vw;
-  color: var(--pc-bg);
-}
-
-.pc-drift::before {
-  content: '';
-  display: block;
-  width: 2.2rem;
-  height: 2px;
-  margin-bottom: 0.4em;
-  background: var(--pc-accent);
-}
-
-.pc-drift__value {
-  font-size: clamp(3rem, 6.4vw, 7.4rem);
-  font-weight: 200;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-}
-
-.pc-drift__label {
-  max-width: 22ch;
-  font-size: clamp(0.8rem, 0.95vw, 1.05rem);
-  font-weight: 500;
-  line-height: 1.35;
-  opacity: 0.8;
-}
-
-.pc-drift--1,
-.pc-drift--3,
-.pc-drift--5 {
-  left: 4.5%;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.pc-drift--2,
-.pc-drift--4,
-.pc-drift--6 {
-  right: 4.5%;
-  align-items: flex-end;
-  text-align: right;
-}
-
-.pc-drift--1 {
-  top: 14%;
-}
-
-.pc-drift--2 {
-  bottom: 12%;
-}
-
-.pc-drift--3 {
-  top: 6%;
-}
-
-.pc-drift--4 {
-  bottom: 6%;
-}
-
-.pc-drift--5 {
-  top: 16%;
-}
-
-.pc-drift--6 {
-  bottom: 12%;
-}
 
 /* ─── Partners ──────────────────────────────────────────────────────────── */
 .pc-partners {
@@ -1793,31 +1693,15 @@ html.pc-menu-open .pc-cursor {
 
 .pc--static .pc-client {
   height: auto;
+  min-height: 70vh;
   opacity: 1;
   -webkit-mask-image: none;
   mask-image: none;
-  background: var(--pc-bg);
-  padding: 4vw 6vw 8vw;
-  flex-direction: column;
-  perspective: none;
-}
-
-.pc--static .pc-client__stage {
-  position: relative;
-  left: auto;
-  top: auto;
-  width: 100%;
-  min-height: 70vh;
-  border-radius: 12px;
-  padding: 10vw 0;
+  padding: 12vw 6vw;
 }
 
 .pc--static .pc-client__lockup {
   max-width: 100%;
-}
-
-.pc--static .pc-client__over {
-  display: none;
 }
 
 .pc--static .pc-partners {
@@ -2044,11 +1928,6 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 1.2rem;
   }
 
-  /* The typographic drift needs side gutters a phone does not have. */
-  .pc-client__over {
-    display: none;
-  }
-
   .pc-client__logos {
     gap: 1.6rem;
     margin-bottom: 1.1rem;
@@ -2106,8 +1985,8 @@ html.pc-menu-open .pc-cursor {
     margin-top: 1.4rem;
   }
 
-  .pc--static .pc-client__stage {
-    padding: 16vw 6vw;
+  .pc--static .pc-client {
+    padding: 18vw 6vw;
     min-height: 60vh;
   }
 

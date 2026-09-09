@@ -130,15 +130,6 @@ export const CLIENT = {
     { value: '600', label: 'Arc Thrift employees with IDD' },
     { value: '$120M+', label: 'social enterprise, from $32M' },
   ] as ClientStat[],
-  /* Larger figures that drift past the tilted stage on wide screens. */
-  drift: [
-    { value: '549', label: 'state and local chapters in The Arc’s national network' },
-    { value: '7M+', label: 'people with intellectual and developmental disabilities in the U.S.' },
-    { value: '600', label: 'Arc Thrift employees with intellectual and developmental disabilities' },
-    { value: '$120M+', label: 'social enterprise, grown from a $32M thrift chain' },
-    { value: '1950', label: 'The Arc founded' },
-    { value: '1968', label: 'Arc Thrift’s first store opens in Colorado' },
-  ] as ClientStat[],
 }
 
 export const PARTNER_STATEMENT =

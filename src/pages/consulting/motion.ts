@@ -5,11 +5,11 @@
    parks in the centre of the horizontal scroller, and finally becomes the
    aperture through which the client section is revealed. */
 
-import { all, buildCursor, buildWordmark, gsap, one, startMotion, ScrollTrigger, type Builder, type MotionStarter } from './engine'
+import { all, buildWordmark, gsap, one, startMotion, ScrollTrigger, type Builder, type MotionStarter } from './engine'
 
 export type { MotionHandle, MotionMode } from './engine'
 
-export const buildHome: Builder = (root, { hover, mobile, vw }) => {
+export const buildHome: Builder = (root, { mobile, vw }) => {
   const orb = one(root, '.pc-orb')
   const disc = one(root, '.pc-disc')
   const hero = one(root, '.pc-hero')
@@ -124,28 +124,36 @@ export const buildHome: Builder = (root, { hover, mobile, vw }) => {
     .to(orb, { top: '50%', left: '50%', scale: 1, width: size(2.5), height: size(2.5), '--pc-orb-fill': 1, duration: 0.2 }, 's')
     .to(one(root, '.pc-journey__end'), { opacity: 0, duration: 0.2, delay: 0.1 })
 
-  /* Client: a circular mask opens from the orb's position, the stage unclips
-     upward, tilts in 3D while the fact chips drift past, and settles flat.
-     The tilt is gentler on a phone so the lockup stays legible, and the mask
-     grows to 300% of the width to cover a tall portrait screen. */
-  const stage = one(root, '.pc-client__stage')
-  const over = one(root, '.pc-client__over')
-  const tilt = mobile ? { far: 0.82, farther: 0.74, turn: 12 } : { far: 0.6, farther: 0.5, turn: 20 }
+  /* Client: a circular mask opens from the orb's position to reveal the
+     full-bleed shader, the lockup rises into place, and the section holds
+     for a beat before it releases. The mask grows to 300% of the width to
+     cover a tall portrait screen. */
+  const lockup = one(root, '.pc-client__lockup')
   gsap.set(client, { '--pc-mask': '1.4%', opacity: 0 })
-  gsap.set(stage, { xPercent: -50, yPercent: -50, clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' })
-  gsap.set(over, { top: '100%' })
+  gsap.set(lockup, { y: mobile ? 24 : 40, opacity: 0 })
 
+  /* The orb's fade is scrubbed, but the opening statement's smoothed scrub
+     can still re-render its "show orb" tween a moment later when the visitor
+     jumps here (menu link, keyboard). The class makes the hide stick from
+     the first pixel of progress until the section is left backwards, and
+     onUpdate (not onToggle) so a jump from past the end to before the start
+     also clears it. */
   const tlClient = gsap
-    .timeline({ scrollTrigger: { trigger: client, start: 'top 0%', end: mobile ? 'top -300%' : 'top -350%', scrub: true, pin: true } })
+    .timeline({
+      scrollTrigger: {
+        trigger: client,
+        start: 'top 0%',
+        end: mobile ? 'top -150%' : 'top -180%',
+        scrub: true,
+        pin: true,
+        onUpdate: (self) => orb.classList.toggle('pc-orb--done', self.progress > 0),
+      },
+    })
     .to(orb, { opacity: 0, duration: 0.15 }, 0)
     .to(client, { opacity: 1, duration: 0.6 }, 0)
     .to(client, { '--pc-mask': mobile ? '300%' : '280%', duration: 2.5 })
-    .to(stage, { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', duration: 0.6 })
-    .to(stage, { scale: tilt.far, rotateY: -tilt.turn, rotateX: -2, duration: 1.5 })
-    .to(stage, { scale: tilt.farther, rotateY: tilt.turn, rotateX: 2, duration: 1.5 })
-    .to(over, { top: '-300%', duration: 4 })
-    .to(stage, { scale: tilt.far, rotateY: -tilt.turn, rotateX: -2, duration: 1.5 })
-    .to(stage, { scale: 1, rotateY: 0, rotateX: 0, duration: 1.5 })
+    .to(lockup, { y: 0, opacity: 1, duration: 1.4, ease: 'power2.out' }, 1.2)
+    .to({}, { duration: 1.2 })
 
   const nav = one(root, '.pc-nav:not(.pc-nav--ghost)')
   const clientPin = tlClient.scrollTrigger
@@ -157,10 +165,7 @@ export const buildHome: Builder = (root, { hover, mobile, vw }) => {
     })
   }
 
-  const cleanupCursor = buildCursor(root, client, hover)
-
   return () => {
-    cleanupCursor()
     gsap.ticker.remove(syncGhost)
     ghostInner.style.transform = ''
     nav.classList.remove('pc-nav--blend')
