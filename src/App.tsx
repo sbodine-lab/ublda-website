@@ -14,6 +14,7 @@ const Team = lazy(() => import('./pages/Team'))
 const ShaderStudy = import.meta.env.DEV ? lazy(() => import('./pages/consulting/ShaderStudy')) : null
 const Consulting = lazy(() => import('./pages/Consulting'))
 const ConsultingPractice = lazy(() => import('./pages/consulting/Practice'))
+const ConsultingLeadership = lazy(() => import('./pages/consulting/Leadership'))
 const ConsultingWork = lazy(() => import('./pages/consulting/Work'))
 const ConsultingServices = lazy(() => import('./pages/consulting/Services'))
 const ConsultingPartners = lazy(() => import('./pages/consulting/Partners'))
@@ -108,6 +109,7 @@ export default function App() {
           {ShaderStudy && <Route path="/consulting/shader-study" element={<ShaderStudy />} />}
           <Route path="/consulting" element={<Consulting />} />
           <Route path="/consulting/practice" element={<ConsultingPractice />} />
+          <Route path="/consulting/leadership" element={<ConsultingLeadership />} />
           <Route path="/consulting/work" element={<ConsultingWork />} />
           <Route path="/consulting/services" element={<ConsultingServices />} />
           <Route path="/consulting/partners" element={<ConsultingPartners />} />

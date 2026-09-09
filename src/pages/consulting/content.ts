@@ -152,6 +152,7 @@ export const SOCIAL = [
 
 export const PAGE_LINKS = [
   { label: 'Practice', to: '/consulting/practice' },
+  { label: 'Leadership', to: '/consulting/leadership' },
   { label: 'Work', to: '/consulting/work' },
   { label: 'Services', to: '/consulting/services' },
   { label: 'Partners', to: '/consulting/partners' },
