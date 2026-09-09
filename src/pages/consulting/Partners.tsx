@@ -6,7 +6,7 @@ import { ConsultingShell } from './Shell'
 
 const STATS = [
   { value: '2', label: 'project managers', desc: 'Alex Forstner and Solomon DeYoung lead the Fall 2026 project.' },
-  { value: '1', label: 'Fall 2026 client', desc: 'Arc Thrift Stores of Colorado, for the Arc University business case.' },
+  { value: '1', label: 'Fall 2026 client', desc: 'Arc Thrift Stores of Colorado, our Fall 2026 engagement.' },
   { value: '6', label: 'analysts at most', desc: 'Four to six undergraduate analysts work together on the client’s question.' },
   { value: '$0', label: 'cost to you', desc: 'We don’t charge clients for our consulting projects.' },
 ]
@@ -39,7 +39,7 @@ const TILES: Tile[] = [
 ]
 
 const INDEX = [
-  { name: 'Arc Thrift Stores of Colorado', kind: 'Client', note: 'Arc University business case, Fall 2026' },
+  { name: 'Arc Thrift Stores of Colorado', kind: 'Client', note: 'Fall 2026 engagement' },
   { name: 'Business Leaders for Diverse Abilities', kind: 'MBA chapter', note: 'Our MBA counterpart at Michigan Ross' },
   { name: 'Michigan Ross', kind: 'School', note: 'UBLDA’s home school' },
   { name: 'Office of Community, Culture and Belonging', kind: 'University office', note: 'Funded the inaugural fireside chat, March 2026' },

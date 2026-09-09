@@ -49,7 +49,7 @@ const benefits = [
 const upcoming = [
   {
     title: 'UBLDA Consulting',
-    desc: `Our first project is a business case for Arc University. Consulting applications run ${APPLY_WINDOW_PROSE}; no consulting experience is required.`,
+    desc: `Our first client is Arc Thrift Stores of Colorado. Consulting applications run ${APPLY_WINDOW_PROSE}; no consulting experience is required.`,
   },
   {
     title: 'Education & Mentorship Plans',
@@ -368,6 +368,12 @@ export default function Home() {
                   Contact us
                 </a>
               </div>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <p className="cta__contact">
+                Questions? Cooper Perry, our Executive VP, answers them:{' '}
+                <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA">cooperry@umich.edu</a>
+              </p>
             </Reveal>
           </div>
         </div>

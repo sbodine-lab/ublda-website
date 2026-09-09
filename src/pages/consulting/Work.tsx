@@ -20,11 +20,11 @@ const PROJECTS: Project[] = [
   {
     id: 'arc',
     title: ['Arc Thrift Stores', 'of Colorado'],
-    tag: 'Fall 2026 · Business case',
-    dec: 'Developing a business case to expand Arc University, a post-secondary program for adults with intellectual and developmental disabilities.',
+    tag: 'Fall 2026 · Client',
+    dec: 'Our Fall 2026 engagement is with Arc Thrift Stores of Colorado, the nonprofit thrift chain that funds Colorado’s 15 Arc chapters and is one of the state’s largest employers of people with intellectual and developmental disabilities.',
     tone: 'teal',
-    status: 'Fall 2026 project',
-    details: ['Market sizing and target segments', 'Pricing and revenue model', 'Go-to-market plan', 'Five-year business case', 'Executive recommendation'],
+    status: 'Fall 2026 client',
+    details: ['Executive sponsor: Arc Thrift’s CEO', 'Two project managers and four to six analysts', 'Weekly working sessions through the semester', 'Final presentation to the client in December'],
     link: { href: CLIENT.url, label: 'arcthrift.com', external: true },
   },
   {

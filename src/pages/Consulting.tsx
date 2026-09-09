@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
   CLIENT,
-  type ClientFact,
+  type ClientStat,
   CONTACT_MAILTO,
   HERO_DESCRIPTION,
   LEADERS,
@@ -38,13 +38,12 @@ function Words({ text, className }: { text: string; className: string }) {
   )
 }
 
-function Fact({ fact, className = '', as: Tag = 'div' }: { fact: ClientFact; className?: string; as?: 'div' | 'li' }) {
+function Drift({ stat, className }: { stat: ClientStat; className: string }) {
   return (
-    <Tag className={`pc-fact pc-fact--${fact.tone} ${fact.wide ? 'pc-fact--wide' : ''} ${className}`}>
-      <span className="pc-fact__kicker">{fact.kicker}</span>
-      <span className="pc-fact__value">{fact.value}</span>
-      <span className="pc-fact__label">{fact.label}</span>
-    </Tag>
+    <div className={`pc-drift ${className}`}>
+      <span className="pc-drift__value">{stat.value}</span>
+      <span className="pc-drift__label">{stat.label}</span>
+    </div>
   )
 }
 
@@ -191,8 +190,15 @@ function HomeBody() {
               ))}
             </div>
             <h2 className="pc-client__name">{CLIENT.name}</h2>
-            <p className="pc-client__project">{CLIENT.project}</p>
             <p className="pc-client__desc">{CLIENT.desc}</p>
+            <ul className="pc-client__stats" aria-label="At a glance">
+              {CLIENT.stats.map((s) => (
+                <li className="pc-client__stat" key={s.value}>
+                  <span className="pc-client__stat-value">{s.value}</span>
+                  <span className="pc-client__stat-label">{s.label}</span>
+                </li>
+              ))}
+            </ul>
             <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
               arcthrift.com
               <NewTab />
@@ -200,21 +206,16 @@ function HomeBody() {
             </a>
           </div>
         </div>
-        {/* Decorative copies drift past the tilted stage; the list below is the
-            accessible version and becomes the visible grid without motion. */}
+        {/* Decorative figures drift past the tilted stage on wide screens; the
+            stage above carries the same facts for everyone. */}
         <div className="pc-client__over" aria-hidden="true">
           {[0, 1, 2].map((row) => (
             <div className="pc-client__over-row" key={row}>
-              <Fact fact={CLIENT.facts[row * 2]} className={`pc-fact--${row * 2 + 1}`} />
-              <Fact fact={CLIENT.facts[row * 2 + 1]} className={`pc-fact--${row * 2 + 2}`} />
+              <Drift stat={CLIENT.drift[row * 2]} className={`pc-drift--${row * 2 + 1}`} />
+              <Drift stat={CLIENT.drift[row * 2 + 1]} className={`pc-drift--${row * 2 + 2}`} />
             </div>
           ))}
         </div>
-        <ul className="pc-client__facts" aria-label="About the client">
-          {CLIENT.facts.map((f) => (
-            <Fact fact={f} as="li" key={f.value} />
-          ))}
-        </ul>
       </section>
 
       {/* 6 · Partners */}
@@ -258,9 +259,18 @@ function HomeBody() {
             Meet the team
           </DotButton>
         </div>
-        <p className="pc-cta__note">
-          Questions? Email {LEADERS[0].name} or {LEADERS[1].name}.
-        </p>
+        <p className="pc-cta__note">Questions? Email the project managers.</p>
+        <ul className="pc-cta__contacts" aria-label="Project managers">
+          {LEADERS.map((l) => (
+            <li className="pc-cta__contact" key={l.email}>
+              <span className="pc-cta__contact-name">{l.name}</span>
+              <span className="pc-cta__contact-role">{l.role}</span>
+              <a className="pc-cta__contact-email pc-line" href={`mailto:${l.email}`}>
+                {l.email}
+              </a>
+            </li>
+          ))}
+        </ul>
         <p className="pc-cta__note">
           For prospective clients: tell us about your business or accessibility question.{' '}
           <a className="pc-line" href={CONTACT_MAILTO}>Discuss a project with us.</a>

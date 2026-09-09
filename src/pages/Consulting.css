@@ -1180,13 +1180,6 @@ html.pc-menu-open .pc-cursor {
   margin-bottom: 1vw;
 }
 
-.pc-client__project {
-  font-size: clamp(1rem, 1.6vw, 1.7rem);
-  font-weight: 400;
-  opacity: 0.9;
-  margin-bottom: 1.5vw;
-}
-
 .pc-client__desc {
   font-size: clamp(0.95rem, 1.1vw, 1.15rem);
   font-weight: 500;
@@ -1208,33 +1201,31 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-client__logos {
-  display: inline-flex;
-  align-items: stretch;
-  margin: 0 auto 1.6vw;
-  padding: 1vw 0.6vw;
-  border-radius: 20px;
-  background: rgba(250, 249, 246, 0.96);
-  border: 1px solid rgba(15, 43, 60, 0.08);
-  box-shadow: 0 24px 60px rgba(9, 30, 42, 0.22);
-}
-
-.pc--light .pc-client__logos {
-  background: #fff;
-  box-shadow: 0 18px 50px rgba(15, 43, 60, 0.12);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(1.6rem, 3.2vw, 3.6rem);
+  margin: 0 auto 1.8vw;
 }
 
 .pc-client__logo {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.6vw;
+  gap: 0.7vw;
   margin: 0;
-  padding: 0.4vw 2vw;
 }
 
-.pc-client__logo + .pc-client__logo {
-  border-left: 1px solid rgba(15, 43, 60, 0.12);
+/* A hairline between the two organizations. */
+.pc-client__logo--2::before {
+  content: '';
+  position: absolute;
+  left: calc(-0.5 * clamp(1.6rem, 3.2vw, 3.6rem));
+  top: 12%;
+  height: 76%;
+  width: 1px;
+  background: rgba(15, 43, 60, 0.18);
 }
 
 .pc-client__logo img {
@@ -1245,11 +1236,11 @@ html.pc-menu-open .pc-cursor {
 /* The Arc mark carries its descriptor line; the Arc Thrift PNG has built-in
    padding, so it is drawn taller to read the same size. */
 .pc-client__logo--1 img {
-  height: clamp(64px, 6.4vw, 100px);
+  height: clamp(64px, 6.2vw, 96px);
 }
 
 .pc-client__logo--2 img {
-  height: clamp(78px, 7.8vw, 122px);
+  height: clamp(78px, 7.6vw, 118px);
   margin: -0.6vw 0;
 }
 
@@ -1258,11 +1249,10 @@ html.pc-menu-open .pc-cursor {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #55636e;
+  color: rgba(15, 43, 60, 0.62);
 }
 
-.pc-sr,
-.pc-client__facts {
+.pc-sr {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1274,8 +1264,43 @@ html.pc-menu-open .pc-cursor {
   border: 0;
 }
 
-.pc-client__facts {
+/* Figures under the description, separated by hairlines. */
+.pc-client__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 1.6vw auto 1.7vw;
+  padding: 0;
   list-style: none;
+}
+
+.pc-client__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0 clamp(1rem, 2vw, 2.2rem);
+  text-align: center;
+}
+
+.pc-client__stat + .pc-client__stat {
+  border-left: 1px solid rgba(15, 43, 60, 0.18);
+}
+
+.pc-client__stat-value {
+  font-size: clamp(1.6rem, 2.6vw, 2.9rem);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.pc-client__stat-label {
+  max-width: 16ch;
+  font-size: clamp(0.68rem, 0.78vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+  opacity: 0.75;
 }
 
 .pc-client__over {
@@ -1293,104 +1318,79 @@ html.pc-menu-open .pc-cursor {
   height: 100vh;
 }
 
-/* Fact cards: a figure about the client or its national network. */
-.pc-fact {
+/* Typographic figures in the gutters beside the tilted stage: no boxes, a
+   short accent rule, a large light numeral and a caption. */
+.pc-drift {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 0.45em;
-  width: clamp(15rem, 21vw, 22rem);
-  padding: clamp(1rem, 1.4vw, 1.5rem) clamp(1.1rem, 1.6vw, 1.7rem);
-  border-radius: 20px;
-  background: #faf9f6;
-  color: #0f2b3c;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  gap: 0.35em;
+  max-width: 21vw;
+  color: var(--pc-bg);
+}
+
+.pc-drift::before {
+  content: '';
+  display: block;
+  width: 2.2rem;
+  height: 2px;
+  margin-bottom: 0.4em;
+  background: var(--pc-accent);
+}
+
+.pc-drift__value {
+  font-size: clamp(3rem, 6.4vw, 7.4rem);
+  font-weight: 200;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.pc-drift__label {
+  max-width: 22ch;
+  font-size: clamp(0.8rem, 0.95vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.35;
+  opacity: 0.8;
+}
+
+.pc-drift--1,
+.pc-drift--3,
+.pc-drift--5 {
+  left: 4.5%;
+  align-items: flex-start;
   text-align: left;
 }
 
-.pc-fact--wide {
-  width: clamp(18rem, 27vw, 29rem);
+.pc-drift--2,
+.pc-drift--4,
+.pc-drift--6 {
+  right: 4.5%;
+  align-items: flex-end;
+  text-align: right;
 }
 
-.pc-fact__kicker {
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.pc-fact__value {
-  font-size: clamp(2rem, 3.4vw, 3.8rem);
-  font-weight: 200;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-}
-
-.pc-fact--wide .pc-fact__value {
-  font-size: clamp(1.6rem, 2.4vw, 2.7rem);
-}
-
-.pc-fact__label {
-  font-size: clamp(0.8rem, 0.92vw, 1rem);
-  font-weight: 500;
-  line-height: 1.4;
-  opacity: 0.88;
-}
-
-.pc-fact--gold {
-  background: #d4a034;
-  color: #091e2a;
-}
-
-.pc-fact--teal {
-  background: #2bbab0;
-  color: #091e2a;
-}
-
-.pc-fact--navy {
-  background: #0f2b3c;
-  color: #faf9f6;
-  border: 1px solid rgba(250, 249, 246, 0.25);
-}
-
-.pc-client__over .pc-fact {
-  position: absolute;
-}
-
-.pc-fact--1 {
-  left: 6%;
-  top: 12%;
-  transform: rotate(-4deg);
-}
-
-.pc-fact--2 {
-  right: 6%;
-  bottom: 8%;
-  transform: rotate(3deg);
-}
-
-.pc-fact--3 {
-  left: 12%;
-  top: 4%;
-  transform: rotate(2deg);
-}
-
-.pc-fact--4 {
-  right: 4%;
-  bottom: 4%;
-  transform: rotate(-3deg);
-}
-
-.pc-fact--5 {
-  left: 5%;
+.pc-drift--1 {
   top: 14%;
-  transform: rotate(3deg);
 }
 
-.pc-fact--6 {
-  right: 6%;
-  bottom: 10%;
-  transform: rotate(-2deg);
+.pc-drift--2 {
+  bottom: 12%;
+}
+
+.pc-drift--3 {
+  top: 6%;
+}
+
+.pc-drift--4 {
+  bottom: 6%;
+}
+
+.pc-drift--5 {
+  top: 16%;
+}
+
+.pc-drift--6 {
+  bottom: 12%;
 }
 
 /* ─── Partners ──────────────────────────────────────────────────────────── */
@@ -1495,6 +1495,44 @@ html.pc-menu-open .pc-cursor {
   font-weight: 500;
   line-height: 1.5;
   color: var(--pc-para);
+}
+
+.pc-cta__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem clamp(2.5rem, 6vw, 7rem);
+  margin: 1.6vw 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-cta__contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.pc-cta__contact-name {
+  font-size: clamp(1.15rem, 1.6vw, 1.6rem);
+  font-weight: 500;
+  color: var(--pc-heading2);
+}
+
+.pc-cta__contact-role {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pc-para);
+}
+
+.pc-cta__contact-email {
+  margin-top: 0.45em;
+  font-size: clamp(1.05rem, 1.35vw, 1.4rem);
+  font-weight: 500;
+  color: var(--pc-accent-ink);
 }
 
 /* ─── Footer ────────────────────────────────────────────────────────────── */
@@ -1782,24 +1820,6 @@ html.pc-menu-open .pc-cursor {
   display: none;
 }
 
-.pc--static .pc-client__facts {
-  position: static;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  width: auto;
-  height: auto;
-  margin: 1.2rem 0 0;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-}
-
-.pc--static .pc-client__facts .pc-fact {
-  width: auto;
-  box-shadow: none;
-}
-
 .pc--static .pc-partners {
   height: auto;
   padding-bottom: 10vw;
@@ -2014,10 +2034,6 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 0.8rem;
   }
 
-  .pc-client__project {
-    margin-bottom: 1rem;
-  }
-
   .pc-client__lockup {
     max-width: 100%;
     padding: 0 7vw;
@@ -2028,23 +2044,30 @@ html.pc-menu-open .pc-cursor {
     margin-bottom: 1.2rem;
   }
 
+  /* The typographic drift needs side gutters a phone does not have. */
+  .pc-client__over {
+    display: none;
+  }
+
   .pc-client__logos {
+    gap: 1.6rem;
     margin-bottom: 1.1rem;
-    padding: 0.7rem 0.2rem;
-    border-radius: 16px;
   }
 
   .pc-client__logo {
     gap: 0.4rem;
-    padding: 0.2rem 1rem;
+  }
+
+  .pc-client__logo--2::before {
+    left: -0.8rem;
   }
 
   .pc-client__logo--1 img {
-    height: 46px;
+    height: 52px;
   }
 
   .pc-client__logo--2 img {
-    height: 56px;
+    height: 62px;
     margin: -0.3rem 0;
   }
 
@@ -2052,42 +2075,35 @@ html.pc-menu-open .pc-cursor {
     font-size: 0.55rem;
   }
 
-  .pc-fact {
-    width: 56vw;
-    padding: 0.85rem 0.95rem;
-    border-radius: 16px;
+  .pc-client__stats {
+    margin: 1rem auto 1.2rem;
+    row-gap: 0.9rem;
   }
 
-  .pc-fact--wide {
-    width: 70vw;
+  .pc-client__stat {
+    flex: 0 0 50%;
+    padding: 0 0.6rem;
   }
 
-  .pc-fact__value {
-    font-size: 1.9rem;
+  .pc-client__stat + .pc-client__stat {
+    border-left: 0;
   }
 
-  .pc-fact--wide .pc-fact__value {
-    font-size: 1.35rem;
+  .pc-client__stat:nth-child(even) {
+    border-left: 1px solid rgba(15, 43, 60, 0.18);
   }
 
-  .pc-fact__label {
-    font-size: 0.74rem;
+  .pc-client__stat-value {
+    font-size: 1.5rem;
   }
 
-  .pc-fact--1,
-  .pc-fact--3,
-  .pc-fact--5 {
-    left: 4%;
+  .pc-client__stat-label {
+    font-size: 0.66rem;
   }
 
-  .pc-fact--2,
-  .pc-fact--4,
-  .pc-fact--6 {
-    right: 4%;
-  }
-
-  .pc--static .pc-client__facts {
-    grid-template-columns: 1fr;
+  .pc-cta__contacts {
+    gap: 1.4rem 2.5rem;
+    margin-top: 1.4rem;
   }
 
   .pc--static .pc-client__stage {
