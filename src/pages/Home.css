@@ -105,7 +105,7 @@
 .btn--ghost:hover {
   color: var(--color-navy);
   border-color: var(--color-gray-400);
-  background: rgba(15, 43, 60, 0.03);
+  background: rgba(10, 54, 88, 0.03);
 }
 
 .btn--lg {

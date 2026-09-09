@@ -61,10 +61,10 @@ export default function Table() {
           <HalftoneCmyk
             image="/ross-modern-exterior.jpg"
             colorBack="#FAF9F6"
-            colorC="#2BBAB0"
-            colorM="#0F2B3C"
-            colorY="#D4A034"
-            colorK="#0F2B3C"
+            colorC="#67B8B3"
+            colorM="#0A3658"
+            colorY="#D2A54B"
+            colorK="#0A3658"
             size={0.3}
             type="ink"
             softness={0.5}

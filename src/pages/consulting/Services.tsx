@@ -134,8 +134,8 @@ const buildServices: Builder = (root, { mobile, vw, vh }) => {
   blocks.forEach((block, i) => {
     const at = i * 1.2 + 0.15
     tl.to(block, { opacity: 1, y: 0, duration: 0.5 }, at)
-      .to(cirs[i], { scale: 1.25, backgroundColor: '#2bbab0', duration: 0.3 }, at)
-      .to(one(cirs[i], '.pcs-approach__cir-label'), { color: '#091e2a', duration: 0.3 }, at)
+      .to(cirs[i], { scale: 1.25, backgroundColor: '#67B8B3', duration: 0.3 }, at)
+      .to(one(cirs[i], '.pcs-approach__cir-label'), { color: '#07263E', duration: 0.3 }, at)
       .to(bar, { scaleX: (i + 1) / blocks.length, duration: 0.8, ease: 'none' }, at + 0.2)
     if (i < blocks.length - 1) {
       tl.to(block, { opacity: 0, y: -30, duration: 0.4 }, at + 0.9)
@@ -145,8 +145,8 @@ const buildServices: Builder = (root, { mobile, vw, vh }) => {
 
 const startServices: MotionStarter = (root, onMode, reduce) => startMotion(root, onMode, buildServices, { reduce })
 
-const SHADER_DARK = ['#0B1F2F', '#14374E', '#2BBAB0', '#D4A034']
-const SHADER_LIGHT = ['#FAF9F6', '#E8F6F4', '#2BBAB0', '#D4A034']
+const SHADER_DARK = ['#0B1F2F', '#14374E', '#67B8B3', '#D2A54B']
+const SHADER_LIGHT = ['#FAF9F6', '#EAF4F2', '#67B8B3', '#D2A54B']
 
 function ServicesBody() {
   const { theme, reducedMotion } = useConsultingUi()

@@ -694,7 +694,7 @@ body:has(.dc-app-shell, .dc-ballot-page, .dc-auth-page, .sched-public) :is(
   .dc-auth-page {
     background:
       radial-gradient(circle at 80% 20%, rgba(20, 43, 74, 0.72), transparent 38%),
-      radial-gradient(circle at 92% 82%, rgba(212, 160, 52, 0.32), transparent 32%),
+      radial-gradient(circle at 92% 82%, rgba(210, 165, 75, 0.32), transparent 32%),
       #071827;
   }
 }

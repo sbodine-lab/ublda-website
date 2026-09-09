@@ -5,10 +5,10 @@
   --links-bg: var(--color-cream);
   --links-text: var(--color-navy);
   --links-muted: var(--color-gray-600);
-  --links-card-bg: rgba(15, 43, 60, 0.04);
-  --links-card-border: rgba(15, 43, 60, 0.08);
-  --links-input-bg: rgba(15, 43, 60, 0.04);
-  --links-input-border: rgba(15, 43, 60, 0.1);
+  --links-card-bg: rgba(10, 54, 88, 0.04);
+  --links-card-border: rgba(10, 54, 88, 0.08);
+  --links-input-bg: rgba(10, 54, 88, 0.04);
+  --links-input-border: rgba(10, 54, 88, 0.1);
   --links-input-text: var(--color-navy);
   --links-placeholder: var(--color-gray-400);
   --links-footer-color: var(--color-gray-400);
@@ -122,7 +122,7 @@
 }
 
 .links__btn--secondary:hover {
-  background: rgba(15, 43, 60, 0.08);
+  background: rgba(10, 54, 88, 0.08);
   transform: translateY(-1px);
 }
 
@@ -289,8 +289,8 @@
 }
 
 .links__form-input:focus {
-  border-color: rgba(43, 186, 176, 0.5);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.15);
+  border-color: rgba(103, 184, 179, 0.5);
+  box-shadow: 0 0 0 3px rgba(103, 184, 179, 0.15);
 }
 
 .links__form-select {
@@ -312,8 +312,8 @@
 }
 
 .links__email-wrapper:focus-within {
-  border-color: rgba(43, 186, 176, 0.5);
-  box-shadow: 0 0 0 3px rgba(43, 186, 176, 0.15);
+  border-color: rgba(103, 184, 179, 0.5);
+  box-shadow: 0 0 0 3px rgba(103, 184, 179, 0.15);
 }
 
 .links__email-input {

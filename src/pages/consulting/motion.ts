@@ -93,7 +93,7 @@ export const buildHome: Builder = (root, { mobile, vw }) => {
     if (i > 0) {
       tlServices
         .to(decs[i - 1], { height: 0, duration: 0.5 }, label)
-        .to(heads[i - 1], { opacity: 0.5, duration: 0.5 }, label)
+        .to(heads[i - 1], { opacity: 0.72, duration: 0.5 }, label)
         .to(i === 1 ? orb : cirs[i - 1], { scale: 0, duration: 0.5 }, label)
         .to(cirs[i], { scale: 1, duration: 0.5 }, label)
     }
@@ -103,7 +103,7 @@ export const buildHome: Builder = (root, { mobile, vw }) => {
     .to(orb, { top: orbTop + rowStep * last + 2, scale: 0, duration: 0.5, overwrite: 'auto' }, 'park')
     .to(cirs[last], { scale: 0, duration: 0.2 }, 'e')
     .to(orb, { scale: 1, duration: 0.1, overwrite: 'auto' }, 'e')
-    .to(heads[last], { opacity: 0.5, duration: 0.1 }, 'e')
+    .to(heads[last], { opacity: 0.72, duration: 0.1 }, 'e')
 
   /* Journey: the orb settles mid-screen as a thin ring while the cards slide
      past, then fills back in and waits to become the client reveal. */

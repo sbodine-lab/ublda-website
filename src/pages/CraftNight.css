@@ -7,8 +7,8 @@
   --craft-text: var(--color-navy);
   --craft-muted: var(--color-gray-600);
   --craft-card-bg: var(--color-white);
-  --craft-card-border: rgba(15, 43, 60, 0.1);
-  --craft-selected-bg: rgba(43, 186, 176, 0.09);
+  --craft-card-border: rgba(10, 54, 88, 0.1);
+  --craft-selected-bg: rgba(103, 184, 179, 0.09);
   --craft-accent: var(--color-teal);
   --craft-accent-deep: #1E8F87;
 

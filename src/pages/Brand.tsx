@@ -74,18 +74,19 @@ export default function Brand() {
 
           <h3 className="brand-subsection">Primary Colors</h3>
           <div className="brand-swatch-grid">
-            <ColorSwatch name="Navy" hex="#0F2B3C" token="--color-navy" usage="Headings, text, backgrounds, primary buttons" />
-            <ColorSwatch name="Teal" hex="#2BBAB0" token="--color-teal" usage="Accent, CTAs, highlights, italic emphasis" light />
-            <ColorSwatch name="Gold" hex="#D4A034" token="--color-gold" usage="Tertiary accent, sparingly for warmth" light />
+            <ColorSwatch name="Navy" hex="#0A3658" token="--color-navy" usage="Headings, text, backgrounds, primary buttons" />
+            <ColorSwatch name="Teal" hex="#67B8B3" token="--color-teal" usage="Logo-matched accent, CTA fills, highlights on navy" light />
+            <ColorSwatch name="Gold" hex="#D2A54B" token="--color-gold" usage="Tertiary accent, sparingly for warmth" light />
             <ColorSwatch name="Cream" hex="#FAF9F6" token="--color-cream" usage="Page background, light sections" light />
           </div>
 
           <h3 className="brand-subsection">Extended Palette</h3>
           <div className="brand-swatch-grid">
-            <ColorSwatch name="Navy Deep" hex="#091E2A" token="--color-navy-deep" usage="Footer, dark sections" />
-            <ColorSwatch name="Navy Light" hex="#1A3D52" token="--color-navy-light" usage="Button hover, lighter dark" />
-            <ColorSwatch name="Teal Soft" hex="#2BBAB018" token="--color-teal-soft" usage="Subtle teal tints (10% opacity)" light />
-            <ColorSwatch name="Gold Soft" hex="#D4A03415" token="--color-gold-soft" usage="Subtle gold tints (8% opacity)" light />
+            <ColorSwatch name="Navy Deep" hex="#07263E" token="--color-navy-deep" usage="Footer, dark sections" />
+            <ColorSwatch name="Navy Light" hex="#234D6B" token="--color-navy-light" usage="Button hover, lighter dark" />
+            <ColorSwatch name="Teal Text" hex="#326D69" token="--color-teal-text" usage="Readable teal text on cream and white" />
+            <ColorSwatch name="Teal Soft" hex="#67B8B318" token="--color-teal-soft" usage="Subtle teal tints (10% opacity)" light />
+            <ColorSwatch name="Gold Soft" hex="#D2A54B15" token="--color-gold-soft" usage="Subtle gold tints (8% opacity)" light />
           </div>
 
           <h3 className="brand-subsection">Neutrals</h3>
@@ -279,7 +280,7 @@ export default function Brand() {
             <div className="brand-card-demo brand-card-demo--navy">
               <h4>Navy Card</h4>
               <p>Dark navy background with white/teal text. Used for CTAs, featured events, program cards.</p>
-              <code>background: #0F2B3C, color: white, border-radius: 1rem</code>
+              <code>background: #0A3658, color: white, border-radius: 1rem</code>
             </div>
             <div className="brand-card-demo brand-card-demo--outline">
               <h4>Outlined Card</h4>
@@ -300,7 +301,7 @@ export default function Brand() {
               A student community focused on{' '}
               <em>disability in business</em>.
             </h3>
-            <code>Instrument Serif italic in text teal (#0B6F68) on light backgrounds; bright teal (#2BBAB0) on navy</code>
+            <code>Instrument Serif italic in text teal (#326D69) on light backgrounds; logo teal (#67B8B3) on navy</code>
           </div>
         </div>
       </section>
@@ -373,7 +374,7 @@ export default function Brand() {
               <div className="brand-ig-template__info">
                 <h4>Event Announcement</h4>
                 <ul>
-                  <li>Navy background (#0F2B3C)</li>
+                  <li>Navy background (#0A3658)</li>
                   <li>Instrument Serif headline, teal italic for speaker/topic</li>
                   <li>Date + location in Plus Jakarta Sans</li>
                   <li>Logo + wordmark in bottom corner</li>
@@ -462,15 +463,15 @@ export default function Brand() {
           <h3 className="brand-subsection">Instagram Color Combos</h3>
           <div className="brand-combos">
             <div className="brand-combo">
-              <div className="brand-combo__preview" style={{ background: '#0F2B3C', color: '#fff' }}>
+              <div className="brand-combo__preview" style={{ background: '#0A3658', color: '#fff' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
-                  Navy + <span style={{ color: '#2BBAB0', fontStyle: 'italic' }}>Teal</span>
+                  Navy + <span style={{ color: '#67B8B3', fontStyle: 'italic' }}>Teal</span>
                 </span>
               </div>
               <span>Primary combo - most posts</span>
             </div>
             <div className="brand-combo">
-              <div className="brand-combo__preview" style={{ background: '#FAF9F6', color: '#0F2B3C' }}>
+              <div className="brand-combo__preview" style={{ background: '#FAF9F6', color: '#0A3658' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Cream + <span style={{ color: 'var(--color-teal-text)', fontStyle: 'italic' }}>Teal</span>
                 </span>
@@ -478,7 +479,7 @@ export default function Brand() {
               <span>Light/clean - quotes, stats</span>
             </div>
             <div className="brand-combo">
-              <div className="brand-combo__preview" style={{ background: '#2BBAB0', color: '#0F2B3C' }}>
+              <div className="brand-combo__preview" style={{ background: '#67B8B3', color: '#0A3658' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Teal + Navy
                 </span>
@@ -486,7 +487,7 @@ export default function Brand() {
               <span>Bold accent - special announcements</span>
             </div>
             <div className="brand-combo">
-              <div className="brand-combo__preview" style={{ background: '#0F2B3C', color: '#D4A034' }}>
+              <div className="brand-combo__preview" style={{ background: '#0A3658', color: '#D2A54B' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
                   Navy + Gold
                 </span>
@@ -497,7 +498,7 @@ export default function Brand() {
 
           <div className="brand-tip">
             <strong>Photo posts:</strong> When using photos, add a semi-transparent navy overlay
-            (rgba(15, 43, 60, 0.7)) so text remains readable. Keep text minimal on photo posts.
+            (rgba(10, 54, 88, 0.7)) so text remains readable. Keep text minimal on photo posts.
           </div>
         </div>
       </section>
@@ -773,9 +774,9 @@ export default function Brand() {
                 <tbody>
                   <tr><td>Display Font</td><td>Instrument Serif (Google Fonts)</td></tr>
                   <tr><td>Body Font</td><td>Plus Jakarta Sans (Google Fonts)</td></tr>
-                  <tr><td>Navy</td><td>#0F2B3C</td></tr>
-                  <tr><td>Teal</td><td>#2BBAB0</td></tr>
-                  <tr><td>Gold</td><td>#D4A034</td></tr>
+                  <tr><td>Navy</td><td>#0A3658</td></tr>
+                  <tr><td>Teal</td><td>#67B8B3</td></tr>
+                  <tr><td>Gold</td><td>#D2A54B</td></tr>
                   <tr><td>Cream</td><td>#FAF9F6</td></tr>
                   <tr><td>IG Post</td><td>1080 &times; 1080px</td></tr>
                   <tr><td>IG Story</td><td>1080 &times; 1920px</td></tr>
@@ -787,9 +788,9 @@ export default function Brand() {
             <div className="brand-cheat">
               <h4>CSS Variables</h4>
               <pre className="brand-code" tabIndex={0} aria-label="CSS variables">{`/* Colors */
---color-navy:      #0F2B3C
---color-teal:      #2BBAB0
---color-gold:      #D4A034
+--color-navy:      #0A3658
+--color-teal:      #67B8B3
+--color-gold:      #D2A54B
 --color-cream:     #FAF9F6
 
 /* Fonts */

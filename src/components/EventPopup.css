@@ -10,7 +10,7 @@
   color: var(--color-white);
   border-radius: var(--radius-lg);
   border-top: 2px solid var(--color-teal);
-  box-shadow: 0 16px 48px rgba(9, 30, 42, 0.4), 0 2px 8px rgba(9, 30, 42, 0.2);
+  box-shadow: 0 16px 48px rgba(7, 38, 62, 0.4), 0 2px 8px rgba(7, 38, 62, 0.2);
 
   opacity: 0;
   transform: translateY(20px);
