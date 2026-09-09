@@ -245,7 +245,7 @@ function HomeBody() {
           <DotButton href={CONSULTING_FORM_URL} external className="pc-dotbtn--big">
             Apply for Fall 2026
           </DotButton>
-          <DotButton to="/consulting/practice" className="pc-dotbtn--big">
+          <DotButton to="/consulting/leadership" className="pc-dotbtn--big">
             Meet the team
           </DotButton>
         </div>

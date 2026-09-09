@@ -2320,6 +2320,99 @@ html.pc-menu-open .pc-cursor {
   max-width: 46vw !important;
 }
 
+.pcl-leadership {
+  padding: clamp(140px, 13vw, 200px) 8vw clamp(64px, 8vw, 120px);
+}
+
+.pcl-leadership__intro {
+  max-width: 850px;
+}
+
+.pcl-leadership__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pc-des);
+}
+
+.pcl-leadership h1 {
+  margin: 18px 0 24px;
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  line-height: 1.05;
+  font-weight: 300;
+  letter-spacing: -0.045em;
+  color: var(--pc-heading);
+}
+
+.pcl-leadership__intro > p:last-child,
+.pcl-leadership__board > p {
+  font-size: clamp(1rem, 1.4vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--pc-des);
+}
+
+.pcl-leadership__people {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6vw;
+  margin: 64px 0;
+}
+
+.pcl-leadership__person {
+  border-top: 1px solid var(--pc-des);
+  padding-top: 28px;
+}
+
+.pcl-leadership__initials {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 28px;
+  border-radius: 50%;
+  background: var(--pc-heading);
+  color: var(--pc-bg);
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+
+.pcl-leadership h2 {
+  margin: 12px 0 8px;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--pc-heading);
+}
+
+.pcl-leadership__role {
+  margin-bottom: 24px;
+  line-height: 1.5;
+  color: var(--pc-des);
+}
+
+.pcl-leadership__board {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--pc-des);
+  padding-top: 32px;
+}
+
+@media (max-width: 767px) {
+  .pcl-leadership__people {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin: 40px 0;
+  }
+
+  .pcl-leadership__board {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 .pcp-team {
   display: grid;
   grid-template-columns: 1fr 1fr;
