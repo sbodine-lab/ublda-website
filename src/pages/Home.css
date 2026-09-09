@@ -863,6 +863,27 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+.cta__contact {
+  position: relative;
+  margin: var(--space-8) auto 0;
+  max-width: 580px;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.cta__contact a {
+  color: var(--color-teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.cta__contact a:hover {
+  color: var(--color-white);
+}
+
 /* ═══════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════ */

@@ -44,7 +44,7 @@ export const SERVICES: Service[] = [
   {
     id: 'strategy',
     title: 'Strategy & business cases',
-    desc: 'Develop market research and financial recommendations for organizations with a disability mission. Our first project is the Arc University business case.',
+    desc: 'Develop market research and financial recommendations for organizations with a disability mission. Our first client is Arc Thrift Stores of Colorado.',
   },
 ]
 
@@ -103,23 +103,15 @@ export const STEPS: Step[] = [
   },
 ]
 
-export type ClientFactTone = 'gold' | 'teal' | 'cream' | 'navy'
-
-export interface ClientFact {
-  /* Small caps line above the figure: which organization the fact is about. */
-  kicker: string
+export interface ClientStat {
   value: string
   label: string
-  tone: ClientFactTone
-  /* A sentence-length fact gets a wider card. */
-  wide?: boolean
 }
 
 export const CLIENT = {
   label: 'Fall 2026 client',
   name: 'Arc Thrift Stores of Colorado',
-  project: 'Arc University business case',
-  desc: 'A business case to scale Arc University, Arc Thrift’s post-secondary program for adults with intellectual and developmental disabilities, with a path into The Arc’s national network.',
+  desc: 'Colorado’s nonprofit thrift chain, funding the state’s 15 Arc chapters since 1968 and one of its largest employers of people with intellectual and developmental disabilities (IDD). Its CEO sits on The Arc of the United States Foundation board.',
   url: 'https://arcthrift.com',
   /* The two logos read left to right: the national organization first, then
      the Colorado client whose stores fund its local chapters. */
@@ -127,18 +119,26 @@ export const CLIENT = {
     { src: '/client-the-arc.svg', alt: 'The Arc', role: 'The Arc of the United States', note: 'National network' },
     { src: '/partners-arc-thrift.png', alt: 'arc Thrift Stores', role: 'Arc Thrift Stores of Colorado', note: 'Our client' },
   ],
-  /* Sources, checked Sept 8, 2026: thearc.org/about-us (chapters, founding,
-     "largest"); thearc.org 2018 data brief (7.3M people with IDD);
-     KJCT Feb 6, 2026 CEO interview (600 employees with IDD); lloydlewis.net
-     ($32M to $120M+); July 28, 2026 sponsor call (Foundation board offer). */
-  facts: [
-    { kicker: 'The Arc', value: '549', label: 'state and local chapters in The Arc’s national network, founded in 1950.', tone: 'gold' },
-    { kicker: 'The Arc', value: '7M+', label: 'people with intellectual and developmental disabilities in the U.S., served by the largest community-based disability organization in the country.', tone: 'teal' },
-    { kicker: 'Arc Thrift', value: '600', label: 'employees with intellectual and developmental disabilities, one of Colorado’s largest employers of people with IDD.', tone: 'cream' },
-    { kicker: 'Arc Thrift', value: '$120M+', label: 'social enterprise, grown from a $32M thrift chain, funding Colorado’s 15 Arc chapters since 1968.', tone: 'navy' },
-    { kicker: 'Where it goes', value: 'The Arc U.S.', label: 'Arc Thrift’s CEO sits on The Arc of the United States Foundation board and has offered to bring the finished case to The Arc’s national leadership.', tone: 'teal', wide: true },
-    { kicker: 'The work', value: '5-year', label: 'business case: market sizing, pricing, go-to-market, launch investment and KPIs, presented at the end of the semester.', tone: 'gold' },
-  ] as ClientFact[],
+  /* Figures under the description. Sources, checked Sept 8, 2026:
+     thearc.org/about-us (549 chapters, founded 1950); The Arc's 2018 data
+     brief (7.3M people with IDD); KJCT Feb 6, 2026 CEO interview (600
+     employees with IDD); lloydlewis.net ($32M to $120M+); arcthrift.com
+     (since 1968). */
+  stats: [
+    { value: '549', label: 'chapters in The Arc’s network' },
+    { value: '7M+', label: 'people with IDD in the U.S.' },
+    { value: '600', label: 'Arc Thrift employees with IDD' },
+    { value: '$120M+', label: 'social enterprise, from $32M' },
+  ] as ClientStat[],
+  /* Larger figures that drift past the tilted stage on wide screens. */
+  drift: [
+    { value: '549', label: 'state and local chapters in The Arc’s national network' },
+    { value: '7M+', label: 'people with intellectual and developmental disabilities in the U.S.' },
+    { value: '600', label: 'Arc Thrift employees with intellectual and developmental disabilities' },
+    { value: '$120M+', label: 'social enterprise, grown from a $32M thrift chain' },
+    { value: '1950', label: 'The Arc founded' },
+    { value: '1968', label: 'Arc Thrift’s first store opens in Colorado' },
+  ] as ClientStat[],
 }
 
 export const PARTNER_STATEMENT =

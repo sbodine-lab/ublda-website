@@ -7,7 +7,7 @@ import { ConsultingShell } from './Shell'
 const FACTS = [
   {
     title: 'Launching Fall 2026',
-    desc: 'Our first client is Arc Thrift Stores of Colorado. The team will develop a business case for its Arc University program.',
+    desc: 'Our first client is Arc Thrift Stores of Colorado, the nonprofit thrift chain that funds Colorado’s Arc chapters.',
   },
   {
     title: 'Pro bono projects',

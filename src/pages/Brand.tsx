@@ -700,7 +700,7 @@ export default function Brand() {
             <div className="brand-voice-card">
               <h4>Use Specific Examples</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "Our first project is a business case for Arc University."
+                <span className="brand-voice-card__yes">Yes:</span> "Our first client is Arc Thrift Stores of Colorado."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "If you don't think about disability inclusion, you're part of the problem."
