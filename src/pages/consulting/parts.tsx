@@ -251,6 +251,7 @@ export function ConsultingFooter() {
       </div>
       <div className="pc-footer__bottom">
         <div className="pc-footer__legal">
+          <Link to="/unsubscribe" className="pc-footer__small">Unsubscribe from emails</Link>
           <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support" className="pc-footer__small">
             Accessibility support
           </a>
