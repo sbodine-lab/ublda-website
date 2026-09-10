@@ -1,0 +1,71 @@
+/* Public-site composition, measured against David Chipperfield Architects.
+   Shared app/consulting shells retain their own component design. */
+.nav.nav { padding: 18px 0; background: var(--color-cream); border: 0; box-shadow: none; backdrop-filter: none; }
+.nav .nav__inner { width: 95.76%; max-width: none; padding-inline: 0; }
+.nav .nav__links { position: static; transform: none; margin-left: 40px; margin-right: auto; gap: 25px; }
+.nav .nav__link { font-size: 15px; letter-spacing: 0; text-transform: none; font-weight: 400; }
+.nav .nav__logo { font-size: 17px; letter-spacing: .045em; }
+.nav .nav__logo-img { width: 25px; height: 25px; }
+.nav .nav__link--active { color: var(--color-teal-text); }
+.nav .nav__link--advisory::before { display: none; }
+.nav .nav__mobile { background: var(--color-cream); box-shadow: none; backdrop-filter: none; }
+.announcement.announcement { background: #e7efec; color: var(--color-navy); padding: 6px 0; }
+.announcement .announcement__inner { width: 95.76%; max-width: none; padding-inline: 0; justify-content: flex-end; gap: 18px; }
+.announcement .announcement__text, .announcement .announcement__gcal, .announcement .announcement__dismiss { font-size: 12px; color: var(--color-navy); }
+.announcement .announcement__gcal { padding: 0; border: 0; border-radius: 0; }
+.announcement .announcement__dismiss { margin-left: 18px; color: var(--color-gray-600); }
+:is(.about,.events-page,.team-page,.join-page) .container { max-width: 1226px; width: 95.76%; padding-inline: 0; }
+:is(.about,.events-page,.team-page,.join-page) > section:first-child { padding-top: 150px; padding-bottom: 65px; }
+:is(.about,.events-page,.team-page,.join-page) h1 { font: 400 clamp(40px,4.4vw,60px)/1.08 var(--font-display); letter-spacing: -.025em; max-width: 780px; }
+:is(.about,.events-page,.team-page,.join-page) .section__label { color: var(--color-gray-600); text-transform: none; letter-spacing: 0; font-size: 13px; }
+:is(.about,.events-page,.team-page,.join-page) .section__label::before { display: none; }
+.events-page .ev-card { border-radius: 0; backdrop-filter: none; background: none; border: 0; border-top: 1px solid #ccd4d3; padding: 32px 0; gap: 50px; }
+.events-page .ev-card--past { opacity: 1; }
+.events-page .ev-card__date-block { background: none; border-radius: 0; align-items: flex-start; min-width: 90px; }
+.events-page .ev-card__month { color: var(--color-gray-600); font-size: 13px; }
+.events-page .ev-card__day { color: var(--color-teal-heading); font-size: 42px; }
+.events-page .ev-card__title { font: 400 clamp(28px,2.6vw,36px)/1.15 var(--font-display); }
+.events-page .ev-card__body { max-width: 820px; }
+.events-page .ev-card__desc { max-width: 710px; font-size: 16px; }
+.events-page .ev-card__format { border: 0; padding-left: 0; font-size: 15px; }
+.events-page .ev-card__actions .btn { border-radius: 0; background: none; border: 0; border-bottom: 1px solid var(--color-teal); padding: 8px 0; color: var(--color-navy); }
+.events-page .ev-card__gcal { font-size: 13px; }
+.events-page .events-page__section-title { text-transform: none; letter-spacing: 0; font-size: 17px; color: var(--color-navy); border: 0; margin-bottom: 8px; }
+.events-page .section { padding-top: 36px; padding-bottom: 65px; }
+.footer.footer { padding: 55px 0 24px; }
+.footer > .container { width: 95.76%; max-width: 1500px; padding-inline: 0; }
+.footer .footer__top { gap: 60px; }
+.footer .footer__cta { background: none; color: var(--color-teal); border-radius: 0; border-bottom: 1px solid var(--color-teal); padding: 0 0 6px; }
+.footer .footer__heading { text-transform: none; letter-spacing: 0; font-size: 14px; }
+.footer .footer__link { font-size: 14px; }
+.footer .footer__bottom { margin-top: 70px; font-size: 11px; }
+@media (max-width: 768px) {
+ .nav .nav__inner, .announcement .announcement__inner, .footer > .container, :is(.about,.events-page,.team-page,.join-page) .container { width: calc(100% - 40px); }
+ .nav .nav__links { display: none; }
+ .announcement .announcement__inner { justify-content: space-between; gap: 6px; flex-wrap: nowrap; }
+ .announcement .announcement__text { font-size: 10px; max-width: 220px; }
+ .announcement .announcement__gcal { font-size: 11px; }
+ .announcement .announcement__dismiss { font-size: 10px; margin-left: 5px; padding: 0; }
+ .announcement .announcement__actions { gap: 6px; }
+ :is(.about,.events-page,.team-page,.join-page) > section:first-child { padding-top: 110px; padding-bottom: 40px; }
+ .events-page .ev-card { flex-direction: column; gap: 18px; }
+ .events-page .ev-card__date-block { flex-direction: row; align-items: baseline; height: auto; gap: 10px; }
+ .events-page .ev-card__day { font-size: 28px; }
+ .footer .footer__top { gap: 40px; }
+ .footer .footer__bottom { margin-top: 40px; }
+}
+.about .value-card, .join-page .reason-card, .join-page .join-faq__item {
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  border-top: 1px solid #ccd4d3;
+  border-radius: 0;
+  padding: 28px 0;
+}
+.about .about__values-grid, .join-page .join-reasons__grid { column-gap: 40px; }
+.team-page .team-card { text-align: left; padding: 28px 0; border-top: 1px solid #ccd4d3; border-radius: 0; }
+.team-page .team-card__avatar { margin-left: 0; border-radius: 0; background: none; color: var(--color-teal-text); justify-content: flex-start; width: auto; height: 32px; }
+.team-page .team-card__name { font: 400 28px/1.2 var(--font-display); }
+.about .btn--ghost { color: var(--color-gray-600); background: transparent; border: 1px solid var(--color-gray-200); }
+.about .btn--ghost:hover { color: var(--color-navy); border-color: var(--color-navy); }

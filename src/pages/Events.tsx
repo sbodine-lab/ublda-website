@@ -94,7 +94,7 @@ export default function Events() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="events-page__headline">
-              Coming up <em className="headline-accent">at UBLDA.</em>
+              Coming up <span>at UBLDA.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
