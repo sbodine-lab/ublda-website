@@ -660,7 +660,7 @@
 
 .brand-accent-demo__text em {
   color: var(--color-teal-text);
-  font-style: italic;
+  font-style: normal;
 }
 
 .brand-accent-demo code {
@@ -817,7 +817,7 @@
 
 .brand-ig-mock__body h3 em {
   color: var(--color-teal);
-  font-style: italic;
+  font-style: normal;
 }
 
 .brand-ig-mock__body p {
@@ -1135,7 +1135,7 @@
 
 .brand-slide-mock__content h3 em {
   color: var(--color-teal);
-  font-style: italic;
+  font-style: normal;
 }
 
 .brand-slide-mock__content p {

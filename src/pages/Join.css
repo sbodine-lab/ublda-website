@@ -10,7 +10,7 @@
 }
 
 .join-page__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal-text);
 }
 
