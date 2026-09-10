@@ -380,7 +380,7 @@
 .community__track {
   display: flex;
   width: max-content;
-  animation: marquee 25s linear infinite;
+  animation: marquee 40s linear infinite;
 }
 
 .community__logo-set {
@@ -410,7 +410,9 @@
 .community__logo-item:nth-child(2) img { height: 54px; }  /* OCCB */
 .community__logo-item:nth-child(3) img { height: 50px; }  /* BLDA */
 .community__logo-item:nth-child(4) img { height: 38px; }  /* Nestidd */
-.community__logo-item:nth-child(5) img { height: 62px; }  /* Arc Thrift */
+.community__logo-item:nth-child(5) img { height: 90px; }  /* Arc Thrift */
+.community__logo-item:nth-child(6) img { height: 36px; }  /* Microsoft */
+.community__logo-item:nth-child(7) img { height: 44px; }  /* WSO */
 
 .community__logo--blda {
   border-radius: var(--radius-sm);
@@ -1039,6 +1041,9 @@
   .community__logo-item:nth-child(2) img { height: 40px; }
   .community__logo-item:nth-child(3) img { height: 36px; }
   .community__logo-item:nth-child(4) img { height: 28px; }
+  .community__logo-item:nth-child(5) img { height: 68px; }
+  .community__logo-item:nth-child(6) img { height: 28px; }
+  .community__logo-item:nth-child(7) img { height: 34px; }
 
   .upcoming-programs {
     padding: var(--space-20) 0;
@@ -1183,4 +1188,27 @@
 .hero__headline .headline-accent {
   display: table;
   margin-top: 0.16em;
+}
+
+/* Keep every organization visible when visitors turn off animation. */
+@media (prefers-reduced-motion: reduce) {
+  .community__marquee {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .community__track {
+    width: 100%;
+    animation: none;
+  }
+
+  .community__logo-set {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .community__logo-set[aria-hidden='true'] {
+    display: none;
+  }
 }

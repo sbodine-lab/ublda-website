@@ -214,6 +214,13 @@ export default function Home() {
                   <img src="/partners-nestidd.png" alt="Nestidd" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
+                  <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores — Fall 2026 client" loading="lazy" decoding="async" />
+                </div>
+                <div className="community__logo-item">
+                  <img src="/partners-microsoft.png" alt="Microsoft — speaker’s organization" loading="lazy" decoding="async" />
+                </div>
+                <div className="community__logo-item">
+                  <img src="/partners-wso.png" alt="Wall Street Oasis — club partner" loading="lazy" decoding="async" />
                 </div>
               </div>
             ))}
