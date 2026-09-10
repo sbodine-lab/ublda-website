@@ -1191,15 +1191,23 @@ html.pc-menu-open .pc-cursor {
   text-wrap: pretty;
 }
 
-.pc-client__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 44px;
-  margin-top: 20px;
-  font-size: 1rem;
-  font-weight: 500;
+.pc-client__name a {
   color: inherit;
+  text-decoration: none;
+}
+
+.pc-client__name a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+.pc-client__name-arrow {
+  display: inline-block;
+  width: 0.3em;
+  height: 0.3em;
+  margin-left: 0.15em;
+  vertical-align: super;
 }
 
 .pc-client__presentation {
@@ -1211,13 +1219,6 @@ html.pc-menu-open .pc-cursor {
   font-size: clamp(1.125rem, 1.5vw, 1.5rem);
   font-weight: 600;
   line-height: 1.45;
-  text-wrap: pretty;
-}
-
-.pc-client__audience {
-  margin-top: 8px;
-  font-size: clamp(1rem, 1.2vw, 1.25rem);
-  line-height: 1.5;
   text-wrap: pretty;
 }
 

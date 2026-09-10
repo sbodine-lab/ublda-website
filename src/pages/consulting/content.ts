@@ -108,9 +108,8 @@ export const CLIENT = {
   name: 'Arc Thrift Stores',
   /* Who they are, and where the work ends up. Sam, Sept 9, 2026: the team
      presents to The Arc's national board at the end of the semester. */
-  desc: 'One of Colorado’s largest employers of people with intellectual and developmental disabilities, funding advocacy in Colorado and New Mexico.',
-  presentation: 'This fall, our team presents to The Arc’s national board.',
-  audience: 'The largest community-based disability organization in the U.S.',
+  desc: 'One of Colorado’s largest employers of people with intellectual and developmental disabilities.',
+  presentation: 'This fall, we present to The Arc’s national board.',
   url: 'https://arcthrift.com',
   /* The two logos read left to right: the national organization first, then
      the Colorado client whose stores fund its local chapters. */
