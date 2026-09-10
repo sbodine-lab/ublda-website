@@ -39,7 +39,7 @@ export default function Team() {
           <Reveal delay={0.1}>
             <h1 className="team-page__headline">
               Meet the<br />
-              <span>executive board.</span>
+              <em className="headline-accent">executive board.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
