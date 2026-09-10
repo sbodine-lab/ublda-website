@@ -1,30 +1,29 @@
 # Mailing-list removal requests
 
-Public page: https://ublda.org/unsubscribe
+Public link: https://ublda.org/unsubscribe
 
-The main site and consulting footers link to this page. It opens a prepared email to sbodine@umich.edu with subject `UBLDA unsubscribe request`. A Gmail compose option is available for visitors without a default mail app. The visitor must send the email; the website does not submit requests or remove members automatically.
+The main site and consulting footers open a Google Form with one required field: UMich uniqname. Submissions are saved in the private [requests Sheet](https://docs.google.com/spreadsheets/d/1pHmVXLBQai5NFtkh4Rv-naVCo5rRIysd_16pd4g1-9U/edit). An installed Apps Script submission trigger emails sbodine@umich.edu with the uniqname and a link to its row.
 
-## Sam's review process
+## Manual removal
 
-1. Search Gmail for `to:sbodine@umich.edu subject:"UBLDA unsubscribe request"`. Also check replies to club emails for removal requests.
-2. Identify the subscribed address from the sender or the address specified in their message.
-3. Remove that address from the [UBLDA MCommunity group](https://mcommunity.umich.edu/group/Undergraduate%20Business%20Leaders%20for%20Diverse%20Abilities), then reload its member list to verify removal. Do this before the next mailing. [U-M instructions](https://documentation.its.umich.edu/node/758).
-4. Record the address and removal date in the Brain so later imports from old signup forms do not add the person again. A new explicit opt-in can supersede the removal.
+1. Open the Sheet from the notification email.
+2. Find the uniqname in the [UBLDA MCommunity group](https://mcommunity.umich.edu/group/Undergraduate%20Business%20Leaders%20for%20Diverse%20Abilities) and remove it.
+3. Verify the member is gone, then check **Removed** in the Sheet. Retain the record so a later import does not add the person back without a new opt-in.
 
-No announcement or automatic reply goes to members. This page cannot add an unsubscribe link to emails already delivered.
+A blank Removed checkbox means removal is still pending. Email sent records when the notification was sent, not when the member was removed. The row marked TEST is setup verification and requires no action.
 
-## Footer for future club emails
+The script sends notifications only to Sam. It does not remove MCommunity members, send member confirmations, or send announcements. Google Forms saves responses even if an email notification fails; check the Sheet before each mailing and review Apps Script failure notices.
 
-HTML:
+## Maintenance
 
-```html
-<a href="https://ublda.org/unsubscribe">Unsubscribe from UBLDA emails</a>
-```
+- [Edit form](https://docs.google.com/forms/d/1f8ythd7hqG6DbJMUR-AEe8W-uHUFRM_mMsRgpT9MLAQ/edit)
+- [Apps Script project](https://script.google.com/home/projects/1V1i-pcqYxNXo2zsEZ6iA3VzKXiGBR_OUFiMyt0o9VwlodVxrCVavFzkA/edit)
+- Trigger: notifyRemoval, from spreadsheet, on form submit, owned by sbodine@umich.edu.
+- Form responder access: anyone with the link. Form editor and Sheet access remain restricted.
+- The script runs independently of the website deployment. Editing or deploying the website does not update it.
 
-Plain text:
+## Future email footer
 
-```
 To leave the mailing list: https://ublda.org/unsubscribe
-```
 
-Add this to the next regular email, preserving its existing copy and inline images. The link opens a manual removal-request page; it is not an automatic one-click unsubscribe endpoint.
+Add this to the next regular email. The form submits a request for manual removal; it is not an automatic one-click unsubscribe endpoint. It cannot change emails already delivered.
