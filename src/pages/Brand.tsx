@@ -178,11 +178,8 @@ export default function Brand() {
           </div>
 
           <div className="brand-tip">
-            <strong>Upright type and teal accents:</strong> On the website, we style select words in <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}>upright teal</em> using Instrument Serif
-            for the main heading, paired with heavier upright Plus Jakarta Sans phrases and a subtle teal underline. Large text uses brighter teal (#368981); small text keeps darker teal for readability. The homepage mission line “We bring that conversation to Ross.” is the one italic exception. Otherwise, keep type upright, including key words like
-            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> inclusion</em>,
-            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> belonging</em>,
-            <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> for everyone</em>.
+            <strong>Editorial website direction:</strong> Use large, undistorted photographs with small captions, generous margins, and quiet navigation. Set headlines in upright Instrument Serif and body copy in Plus Jakarta Sans. Avoid repeated colored words and highlight effects. Reserve brighter teal (#368981) for large text and use darker teal for small links. The homepage line “We bring that conversation to Ross.” remains italic.
+
           </div>
         </div>
       </section>

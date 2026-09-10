@@ -6,6 +6,7 @@ import { CONSULTING_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Table from './pages/Table'
+import './styles/editorial.css'
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 
 const About = lazy(() => import('./pages/About'))

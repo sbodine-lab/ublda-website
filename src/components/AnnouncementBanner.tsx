@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import './AnnouncementBanner.css'
 
 import { APPLY_DEADLINE_AT_MS, APPLY_OPENS_AT_MS } from '../lib/applyForm'
-import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 
 const CONSULTING_PAGE = '/consulting'
 const STORAGE_KEY = 'ublda-fall-2026-consulting-banner-dismissed'
@@ -78,26 +77,12 @@ export default function AnnouncementBanner() {
     <div className="announcement" ref={bannerRef} role="region" aria-label="Fall 2026 sign-up">
       <div className="announcement__inner container">
         <div className="announcement__text">
-          <span>Fall 2026 membership sign-up is open. Consulting applications close Sept 20.</span>
-          <span className="announcement__countdown">
-            <span className="announcement__countdown-unit">
-              <span className="announcement__countdown-num">{timeLeft.days}</span>d
-            </span>
-            <span className="announcement__countdown-unit">
-              <span className="announcement__countdown-num">{timeLeft.hours}</span>h
-            </span>
-            <span className="announcement__countdown-unit">
-              <span className="announcement__countdown-num">{timeLeft.minutes}</span>m
-            </span>
-          </span>
+          <span>Fall consulting applications close September 20.</span>
+
         </div>
         <div className="announcement__actions">
-          <a href={MEMBERSHIP_FORM_URL} target="_blank" rel="noopener noreferrer" className="announcement__rsvp">
-            Join UBLDA
-            <span className="sr-only"> (interest form, opens in a new tab)</span>
-          </a>
           <Link to={CONSULTING_PAGE} className="announcement__gcal">
-            UBLDA Consulting
+            Apply ↗
           </Link>
           <button onClick={handleDismiss} className="announcement__dismiss">
             Hide

@@ -64,7 +64,7 @@ export default function Join() {
           <Reveal delay={0.1}>
             <h1 className="join-page__headline">
               Join<br />
-              <em className="headline-accent">UBLDA.</em>
+              <span>UBLDA.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
