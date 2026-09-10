@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import './Unsubscribe.css'
 
 const recipient = 'sbodine@umich.edu'
@@ -12,11 +11,9 @@ export default function Unsubscribe() {
     <main id="main-content" className="unsubscribe-page">
       <div className="container">
         <div className="unsubscribe-page__content">
-          <p className="section__label">Email preferences</p>
           <h1>Leave the mailing list</h1>
           <p className="unsubscribe-page__intro">
-            To stop receiving UBLDA emails, send a removal request to Sam Bodine.
-            No explanation needed.
+            Send an email from the address you’d like removed.
           </p>
           <div className="unsubscribe-page__actions">
             <a href={mailto} className="btn btn--primary">Email a removal request</a>
@@ -24,16 +21,7 @@ export default function Unsubscribe() {
               Open in Gmail<span className="sr-only"> (opens in a new tab)</span>
             </a>
           </div>
-          <p className="unsubscribe-page__note">
-            These links open a prepared email. Send it from the address that receives
-            UBLDA updates, or include that address in your message. Sam will remove
-            it manually; opening this page does not unsubscribe you.
-          </p>
-          <div className="unsubscribe-page__fallback">
-            <p>You can also write directly to <a href={mailto}>{recipient}</a> with
-              the subject <strong>UBLDA unsubscribe request</strong>.</p>
-          </div>
-          <Link to="/" className="unsubscribe-page__back">Back to UBLDA</Link>
+
         </div>
       </div>
     </main>
