@@ -67,7 +67,7 @@ export function startMotion(root: HTMLElement, onMode: (mode: MotionMode) => voi
     lenis = new Lenis({
       duration: 1.2,
       easing: (t) => 1 - Math.pow(1 - t, 3),
-      wheelMultiplier: 0.8,
+      wheelMultiplier: 0.9,
       touchMultiplier: 1.2,
       /* Touch stays native: momentum, overscroll, and the address bar all
          behave as people expect, and ScrollTrigger reads the real scroll. */
