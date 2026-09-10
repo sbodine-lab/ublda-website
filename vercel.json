@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
+      "source": "/unsubscribe",
+      "destination": "https://docs.google.com/forms/d/e/1FAIpQLScSq8U2oX98HTT-MYoWQwZ1FcZ0Ok0pmnW7zM9LVsfAkYKCFA/viewform",
+      "permanent": false
+    },
+    {
       "source": "/join",
       "destination": "https://forms.gle/yVfh88HYh5xsMb4P8",
       "permanent": false
