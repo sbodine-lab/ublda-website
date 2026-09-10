@@ -92,7 +92,7 @@
   bottom: 0;
   transform: rotateX(180deg);
   justify-content: center;
-  font-style: italic;
+  font-style: normal;
   letter-spacing: 0;
 }
 
@@ -189,7 +189,7 @@
 }
 
 .hero__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal-text);
 }
 
@@ -311,7 +311,7 @@
 }
 
 .partnership__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal-text);
 }
 
@@ -446,7 +446,7 @@
 }
 
 .upcoming__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal);
 }
 
@@ -482,7 +482,7 @@
   margin-top: var(--space-8);
   font-size: var(--text-base);
   color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
+  font-style: normal;
   max-width: 560px;
 }
 
@@ -503,7 +503,7 @@
 }
 
 .recruiting-events__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal-text);
 }
 
@@ -826,7 +826,7 @@
 }
 
 .cta__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal);
 }
 

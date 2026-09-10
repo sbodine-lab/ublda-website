@@ -293,3 +293,15 @@ strong, b {
     @apply font-sans;
   }
 }
+
+/* Upright type and a small brand rule carry the public heading hierarchy. */
+em, i { font-style: normal; }
+
+:is(.hero__headline, .about__headline, .events-page__headline, .team-page__headline, .join-page__headline)::after {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 3px;
+  margin-top: 1.25rem;
+  background: var(--color-teal);
+}

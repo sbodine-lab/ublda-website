@@ -11,7 +11,7 @@
 }
 
 .events-page__headline em {
-  font-style: italic;
+  font-style: normal;
   color: var(--color-teal-text);
 }
 
@@ -231,3 +231,12 @@
     font-size: var(--text-base);
   }
 }
+
+.ev-card__format {
+  margin-bottom: var(--space-6);
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-teal);
+  color: var(--color-navy);
+  line-height: var(--leading-normal);
+}
+.ev-card__actions { flex-wrap: wrap; }

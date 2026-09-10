@@ -15,9 +15,25 @@ interface Event {
   tags?: string[]
   past?: boolean
   rsvpUrl?: string
+  formatNote?: string
+  timezone?: string
 }
 
 const events: Event[] = [
+  {
+    date: 'October 1, 2026',
+    month: 'Oct',
+    day: '1',
+    time: '7:00 PM - 8:00 PM',
+    timezone: 'America/Detroit',
+    title: 'A conversation with Alli Hirt, Microsoft',
+    host: 'UBLDA',
+    description:
+      'Join Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft, for a conversation about her career and accessibility in the products people use every day. Two student moderators will lead the discussion, followed by audience Q&A. Attendance is free; RSVP to receive room details the week of the event and submit a question for Alli.',
+    formatNote: 'Students gather in person at Ross. Alli joins live by video from Seattle and will not be on campus.',
+    location: 'Ross School of Business, 701 Tappan Avenue. Room details emailed the week of the event.',
+    rsvpUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScB4BYm2kkqSO5Q9n6j5BrV8Xxtb1k3MZi00plC3HnvRXMeiw/viewform',
+  },
   {
     date: 'April 16, 2026',
     month: 'Apr',
@@ -78,7 +94,7 @@ export default function Events() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="events-page__headline">
-              What we've <em>been up to.</em>
+              Coming up <em>at UBLDA.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
@@ -154,10 +170,11 @@ function EventCard({ event }: { event: Event }) {
         <span className="ev-card__day">{event.day}</span>
       </div>
       <div className="ev-card__body">
-        {event.time && <p className="ev-card__time">{event.time}</p>}
+        {event.time && <p className="ev-card__time">{event.date} · {event.time}{event.timezone ? ' ET' : ''}</p>}
         <h3 className="ev-card__title">{event.title}</h3>
         {event.host && <p className="ev-card__host">Hosted by {event.host}</p>}
         <p className="ev-card__desc">{event.description}</p>
+        {event.formatNote && <p className="ev-card__format">{event.formatNote}</p>}
         <div className="ev-card__footer">
           <span className="ev-card__location">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 0 1 4.5 4.5c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5z" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.2"/></svg>
@@ -169,14 +186,14 @@ function EventCard({ event }: { event: Event }) {
                 href={event.rsvpUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ev-card__gcal"
+                className="btn btn--primary"
               >
                 RSVP
               </a>
             )}
             {!event.past && (
               <a
-                href={buildGCalUrl(event)}
+                href={buildGCalUrl({ ...event, description: [event.description, event.formatNote, event.rsvpUrl ? `RSVP: ${event.rsvpUrl}` : undefined].filter(Boolean).join('\n\n') })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ev-card__gcal"

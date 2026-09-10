@@ -17,6 +17,7 @@ export type MarketingCalendarEvent = {
   date: string
   /** "7:00 PM - 8:00 PM". Absent means an all-day entry. */
   time?: string
+  timezone?: string
   title: string
   description: string
   location: string
@@ -60,6 +61,8 @@ export function buildGCalUrl(event: MarketingCalendarEvent): string {
     details: event.description,
     location: event.location,
   })
+
+  if (event.timezone) params.set('ctz', event.timezone)
 
   return `${GCAL_RENDER}?${params.toString()}`
 }

@@ -25,7 +25,7 @@
 .craftadmin__note {
   display: block;
   margin-top: 2px;
-  font-style: italic;
+  font-style: normal;
   color: var(--color-gray-400);
 }
 

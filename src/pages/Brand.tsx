@@ -128,7 +128,7 @@ export default function Brand() {
               </p>
               <div className="brand-type-card__specimen">
                 <span style={{ fontSize: 'var(--type-lg)' }}>Aa</span>
-                <span style={{ fontSize: 'var(--type-lg)', fontStyle: 'italic' }}>Aa</span>
+                <span style={{ fontSize: 'var(--type-lg)', fontStyle: 'normal' }}>Aa</span>
                 <span className="brand-type-card__chars">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</span>
               </div>
             </div>
@@ -178,8 +178,8 @@ export default function Brand() {
           </div>
 
           <div className="brand-tip">
-            <strong>Teal italic pattern:</strong> On the website, we style select words in <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}>teal italic</em> using Instrument Serif
-            to add emphasis. Use this same pattern in social posts and slides for key words like
+            <strong>Upright type and teal accents:</strong> On the website, we style select words in <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}>upright teal</em> using Instrument Serif
+            to add emphasis, with a short teal rule below main page headings. The homepage mission line “We bring that conversation to Ross.” is the one italic exception. Otherwise, keep type upright, including key words like
             <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> inclusion</em>,
             <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> belonging</em>,
             <em style={{ color: 'var(--color-teal-text)', fontFamily: 'var(--font-display)' }}> for everyone</em>.
@@ -301,7 +301,7 @@ export default function Brand() {
               A student community focused on{' '}
               <em>disability in business</em>.
             </h3>
-            <code>Instrument Serif italic in text teal (#326D69) on light backgrounds; logo teal (#67B8B3) on navy</code>
+            <code>Upright Instrument Serif in text teal (#326D69) on light backgrounds; logo teal (#67B8B3) on navy</code>
           </div>
         </div>
       </section>
@@ -375,7 +375,7 @@ export default function Brand() {
                 <h4>Event Announcement</h4>
                 <ul>
                   <li>Navy background (#0A3658)</li>
-                  <li>Instrument Serif headline, teal italic for speaker/topic</li>
+                  <li>Instrument Serif headline, upright teal for speaker/topic</li>
                   <li>Date + location in Plus Jakarta Sans</li>
                   <li>Logo + wordmark in bottom corner</li>
                   <li>Keep it minimal - one event per post</li>
@@ -399,7 +399,7 @@ export default function Brand() {
                 <ul>
                   <li>Cream background (#FAF9F6)</li>
                   <li>Navy Instrument Serif text, centered</li>
-                  <li>Teal italic for key phrase</li>
+                  <li>Upright teal for key phrase</li>
                   <li>Logo at bottom</li>
                   <li>Great for quotes, stats, mission statements</li>
                 </ul>
@@ -451,7 +451,7 @@ export default function Brand() {
                 <ul>
                   <li>Cream or navy background</li>
                   <li>Bold Instrument Serif headline</li>
-                  <li>Teal italic for key phrase</li>
+                  <li>Upright teal for key phrase</li>
                   <li>"Swipe" indicator in Plus Jakarta Sans</li>
                   <li>Interior slides: one idea per slide, numbered</li>
                   <li>Final slide: CTA ("Follow @michiganublda for event updates")</li>
@@ -465,7 +465,7 @@ export default function Brand() {
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#0A3658', color: '#fff' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
-                  Navy + <span style={{ color: '#67B8B3', fontStyle: 'italic' }}>Teal</span>
+                  Navy + <span style={{ color: '#67B8B3', fontStyle: 'normal' }}>Teal</span>
                 </span>
               </div>
               <span>Primary combo - most posts</span>
@@ -473,7 +473,7 @@ export default function Brand() {
             <div className="brand-combo">
               <div className="brand-combo__preview" style={{ background: '#FAF9F6', color: '#0A3658' }}>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--type-md)' }}>
-                  Cream + <span style={{ color: 'var(--color-teal-text)', fontStyle: 'italic' }}>Teal</span>
+                  Cream + <span style={{ color: 'var(--color-teal-text)', fontStyle: 'normal' }}>Teal</span>
                 </span>
               </div>
               <span>Light/clean - quotes, stats</span>
@@ -626,7 +626,7 @@ export default function Brand() {
               </div>
               <span className="brand-slide-mock__label">Section Divider</span>
               <div className="brand-slide-mock__spec">
-                Navy bg, large Instrument Serif text, teal italic accent word
+                Navy bg, large Instrument Serif text, upright teal accent word
               </div>
             </div>
 
@@ -653,7 +653,7 @@ export default function Brand() {
                 <li>Use large type (min 24px body, 48px+ headings)</li>
                 <li>Use plenty of white space</li>
                 <li>Add the UBLDA logo on the first and last slide</li>
-                <li>Use teal italic for emphasis words</li>
+                <li>Use upright teal for emphasis words</li>
               </ul>
             </div>
             <div className="brand-rule brand-rule--dont">
