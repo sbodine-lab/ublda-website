@@ -53,6 +53,10 @@ const upcoming = [
     desc: `Our first client is Arc Thrift Stores of Colorado. Consulting applications run ${APPLY_WINDOW_PROSE}; no consulting experience is required.`,
   },
   {
+    title: 'Education',
+    desc: 'Educational programming is in active development across finance, consulting, and other business functions, with a focus on disability and impact.',
+  },
+  {
     title: 'Speaker Series',
     desc: 'Hear from business leaders about disability in their work. Past speakers include Lloyd Lewis of Arc Thrift Stores and Andrew Parker of Nestidd.',
   },
