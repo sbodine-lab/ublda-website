@@ -12,7 +12,7 @@
 
 .about__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .about__intro {

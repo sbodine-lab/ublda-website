@@ -12,7 +12,7 @@
 
 .events-page__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .events-page__intro {

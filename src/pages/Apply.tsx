@@ -134,7 +134,7 @@ export default function Apply() {
           <Reveal delay={0.1}>
             <h1 className="join-page__headline">
               Join the fall<br />
-              <em>consulting team.</em>
+              <em className="headline-accent">consulting team.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>

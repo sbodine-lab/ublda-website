@@ -294,14 +294,17 @@ strong, b {
   }
 }
 
-/* Upright type and a small brand rule carry the public heading hierarchy. */
+/* Serif headings pair with a heavier sans-serif phrase. */
 em, i { font-style: normal; }
 
-:is(.hero__headline, .about__headline, .events-page__headline, .team-page__headline, .join-page__headline)::after {
-  content: '';
-  display: block;
-  width: 3rem;
-  height: 3px;
-  margin-top: 1.25rem;
-  background: var(--color-teal);
+.headline-accent {
+  font-family: var(--font-body);
+  font-size: 0.82em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  background-image: linear-gradient(transparent 87%, var(--color-teal-muted) 87%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-bottom: 0.06em;
 }
