@@ -186,10 +186,6 @@ function HomeBody() {
                 <ArrowUpRight className="pc-client__name-arrow" aria-hidden="true" strokeWidth={1.5} />
               </a>
             </h2>
-            <p className="pc-client__desc">{CLIENT.desc}</p>
-            <div className="pc-client__presentation">
-              <p className="pc-client__presentation-title">{CLIENT.presentation}</p>
-            </div>
           </div>
           <div className="pc-client__logos">
             {CLIENT.logos.map((l, i) => (

@@ -1121,7 +1121,7 @@ html.pc-menu-open .pc-cursor {
   --pc-mask: 1.4%;
   position: relative;
   min-height: 100svh;
-  padding: clamp(100px, 12svh, 160px) 6vw clamp(48px, 7svh, 96px);
+  padding: clamp(96px, 10svh, 144px) 6vw;
   width: 100%;
   display: flex;
   align-items: center;
@@ -1157,12 +1157,12 @@ html.pc-menu-open .pc-cursor {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
-  column-gap: 5vw;
+  justify-items: center;
   row-gap: clamp(40px, 7svh, 100px);
   width: 100%;
-  text-align: left;
+  text-align: center;
   color: #0A3658;
 }
 
@@ -1174,21 +1174,13 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-client__name {
-  max-width: 12ch;
+  max-width: none;
   font-size: clamp(3.5rem, 7vw, 8.5rem);
   font-weight: 400;
   line-height: 1.02;
   letter-spacing: -0.055em;
   text-wrap: balance;
-  margin-bottom: clamp(24px, 3svh, 40px);
-}
-
-.pc-client__desc {
-  font-size: clamp(1rem, 1.35vw, 1.375rem);
-  font-weight: 400;
-  line-height: 1.6;
-  max-width: 48ch;
-  text-wrap: pretty;
+  margin: 0;
 }
 
 .pc-client__name a {
@@ -1210,20 +1202,9 @@ html.pc-menu-open .pc-cursor {
   vertical-align: super;
 }
 
-.pc-client__presentation {
-  max-width: 48ch;
-  margin-top: clamp(24px, 3svh, 40px);
-}
-
-.pc-client__presentation-title {
-  font-size: clamp(1.125rem, 1.5vw, 1.5rem);
-  font-weight: 600;
-  line-height: 1.45;
-  text-wrap: pretty;
-}
-
 .pc-client__stats {
   grid-column: 1 / -1;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 32px;
@@ -1236,6 +1217,7 @@ html.pc-menu-open .pc-cursor {
 .pc-client__stat {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
@@ -1919,7 +1901,7 @@ html.pc-menu-open .pc-cursor {
 
   .pc-client {
     min-height: 100svh;
-    padding: 96px 6vw 48px;
+    padding: 80px 6vw;
   }
 
   .pc-client__label {
@@ -1933,7 +1915,7 @@ html.pc-menu-open .pc-cursor {
 
   .pc-client__name {
     font-size: clamp(3rem, 11.5vw, 5.5rem);
-    max-width: 12ch;
+    max-width: none;
   }
 
   .pc-client__stats {
@@ -1951,7 +1933,6 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-client__logos {
-    justify-content: flex-start;
     gap: 48px;
   }
 
