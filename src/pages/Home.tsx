@@ -53,10 +53,6 @@ const upcoming = [
     desc: `Our first client is Arc Thrift Stores of Colorado. Consulting applications run ${APPLY_WINDOW_PROSE}; no consulting experience is required.`,
   },
   {
-    title: 'Education & Mentorship Plans',
-    desc: 'We’re developing business workshops and a peer mentorship program with BLDA’s MBA students. We’ll share details with members as plans are confirmed.',
-  },
-  {
     title: 'Speaker Series',
     desc: 'Hear from business leaders about disability in their work. Past speakers include Lloyd Lewis of Arc Thrift Stores and Andrew Parker of Nestidd.',
   },
