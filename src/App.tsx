@@ -20,6 +20,7 @@ const ConsultingServices = lazy(() => import('./pages/consulting/Services'))
 const ConsultingPartners = lazy(() => import('./pages/consulting/Partners'))
 const ConsultingContact = lazy(() => import('./pages/consulting/Contact'))
 const Join = lazy(() => import('./pages/Join'))
+const Unsubscribe = lazy(() => import('./pages/Unsubscribe'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
 const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
@@ -97,7 +98,7 @@ export default function App() {
           Skip to main content
         </a>
       )}
-      {!inStandalone && <AnnouncementBanner />}
+      {!inStandalone && pathname !== '/unsubscribe' && <AnnouncementBanner />}
       {!inStandalone && <Nav />}
       <ScrollToTop enabled={!inStandalone} />
       <Suspense fallback={<PageFallback />}>
@@ -117,6 +118,7 @@ export default function App() {
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
+          <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/apply" element={<ExternalRedirect to={CONSULTING_FORM_URL} />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />

@@ -53,6 +53,7 @@ export default function Footer() {
             University of Michigan &middot; Stephen M. Ross School of Business
           </p>
           <div className="footer__utility">
+            <Link to="/unsubscribe" className="footer__a11y-link">Unsubscribe from emails</Link>
             <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support" className="footer__a11y-link">Accessibility support</a>
             <Link to="/workspace" className="footer__leadership-link">
               Leadership login
