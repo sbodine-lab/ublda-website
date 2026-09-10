@@ -39,7 +39,7 @@
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-navy-deep);
-  background: var(--color-gold);
+  background: var(--color-teal);
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);
   letter-spacing: var(--tracking-wide);
@@ -70,7 +70,7 @@
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
-  color: var(--color-gold);
+  color: var(--color-teal);
   margin-bottom: var(--space-3);
 }
 
