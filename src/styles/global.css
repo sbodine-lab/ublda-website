@@ -294,4 +294,17 @@ strong, b {
   }
 }
 
+/* Serif headings pair with a heavier sans-serif phrase. */
 em, i { font-style: normal; }
+
+.headline-accent {
+  font-family: var(--font-body);
+  font-size: 0.82em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  background-image: linear-gradient(transparent 87%, var(--color-teal-muted) 87%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-bottom: 0.06em;
+}

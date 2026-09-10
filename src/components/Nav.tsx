@@ -10,6 +10,22 @@ const publicLinks = [
   { label: 'Consulting', path: '/consulting' },
 ]
 
+function NavLetters({ text }: { text: string }) {
+  return (
+    <>
+      {text.split('').map((char, i) => (
+        <span
+          key={i}
+          className="nav__letter"
+          style={{ '--i': i } as React.CSSProperties}
+        >
+          {char}
+        </span>
+      ))}
+    </>
+  )
+}
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -53,7 +69,7 @@ export default function Nav() {
         <Link to="/" className="nav__logo">
           <img src="/logo-64.png" alt="" className="nav__logo-img" width="63" height="64" />
           <span className="nav__logo-text">
-            UBLDA
+            <NavLetters text="UBLDA" />
           </span>
         </Link>
 
@@ -66,7 +82,7 @@ export default function Nav() {
               aria-current={isCurrent(link.path) ? 'page' : undefined}
               onClick={() => setMobileOpen(false)}
             >
-              {link.label}
+              <NavLetters text={link.label} />
             </Link>
           ))}
         </nav>

@@ -42,6 +42,10 @@ export default function Footer() {
           </div>
         </div>
 
+        <div className="footer__brand-mark" aria-hidden="true">
+          <span data-text="UBLDA" />
+        </div>
+
         <div className="footer__bottom">
           <p>&copy; {new Date().getFullYear()} UBLDA</p>
           <p className="footer__affiliation">

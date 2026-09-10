@@ -33,7 +33,7 @@ export default function About() {
           </Reveal>
           <Reveal delay={0.1}>
             <h1 className="about__headline">
-              A student community focused on <span>disability in business.</span>
+              A student community focused on <em className="headline-accent">disability in business.</em>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
