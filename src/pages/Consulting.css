@@ -1321,7 +1321,9 @@ html.pc-menu-open .pc-cursor {
 
 .pc-marquee__set {
   flex-shrink: 0;
-  width: fit-content;
+  /* Each repeated set must include all logos and gaps in its width. A
+     fit-content set shrinks to the viewport and overlaps the next copy. */
+  width: max-content;
   display: flex;
   align-items: center;
   gap: 10vw;
@@ -1330,6 +1332,7 @@ html.pc-menu-open .pc-cursor {
 }
 
 .pc-marquee__set img {
+  flex-shrink: 0;
   width: 9vw;
   height: 9vw;
   padding: 1vw;
@@ -1346,6 +1349,20 @@ html.pc-menu-open .pc-cursor {
 .pc-marquee__set img:hover {
   filter: none;
   opacity: 1;
+}
+
+/* Reduced-motion visitors need a complete static list, not the first few
+   logos clipped out of a stopped, repeated marquee. */
+.pc--reduced .pc-marquee__set {
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 7vw;
+}
+
+.pc--reduced .pc-marquee__set ~ .pc-marquee__set {
+  display: none;
 }
 
 @keyframes pc-slide {
@@ -1709,7 +1726,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-nav__apply {
-    min-height: 32px;
+    min-height: 44px;
     padding: 0 0.8em;
     font-size: 0.66rem;
   }
@@ -1723,6 +1740,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-dotbtn {
+    min-height: 44px;
     gap: 0.6rem;
     margin-top: 1.5rem;
   }
@@ -1973,8 +1991,9 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-marquee__set img {
-    width: 18vw;
-    height: 18vw;
+    width: clamp(88px, 24vw, 140px);
+    height: clamp(88px, 24vw, 140px);
+    padding: 10px;
   }
 
   .pc-cta {
@@ -4245,8 +4264,19 @@ html.pc-menu-open .pc-cursor {
     padding-top: 1.4rem;
   }
 
+  .pcc-field input,
+  .pcc-field select,
+  .pcc-field textarea {
+    min-height: 44px;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
   .pcc-field > label {
-    top: 1.9rem;
+    top: 2.025rem;
+    font-size: 1rem;
   }
 
   .pcc-field input:focus + label,
@@ -4257,7 +4287,7 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pcc-field__chev {
-    top: 2.1rem;
+    top: 2.275rem;
   }
 
   .pcc-jobs__title {

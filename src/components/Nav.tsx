@@ -66,7 +66,7 @@ export default function Nav() {
   return (
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`} ref={rootRef}>
       <div className="nav__inner container">
-        <Link to="/" className="nav__logo">
+        <Link to="/" className="nav__logo" aria-label="UBLDA home">
           <img src="/logo-64.png" alt="" className="nav__logo-img" width="63" height="64" />
           <span className="nav__logo-text">
             <NavLetters text="UBLDA" />
