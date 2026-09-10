@@ -11,7 +11,7 @@
 
 .team-page__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .team-page__intro {

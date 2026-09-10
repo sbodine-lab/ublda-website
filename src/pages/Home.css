@@ -190,7 +190,7 @@
 
 .hero__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .hero__sub {
@@ -236,7 +236,7 @@
 
 .mission__headline em {
   font-style: italic;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 /* ═══════════════════════════════════════
@@ -312,7 +312,7 @@
 
 .partnership__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .partnership__desc {
@@ -504,7 +504,7 @@
 
 .recruiting-events__headline em {
   font-style: normal;
-  color: var(--color-teal-text);
+  color: var(--color-teal-heading);
 }
 
 .recruiting-events__grid {
@@ -1178,4 +1178,9 @@
     font-size: var(--type-sm);
     margin-bottom: var(--space-3);
   }
+}
+
+.hero__headline .headline-accent {
+  display: table;
+  margin-top: 0.16em;
 }

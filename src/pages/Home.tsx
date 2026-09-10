@@ -91,9 +91,8 @@ export default function Home() {
         <div className="container">
           <div className="hero__content">
             <h1 className="hero__headline hero__entrance hero__entrance--headline">
-              Undergraduate Business Leaders{' '}
-              <em>for</em>{' '}
-              Diverse Abilities
+              Undergraduate Business Leaders for{' '}
+              <em className="headline-accent">Diverse Abilities</em>
             </h1>
 
             <p className="hero__sub hero__entrance hero__entrance--sub">
@@ -161,7 +160,7 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.1}>
                 <h2 className="partnership__headline">
-                  Partnered with <em>BLDA</em> at Ross
+                  Partnered with <em className="headline-accent">BLDA</em> at Ross
                 </h2>
               </Reveal>
               <Reveal delay={0.2}>
@@ -229,7 +228,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="upcoming__headline">
-              What we’re <em>working on.</em>
+              What we’re <em className="headline-accent">working on.</em>
             </h2>
           </Reveal>
           <RevealStagger className="upcoming__grid">
@@ -251,7 +250,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="recruiting-events__headline">
-              Get involved <em>this fall.</em>
+              Get involved <em className="headline-accent">this fall.</em>
             </h2>
           </Reveal>
           <RevealStagger className="recruiting-events__grid">
@@ -346,7 +345,7 @@ export default function Home() {
             <Reveal>
               <h2 className="cta__headline">
                 Get involved in<br />
-                <em>disability inclusion at Ross.</em>
+                <em className="headline-accent">disability inclusion at Ross.</em>
               </h2>
             </Reveal>
             <Reveal delay={0.15}>

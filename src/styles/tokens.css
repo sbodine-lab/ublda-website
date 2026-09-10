@@ -5,6 +5,7 @@
   --color-navy-deep:  #07263E;
   --color-navy-light: #234D6B;
   --color-teal:       #67B8B3;
+  --color-teal-heading: #368981; /* brighter teal for large headings */
   --color-teal-text:  #326D69;  /* text on cream; logo teal is reserved for accents */
   --color-teal-soft:  #67B8B318;
   --color-teal-muted: #67B8B340;
