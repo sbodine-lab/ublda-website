@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MeshGradient } from '@paper-design/shaders-react'
+import { GrainGradient } from '@paper-design/shaders-react'
 import { ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL } from '../lib/forms'
 import {
@@ -21,7 +21,7 @@ import { HeroBackdrop } from './consulting/HeroBackdrop'
 import { useConsultingUi } from './consulting/context'
 import './Consulting.css'
 
-const CLIENT_COLORS = ['#faf9f6', '#e5ece5', '#b8cec3', '#ede8dc']
+const CLIENT_COLORS = ['#0A3658', '#D2A54B', '#67B8B3']
 
 function Words({ text, className }: { text: string; className: string }) {
   return (
@@ -51,7 +51,7 @@ function StatementBody({ ghost = false }: { ghost?: boolean }) {
 function HomeBody() {
   const { mode, reducedMotion } = useConsultingUi()
   const [openService, setOpenService] = useState<string | null>(null)
-  const shaderSpeed = reducedMotion ? 0 : 0.12
+  const shaderSpeed = reducedMotion ? 0 : 0.65
   const isStatic = mode === 'static'
 
   return (
@@ -161,14 +161,17 @@ function HomeBody() {
       {/* 5 · Client */}
       <section className="pc-client" id="consulting-clients" aria-labelledby="pc-client-name">
         <div className="pc-client__media" aria-hidden="true">
-          <MeshGradient
+          <GrainGradient
             colors={CLIENT_COLORS}
-            distortion={0.25}
-            swirl={0.08}
-            grainMixer={0}
-            grainOverlay={0.025}
-            scale={0.85}
+            colorBack="#FAF9F6"
+            shape="wave"
+            softness={0.8}
+            intensity={0.32}
+            noise={0.22}
+            scale={1.15}
+            rotation={-25}
             speed={shaderSpeed}
+            frame={12000}
             minPixelRatio={1}
             maxPixelCount={1400000}
             style={{ width: '100%', height: '100%' }}
