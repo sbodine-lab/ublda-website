@@ -107,7 +107,7 @@ export default function Table() {
             <div className="tb-qrwrap">
               <Qr qr={QR_CONSULTING} label="QR code that opens ublda.org/consulting" />
             </div>
-            <p className="tb-card__note">Closes Sept 20</p>
+            <p className="tb-card__note">Closes Sept 21</p>
           </section>
 
           <section className="tb-card" aria-labelledby="tb-join">

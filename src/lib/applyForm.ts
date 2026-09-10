@@ -4,14 +4,14 @@
 
 export const APPLY_TERM_LABEL = 'Fall 2026'
 export const APPLY_OPENS_LABEL = 'Wednesday, September 2 at 12:00 PM ET'
-export const APPLY_DEADLINE_LABEL = 'Sunday, September 20 at 11:30 PM ET'
+export const APPLY_DEADLINE_LABEL = 'Monday, September 21 at 11:30 PM ET'
 
 /* The application and membership sign-up both open Wednesday Sep 2 at 12 PM ET
-   (ahead of Festifall that afternoon), and the application closes Sunday Sep 20
+   (ahead of Festifall that afternoon), and the application closes Monday Sep 21
    at 11:30 PM ET with a small server-side grace period. Times below are UTC. */
 export const APPLY_OPENS_AT_MS = Date.UTC(2026, 8, 2, 16, 0, 0) // Sep 2, 12:00 PM ET
-export const APPLY_DEADLINE_AT_MS = Date.UTC(2026, 8, 21, 3, 30, 0) // Sep 20, 11:30 PM ET (public deadline)
-export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 21, 3, 59, 0) // Sep 20, 11:59 PM ET (grace past the 11:30 label)
+export const APPLY_DEADLINE_AT_MS = Date.UTC(2026, 8, 22, 3, 30, 0) // Sep 21, 11:30 PM ET (public deadline)
+export const APPLY_CLOSES_AT_MS = Date.UTC(2026, 8, 22, 3, 59, 0) // Sep 21, 11:59 PM ET (grace past the 11:30 label)
 
 /* Membership (the /join form) opens at the same moment as the application. */
 export const MEMBERSHIP_OPENS_AT_MS = APPLY_OPENS_AT_MS
@@ -21,10 +21,10 @@ export const MEMBERSHIP_OPENS_LABEL = 'Wednesday, September 2 at 12:00 PM ET'
    consulting sub-site all render these. They drifted apart once — the homepage
    kept advertising Sept 9–20 and an 11:59 PM close after the dates moved — so
    every surface reads them from here instead of hardcoding its own copy. */
-export const APPLY_WINDOW_SHORT = 'Sept 2–20'
-export const APPLY_WINDOW_PROSE = 'September 2–20'
+export const APPLY_WINDOW_SHORT = 'Sept 2–21'
+export const APPLY_WINDOW_PROSE = 'September 2–21'
 export const APPLY_OPENS_PROSE = 'September 2'
-export const APPLY_CLOSES_PROSE = 'September 20'
+export const APPLY_CLOSES_PROSE = 'September 21'
 export const APPLY_CLOSE_TIME_SHORT = 'closes 11:30 PM ET'
 export const INTERVIEW_WINDOW_SHORT = 'Sept 25–27'
 export const OFFERS_SHORT = 'By Tuesday, Sept 29'
