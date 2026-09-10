@@ -1,5 +1,5 @@
+import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import {
   APPLY_CLOSES_AT_MS,
@@ -187,7 +187,7 @@ export default function Apply() {
                       and BBA Meet the Clubs on Tuesday, Sept 8.
                     </p>
                     <p className="apply-notice__desc">
-                      <Link to="/join" className="join-contact__email">Join the mailing list</Link>
+                      <a href={MEMBERSHIP_FORM_URL} className="join-contact__email">Join the mailing list</a>
                       {' '}and we'll email you the moment it opens.
                     </p>
                   </>
@@ -198,7 +198,7 @@ export default function Apply() {
                       Missed it? Email{' '}
                       <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>
                       {' '}— late applications are read if seats remain — or{' '}
-                      <Link to="/join" className="join-contact__email">join the mailing list</Link>
+                      <a href={MEMBERSHIP_FORM_URL} className="join-contact__email">join the mailing list</a>
                       {' '}for the winter cycle.
                     </p>
                   </>

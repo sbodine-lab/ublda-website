@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import { CONSULTING_FORM_URL } from '../../lib/forms'
+import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from '../../lib/forms'
 import { APPLY_CLOSES_PROSE } from '../../lib/applyForm'
 import { CONTACT_MAILTO, LEADERS, PAGE_LINKS, SOCIAL } from './content'
 
@@ -192,7 +192,7 @@ export const ConsultingMenu = forwardRef<HTMLDivElement, MenuProps>(function Con
           <DotButton href={CONSULTING_FORM_URL} external onClick={onClose}>
             Apply for Fall 2026
           </DotButton>
-          <DotButton to="/join" onClick={onClose}>
+          <DotButton href={MEMBERSHIP_FORM_URL} onClick={onClose}>
             Join UBLDA
           </DotButton>
         </div>
@@ -226,7 +226,7 @@ export function ConsultingFooter() {
             ))}
             <Link to="/about">ABOUT</Link>
             <Link to="/events">EVENTS</Link>
-            <Link to="/join">JOIN UBLDA</Link>
+            <a href={MEMBERSHIP_FORM_URL}>JOIN UBLDA</a>
           </div>
           <div className="pc-footer__col pc-footer__col--contact">
             <p className="pc-footer__big">Partner with us</p>
