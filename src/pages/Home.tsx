@@ -54,7 +54,7 @@ const upcoming = [
   },
   {
     title: 'Education',
-    desc: 'Led by our VP of Education, programming is in active development across finance, consulting, and other business functions, with a focus on disability and impact.',
+    desc: 'Our VP of Education is developing programming across finance, consulting, and other business functions, with a focus on disability and impact. It hasn’t launched yet; we’ll share details when it’s ready.',
   },
   {
     title: 'Speaker Series',
