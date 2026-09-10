@@ -1115,17 +1115,18 @@ html.pc-menu-open .pc-cursor {
 }
 
 /* ─── Client ────────────────────────────────────────────────────────────── */
+/* Use the whole viewport during the pinned reveal; let short screens grow
+   with the content instead of clipping the statistics. */
 .pc-client {
   --pc-mask: 1.4%;
   position: relative;
-  min-height: min(760px, 100svh);
-  padding: clamp(96px, 12vh, 144px) 8vw;
+  min-height: 100svh;
+  padding: clamp(100px, 12svh, 160px) 6vw clamp(48px, 7svh, 96px);
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
   overflow: hidden;
-  background: #faf9f6;
+  background: #b8d8cd;
   opacity: 0;
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50'/%3E%3C/svg%3E");
@@ -1140,66 +1141,54 @@ html.pc-menu-open .pc-cursor {
 .pc-client__media {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
+/* A translucent cream wash keeps navy copy and original logo colors legible
+   while leaving the Paper grain visible across the entire section. */
 .pc-client__media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(7, 38, 62, 0.35) 0%, rgba(7, 38, 62, 0.6) 100%);
-}
-
-.pc--light .pc-client__media::after {
-  background: linear-gradient(100deg, #faf9f6c7 0%, #faf9f673 45%, #faf9f600 100%);
+  background: linear-gradient(110deg, #faf9f6de 0%, #faf9f6b8 48%, #faf9f680 100%);
 }
 
 .pc-client__lockup {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: 1.3fr 1fr;
   align-items: center;
-  column-gap: clamp(48px, 8vw, 120px);
-  row-gap: 48px;
+  column-gap: 5vw;
+  row-gap: clamp(40px, 7svh, 100px);
   width: 100%;
-  max-width: 1120px;
   text-align: left;
-  color: #faf9f6;
-}
-
-.pc--light .pc-client__lockup {
   color: #0A3658;
 }
 
 .pc-client__label {
-  font-size: 0.75rem;
+  font-size: clamp(0.875rem, 1.15vw, 1.125rem);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--pc-accent-ink);
-  margin-bottom: 28px;
-}
-
-.pc--light .pc-client__label {
-  color: #295D59;
+  letter-spacing: 0.04em;
+  margin-bottom: clamp(20px, 3svh, 40px);
 }
 
 .pc-client__name {
   max-width: 12ch;
-  font-size: clamp(2.5rem, 4.1vw, 3.75rem);
+  font-size: clamp(3.5rem, 7vw, 8.5rem);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  line-height: 1.02;
+  letter-spacing: -0.055em;
   text-wrap: balance;
-  margin-bottom: 24px;
+  margin-bottom: clamp(24px, 3svh, 40px);
 }
 
 .pc-client__desc {
-  font-size: 1rem;
+  font-size: clamp(1rem, 1.35vw, 1.375rem);
   font-weight: 400;
-  line-height: 1.75;
-  max-width: 43ch;
+  line-height: 1.6;
+  max-width: 48ch;
   text-wrap: pretty;
-  opacity: 0.85;
 }
 
 .pc-client__link {
@@ -1207,28 +1196,29 @@ html.pc-menu-open .pc-cursor {
   align-items: center;
   gap: 12px;
   min-height: 44px;
-  margin-top: 28px;
-  font-size: 0.85rem;
+  margin-top: 20px;
+  font-size: 1rem;
   font-weight: 500;
   color: inherit;
 }
 
 .pc-client__presentation {
-  max-width: 43ch;
-  margin-top: 24px;
+  max-width: 48ch;
+  margin-top: clamp(24px, 3svh, 40px);
 }
 
 .pc-client__presentation-title {
-  font-size: 1rem;
+  font-size: clamp(1.125rem, 1.5vw, 1.5rem);
   font-weight: 600;
-  line-height: 1.6;
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
 .pc-client__audience {
   margin-top: 8px;
-  font-size: 0.9rem;
-  line-height: 1.65;
-  opacity: 0.85;
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .pc-client__stats {
@@ -1238,35 +1228,34 @@ html.pc-menu-open .pc-cursor {
   gap: 32px;
   list-style: none;
   margin: 0;
-  padding: 32px 0 0;
-  border-top: 1px solid rgba(10, 54, 88, 0.18);
+  padding: clamp(24px, 4svh, 56px) 0 0;
+  border-top: 1px solid rgba(10, 54, 88, 0.3);
 }
 
 .pc-client__stat {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pc-client__stat-value {
-  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-size: clamp(3rem, 5.5vw, 6.5rem);
   font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .pc-client__stat-label {
-  max-width: 24ch;
-  font-size: 0.8rem;
+  max-width: 27ch;
+  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
   line-height: 1.5;
-  opacity: 0.8;
 }
 
 .pc-client__logos {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(40px, 4vw, 64px);
+  gap: 4vw;
   margin: 0;
 }
 
@@ -1275,19 +1264,17 @@ html.pc-menu-open .pc-cursor {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7vw;
   margin: 0;
 }
 
-/* A hairline between the two organizations. */
 .pc-client__logo--2::before {
   content: '';
   position: absolute;
-  left: calc(-0.5 * clamp(40px, 4vw, 64px));
+  left: -2vw;
   top: 12%;
   height: 76%;
   width: 1px;
-  background: rgba(10, 54, 88, 0.18);
+  background: rgba(10, 54, 88, 0.25);
 }
 
 .pc-client__logo img {
@@ -1295,14 +1282,13 @@ html.pc-menu-open .pc-cursor {
   width: auto;
 }
 
-/* The Arc mark carries its descriptor line; the Arc Thrift PNG has built-in
-   padding, so it is drawn taller to read the same size. */
+/* Compensate for the transparent padding inside the Arc Thrift asset. */
 .pc-client__logo--1 img {
-  height: clamp(72px, 7.2vw, 104px);
+  height: clamp(90px, 9.5vw, 180px);
 }
 
 .pc-client__logo--2 img {
-  height: clamp(88px, 8.8vw, 128px);
+  height: clamp(112px, 11.8vw, 224px);
 }
 
 .pc-sr {
@@ -1931,36 +1917,36 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-client {
-    min-height: 0;
-    padding: 104px 7vw 88px;
+    min-height: 100svh;
+    padding: 96px 6vw 48px;
   }
 
   .pc-client__label {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .pc-client__lockup {
     grid-template-columns: 1fr;
     gap: 32px;
-    max-width: 480px;
+  }
+
+  .pc-client__name {
+    font-size: clamp(3rem, 11.5vw, 5.5rem);
+    max-width: 12ch;
   }
 
   .pc-client__stats {
-    gap: 16px;
+    gap: 12px;
     padding-top: 24px;
   }
 
   .pc-client__stat-value {
-    font-size: clamp(1.5rem, 6.5vw, 2rem);
+    font-size: clamp(1.75rem, 7.5vw, 3.25rem);
   }
 
   .pc-client__stat-label {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
-  }
-
-  .pc-client__desc {
-    font-size: 0.95rem;
   }
 
   .pc-client__logos {
@@ -1973,11 +1959,11 @@ html.pc-menu-open .pc-cursor {
   }
 
   .pc-client__logo--1 img {
-    height: 64px;
+    height: 76px;
   }
 
   .pc-client__logo--2 img {
-    height: 80px;
+    height: 94px;
   }
 
   .pc-cta__contacts {
