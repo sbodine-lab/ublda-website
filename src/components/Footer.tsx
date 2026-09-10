@@ -1,3 +1,4 @@
+import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import './Footer.css'
@@ -12,10 +13,10 @@ export default function Footer() {
             <p className="footer__tagline">
               A student organization at Michigan Ross.
             </p>
-            <Link to="/join" className="footer__cta">
+            <a href={MEMBERSHIP_FORM_URL} className="footer__cta">
               Join UBLDA
               <ArrowRight aria-hidden="true" size={14} strokeWidth={1.5} />
-            </Link>
+            </a>
           </div>
 
           <div className="footer__grid">
@@ -25,7 +26,7 @@ export default function Footer() {
               <Link to="/events" className="footer__link">Events</Link>
               <Link to="/team" className="footer__link">Team</Link>
               <Link to="/consulting" className="footer__link">Consulting</Link>
-              <Link to="/join" className="footer__link">Join UBLDA</Link>
+              <a href={MEMBERSHIP_FORM_URL} className="footer__link">Join UBLDA</a>
             </div>
 
             <div className="footer__col">

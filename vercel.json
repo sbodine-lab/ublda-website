@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
+      "source": "/join",
+      "destination": "https://forms.gle/yVfh88HYh5xsMb4P8",
+      "permanent": false
+    },
+    {
       "source": "/:path*",
       "has": [
         { "type": "host", "value": "www.ublda.org" }

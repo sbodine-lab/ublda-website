@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { MEMBERSHIP_FORM_URL } from '../lib/forms'
 import Reveal, { RevealStagger, RevealChild } from '../components/Reveal'
 import './Team.css'
 
@@ -69,10 +69,10 @@ export default function Team() {
       <section className="section team-contact">
         <div className="container container--narrow" style={{ textAlign: 'center' }}>
           <Reveal>
-            <Link to="/join" className="btn btn--primary btn--lg">
+            <a href={MEMBERSHIP_FORM_URL} className="btn btn--primary btn--lg">
               Join UBLDA
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </Link>
+            </a>
           </Reveal>
         </div>
       </section>
