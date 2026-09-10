@@ -180,17 +180,16 @@ function HomeBody() {
         <div className="pc-client__lockup">
           <div className="pc-client__copy">
             <p className="pc-client__label">{CLIENT.label}</p>
-            <h2 className="pc-client__name" id="pc-client-name">{CLIENT.name}</h2>
+            <h2 className="pc-client__name" id="pc-client-name">
+              <a href={CLIENT.url} target="_blank" rel="noopener noreferrer">
+                {CLIENT.name}<NewTab />
+                <ArrowUpRight className="pc-client__name-arrow" aria-hidden="true" strokeWidth={1.5} />
+              </a>
+            </h2>
             <p className="pc-client__desc">{CLIENT.desc}</p>
             <div className="pc-client__presentation">
               <p className="pc-client__presentation-title">{CLIENT.presentation}</p>
-              <p className="pc-client__audience">{CLIENT.audience}</p>
             </div>
-            <a href={CLIENT.url} target="_blank" rel="noopener noreferrer" className="pc-client__link pc-line">
-              Meet our client
-              <NewTab />
-              <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-            </a>
           </div>
           <div className="pc-client__logos">
             {CLIENT.logos.map((l, i) => (
