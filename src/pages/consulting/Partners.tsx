@@ -31,7 +31,8 @@ const TILES: Tile[] = [
   { name: 'BLDA', kind: 'MBA partner chapter', src: PARTNERS[2].src },
   { name: 'Nestidd', kind: 'Speaker’s organization', src: PARTNERS[3].src },
   { name: 'Arc Thrift Stores of Colorado', kind: 'Fall 2026 client', src: '/partners-arc-thrift.png' },
-  { name: 'Wall Street Oasis', kind: 'Member resources' },
+  { name: 'Microsoft', kind: 'Speaker’s organization', src: '/partners-microsoft.png' },
+  { name: 'Wall Street Oasis', kind: 'Club partner', src: '/partners-wso.png' },
   { name: 'Nonprofits', kind: 'Prospective clients' },
   { name: 'Community organizations', kind: 'Prospective clients' },
   { name: 'Corporate accessibility teams', kind: 'Prospective clients' },
@@ -44,7 +45,8 @@ const INDEX = [
   { name: 'Michigan Ross', kind: 'School', note: 'UBLDA’s home school' },
   { name: 'Office of Community, Culture and Belonging', kind: 'University office', note: 'Funded the inaugural fireside chat, March 2026' },
   { name: 'Nestidd', kind: 'Speaker', note: 'CEO Andrew Parker spoke at the inaugural fireside, March 2026' },
-  { name: 'Wall Street Oasis', kind: 'Resources', note: 'Member perks and materials since June 2026' },
+  { name: 'Microsoft', kind: 'Speaker', note: 'Alli Hirt fireside scheduled for October 1, 2026' },
+  { name: 'Wall Street Oasis', kind: 'Club partner', note: 'Finance events and member resources since June 2026' },
 ]
 
 const buildPartners: Builder = (root, { hover }) => {
