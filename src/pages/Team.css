@@ -56,16 +56,16 @@
   margin-top: 0;
 }
 
-/* Grid - uniform 3-col */
+/* Give long titles room before adding another column. */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: var(--space-6);
 }
 
 /* Card - seamless, no border/bg */
 .team-card {
-  padding: var(--space-8);
+  padding: var(--space-8) var(--space-4);
   text-align: center;
   position: relative;
   border-radius: var(--radius-lg);
@@ -96,7 +96,7 @@
 }
 
 .team-card__role {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--color-gray-600);
   margin-bottom: var(--space-3);
 }
@@ -128,12 +128,11 @@
   }
 
   .team-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-3);
   }
 
   .team-card {
-    padding: var(--space-6);
+    padding: var(--space-6) var(--space-4);
   }
 
   .team-card__avatar {
@@ -145,14 +144,4 @@
     font-size: var(--text-base);
   }
 
-  .team-card__role {
-    font-size: var(--text-sm);
-  }
-
-}
-
-@media (max-width: 400px) {
-  .team-grid {
-    grid-template-columns: 1fr;
-  }
 }
