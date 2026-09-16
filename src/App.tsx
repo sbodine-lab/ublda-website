@@ -19,6 +19,9 @@ const ConsultingWork = lazy(() => import('./pages/consulting/Work'))
 const ConsultingServices = lazy(() => import('./pages/consulting/Services'))
 const ConsultingPartners = lazy(() => import('./pages/consulting/Partners'))
 const ConsultingContact = lazy(() => import('./pages/consulting/Contact'))
+const ConsultingInsights = lazy(() => import('./pages/consulting/StudioPages').then(m => ({ default: m.StudioInsights })))
+const ConsultingInsight = lazy(() => import('./pages/consulting/StudioPages').then(m => ({ default: m.StudioInsight })))
+const ConsultingServiceDetail = lazy(() => import('./pages/consulting/StudioPages').then(m => ({ default: m.StudioServiceDetail })))
 const Join = lazy(() => import('./pages/Join'))
 const Unsubscribe = lazy(() => import('./pages/Unsubscribe'))
 const Links = lazy(() => import('./pages/Links'))
@@ -113,6 +116,9 @@ export default function App() {
           <Route path="/consulting/leadership" element={<ConsultingLeadership />} />
           <Route path="/consulting/work" element={<ConsultingWork />} />
           <Route path="/consulting/services" element={<ConsultingServices />} />
+          <Route path="/consulting/services/:service" element={<ConsultingServiceDetail />} />
+          <Route path="/consulting/insights" element={<ConsultingInsights />} />
+          <Route path="/consulting/insights/:insight" element={<ConsultingInsight />} />
           <Route path="/consulting/partners" element={<ConsultingPartners />} />
           <Route path="/consulting/contact" element={<ConsultingContact />} />
           {/* The consulting arm used to live at /advisory; keep old links working. */}
