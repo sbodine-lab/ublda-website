@@ -18,9 +18,44 @@ import {
 const enterDelay = (ms: number) =>
   ({ "--enter-delay": `${ms}ms` }) as CSSProperties;
 
-function ServiceArt({ area }: { area: (typeof AREAS)[number] }) {
+const LOGO_ASSETS: Record<string, string> = {
+  "/partners-ross.png": "/consulting/logos/ross.svg",
+  "/partners-arc-thrift.png": "/consulting/logos/arc-thrift.svg",
+  "/partners-nestidd.png": "/consulting/logos/nestidd.svg",
+  "/partners-microsoft.png": "/consulting/logos/microsoft.svg",
+};
+
+function BrandLogo({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      className={`st-brand-logo${src.includes("blda") ? " st-brand-logo--reverse" : ""}`}
+      src={LOGO_ASSETS[src] || src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
+function ServiceArt({
+  area,
+  full = false,
+}: {
+  area: (typeof AREAS)[number];
+  full?: boolean;
+}) {
   return area.image ? (
-    <img src={area.image} alt="" loading="lazy" />
+    <img
+      src={area.image}
+      srcSet={`${area.imageSmall} 960w, ${area.image} 2400w`}
+      sizes={full ? "100vw" : "(max-width: 700px) 100vw, 45vw"}
+      className={`st-service-photo st-service-photo--${area.id}`}
+      alt={area.imageAlt}
+      width="2400"
+      height="1600"
+      loading="lazy"
+      decoding="async"
+    />
   ) : (
     <div className="st-access-art" aria-hidden="true">
       <span />
@@ -153,11 +188,11 @@ function People({ full = false }: { full?: boolean }) {
 function ClientLogos() {
   return (
     <div className="st-client-logos">
-      <img
+      <BrandLogo
         src="/client-the-arc.svg"
         alt="The Arc — planned national board presentation"
       />
-      <img
+      <BrandLogo
         src="/partners-arc-thrift.png"
         alt="Arc Thrift Stores — Fall 2026 client"
       />
@@ -218,19 +253,19 @@ export function StudioHome() {
       <section className="st-wrap st-positioning">
         <div className="st-affiliations" data-enter>
           <div>
-            <img src="/partners-ross.png" alt="Michigan Ross" />
+            <BrandLogo src="/partners-ross.png" alt="Michigan Ross" />
             <small>Our campus</small>
           </div>
           <div>
-            <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+            <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
             <small>Fall 2026 client</small>
           </div>
           <div>
-            <img src="/client-the-arc.svg" alt="The Arc" />
+            <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
             <small>Planned national board presentation</small>
           </div>
           <div>
-            <img
+            <BrandLogo
               src="/partners-blda.webp"
               alt="Business Leaders for Diverse Abilities"
             />
@@ -253,8 +288,11 @@ export function StudioHome() {
       <section className="st-wrap st-story" data-enter>
         <div className="st-story-photo">
           <img
-            src="/ross-front-entrance.jpg"
-            alt="Stephen M. Ross School of Business at the University of Michigan"
+            src="/consulting/ross-study.jpg"
+            width="800"
+            height="1200"
+            decoding="async"
+            alt="Students working together around a study table at Michigan Ross"
             loading="lazy"
           />
         </div>
@@ -385,7 +423,7 @@ export function StudioServiceDetail() {
         <p>{area.desc}</p>
       </Intro>
       <div className="st-wrap st-detail-art">
-        <ServiceArt area={area} />
+        <ServiceArt area={area} full />
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
@@ -433,7 +471,7 @@ export function StudioWork() {
       </Intro>
       <section className="st-wrap st-work-row" data-enter>
         <div className="st-work-logo">
-          <img src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+          <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
         </div>
         <div>
           <p className="st-eyebrow">Fall 2026 · Current engagement</p>
@@ -492,10 +530,22 @@ export function StudioPractice() {
         </p>
       </Intro>
       <div className="st-wrap st-campus-image">
-        <img
-          src="/ross-modern-exterior.jpg"
-          alt="The Ross School of Business campus"
-        />
+        <picture>
+          <source
+            media="(max-width: 700px)"
+            srcSet="/consulting/ross-wintergarden.jpg"
+            width="900"
+            height="1200"
+          />
+          <img
+            src="/consulting/ross-common-full.jpg"
+            width="1658"
+            height="447"
+            loading="lazy"
+            decoding="async"
+            alt="Students studying and gathering in the Michigan Ross Winter Garden"
+          />
+        </picture>
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
@@ -577,7 +627,7 @@ export function StudioPartners() {
         {PARTNERS.map((partner, i) => (
           <article key={partner.src}>
             <div>
-              <img src={partner.src} alt="" />
+              <BrandLogo src={partner.src} alt="" />
             </div>
             <h2>{partner.alt.split(" — ")[0]}</h2>
             <p>

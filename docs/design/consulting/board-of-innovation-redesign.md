@@ -39,8 +39,8 @@ Added primary-source research (checked Sept 16, 2026):
 
 ## Visual assets
 
-- Existing UBLDA logos and campus images are reused from this repository.
-- Generic strategy/workplace imagery is reproduced from the user-requested reference: `/wp-content/uploads/2026/03/Value-creation-AI.webp` and `/wp-content/uploads/2026/03/Work-redesign-AI.webp` on boardofinnovation.com. Source filenames and provenance are retained here; these are not UBLDA team or client photos.
+- Logo and photo sources, responsive assets, and the September 16 follow-up polish are documented in [image-polish.md](image-polish.md).
+- The initial reference imagery was replaced with relevant Pexels service photographs in the follow-up polish. These are illustrative, not UBLDA team or client photos.
 - Abstract accessibility, research, and monogram graphics are CSS, not fabricated documentary photos.
 
 ## Verification

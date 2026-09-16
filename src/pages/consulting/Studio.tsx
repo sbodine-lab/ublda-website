@@ -258,7 +258,7 @@ export function Studio({
             className="st-logo"
             aria-label="UBLDA Consulting home"
           >
-            <img src="/logo-mark.svg" alt="" />
+            <img src="/consulting/logos/ublda.svg" alt="" />
             <span>
               UBLDA<small>CONSULTING</small>
             </span>
