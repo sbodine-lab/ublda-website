@@ -51,7 +51,10 @@ export const AREAS = [
   {
     id: "strategy",
     title: "Strategy & growth",
-    image: "/consulting/strategy.webp",
+    image: "/consulting/strategy-meeting-2400.jpg",
+    imageSmall: "/consulting/strategy-meeting-960.jpg",
+    imageAlt:
+      "Colleagues reviewing research, charts, and business plans around a table",
     desc: "Help organizations with a disability mission make informed choices about where to go next.",
     detail:
       "We research markets, compare options, and develop business cases that connect an organization’s ambitions to practical decisions.",
@@ -65,6 +68,8 @@ export const AREAS = [
     id: "accessibility",
     title: "Accessible experiences",
     image: "",
+    imageSmall: "",
+    imageAlt: "",
     desc: "Look closely at the websites, communications, and programs people use. Find the barriers. Recommend improvements.",
     detail:
       "We examine how people find information and take part in an organization’s services, with attention to disability and accessibility.",
@@ -77,7 +82,10 @@ export const AREAS = [
   {
     id: "workplace",
     title: "Inclusive workplaces",
-    image: "/consulting/workplace.webp",
+    image: "/consulting/workplace-meeting-2400.jpg",
+    imageSmall: "/consulting/workplace-meeting-960.jpg",
+    imageAlt:
+      "Colleagues collaborating at an office table, including a wheelchair user",
     desc: "Help organizations understand how recruiting, hiring, and everyday work can include more people.",
     detail:
       "We look at the employee journey and research ways to make information, processes, and support easier to access.",

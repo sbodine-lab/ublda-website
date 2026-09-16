@@ -315,7 +315,7 @@ html.st-menu-open {
   text-align: center;
 }
 .st-affiliations img {
-  height: 60px;
+  height: 72px;
   max-width: 190px;
   width: 100%;
   object-fit: contain;
@@ -418,13 +418,14 @@ html.st-menu-open {
   align-items: start;
 }
 .st-story-photo {
-  height: 560px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   overflow: hidden;
 }
 .st-story-photo img {
   height: 100%;
   width: 100%;
-  object-position: 48% center;
+  object-position: center;
 }
 .st-story h2 {
   font-size: 33.6px;
@@ -868,6 +869,10 @@ html.st-menu-open {
   width: 100%;
   height: 100%;
 }
+.st-detail-art:has(.st-service-photo) {
+  height: auto;
+  aspect-ratio: 3 / 2;
+}
 .st-detail-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -904,7 +909,6 @@ html.st-menu-open {
 }
 .st-work-logo {
   height: 240px;
-  background: #eeeef1;
   display: grid;
   place-items: center;
   padding: 40px;
@@ -927,12 +931,12 @@ html.st-menu-open {
   margin-top: 20px;
 }
 .st-campus-image {
-  height: 580px;
+  height: auto;
   overflow: hidden;
 }
 .st-campus-image img {
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 .st-timeline {
   display: grid;
@@ -988,6 +992,43 @@ html.st-menu-open {
   max-width: 240px;
   max-height: 100px;
   object-fit: contain;
+}
+.st .st-brand-logo {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+/* Reverse the existing navy-backed artwork into a clean monochrome mark.
+   The source stays intact; white becomes transparent against the paper. */
+.st .st-brand-logo--reverse {
+  filter: grayscale(1) invert(1) contrast(2.2);
+}
+.st-affiliations .st-brand-logo[src*="arc-thrift"],
+.st-client-logos .st-brand-logo[src*="arc-thrift"] {
+  max-width: 112px;
+}
+.st-affiliations .st-brand-logo[src*="ross"] {
+  max-width: 210px;
+}
+.st-partner-grid .st-brand-logo[src*="arc-thrift"] {
+  max-width: 120px;
+}
+.st-partner-grid .st-brand-logo[src*="occb"] {
+  max-width: 192px;
+}
+.st-partner-grid .st-brand-logo--reverse {
+  max-width: 175px;
+}
+.st-partner-grid .st-brand-logo[src*="nestidd"] {
+  max-width: 185px;
+}
+.st-work-logo .st-brand-logo {
+  max-width: 172px;
+}
+.st .st-service-photo--strategy {
+  object-position: 45% center;
+}
+.st .st-service-photo--workplace {
+  object-position: 73% center;
 }
 .st-partner-grid h2 {
   font-size: 26px;
@@ -1477,7 +1518,7 @@ html.st-menu-open {
     font-size: 28px;
   }
   .st-story-photo {
-    height: 470px;
+    height: auto;
   }
   .st-section {
     padding-top: 100px;
@@ -1714,7 +1755,8 @@ html.st-menu-open {
     padding-top: 55px;
   }
   .st-story-photo {
-    height: 370px;
+    height: auto;
+    max-width: 400px;
   }
   .st-story h2 {
     font-size: 28px;
@@ -1925,7 +1967,7 @@ html.st-menu-open {
     font-size: 18px;
   }
   .st-campus-image {
-    height: 360px;
+    height: auto;
   }
   .st-timeline {
     grid-template-columns: 1fr;
