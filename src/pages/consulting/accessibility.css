@@ -28,7 +28,7 @@
 .st-hero { height: auto; min-height: max(680px, 90svh); max-height: none; padding-bottom: 85px; }
 .st-wait { opacity: 1; }
 @keyframes st-enter {
-  from { transform: translateY(30px); }
+  from { transform: translateY(22px); }
   to { transform: none; }
 }
 .st-paused .st *, .st-paused .st *::before, .st-paused .st *::after {
