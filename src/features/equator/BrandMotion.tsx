@@ -43,7 +43,7 @@ export function LogoStage() {
   );
 }
 
-export { ValueSymbol as Glyph } from "./ValueSymbol";
+export { RibbonAnchor as Glyph } from "./RibbonJourney";
 
 export function StoryArtwork({ kind }: { kind: string }) {
   return (
