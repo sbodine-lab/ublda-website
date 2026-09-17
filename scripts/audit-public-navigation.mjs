@@ -9,7 +9,22 @@ const checks = [], errors = [], links = new Map();
 page.on('pageerror', e => errors.push({ url:page.url(),message:e.message }));
 const check = (name, pass, detail) => { checks.push({name,pass,detail}); console.log(JSON.stringify(checks.at(-1))); };
 const ready = async (route='/') => { await page.goto(base+route); await page.locator('main h1').waitFor(); await page.evaluate(()=>document.fonts.ready); };
-const pause = () => page.waitForTimeout(100);
+const pause = async () => {
+  // Native smooth navigation is interruptible and distance-dependent. Check the
+  // settled destination rather than assuming every click teleports in 100ms.
+  await page.waitForTimeout(150);
+  await page.evaluate(() => new Promise(resolve => {
+    let last = scrollY, stable = 0;
+    const start = performance.now();
+    const tick = () => {
+      stable = Math.abs(scrollY - last) < .5 ? stable + 1 : 0;
+      last = scrollY;
+      if (stable >= 5 || performance.now() - start > 4000) resolve();
+      else requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }));
+};
 const routeClick = async (link, name) => {
   const destination = new URL(await link.getAttribute('href'),page.url());
   await link.click(); await page.waitForURL(url=>url.pathname===destination.pathname && url.hash===destination.hash); await page.locator('main h1').waitFor(); await pause();
@@ -85,13 +100,13 @@ try {
       for(let repeat=0;repeat<2;repeat++) {
         if(repeat) await page.locator('.eq-footer-wordmark').scrollIntoViewIfNeeded();
         if(width<769) await page.getByRole('button',{name:'Open menu',exact:true}).click();
-        await page.locator('.eq-header nav').getByRole('link',{name:label,exact:true}).click(); await page.waitForTimeout(300);
+        await page.locator('.eq-header nav').getByRole('link',{name:label,exact:true}).click(); await pause();
         const result=await page.locator('#'+id).evaluate(el=>({top:el.getBoundingClientRect().top,focused:el.contains(document.activeElement)}));
         check(`Full motion ${label} ${width} ${repeat?'repeat':'first'}`,Math.abs(result.top)<110 && result.focused,result);
       }
     }
     await page.locator('.eq-wordmark').click(); await pause();
-    await page.locator('.eq-footer-wordmark').scrollIntoViewIfNeeded(); await page.locator('.eq-footer-wordmark').click(); await page.waitForTimeout(300);
+    await page.locator('.eq-footer-wordmark').scrollIntoViewIfNeeded(); await page.locator('.eq-footer-wordmark').click(); await pause();
     check(`Full motion home link ${width}`,await page.evaluate(()=>scrollY<5));
   }
   await page.emulateMedia({reducedMotion:'reduce'});

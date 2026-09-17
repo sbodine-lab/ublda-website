@@ -54,7 +54,7 @@ function EventRecap({ event, preview }: { event: ClubEvent; preview: boolean }) 
     if (!preview && hash === `#${event.id}` && detail.current) detail.current.open = true;
   }, [event.id, hash, preview, locationKey]);
   return (
-    <details className="eq-event-recap" ref={detail} id={preview ? undefined : event.id} onToggle={() => ScrollTrigger.refresh()} onTransitionEnd={() => ScrollTrigger.refresh()}>
+    <details className="eq-event-recap" ref={detail} id={preview ? undefined : event.id} onToggle={() => ScrollTrigger.refresh(true)}>
       <summary>
         <time dateTime={event.isoDate}>{event.date}</time>
         <div className="eq-event-recap-heading">

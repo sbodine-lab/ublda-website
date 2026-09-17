@@ -78,6 +78,7 @@ export function ParticleLogo({ colored = false }: { colored?: boolean }) {
     let aimX = 0;
     let aimY = 0;
     let fleckScale = 1;
+    let solidPainted = false;
     const resize = new ResizeObserver(([entry]) => {
       // Keep individual flecks legible when the canvas is scaled down on phones.
       fleckScale = Math.max(1, Math.min(2, 380 / entry.contentRect.width));
@@ -101,7 +102,6 @@ export function ParticleLogo({ colored = false }: { colored?: boolean }) {
     resize.observe(parent);
 
     const paint = (seconds: number, still = false) => {
-      context.clearRect(0, 0, 600, 600);
       // Assemble, hold, release into a rippling flock, and return without a loop cut.
       const cycle = seconds % (colored ? 12.4 : 16);
       const disperse = still
@@ -136,9 +136,15 @@ export function ParticleLogo({ colored = false }: { colored?: boolean }) {
         ? `perspective(1000px) rotateY(${tilt * 5}deg) rotateX(${tilt * -2}deg)`
         : "none";
       if (solid === 1) {
-        context.drawImage(logoLayer, 0, 0, 600, 600);
+        if (!solidPainted) {
+          context.clearRect(0, 0, 600, 600);
+          context.drawImage(logoLayer, 0, 0, 600, 600);
+          solidPainted = true;
+        }
         return;
       }
+      solidPainted = false;
+      context.clearRect(0, 0, 600, 600);
       const ink = colored ? particleContext : context;
       if (colored) ink.clearRect(0, 0, 600, 600);
       pointerX += (aimX - pointerX) * 0.04;

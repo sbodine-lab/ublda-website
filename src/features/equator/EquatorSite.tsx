@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ArrowDown,
@@ -426,24 +426,18 @@ function Values() {
     let frame = 0;
     const update = () => {
       frame = 0;
-      const index = panels.reduce(
-        (active, panel, i) =>
-          panel.getBoundingClientRect().top < 160 ? i : active,
-        0,
-      );
+      // Measure the entire stack before changing opacity: interleaving the two
+      // forces a fresh layout for each sticky panel on every scroll frame.
+      const tops = panels.map(panel => panel.getBoundingClientRect().top);
+      const index = tops.reduce((active, top, i) => top < 160 ? i : active, 0);
       if (number.current) number.current.textContent = String(index + 1);
       panels.forEach((panel, i) => {
-        const next = panels[i + 1];
-        const fade = next
-          ? Math.max(
-              0,
-              Math.min(
-                1,
-                (next.getBoundingClientRect().top - 170) / (innerHeight * 0.55),
-              ),
-            )
+        const content = panel.firstElementChild as HTMLElement;
+        const fade = tops[i + 1] !== undefined
+          ? Math.max(0, Math.min(1, (tops[i + 1] - 170) / (innerHeight * 0.55)))
           : 1;
-        panel.style.setProperty("--panel-opacity", String(fade));
+        const opacity = String(Math.round(fade * 1000) / 1000);
+        if (content.style.opacity !== opacity) content.style.opacity = opacity;
       });
     };
     const scroll = () => {
@@ -1090,12 +1084,14 @@ export default function EquatorSite() {
   const { pathname, hash, key: locationKey } = useLocation();
   const root = useRef<HTMLDivElement>(null);
   const previousLocation = useRef(locationKey);
+  const previousPathname = useRef(pathname);
   const systemMotion = useDeviceReducedMotion();
   const [paused, setPaused] = useState(() => {
     try { return localStorage.getItem("ublda-motion-paused") === "true"; }
     catch { return false; }
   });
   const motionPaused = paused || systemMotion;
+  const samePageScrollBehavior = useEffectEvent(() => motionPaused ? "instant" as const : "smooth" as const);
   const toggleMotion = () => {
     const next = !paused;
     setPaused(next);
@@ -1127,9 +1123,9 @@ export default function EquatorSite() {
         );
         gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
           gsap.from(el, {
-            y: 35,
-            duration: 0.7,
-            ease: "power2.out",
+            y: 24,
+            duration: 0.65,
+            ease: "power3.out",
             scrollTrigger: { trigger: el, start: "top 92%", once: true },
           }),
         );
@@ -1152,32 +1148,39 @@ export default function EquatorSite() {
     document.title = `${titles[pathname] || "UBLDA"} — UBLDA · Michigan Ross`;
     let disposed = false;
     let frame = 0;
+    const el = root.current;
+    if (!el) return;
+    const wordmark = el.querySelector<HTMLElement>(".eq-wordmark");
+    const sections = [...el.querySelectorAll<HTMLElement>("[data-tone]")];
+    const navLinks = [...el.querySelectorAll<HTMLAnchorElement>(".eq-header nav a")];
+    let activeSection: HTMLElement | undefined;
     const update = () => {
       frame = 0;
-      const el = root.current;
-      if (!el) return;
-      const start = innerWidth > 768 ? innerHeight / 2 - 34 : 0;
-      const y = home ? Math.max(0, start - scrollY) : 0;
-      const scale = home
-        ? 1 + Math.max(0, 1 - scrollY / (innerHeight * 0.65)) * 0.5
-        : 1;
-      el.style.setProperty("--brand-y", `${y}px`);
-      el.style.setProperty("--brand-scale", String(scale));
-      el.dataset.navVisible = String(!home || scrollY > innerHeight * 0.35);
-      const sections = [...el.querySelectorAll<HTMLElement>("[data-tone]")];
-      const section = sections.find((section) => {
+      // Read geometry first. Keep frequently changing transform values on the
+      // wordmark itself so they don't invalidate styles for the entire site.
+      const section = sections.find(section => {
         const r = section.getBoundingClientRect();
         return r.top <= 80 && r.bottom > 80;
       });
-      el.dataset.headerTone = section?.dataset.tone || "teal";
-      if (home)
-        el.querySelectorAll<HTMLAnchorElement>(".eq-header nav a").forEach(
-          (link) => {
-            if (link.hash && link.hash.slice(1) === section?.id)
-              link.setAttribute("aria-current", "location");
-            else link.removeAttribute("aria-current");
-          },
-        );
+      const start = innerWidth > 768 ? innerHeight / 2 - 34 : 0;
+      const y = home ? Math.max(0, start - scrollY) : 0;
+      const scale = home ? 1 + Math.max(0, 1 - scrollY / (innerHeight * 0.65)) * 0.5 : 1;
+      const yValue = `${y}px`, scaleValue = String(scale);
+      if (wordmark && wordmark.style.getPropertyValue("--brand-y") !== yValue)
+        wordmark.style.setProperty("--brand-y", yValue);
+      if (wordmark && wordmark.style.getPropertyValue("--brand-scale") !== scaleValue)
+        wordmark.style.setProperty("--brand-scale", scaleValue);
+      const visible = String(!home || scrollY > innerHeight * 0.35);
+      if (el.dataset.navVisible !== visible) el.dataset.navVisible = visible;
+      const tone = section?.dataset.tone || "teal";
+      if (el.dataset.headerTone !== tone) el.dataset.headerTone = tone;
+      if (home && section !== activeSection) {
+        navLinks.forEach(link => {
+          if (link.hash && link.hash.slice(1) === section?.id) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+        activeSection = section;
+      }
     };
     const scroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -1207,14 +1210,19 @@ export default function EquatorSite() {
         try { id = decodeURIComponent(id); } catch { /* Keep malformed fragments harmless. */ }
         const target = id ? document.getElementById(id) : root.current?.querySelector<HTMLElement>("main");
         if (!target) return;
-        if (hash) target.scrollIntoView({ behavior: "instant", block: "start" });
-        else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        // Animate intentional same-page navigation with the browser's own
+        // interruptible scroll. New pages and reduced motion arrive immediately.
+        const samePage = previousPathname.current === pathname && previousLocation.current !== locationKey;
+        const behavior = samePage ? samePageScrollBehavior() : "instant";
+        if (hash) target.scrollIntoView({ behavior, block: "start" });
+        else window.scrollTo({ top: 0, left: 0, behavior });
         if (hash || previousLocation.current !== locationKey) {
           const heading = id && id !== "main-content" ? target.querySelector<HTMLElement>("h1, h2, h3") || target : target;
           heading.setAttribute("tabindex", "-1");
           heading.focus({ preventScroll: true });
         }
         previousLocation.current = locationKey;
+        previousPathname.current = pathname;
       });
     });
     return () => { disposed = true; cancelAnimationFrame(frame); };

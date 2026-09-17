@@ -4,9 +4,9 @@ import Nav from './components/Nav'
 import AnnouncementBanner from './components/AnnouncementBanner'
 import { CONSULTING_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
-import Home from './pages/Home'
+const Home = lazy(() => import('./pages/Home'))
 const EquatorSite = lazy(() => import('./features/equator/EquatorSite'))
-import Table from './pages/Table'
+const Table = lazy(() => import('./pages/Table'))
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 
 const About = lazy(() => import('./pages/About'))
@@ -72,13 +72,25 @@ function PageFallback() {
 export default function App() {
   const { pathname } = useLocation()
   useTabEasterEgg()
+  // Public club and Consulting pages use local fonts. Fetch the older Google
+  // font families only for routes that actually use them (workspace, table, etc.).
+  const publicPage = ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe'].includes(pathname)
+  const consultingPage = matchesPrefix(pathname, ['/consulting', '/advisory'])
+  useEffect(() => {
+    if (publicPage || consultingPage || document.getElementById('legacy-fonts')) return
+    const stylesheet = document.createElement('link')
+    stylesheet.id = 'legacy-fonts'
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href = 'https://fonts.googleapis.com/css2?family=Manrope:wght@500;600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300..700&display=swap'
+    document.head.append(stylesheet)
+  }, [publicPage, consultingPage])
   const inStandalone = matchesPrefix(pathname, STANDALONE_PREFIXES)
   const inDecisionCenter = matchesPrefix(pathname, DECISION_PREFIXES)
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
   // The club design is scoped to public pages; Consulting and operations retain their own UI.
-  if (['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe'].includes(pathname)) {
+  if (publicPage) {
     return <Suspense fallback={<PageFallback />}><EquatorSite /></Suspense>
   }
   if (inDecisionCenter) {

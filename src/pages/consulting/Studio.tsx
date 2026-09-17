@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useRef,
   useState,
@@ -62,8 +63,10 @@ export function Bands({ className = "" }: { className?: string }) {
     let frame = 0,
       w = 0,
       h = 0,
-      visible = true,
-      paused = false;
+      visible = false,
+      paused = false,
+      elapsed = 2200,
+      previous = 0;
     const styles = getComputedStyle(el);
     const rgb = (token: string) => {
       const hex = styles.getPropertyValue(token).trim().slice(1);
@@ -75,12 +78,14 @@ export function Bands({ className = "" }: { className?: string }) {
       bright.map((channel, j) => channel + ((dark[j] - channel) * i) / 21),
     );
     const colors = [...palette, ...palette.slice(1, -1).reverse()];
-    const color = (index: number) => {
-      const phase = ((index % 42) + 42) % 42,
-        lo = Math.floor(phase),
-        mix = phase - lo;
+    // Reuse a fine-grained palette instead of allocating hundreds of RGB
+    // arrays and strings on every frame. Sixteen steps per band remain smooth.
+    const paletteSteps = 16;
+    const paintColors = Array.from({ length: 42 * paletteSteps }, (_, i) => {
+      const lo = Math.floor(i / paletteSteps), mix = (i % paletteSteps) / paletteSteps;
       return `rgb(${colors[lo].map((v, j) => Math.round(v + (colors[(lo + 1) % 42][j] - v) * mix)).join(",")})`;
-    };
+    });
+    const color = (index: number) => paintColors[Math.floor((((index % 42) + 42) % 42) * paletteSteps)];
     const draw = (time: number) => {
       const columns = w <= 768 ? 2 : w <= 1024 ? 4 : 8;
       const band = Math.max(4, Math.round(h / 55)),
@@ -103,23 +108,30 @@ export function Bands({ className = "" }: { className?: string }) {
       }
     };
     const tick = (time: number) => {
-      draw(time);
+      if (previous) elapsed += Math.min(time - previous, 50);
+      previous = time;
+      draw(elapsed);
       frame = requestAnimationFrame(tick);
     };
     const sync = () => {
       cancelAnimationFrame(frame);
+      previous = 0;
       paused = document.documentElement.classList.contains("st-paused");
       if (visible && !document.hidden && !media.matches && !paused)
         frame = requestAnimationFrame(tick);
-      else draw(2200);
+      else if (media.matches || paused) draw(elapsed);
     };
     const resize = new ResizeObserver(() => {
-      w = el.clientWidth;
-      h = el.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      el.width = w * dpr;
-      el.height = h * dpr;
+      const width = el.clientWidth, height = el.clientHeight;
+      if (width === w && height === h) return;
+      w = width;
+      h = height;
+      // These flat bands don't need a full-resolution retina framebuffer.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      el.width = Math.round(w * dpr);
+      el.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(elapsed);
       sync();
     });
     const observer = new IntersectionObserver(([entry]) => {
@@ -176,6 +188,8 @@ export function Studio({
   });
   const deviceReducedMotion = useDeviceReducedMotion();
   const motionPaused = paused || deviceReducedMotion;
+  const previousPathname = useRef<string | null>(null);
+  const samePageScrollBehavior = useEffectEvent(() => motionPaused ? "instant" as const : "smooth" as const);
   const { pathname, hash, key: locationKey } = useLocation();
   const closeMenu = useCallback(() => setOpen(false), []);
   useMenuKeyboard(open, root, ".st-navlinks", ".st-menu-toggle", closeMenu);
@@ -205,8 +219,10 @@ export function Studio({
       if (target) {
         target.tabIndex = -1;
         target.focus({ preventScroll: true });
-        if (hash) target.scrollIntoView({ behavior: "instant" });
-        else window.scrollTo({ top: 0, behavior: "instant" });
+        const behavior = previousPathname.current === pathname ? samePageScrollBehavior() : "instant";
+        if (hash) target.scrollIntoView({ behavior });
+        else window.scrollTo({ top: 0, behavior });
+        previousPathname.current = pathname;
       }
     });
     return () => cancelAnimationFrame(frame);
@@ -245,34 +261,14 @@ export function Studio({
     );
     if (!motionPaused)
       items.forEach((el) => {
-        el.classList.add("st-wait");
-        observer.observe(el);
+        if (!el.classList.contains("st-entered")) {
+          el.classList.add("st-wait");
+          observer.observe(el);
+        }
       });
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      node.querySelectorAll<HTMLElement>(".st-metrics").forEach((el) => {
-        const shift = Math.min(
-          1,
-          Math.max(
-            0,
-            0.6 - el.getBoundingClientRect().top / window.innerHeight,
-          ),
-        );
-        el.style.setProperty("--shift", String(shift));
-      });
-    };
-    const scroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    if (!motionPaused) {
-      window.addEventListener("scroll", scroll, { passive: true });
-      update();
-    }
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", scroll);
-      cancelAnimationFrame(frame);
+      items.forEach(el => el.classList.remove("st-wait"));
     };
   }, [pathname, motionPaused]);
   const toggleMotion = () => {
