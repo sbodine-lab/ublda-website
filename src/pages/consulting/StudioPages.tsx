@@ -177,7 +177,7 @@ function Timeline() {
     [
       "Interview",
       INTERVIEW_WINDOW_SHORT,
-      "Two 30-minute conversations at Ross, one behavioral and one technical.",
+      "Two 30-minute conversations at Ross: one behavioral and one technical.",
     ],
     ["Decisions", OFFERS_SHORT, ""],
     ["Kickoff", KICKOFF_SHORT, "Begin weekly project work with your team."],
@@ -205,15 +205,15 @@ export function StudioHome() {
         <Bands />
         <div className="st-wrap st-hero-content">
           <h1>
-            <span data-enter>Business can include more people.</span>
+            <span data-enter>Expand access.</span>
             <span data-enter style={enterDelay(250)}>
-              We help make it happen.
+              Strengthen your business.
             </span>
           </h1>
           <div className="st-actions" data-enter style={enterDelay(600)}>
-            <Button to="/consulting/work">Browse our work</Button>
+            <Button to="/consulting/work">View work</Button>
             <Button to="/consulting/contact" solid>
-              Talk to us
+              Discuss a project
             </Button>
           </div>
         </div>
@@ -238,13 +238,14 @@ export function StudioHome() {
         </div>
         <div className="st-statement" data-enter>
           <p>
-            UBLDA Consulting is the student-led, pro bono consulting division of
-            Undergraduate Business Leaders for Diverse Abilities.
+            UBLDA Consulting is the pro bono consulting division of Undergraduate
+            Business Leaders for Diverse Abilities. Our student teams bring
+            research and analysis to business decisions.
           </p>
           <p>
-            We help disability-focused organizations solve business challenges
-            and help companies across industries improve accessibility—in their
-            products, services, and workplaces.
+            We help disability-focused organizations pursue growth and solve
+            business challenges. We also help companies across industries
+            improve accessibility for their customers and employees.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
@@ -256,24 +257,25 @@ export function StudioHome() {
         </div>
         <div>
           <h2>
-            Good business decisions start with understanding who gets left out.
+            Research that sharpens decisions.
             <br />
             <span>
-              We’re here to ask better questions—and help answer them.
+              Recommendations built for action.
             </span>
           </h2>
           <p>
-            Four to six analysts. Two project managers. A semester of research,
-            collaboration, and recommendations for a real client.
+            Your business question sets the direction. A team of four to six
+            analysts and two project managers investigates the options and
+            develops recommendations over the semester.
           </p>
           <Button to="/consulting/practice">How we work</Button>
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
         <h2 className="st-section-heading">
-          Where business strategy
+          Business strategy and
           <br />
-          meets disability inclusion
+          accessibility consulting
         </h2>
         <ServiceCards />
       </section>
@@ -304,8 +306,8 @@ export function StudioHome() {
             <div>
               <h3>National board presentation</h3>
               <p>
-                Our Fall 2026 team will present to The Arc’s national board at
-                the end of the semester.
+                Our Fall 2026 team plans to present its recommendations to
+                The Arc’s national board at the end of the semester.
               </p>
             </div>
           </div>
@@ -314,9 +316,9 @@ export function StudioHome() {
       <section className="st-wrap st-section">
         <div className="st-section-top" data-enter>
           <h2 className="st-section-heading">
-            A closer look
+            Evidence to inform
             <br />
-            at inclusion
+            better decisions
           </h2>
           <Button to="/consulting/insights">Browse all insights</Button>
         </div>
@@ -358,7 +360,7 @@ export function StudioServices() {
               <h2>{area.title}</h2>
               <p>{area.desc}</p>
               <Button to={`/consulting/services/${area.id}`}>
-                Explore this area
+                Explore the service
               </Button>
             </div>
           </section>
@@ -366,10 +368,9 @@ export function StudioServices() {
       </div>
       <section className="st-wrap st-scope-note">
         <p>
-          These are potential project areas. Each engagement starts with a
-          defined question, agreed scope, and a student team’s capacity. We
-          provide research and recommendations, not legal advice or compliance
-          certification.
+          We agree on a business question and a scope our student team can
+          deliver. Our work provides research and recommendations. Legal advice
+          and compliance certification fall outside our services.
         </p>
       </section>
       <Callout />
@@ -390,12 +391,12 @@ export function StudioServiceDetail() {
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
-          A focused question.
-          <br />A useful recommendation.
+          Define the challenge.
+          <br />Evaluate the options.
         </h2>
         <div>
           <p>{area.detail}</p>
-          <h3>Questions we can explore</h3>
+          <h3>Potential project areas</h3>
           <ul>
             {area.examples.map((e) => (
               <li key={e}>{e}</li>
@@ -414,17 +415,17 @@ export function StudioWork() {
       <Intro
         title={
           <>
-            Business with
+            Business strategy.
             <br />
-            <em>a broader purpose.</em>
+            <em>Disability impact.</em>
           </>
         }
       >
         <ClientLogos />
         <p>
-          Our first consulting client is Arc Thrift Stores of Colorado. The Fall
-          2026 engagement brings Michigan students together around a business
-          with a commitment to disability inclusion.
+          Our first client is Arc Thrift Stores of Colorado. Our Fall 2026 team
+          will develop recommendations for a social enterprise that puts
+          disability employment at the heart of its business.
         </p>
       </Intro>
       <section className="st-wrap st-work-row" data-enter>
@@ -439,26 +440,26 @@ export function StudioWork() {
             employing people with intellectual and developmental disabilities.
           </p>
           <p>
-            The engagement is sponsored by Arc Thrift’s CEO. Our team includes
-            two project managers and four to six analysts, with a planned final
-            presentation to The Arc’s national board in December.
+            Arc Thrift’s CEO sponsors the engagement. Four to six analysts work
+            with two project managers. The team plans to present its
+            recommendations to The Arc’s national board in December.
           </p>
           <Button href="https://arcthrift.com">Visit Arc Thrift Stores</Button>
         </div>
       </section>
       <section className="st-wrap st-detail-body">
         <h2>
-          A semester
+          A business question.
           <br />
-          of real client work.
+          A clear recommendation.
         </h2>
         <div>
           <p>
-            Weekly working sessions, research and analysis, a midpoint review,
-            and a final presentation. Students learn how to turn an open
-            question into a considered recommendation.
+            The team develops its analysis through weekly working sessions and a
+            midpoint review. The final presentation connects the research to
+            recommendations the client can evaluate.
           </p>
-          <Button to="/consulting/practice">Inside the practice</Button>
+          <Button to="/consulting/practice">How we work</Button>
         </div>
       </section>
       <Callout />
@@ -471,20 +472,21 @@ export function StudioPractice() {
       <Intro
         title={
           <>
-            Student-led.
+            Ambitious thinking.
             <br />
-            <em>Purpose-driven.</em>
+            <em>Disciplined work.</em>
           </>
         }
       >
         <p>
-          UBLDA Consulting is the pro bono consulting program of Undergraduate
-          Business Leaders for Diverse Abilities at Michigan Ross.
+          UBLDA Consulting is the student-led consulting division of
+          Undergraduate Business Leaders for Diverse Abilities at Michigan Ross.
+          We work pro bono.
         </p>
         <p>
-          We support disability-focused organizations with business strategy
-          and help companies across industries with accessibility research,
-          programs, and workplace inclusion.
+          We help disability-focused organizations address business challenges.
+          We also help companies across industries improve their accessibility
+          strategies and programs.
         </p>
       </Intro>
       <div className="st-wrap st-practice-art">
@@ -492,30 +494,31 @@ export function StudioPractice() {
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
-          Small teams.
-          <br />A clear question.
+          Focused teams.
+          <br />Critical thinking.
           <br />
-          Shared responsibility.
+          Practical recommendations.
         </h2>
         <div>
           <p>
-            Analysts work in teams of four to six, supported by two project
-            managers. Together, they research a client’s question, test their
-            thinking, and develop recommendations.
+            Four to six analysts work with two project managers. They research
+            the client’s question and test their assumptions before
+            recommending a direction.
           </p>
           <p>
-            Weekly deliverables, a midpoint review, and a final presentation
-            give the work structure and give students regular feedback.
+            Weekly deliverables keep the project moving. A midpoint review gives
+            the team feedback to strengthen its analysis before the final
+            presentation.
           </p>
           <p>
-            You don’t need prior consulting experience. Curiosity,
-            follow-through, and a willingness to learn matter.
+            Bring curiosity and the discipline to follow through. You do not need
+            prior consulting experience.
           </p>
           <Button to="/consulting/contact#join">Join the team</Button>
         </div>
       </section>
       <section className="st-wrap st-section">
-        <h2 className="st-section-heading">Fall 2026, step by step</h2>
+        <h2 className="st-section-heading">The Fall 2026 timeline</h2>
         <Timeline />
       </section>
       <Callout join />
@@ -579,14 +582,15 @@ export function StudioInsights() {
       <Intro
         title={
           <>
-            The case for
+            Disability inclusion.
             <br />
-            <em>including more people.</em>
+            <em>A business priority.</em>
           </>
         }
       >
         <p>
-          Research on disability, employment, and business performance.
+          Understand the scale of disability and its relevance to business.
+          Explore research on market reach and workforce participation.
         </p>
       </Intro>
       <section className="st-wrap st-section">
@@ -622,15 +626,16 @@ export function StudioInsight() {
           <small>{item.source}</small>
         </div>
         <div>
-          <h2>Why we’re paying attention</h2>
+          <h2>What it means for business</h2>
           <p>{item.takeaway}</p>
-          <h2>Read the number in context</h2>
+          <h2>What the data shows</h2>
           <p>{item.context}</p>
           <a className="st-text-link" href={item.url}>
             Read the original source <ArrowUpRight size={18} />
           </a>
           <p className="st-article-note">
-            Independent research, not UBLDA results. Source checked September 16, 2026.
+            These findings come from independent research. They are not UBLDA
+            project results. Source checked September 16, 2026.
           </p>
           <Button to="/consulting/insights">All insights</Button>
         </div>
@@ -676,7 +681,7 @@ function InquiryForm() {
         />
       </label>
       <label>
-        What would you like to work on?
+        What business challenge are you working on?
         <textarea name="message" rows={4} required maxLength={4000} />
       </label>
       <button className="st-button st-button--solid" type="submit">
@@ -710,14 +715,15 @@ export function StudioContact() {
       <Intro
         title={
           <>
-            Let’s put a good
+            What comes next
             <br />
-            <em>question to work.</em>
+            <em>for your business?</em>
           </>
         }
       >
         <p>
-          Get in touch about a project or joining the team.
+          Tell us what you want to achieve. We’ll discuss whether a focused
+          consulting project can help. Students can explore opportunities below.
         </p>
         <div className="st-contact-emails">
           {LEADERS.map((l) => (
@@ -743,9 +749,9 @@ export function StudioContact() {
         <div className="st-wrap">
           <div className="st-section-top">
             <h2 className="st-section-heading">
-              Your first consulting project
+              Build your skills.
               <br />
-              can mean something.
+              Take on a real business challenge.
             </h2>
             <p>
               Open to University of Michigan undergraduates of all majors and
@@ -760,8 +766,8 @@ export function StudioContact() {
             <div className="st-opening">
               <div>
                 <p>
-                  Join four to six analysts and two project managers for weekly
-                  client work, October through December.
+                  Work in a team of four to six analysts with two project managers.
+                  Weekly client work runs from October through December.
                 </p>
                 <p>
                   {windowState === "open"
@@ -787,8 +793,9 @@ export function StudioContact() {
             </summary>
             <div className="st-opening">
               <p>
-                Join UBLDA for speaker events, workshops, and community. General
-                membership is free and doesn’t require a selection process.
+                Learn through speaker events and workshops. Connect with students
+                who care about disability in business. General membership is
+                free and open without a selection process.
               </p>
               <Button href={MEMBERSHIP_FORM_URL}>Join UBLDA</Button>
             </div>

@@ -6,14 +6,14 @@ export const RESEARCH = [
     source: "World Health Organization",
     date: "March 2023",
     value: "1.3B",
-    title: "Disability is part of the market. Plan for it.",
+    title: "Disability belongs in your market strategy.",
     summary:
       "An estimated 1.3 billion people worldwide experience significant disability. That is about one in six people.",
     url: "https://www.who.int/news-room/fact-sheets/detail/disability-and-health",
     takeaway:
-      "A product, service, or program can exclude people before anyone notices a problem. Accessibility belongs in early research, everyday decisions, and the way success is measured.",
+      "Accessibility shapes who can use your products and services. Include disabled people in early research so their needs inform business decisions and measures of success.",
     context:
-      "WHO’s estimate concerns significant disability globally. Disability is diverse: one person’s experience cannot stand in for everyone’s.",
+      "WHO’s estimate covers significant disability worldwide. Needs and experiences vary. Research should account for that variation.",
   },
   {
     id: "the-business-case",
@@ -21,14 +21,14 @@ export const RESEARCH = [
     source: "Accenture · Disability:IN · AAPD",
     date: "November 2023",
     value: "1.6×",
-    title: "The business case for disability inclusion.",
+    title: "Disability inclusion and business performance.",
     summary:
       "Disability-inclusion leaders in Accenture’s study generated 1.6 times the revenue of other participating companies.",
     url: "https://newsroom.accenture.com/news/2023/companies-that-lead-in-disability-inclusion-outperform-peers-financially-reveals-new-research-from-accenture",
     takeaway:
-      "For business students, inclusion deserves serious attention in strategy and operations. Research can help frame the question; client-specific evidence must guide the recommendation.",
+      "Disability inclusion deserves a place in business strategy. Use this research to frame the opportunity. Use evidence from your own organization to decide where to act.",
     context:
-      "The 2023 research analyzed about 346 unique Disability Equality Index respondents from 2015–2022. This is an association in the study sample, not proof of causation or a promised return from consulting.",
+      "The 2023 study analyzed about 346 unique Disability Equality Index respondents from 2015–2022. The association does not establish causation or predict the return from a consulting project.",
   },
   {
     id: "employment-and-access",
@@ -36,14 +36,14 @@ export const RESEARCH = [
     source: "U.S. Bureau of Labor Statistics",
     date: "March 2026 · 2025 data",
     value: "38.1%",
-    title: "Employment access remains a business question.",
+    title: "A broader view of workforce opportunity.",
     summary:
-      "In 2025, 38.1% of U.S. people with a disability ages 16–64 were employed, according to BLS.",
+      "BLS reports that 38.1% of U.S. people with a disability ages 16–64 were employed in 2025.",
     url: "https://www.bls.gov/news.release/disabl.nr0.htm",
     takeaway:
-      "Recruiting, onboarding, and everyday workplace systems affect who can participate. Examining those experiences can help organizations identify barriers they can act on.",
+      "Recruiting and workplace systems shape access to employment. Examine the path from application to onboarding to identify barriers your organization can address.",
     context:
-      "This is an employment-to-population ratio, not an unemployment rate. BLS used 11 months of data because October 2025 was not collected, so the annual estimate is not strictly comparable with other years.",
+      "This figure measures the share of the population that is employed. It is not an unemployment rate. BLS used 11 months of data because October 2025 was not collected. The annual estimate is not strictly comparable with other years.",
   },
 ];
 
@@ -51,9 +51,9 @@ export const AREAS = [
   {
     id: "strategy",
     title: "Strategy & growth",
-    desc: "Help organizations with a disability mission make informed choices about where to go next.",
+    desc: "Identify growth opportunities and evaluate the next move for your disability-focused organization.",
     detail:
-      "We research markets, compare options, and develop business cases that connect an organization’s ambitions to practical decisions.",
+      "We research your market and compare strategic options. The resulting business case helps your team assess opportunities and choose a direction.",
     examples: [
       "Market and competitor research",
       "Program and growth opportunities",
@@ -63,9 +63,9 @@ export const AREAS = [
   {
     id: "accessibility",
     title: "Accessible experiences",
-    desc: "Look closely at the websites, communications, and programs people use. Find the barriers. Recommend improvements.",
+    desc: "Identify access barriers in your products and services. Prioritize practical improvements.",
     detail:
-      "We examine how people find information and take part in an organization’s services, with attention to disability and accessibility.",
+      "We examine how disabled people find information and use your services. Our research helps your team understand barriers and evaluate improvements.",
     examples: [
       "Websites and app experiences",
       "Documents and communications",
@@ -75,9 +75,9 @@ export const AREAS = [
   {
     id: "workplace",
     title: "Inclusive workplaces",
-    desc: "Help organizations understand how recruiting, hiring, and everyday work can include more people.",
+    desc: "Find ways to make hiring and everyday work more accessible to disabled people.",
     detail:
-      "We look at the employee journey and research ways to make information, processes, and support easier to access.",
+      "We study the path from recruitment to everyday work. Our recommendations help your team assess how workplace processes and support could better serve disabled employees.",
     examples: [
       "Recruiting and hiring experiences",
       "Onboarding and employee communication",
