@@ -4,7 +4,7 @@ import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { Bands, Button, Callout, Intro, Studio } from "./Studio";
 import { GenerativeArt } from "./GenerativeArt";
 import { AREAS, RESEARCH } from "./research";
-import { LEADERS, PARTNERS, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
+import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import {
   APPLY_DEADLINE_LABEL,
@@ -20,7 +20,6 @@ const enterDelay = (ms: number) =>
   ({ "--enter-delay": `${ms}ms` }) as CSSProperties;
 
 const LOGO_ASSETS: Record<string, string> = {
-  "/partners-ross.png": "/consulting/logos/ross.svg",
   "/partners-arc-thrift.png": "/consulting/logos/arc-thrift.svg",
   "/partners-nestidd.png": "/consulting/logos/nestidd.svg",
   "/partners-microsoft.png": "/consulting/logos/microsoft.svg",
@@ -222,10 +221,6 @@ export function StudioHome() {
       <section className="st-wrap st-positioning">
         <div className="st-affiliations" data-enter>
           <div>
-            <BrandLogo src="/partners-ross.png" alt="Michigan Ross" />
-            <small>Our campus</small>
-          </div>
-          <div>
             <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
             <small>Fall 2026 client</small>
           </div>
@@ -243,7 +238,7 @@ export function StudioHome() {
         </div>
         <div className="st-statement" data-enter>
           <p>
-            We’re a student consulting practice at Michigan Ross, working at the
+            We’re a student consulting practice working at the
             intersection of business and disability inclusion.
           </p>
           <p>
@@ -251,6 +246,7 @@ export function StudioHome() {
             disability-focused organizations and accessibility teams. Pro bono.
             Built around a real business question.
           </p>
+          <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
       </section>
       <Metrics />
@@ -554,31 +550,16 @@ export function StudioPartners() {
           </>
         }
       >
-        <p>
-          Our connections at Michigan Ross bring students together with people
-          working in disability-focused businesses.
-        </p>
+        <p>{PARTNER_STATEMENT}</p>
       </Intro>
       <div className="st-wrap st-partner-grid">
-        {PARTNERS.map((partner, i) => (
+        {PARTNERS.map((partner) => (
           <article key={partner.src}>
             <div>
               <BrandLogo src={partner.src} alt="" />
             </div>
             <h2>{partner.alt.split(" — ")[0]}</h2>
-            <p>
-              {
-                [
-                  "Our campus and business-school community",
-                  "Campus community",
-                  "MBA community",
-                  "Disability-focused business connection",
-                  "Fall 2026 consulting client",
-                  "Speaker’s organization",
-                  "Club partner",
-                ][i]
-              }
-            </p>
+            <p>{partner.role}</p>
           </article>
         ))}
       </div>

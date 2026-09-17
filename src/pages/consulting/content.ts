@@ -123,16 +123,14 @@ export const CLIENT = {
 }
 
 export const PARTNER_STATEMENT =
-  'Our connections at Michigan Ross bring students together with people working in disability-focused businesses.'
+  'UBLDA is a student organization affiliated with the Stephen M. Ross School of Business and partnered with its Office of Community, Culture, and Belonging.'
 
 export const PARTNERS = [
-  { src: '/partners-ross.png', alt: 'Michigan Ross School of Business' },
-  { src: '/partners-occb.png', alt: 'Office of Community, Culture, and Belonging' },
-  { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities' },
-  { src: '/partners-nestidd.png', alt: 'Nestidd' },
-  { src: '/partners-arc-thrift.png', alt: 'Arc Thrift Stores — Fall 2026 client' },
-  { src: '/partners-microsoft.png', alt: 'Microsoft — speaker’s organization' },
-  { src: '/partners-wso.png', alt: 'Wall Street Oasis — club partner' },
+  { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities', role: 'MBA community' },
+  { src: '/partners-nestidd.png', alt: 'Nestidd', role: 'Disability-focused business connection' },
+  { src: '/partners-arc-thrift.png', alt: 'Arc Thrift Stores — Fall 2026 client', role: 'Fall 2026 consulting client' },
+  { src: '/partners-microsoft.png', alt: 'Microsoft — speaker’s organization', role: 'Speaker’s organization' },
+  { src: '/partners-wso.png', alt: 'Wall Street Oasis — club partner', role: 'Club partner' },
 ]
 
 export const LEADERS = [

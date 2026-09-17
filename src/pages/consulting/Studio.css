@@ -329,7 +329,7 @@ html.st-menu-open {
 }
 .st-affiliations {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 70px;
   align-items: center;
   margin-bottom: 115px;
@@ -361,6 +361,13 @@ html.st-menu-open {
 }
 .st-statement p + p {
   margin-top: 40px;
+}
+.st-statement .st-campus-affiliation {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--st-muted);
+  max-width: 760px;
+  margin-inline: auto;
 }
 .st-statement p:last-child {
   margin-bottom: 0;
@@ -1003,14 +1010,8 @@ html.st-menu-open {
 .st-client-logos .st-brand-logo[src*="arc-thrift"] {
   max-width: 112px;
 }
-.st-affiliations .st-brand-logo[src*="ross"] {
-  max-width: 210px;
-}
 .st-partner-grid .st-brand-logo[src*="arc-thrift"] {
   max-width: 120px;
-}
-.st-partner-grid .st-brand-logo[src*="occb"] {
-  max-width: 192px;
 }
 .st-partner-grid .st-brand-logo--reverse {
   max-width: 175px;
@@ -1686,8 +1687,8 @@ html.st-menu-open {
     padding-bottom: 80px;
   }
   .st-affiliations {
-    grid-template-columns: 1fr 1fr;
-    gap: 35px 30px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 18px;
     margin-bottom: 75px;
   }
   .st-affiliations img {
