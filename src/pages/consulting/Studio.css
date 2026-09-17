@@ -21,22 +21,22 @@ html.st-menu-open {
   overflow: hidden;
 }
 .st {
-  /* Ink & Persimmon: parent navy anchors a distinct, warm consulting identity. */
-  --st-accent: #b63e26;
+  /* UBLDA Consulting: parent navy/teal with a cobalt service-division accent. */
+  --st-accent: #3559a8;
   --st-ink: #0a3658;
   --st-paper: #faf9f6;
-  --st-dark: #141f2e;
+  --st-dark: #092c49;
   --st-brand-teal: #67b8b3;
-  --st-highlight: #ffddcc;
-  --st-surface: #eeece7;
+  --st-highlight: #e0e8ff;
+  --st-surface: #eeefed;
   --st-card: #ffffff;
-  --st-cool: #dce4f1;
+  --st-cool: #e5eaf4;
   --st-muted: #59616b;
   --st-muted-light: #c1c8d2;
   --st-rule: #0a365826;
   /* Keep the shader geometry and timing; only its color endpoints change. */
-  --st-band-bright: #ad3c24;
-  --st-band-dark: #141f2e;
+  --st-band-bright: #385b9e;
+  --st-band-dark: #092c49;
   font:
     400 18px/1.5 "Studio Sans",
     sans-serif;
@@ -124,7 +124,7 @@ html.st-menu-open {
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
-  gap: 6px;
+  gap: 8px;
 }
 .st-parent-link {
   display: inline-flex;
@@ -142,28 +142,17 @@ html.st-menu-open {
   display: none;
 }
 .st-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   flex-shrink: 0;
-  font-size: 29px;
-  line-height: 0.9;
-  letter-spacing: -1px !important;
+  line-height: 0;
 }
 .st-logo img {
-  width: 35px;
-  height: 40px;
-  object-fit: contain;
-  filter: grayscale(1) brightness(0.25);
+  display: block;
+  width: 140px;
+  height: auto;
 }
 .st-header--light .st-logo img {
   filter: brightness(0) invert(1);
-}
-.st-logo small {
-  display: block;
-  font-size: 9px;
-  letter-spacing: 2px !important;
-  margin-top: 7px;
 }
 .st-navlinks {
   display: flex;
@@ -546,7 +535,7 @@ html.st-menu-open {
 .st-card-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, #141f2ee6);
+  background: linear-gradient(transparent 30%, #092c49e6);
   transition: background 0.3s;
 }
 .st-service-card h3 {
@@ -584,7 +573,7 @@ html.st-menu-open {
 }
 .st-service-card:hover .st-card-scrim,
 .st-service-card:focus-visible .st-card-scrim {
-  background: #141f2e99;
+  background: #092c4999;
 }
 .st-service-card:hover .st-service-desc,
 .st-service-card:focus-visible .st-service-desc {
@@ -608,7 +597,7 @@ html.st-menu-open {
   padding: 64px;
   width: 100%;
   min-height: 430px;
-  background: linear-gradient(90deg, #141f2ed9, transparent 75%);
+  background: linear-gradient(90deg, #092c49d9, transparent 75%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1437,7 +1426,10 @@ html.st-menu-open {
 }
 @media (max-width: 1024px) {
   .st-header-inner {
-    height: 100px;
+    height: 120px;
+  }
+  .st-logo img {
+    width: 112px;
   }
   .st button.st-menu-toggle {
     display: block;
@@ -1662,17 +1654,11 @@ html.st-menu-open {
     width: calc(100% - 60px);
   }
   .st-header-inner {
-    height: 96px;
-  }
-  .st-logo {
-    font-size: 25px;
+    height: 120px;
   }
   .st-logo img {
-    width: 29px;
-    height: 34px;
-  }
-  .st-logo small {
-    font-size: 8px;
+    width: 112px;
+    height: auto;
   }
   .st-menu-open .st-menu-toggle {
     right: 30px;
@@ -1829,7 +1815,7 @@ html.st-menu-open {
     filter: brightness(0.65);
   }
   .st-card-scrim {
-    background: linear-gradient(#141f2e55, transparent 55%, #141f2edd);
+    background: linear-gradient(#092c4955, transparent 55%, #092c49dd);
   }
   .st-callout {
     margin-top: 75px;

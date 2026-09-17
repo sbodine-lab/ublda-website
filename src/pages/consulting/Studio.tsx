@@ -265,10 +265,12 @@ export function Studio({
               className="st-logo"
               aria-label="UBLDA Consulting home"
             >
-              <img src="/consulting/logos/ublda.svg" alt="" />
-              <span>
-                UBLDA<small>CONSULTING</small>
-              </span>
+              <img
+                src="/consulting/logos/consulting-wordmark-color.svg"
+                alt="UBLDA Consulting"
+                width="140"
+                height="70"
+              />
             </Link>
             <Link to="/" className="st-parent-link">
               <ArrowLeft size={13} aria-hidden="true" /> UBLDA home

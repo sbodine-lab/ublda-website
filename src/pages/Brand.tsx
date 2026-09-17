@@ -91,19 +91,20 @@ export default function Brand() {
 
           <h3 className="brand-subsection">UBLDA Consulting</h3>
           <p className="brand-section__desc">
-            Ink &amp; Persimmon gives Consulting a distinct editorial identity.
-            UBLDA navy anchors warm paper and white surfaces; persimmon marks actions
-            and emphasis. Cool blue and the parent teal appear selectively in artwork.
+            UBLDA Consulting is a service division within the UBLDA brand family.
+            It shares the parent navy, teal, and warm white, with cobalt blue for
+            actions and emphasis. White panels and pale blue surfaces keep the
+            division distinct without separating it from UBLDA.
           </p>
           <div className="brand-swatch-grid">
-            <ColorSwatch name="Persimmon" hex="#B63E26" token="--st-accent" usage="Actions, links, selected states, and focused emphasis" />
+            <ColorSwatch name="Cobalt" hex="#3559A8" token="--st-accent" usage="Actions, links, selected states, and focused emphasis" />
             <ColorSwatch name="UBLDA Navy" hex="#0A3658" token="--st-ink" usage="Primary text; connection to the parent brand" />
-            <ColorSwatch name="Ink" hex="#141F2E" token="--st-dark" usage="Dark sections, footer, and shader shadows" />
+            <ColorSwatch name="Deep Navy" hex="#092C49" token="--st-dark" usage="Dark sections, footer, and shader shadows" />
             <ColorSwatch name="Paper" hex="#FAF9F6" token="--st-paper" usage="Warm neutral reading surfaces" light />
             <ColorSwatch name="White" hex="#FFFFFF" token="--st-card" usage="Client and metric panels" light />
-            <ColorSwatch name="Stone" hex="#EEECE7" token="--st-surface" usage="Quiet supporting surfaces" light />
-            <ColorSwatch name="Peach" hex="#FFDDCC" token="--st-highlight" usage="Highlights and focus rings on dark backgrounds" light />
-            <ColorSwatch name="Blue Gray" hex="#DCE4F1" token="--st-cool" usage="Research bands and accessibility artwork" light />
+            <ColorSwatch name="Stone" hex="#EEEFED" token="--st-surface" usage="Quiet supporting surfaces" light />
+            <ColorSwatch name="Ice Blue" hex="#E0E8FF" token="--st-highlight" usage="Highlights and focus rings on dark backgrounds" light />
+            <ColorSwatch name="Blue Gray" hex="#E5EAF4" token="--st-cool" usage="Research bands and accessibility artwork" light />
           </div>
 
           <h3 className="brand-subsection">Neutrals</h3>
@@ -232,8 +233,30 @@ export default function Brand() {
               <span className="brand-logo-lockup__text">UBLDA</span>
             </div>
             <p className="brand-logo-lockup__note">
-              Use Plus Jakarta Sans for the wordmark. The consulting header uses a consistent medium weight across every letter.
+              Use Plus Jakarta Sans for the parent wordmark. Consulting uses the separate typographic lockup below.
             </p>
+          </div>
+
+          <h3 className="brand-subsection">Consulting wordmark</h3>
+          <p className="brand-section__desc">
+            Keep “UBLDA” and “Consulting” together. The parent name identifies the
+            organization; the service name identifies its specialized division.
+            Use this wordmark without the parent pictorial mark or another icon.
+            The outlined SVG files stay sharp and do not require installed fonts.
+          </p>
+          <div className="brand-logo-grid">
+            <div className="brand-logo-card">
+              <div className="brand-logo-card__preview">
+                <img src="/consulting/logos/consulting-wordmark-color.svg" alt="UBLDA Consulting wordmark" width="200" height="100" />
+              </div>
+              <a href="/consulting/logos/consulting-wordmark-color.svg" download>Download color SVG</a>
+            </div>
+            <div className="brand-logo-card">
+              <div className="brand-logo-card__preview brand-logo-card__preview--dark">
+                <img src="/consulting/logos/consulting-wordmark-white.svg" alt="UBLDA Consulting wordmark in white" width="200" height="100" />
+              </div>
+              <a href="/consulting/logos/consulting-wordmark-white.svg" download>Download white SVG</a>
+            </div>
           </div>
 
           <h3 className="brand-subsection">Logo Usage Rules</h3>

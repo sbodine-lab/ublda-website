@@ -1,44 +1,57 @@
-# UBLDA Consulting — Ink & Persimmon
+# UBLDA Consulting — service-division identity
 
-September 16, 2026. This supersedes the earlier teal/mint consulting palette after Sam found it too blended and monochromatic.
+September 16, 2026. Supersedes Ink & Persimmon after Sam rejected red and requested a clearer subbrand relationship, a new wordmark, and colors grounded in professional brand-architecture practice.
 
-## Design rationale
+## Architecture and positioning
 
-Retain UBLDA navy (#0A3658) and warm paper (#FAF9F6) as the family connection. Give Consulting a warm persimmon action color and a darker, less blue ink. Use mostly neutral reading surfaces, deliberate light/dark section changes, and limited warm accents. Keep the parent logo and parent site palette intact. The parent teal survives in the workplace illustration rather than coloring every surface.
+Use the parent-name + service-name model: **UBLDA Consulting**. This is a specialized division of UBLDA, not an independent organization and not a Ross institutional unit. Retain the recognizable UBLDA name, parent navy, teal and warm white. Distinguish the division through cobalt accents, a typographic wordmark, clear service language, and its established abstract art/motion system.
 
-The professional precedent is a color system with explicit roles, not a claim that any one hue is objectively more professional. IBM Carbon uses dominant neutrals, a consistent primary action color, purposeful additional colors, and light/dark contrast moments. IBM Design Language likewise lets supporting colors gain impact against a restrained core. This design applies those principles to UBLDA's own identity.
+Its scope has two sides: business strategy for organizations with a disability mission, and accessibility-related consulting for companies across industries, including corporate accessibility teams, products, services and workplaces. State that it is student-led and pro bono. Do not imply certification, legal compliance guarantees or professional credentials the team has not established.
 
-Sources:
-- https://carbondesignsystem.com/elements/color/overview/
-- https://www.ibm.com/design/language/color/
-- https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+## Evidence and design judgment
 
-## Palette and allocation
+- IBM's identity guidance describes consistent relationships between the master identity and business-unit/service logotypes: https://www.ibm.com/design/language/ibm-logos/8-bar/
+- IBM's brand-expression guidance identifies IBM Consulting among related brands and says the systems work as parts of a greater whole: https://www.ibm.com/design/event/brand-expression/
+- Virginia Tech's architecture distinguishes closely connected named extensions from more independent subbrands, demonstrating why the relationship should drive the identity: https://brand.vt.edu/architecture.html
+- IBM Carbon separates dominant neutral surfaces, a primary action color, purposeful supporting colors, and light/dark themes: https://carbondesignsystem.com/elements/color/overview/
+- Contrast criteria: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
 
-| Role | Color | Application |
+These are precedents and principles, not rules governing UBLDA. Our recommendation is a closely connected service-division identity. No source prescribes an objectively correct consulting hue, and no universal rule requires a new symbol for every division. A separate icon would add an identifier stakeholders must learn; the UBLDA Consulting name already communicates the relationship and specialization.
+
+## Wordmark
+
+The header uses an original stacked type composition: UBLDA in DM Sans Medium, Consulting in DM Sans Regular. Both lines remain together at their designed proportions. There is no parent pictorial mark, Block M, Ross mark, or new independent icon in this identity.
+
+Outlined SVG assets (no font dependency):
+- public/consulting/logos/consulting-wordmark-color.svg — parent navy + cobalt on light backgrounds.
+- public/consulting/logos/consulting-wordmark-white.svg — warm white on dark backgrounds.
+
+The website reverses the same artwork to white over the hero. Keep surrounding clear space of at least one quarter of the wordmark height, with more where possible; do not compress or stretch it. Minimum website width is 112px. The public /brand page previews and offers both assets. Regenerate from the existing fonts using scripts/design/generate-consulting-wordmark.py (fontTools required).
+
+Keep the visible UBLDA home link to the parent website. Campus affiliation and OCCB partnership remain text only. The parent organization keeps its existing logo and palette.
+
+## Color roles
+
+| Role | Hex | Use |
 | --- | --- | --- |
-| Parent navy | #0A3658 | Primary text, research bands |
-| Ink | #141F2E | Dark service pages, footer, shader shadows |
-| Paper | #FAF9F6 | Main reading surface |
-| White | #FFFFFF | Metric cards and client panel |
-| Stone | #EEECE7 | Secondary neutral surfaces |
-| Persimmon | #B63E26 | Actions, links, emphasis and selected states |
-| Peach | #FFDDCC | Highlights and focus rings on dark backgrounds |
-| Blue gray | #DCE4F1 | Research transitions and accessibility artwork |
-| Parent teal | #67B8B3 | Workplace artwork only |
-| Muted text | #59616B / #C1C8D2 | Secondary text on light / dark backgrounds |
-| Shader | #AD3C24 → #141F2E | Warm/cool contrast; existing geometry and timing |
+| UBLDA navy | #0A3658 | Main text and the parent name in the wordmark |
+| Parent teal | #67B8B3 | Selected artwork, connecting to UBLDA |
+| Cobalt | #3559A8 | Consulting action/link/emphasis color and service name |
+| Deep navy | #092C49 | Footer, dark service pages, shader shadows |
+| Warm white | #FAF9F6 | Main reading surface and reversed text |
+| White | #FFFFFF | Client and metric panels |
+| Stone | #EEEFED | Neutral supporting surfaces |
+| Ice blue | #E0E8FF | Highlights, light buttons, inverse focus rings |
+| Blue gray | #E5EAF4 | Research bands and light artwork surfaces |
+| Muted text | #59616B / #C1C8D2 | Secondary text on light / dark |
+| Shader endpoints | #385B9E → #092C49 | Blue to parent-related navy |
 
-## Page rhythm
+Avoid the previous full-site teal tint and all red/persimmon/peach treatments. Light and dark areas have distinct jobs. White client/metric panels stay separate from the page; service artwork varies across cobalt ribbon, pale-blue arches and restrained iris weave. Teal appears in the perspective and practice art. It is not applied to every surface.
 
-The homepage moves from warm animated hero to paper, cool research bands with white cards, a blue orbital illustration, three distinguishable service artworks, a warm callout, and a white client panel with a narrow persimmon rule. The footer settles into ink. This avoids simply swapping every teal area for orange.
+## Motion and verification
 
-Artwork stays original vector geometry: copper strategy ribbons, blue arches on a light ground for accessibility, parent-teal workplace weave, cool blue perspective contours, and warm/cool practice waves. Do not use artwork colors for unlabeled status or category meaning; service titles remain explicit.
+No changes to band geometry, 6.59-second phase timing, 720ms column delay, scroll behavior, pause controls or reduced-motion behavior.
 
-Keep existing font families, layout, shader geometry, scroll timing, pause behavior and reduced-motion support. The shader still uses 22 bands, a 6.59-second cycle and 720ms column delay. No new dependencies, stock photos, or image downloads.
+Calculated color contrast: cobalt/warm white 6.34:1; cobalt/stone 5.79:1; muted text/stone 5.44:1; navy/ice blue 10.20:1; white text over brightest shader endpoint 6.32:1; ice-blue text over that endpoint 5.43:1; muted light text/deep navy 8.49:1. RGB interpolation between the shader endpoints stays within those luminance bounds.
 
-## Verification
-
-Color-pair calculations: persimmon/paper 5.38:1; persimmon/stone 4.80:1; muted text/stone 5.31:1; paper/brightest shader endpoint 5.78:1; secondary light text/ink 9.85:1. Peach was lightened to #FFDDCC so even normal text exceeds 4.5:1 against the brightest shader endpoint. Interpolation between shader endpoints remains bounded by those endpoint luminances.
-
-Chrome: all 14 consulting routes at 390px without horizontal overflow. Computed text colors on flat backgrounds passed the applicable 4.5:1 or 3:1 threshold. This targeted check excludes canvas, gradients, and artwork overlays, which receive separate visual and endpoint checks; it is not a full accessibility audit. Desktop hero, service cards and section transitions visually reviewed. Existing motion and geometry were not changed.
+Chrome QA includes desktop and mobile visual review, the wordmark on light/dark backgrounds, layout at responsive breakpoints, all consulting routes, flat-background text contrast and parent-site navigation. Flat-background checks exclude artwork overlays and canvas, which need separate visual and endpoint checks; this is not a full accessibility audit.
