@@ -5,6 +5,7 @@ import AnnouncementBanner from './components/AnnouncementBanner'
 import { CONSULTING_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 import Home from './pages/Home'
+const EquatorSite = lazy(() => import('./features/equator/EquatorSite'))
 import Table from './pages/Table'
 import { useTabEasterEgg } from './hooks/useTabEasterEgg'
 
@@ -76,6 +77,10 @@ export default function App() {
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
+  // The club design is scoped to public pages; Consulting and operations retain their own UI.
+  if (['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe'].includes(pathname)) {
+    return <Suspense fallback={<PageFallback />}><EquatorSite /></Suspense>
+  }
   if (inDecisionCenter) {
     return (
       <>
