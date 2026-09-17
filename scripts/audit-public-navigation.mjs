@@ -69,7 +69,8 @@ try {
     }
     await ready();
     await routeClick(page.locator('.eq-team-link'),`Meet the executive board ${width}`);
-    await routeClick(page.locator('.eq-cta').getByRole('link',{name:'Join UBLDA',exact:true}),`Join CTA ${width}`);
+    check(`Join CTA opens membership form ${width}`, (await page.locator(".eq-cta").getByRole("link",{name:"Join UBLDA",exact:true}).getAttribute("href"))?.includes("1FAIpQLSdC4ZFjdoCPnydqAI2ctdHK1AbWfXlVfNbrSiC_Z5ZB9cyTrg/viewform"));
+    check(`Footer Join opens membership form ${width}`, (await page.locator(".eq-footer-nav").getByRole("link",{name:"Join",exact:true}).getAttribute("href"))?.includes("1FAIpQLSdC4ZFjdoCPnydqAI2ctdHK1AbWfXlVfNbrSiC_Z5ZB9cyTrg/viewform"));
     await ready();
     await routeClick(page.locator('.eq-cta').getByRole('link',{name:'Come to an event',exact:true}),`Events CTA ${width}`);
     await ready();
@@ -78,7 +79,7 @@ try {
     await routeClick(page.getByRole('link',{name:'Explore past events',exact:true}),`Past events anchor ${width}`);
     await page.locator('.eq-event-recap summary').first().click();
     check(`Event recap expands ${width}`, await page.locator('.eq-event-recap').first().evaluate(el=>el.open));
-    for(const href of ['/about','/events','/team','/consulting','/join','/brand','/links','/unsubscribe']) {
+    for(const href of ['/about','/events','/team','/consulting','/brand','/links','/unsubscribe']) {
       await ready();
       await routeClick(page.locator(`.eq-footer-nav a[href="${href}"]`),`Footer ${href} ${width}`);
     }
