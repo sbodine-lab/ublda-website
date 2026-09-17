@@ -282,21 +282,13 @@ export function StudioHome() {
         <ServiceCards />
       </section>
       <Callout />
-      <section className="st-wrap st-client-feature">
-        <div className="st-client-visual" data-enter>
-          <ClientLogos />
-          <p>Fall 2026</p>
-          <span>
-            Business with
-            <br />a disability mission.
-          </span>
-        </div>
-        <div data-enter>
-          <h2>
-            Arc Thrift Stores
-            <br />
-            of Colorado
-          </h2>
+      <section
+        className="st-wrap st-client-feature"
+        aria-labelledby="client-heading"
+        data-enter
+      >
+        <div className="st-client-copy">
+          <h2 id="client-heading">Arc Thrift Stores of Colorado</h2>
           <p>
             Colorado’s nonprofit thrift chain funds the state’s Arc chapters and
             is one of its largest employers of people with intellectual and
@@ -307,6 +299,16 @@ export function StudioHome() {
             end of the semester.
           </p>
           <Button to="/consulting/work">Meet our client</Button>
+        </div>
+        <div className="st-client-marks">
+          <figure>
+            <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+            <figcaption>Fall 2026 client</figcaption>
+          </figure>
+          <figure>
+            <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
+            <figcaption>National board presentation</figcaption>
+          </figure>
         </div>
       </section>
       <section className="st-wrap st-section">

@@ -593,39 +593,53 @@ html.st-menu-open {
 }
 .st-client-feature {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
-  padding-top: 150px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+  gap: 72px;
+  margin-top: 120px;
+  padding: 64px;
+  background: var(--st-surface);
   align-items: center;
 }
 .st-client-feature h2 {
-  font-size: 49.6px;
-  margin-bottom: 40px;
+  font-size: clamp(36px, 3.2vw, 52px);
+  line-height: 1.08;
+  max-width: 570px;
+  margin-bottom: 28px;
 }
-.st-client-feature p:not(.st-eyebrow) {
-  font-size: 23px;
-  line-height: 1.35;
+.st-client-copy p {
+  font-size: 20px;
+  line-height: 1.5;
   color: var(--st-muted);
+  max-width: 620px;
 }
 .st-client-feature .st-button {
   margin-top: 20px;
 }
-.st-client-visual {
-  min-height: 580px;
-  background: var(--st-surface);
-  padding: 48px;
+.st-client-marks {
+  padding-left: 56px;
+  border-left: 1px solid #0a365826;
+}
+.st-client-marks figure {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-block: 28px;
 }
-.st-client-visual > span {
-  font-size: 60px;
-  line-height: 1.06;
-  letter-spacing: -1.5px;
+.st-client-marks figure + figure {
+  border-top: 1px solid #0a365826;
 }
-.st-client-visual > p {
-  font-size: 15px !important;
-  margin: 70px 0 14px !important;
+.st-client-marks img {
+  width: 180px;
+  height: 125px;
+  object-fit: contain;
+}
+.st-client-marks figcaption {
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--st-muted);
 }
 .st-client-logos {
   display: flex;
@@ -638,9 +652,7 @@ html.st-menu-open {
   height: 110px;
   object-fit: contain;
 }
-.st-client-visual .st-client-logos img {
-  height: 95px;
-}
+
 .st-insight-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1348,9 +1360,6 @@ html.st-menu-open {
   .st-service-card h3 {
     font-size: 30px;
   }
-  .st-client-visual > span {
-    font-size: 50px;
-  }
 }
 @media (max-width: 1200px) {
   .st-wrap {
@@ -1367,7 +1376,11 @@ html.st-menu-open {
     gap: 50px;
   }
   .st-client-feature {
-    gap: 60px;
+    gap: 40px;
+    padding: 44px;
+  }
+  .st-client-marks {
+    padding-left: 32px;
   }
   .st-section-heading,
   .st-client-feature h2,
@@ -1518,23 +1531,17 @@ html.st-menu-open {
     font-size: 42px;
   }
   .st-client-feature {
-    gap: 40px;
-    padding-top: 100px;
+    gap: 32px;
+    margin-top: 100px;
+    padding: 36px;
   }
   .st-client-feature h2 {
-    font-size: 40px;
-  }
-  .st-client-visual {
-    padding: 30px;
-    min-height: 480px;
-  }
-  .st-client-visual > span {
     font-size: 40px;
   }
   .st-client-logos {
     gap: 25px;
   }
-  .st-client-feature p:not(.st-eyebrow) {
+  .st-client-copy p {
     font-size: 20px;
   }
   .st-insight-art {
@@ -1812,21 +1819,38 @@ html.st-menu-open {
   }
   .st-client-feature {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding-top: 80px;
+    gap: 30px;
+    margin-top: 80px;
+    padding: 30px 24px;
   }
-  .st-client-visual {
-    min-height: 430px;
-    padding: 30px;
+  .st-client-marks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    border-left: 0;
+    border-top: 1px solid #0a365826;
+    padding: 24px 0 0;
   }
-  .st-client-visual > span {
-    font-size: 44px;
+  .st-client-marks figure {
+    padding: 0;
+    gap: 16px;
+  }
+  .st-client-marks figure + figure {
+    border-top: 0;
+  }
+  .st-client-marks img {
+    width: 100%;
+    max-width: 145px;
+    height: 100px;
+  }
+  .st-client-marks figcaption {
+    font-size: 12px;
   }
   .st-client-feature h2 {
     font-size: 38px;
     margin-bottom: 25px;
   }
-  .st-client-feature p:not(.st-eyebrow) {
+  .st-client-copy p {
     font-size: 19px;
   }
   .st-client-feature .st-button {
