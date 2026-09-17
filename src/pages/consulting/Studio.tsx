@@ -210,10 +210,7 @@ export function Studio({
     return () => desktop.removeEventListener("change", onChange);
   }, [closeMenu]);
   useEffect(() => {
-    document.title =
-      title === "Home"
-        ? "UBLDA Consulting | Student consulting at Michigan Ross"
-        : `${title} · UBLDA Consulting`;
+    document.title = "UBLDA Consulting";
     const frame = requestAnimationFrame(() => {
       const target = (hash && document.getElementById(hash.slice(1))) || root.current?.querySelector<HTMLElement>("main");
       if (target) {

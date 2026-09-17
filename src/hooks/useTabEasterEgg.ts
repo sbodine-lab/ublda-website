@@ -16,8 +16,9 @@ const GREETING_MS = 2000
  * background or unfocused tab becomes visible through this same event, and
  * greeting that arrival would welcome back a first-time visitor.
  */
-export function useTabEasterEgg() {
+export function useTabEasterEgg(enabled = true) {
   useEffect(() => {
+    if (!enabled) return
     let pageTitle = document.title
     let timeout: ReturnType<typeof setTimeout> | undefined
     let hasLeft = false
@@ -50,5 +51,5 @@ export function useTabEasterEgg() {
       clearTimeout(timeout)
       if (isGreeting(document.title)) document.title = pageTitle
     }
-  }, [])
+  }, [enabled])
 }

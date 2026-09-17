@@ -1135,17 +1135,7 @@ export default function EquatorSite() {
     return () => context.revert();
   }, [motionPaused, pathname]);
   useEffect(() => {
-    const titles: Record<string, string> = {
-      "/": "Disability inclusion belongs in business",
-      "/about": "Our Story",
-      "/team": "Our Team",
-      "/events": "Events",
-      "/join": "Join UBLDA",
-      "/brand": "Brand",
-      "/links": "Links",
-      "/unsubscribe": "Unsubscribe",
-    };
-    document.title = `${titles[pathname] || "UBLDA"} — UBLDA · Michigan Ross`;
+    document.title = "UBLDA";
     let disposed = false;
     let frame = 0;
     const el = root.current;

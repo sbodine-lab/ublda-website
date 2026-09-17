@@ -71,11 +71,11 @@ function PageFallback() {
 
 export default function App() {
   const { pathname } = useLocation()
-  useTabEasterEgg()
   // Public club and Consulting pages use local fonts. Fetch the older Google
   // font families only for routes that actually use them (workspace, table, etc.).
   const publicPage = ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe'].includes(pathname)
   const consultingPage = matchesPrefix(pathname, ['/consulting', '/advisory'])
+  useTabEasterEgg(!publicPage && !consultingPage)
   useEffect(() => {
     if (publicPage || consultingPage || document.getElementById('legacy-fonts')) return
     const stylesheet = document.createElement('link')
