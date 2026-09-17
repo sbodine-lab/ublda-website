@@ -51,7 +51,7 @@ const values = [
         from the start
       </>
     ),
-    icon: "sustainability",
+    icon: "inclusion",
     a: "Disability inclusion belongs in the decisions that shape businesses: who gets hired, what gets built, and whose needs get heard.",
     b: "We bring that conversation to Michigan Ross, and make space for students to take part.",
   },
@@ -62,7 +62,7 @@ const values = [
         <br />A shared purpose.
       </>
     ),
-    icon: "global",
+    icon: "shared",
     a: "We bring together disabled and non-disabled students, across majors and backgrounds, around a common goal.",
     b: "A business community where people with disabilities can participate, contribute, and lead.",
   },
@@ -74,7 +74,7 @@ const values = [
         in real experience
       </>
     ),
-    icon: "grounded",
+    icon: "learning",
     a: "Meet leaders working at the intersection of business and disability. Ask questions, explore their decisions, and learn from the people doing the work.",
     b: "From conversations with business leaders to student consulting projects, we connect ideas with practice.",
   },
@@ -86,7 +86,7 @@ const values = [
         Listen with care.
       </>
     ),
-    icon: "curiosity",
+    icon: "listening",
     a: "You don’t need a background in disability advocacy to get involved. Bring your questions, your perspective, and a willingness to learn.",
     b: "We want members to listen closely, challenge assumptions, and help shape what comes next.",
   },
@@ -98,7 +98,7 @@ const values = [
         Carry it forward.
       </>
     ),
-    icon: "difference",
+    icon: "community",
     a: "Our connection with BLDA, our MBA counterpart at Ross, brings undergraduate and graduate students together around a shared mission.",
     b: "We’re building relationships and experiences that students can take into their careers and communities.",
   },
@@ -540,12 +540,6 @@ function Programs() {
   );
 }
 const stories = [
-  {
-    title: "A conversation with Alli Hirt",
-    art: "microsoft",
-    text: "Our speaker program connects students with leaders working on accessibility, including Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft. See our events page for dates, formats, and details.",
-    link: "/events",
-  },
   {
     title: "Learning through client work",
     art: "arc",

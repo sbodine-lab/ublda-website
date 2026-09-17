@@ -75,14 +75,14 @@ export const STEPS: Step[] = [
   },
   {
     num: '03',
-    title: 'Interview',
+    title: 'Interviews',
     when: INTERVIEW_WINDOW_SHORT,
-    desc: `${INTERVIEW_FORMAT} Interviews are expected at Ross; confirmed dates and times will be shared with invitees.`,
+    desc: `${INTERVIEW_FORMAT} Invited applicants will receive confirmed dates and times.`,
     tone: 'gold',
   },
   {
     num: '04',
-    title: 'Offers',
+    title: 'Decisions',
     when: OFFERS_SHORT,
     desc: 'Final decisions follow interviews.',
     tone: 'cream',

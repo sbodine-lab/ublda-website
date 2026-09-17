@@ -30,7 +30,7 @@ export const APPLY_CLOSE_TIME_SHORT = 'closes 11:30 PM ET'
 export const INTERVIEW_WINDOW_SHORT = 'Late September'
 export const INTERVIEW_FORMAT = 'One interview round, split between behavioral questions and a simple case.'
 export const OFFERS_SHORT = 'After interviews'
-export const KICKOFF_SHORT = 'Early October (planned)'
+export const KICKOFF_SHORT = 'Early October'
 
 export type ApplyWindow = 'before' | 'open' | 'closed'
 

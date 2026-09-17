@@ -43,27 +43,11 @@ export function LogoStage() {
   );
 }
 
-export { ValueSculpture as Glyph } from "./ValueSculpture";
+export { ValueSymbol as Glyph } from "./ValueSymbol";
 
 export function StoryArtwork({ kind }: { kind: string }) {
   return (
     <div className={`eq-story-art eq-story-art--${kind}`} aria-hidden="true">
-      {kind === "microsoft" && (
-        <>
-          <div className="eq-art-event">
-            <span>OCT</span>
-            <strong>01</strong>
-            <span>2026</span>
-          </div>
-          <div className="eq-art-foot">
-            <span>
-              Alli Hirt
-              <br />
-              Accessibility at Microsoft
-            </span>
-          </div>
-        </>
-      )}
       {kind === "arc" && (
         <>
           <div className="eq-art-partner">
