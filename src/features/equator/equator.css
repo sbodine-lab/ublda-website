@@ -662,17 +662,18 @@
 .eq-marquee > div {
   display: flex;
   width: max-content;
-  animation: eq-marquee 32s linear infinite;
+  animation: eq-marquee 24s linear infinite;
 }
 .eq-logo-set {
   display: flex;
-  gap: 75px;
+  gap: 48px;
   align-items: center;
   flex-shrink: 0;
-  padding-right: 75px;
+  padding-right: 48px;
 }
 .eq-logo-set figure {
-  width: 180px;
+  width: 160px;
+  flex-shrink: 0;
   margin: 0;
   text-align: center;
 }
@@ -685,7 +686,7 @@
 }
 @keyframes eq-marquee {
   to {
-    transform: translateX(-50%);
+    transform: translateX(calc(-100% / var(--logo-set-count, 2)));
   }
 }
 .eq-marquee:hover > div {
@@ -1433,8 +1434,11 @@
     font-size: 21px;
   }
   .eq-logo-set {
-    gap: 40px;
-    padding-right: 40px;
+    gap: 32px;
+    padding-right: 32px;
+  }
+  .eq-logo-set figure {
+    width: 140px;
   }
   .eq-logo-set img {
     width: 125px;
