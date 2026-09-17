@@ -94,9 +94,6 @@ function Metrics() {
       aria-label="Why disability inclusion matters"
     >
       <div className="st-wrap">
-        <p className="st-eyebrow">
-          The context for our work · independent research
-        </p>
         <div className="st-metric-grid">
           {RESEARCH.map((item) => (
             <Link
@@ -142,9 +139,7 @@ function InsightCards({ filter = "All" }: { filter?: string }) {
             <span>{item.value}</span>
             <ArrowUpRight size={32} />
           </div>
-          <p className="st-eyebrow">
-            {item.category} · {item.source}
-          </p>
+          <p className="st-eyebrow">{item.source}</p>
           <h3>{item.title}</h3>
         </Link>
       ))}
@@ -168,7 +163,6 @@ function People({ full = false }: { full?: boolean }) {
             </span>
             <div />
           </div>
-          <p className="st-eyebrow">Project manager</p>
           <h2>{person.name}</h2>
           <p>{person.role.split(",")[0]}</p>
           <a className="st-text-link" href={`mailto:${person.email}`}>
@@ -211,7 +205,7 @@ function Timeline() {
       INTERVIEW_WINDOW_SHORT,
       "Two 30-minute conversations at Ross, one behavioral and one technical.",
     ],
-    ["Decisions", OFFERS_SHORT, "Receive your application decision."],
+    ["Decisions", OFFERS_SHORT, ""],
     ["Kickoff", KICKOFF_SHORT, "Begin weekly project work with your team."],
   ];
   return (
@@ -222,7 +216,7 @@ function Timeline() {
           <div>
             <p className="st-eyebrow">{date}</p>
             <h3>{name}</h3>
-            <p>{text}</p>
+            {text && <p>{text}</p>}
           </div>
         </article>
       ))}
@@ -330,7 +324,6 @@ export function StudioHome() {
           </span>
         </div>
         <div data-enter>
-          <p className="st-eyebrow">Our first engagement</p>
           <h2>
             Arc Thrift Stores
             <br />
@@ -419,7 +412,7 @@ export function StudioServiceDetail() {
   if (!area) return <Navigate to="/consulting/services" replace />;
   return (
     <Studio key={area.id} title={area.title} dark>
-      <Intro eyebrow="Our services" title={area.title}>
+      <Intro title={area.title}>
         <p>{area.desc}</p>
       </Intro>
       <div className="st-wrap st-detail-art">
@@ -438,11 +431,6 @@ export function StudioServiceDetail() {
               <li key={e}>{e}</li>
             ))}
           </ul>
-          <p>
-            We agree on the question and scope together, research it with a
-            small student team, and share our recommendations through working
-            sessions and a final presentation.
-          </p>
           <Button href={CONTACT_MAILTO}>Discuss a project</Button>
         </div>
       </section>
@@ -474,7 +462,7 @@ export function StudioWork() {
           <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
         </div>
         <div>
-          <p className="st-eyebrow">Fall 2026 · Current engagement</p>
+          <p className="st-eyebrow">Fall 2026</p>
           <h2>Arc Thrift Stores of Colorado</h2>
           <p>
             A nonprofit thrift retailer supporting Colorado’s Arc chapters and
@@ -511,7 +499,6 @@ export function StudioPractice() {
   return (
     <Studio title="Our practice">
       <Intro
-        eyebrow="Our practice"
         title={
           <>
             Student-led.
@@ -583,19 +570,14 @@ export function StudioLeadership() {
   return (
     <Studio title="Leadership">
       <Intro
-        eyebrow="Meet our project managers"
         title={
           <>
-            Michigan students.
+            Meet our
             <br />
-            <em>Working together.</em>
+            <em>project managers.</em>
           </>
         }
       >
-        <p>
-          Questions about consulting, the application, or a possible project?
-          Get in touch with Alex or Solomon.
-        </p>
         <Button to="/team">View the full E-board</Button>
       </Intro>
       <section className="st-wrap st-leadership">
@@ -609,7 +591,6 @@ export function StudioPartners() {
   return (
     <Studio title="Our connections">
       <Intro
-        eyebrow="Our connections"
         title={
           <>
             A community
@@ -655,7 +636,6 @@ export function StudioInsights() {
   return (
     <Studio title="Research & insights">
       <Intro
-        eyebrow="Research & insights"
         title={
           <>
             The case for
@@ -665,14 +645,11 @@ export function StudioInsights() {
         }
       >
         <p>
-          Research from other organizations helps explain why our work matters.
-          Here’s what the evidence says, what it doesn’t, and the questions it
-          raises for business.
+          Research on disability, employment, and business performance.
         </p>
       </Intro>
       <section className="st-wrap st-section">
         <div className="st-filters" aria-label="Filter insights">
-          <span>Browse by</span>
           {["All", "Perspective", "Research", "Data"].map((f) => (
             <button
               key={f}
@@ -695,7 +672,7 @@ export function StudioInsight() {
   if (!item) return <Navigate to="/consulting/insights" replace />;
   return (
     <Studio key={item.id} title={item.title}>
-      <Intro eyebrow={`${item.category} · ${item.date}`} title={item.title}>
+      <Intro eyebrow={item.date} title={item.title}>
         <p>{item.summary}</p>
       </Intro>
       <article className="st-wrap st-article">
@@ -712,9 +689,7 @@ export function StudioInsight() {
             Read the original source <ArrowUpRight size={18} />
           </a>
           <p className="st-article-note">
-            UBLDA perspective on independent research. These figures describe
-            external research, not results achieved by UBLDA. Source checked
-            September 16, 2026.
+            Independent research, not UBLDA results. Source checked September 16, 2026.
           </p>
           <Button to="/consulting/insights">All insights</Button>
         </div>
@@ -768,14 +743,11 @@ function InquiryForm() {
         Prepare email
       </button>
       <p className="st-form-note">
-        Opens a draft in your email app addressed to Alex and Solomon. You
-        review and send it there.
+        Opens a draft in your email app for you to review and send.
       </p>
       {prepared && (
         <p role="status">
-          Your email draft is ready. If your email app didn’t open,{" "}
-          <a href={prepared}>open the draft</a> or contact a project manager
-          directly.
+          Email app didn’t open? <a href={prepared}>Open the draft</a>.
         </p>
       )}
     </form>
@@ -795,7 +767,6 @@ export function StudioContact() {
   return (
     <Studio title="Get in touch">
       <Intro
-        eyebrow="Get in touch"
         title={
           <>
             Let’s put a good
@@ -805,8 +776,7 @@ export function StudioContact() {
         }
       >
         <p>
-          Tell us about your organization and the question you want to answer.
-          Or ask us about joining the consulting team.
+          Get in touch about a project or joining the team.
         </p>
         <div className="st-contact-emails">
           {LEADERS.map((l) => (
@@ -820,7 +790,6 @@ export function StudioContact() {
       <section className="st-wrap st-contact-form" id="contact-form">
         <div>
           <h2>Start a conversation</h2>
-          <p>We’ll discuss fit, timing, and what a student team can take on.</p>
           <address>
             {ROSS_ADDRESS.map((l) => (
               <span key={l}>{l}</span>

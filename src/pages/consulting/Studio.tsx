@@ -341,16 +341,10 @@ export function Studio({
               Possibility.
             </h2>
             <div>
-              <p>Stay connected with UBLDA.</p>
               <Button href={MEMBERSHIP_FORM_URL}>Join the community</Button>
-              <small>
-                Speaker events, workshops, and opportunities at Michigan.
-              </small>
             </div>
           </div>
           <Link className="st-footer-talk" to="/consulting/contact">
-            Got a question worth working on?
-            <br />
             Let’s talk. <ArrowUpRight />
           </Link>
           <div className="st-footer-grid">
