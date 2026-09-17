@@ -61,7 +61,8 @@ function ServiceCards() {
     </div>
   );
 }
-function InsightCards({ filter = "All" }: { filter?: string }) {
+function InsightCards({ filter = "All", headingLevel = 3 }: { filter?: string; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <div className="st-insight-cards">
       {RESEARCH.filter(
@@ -79,7 +80,7 @@ function InsightCards({ filter = "All" }: { filter?: string }) {
             <ArrowUpRight size={32} />
           </div>
           <p className="st-eyebrow">{item.source}</p>
-          <h3>{item.title}</h3>
+          <Heading>{item.title}</Heading>
         </Link>
       ))}
     </div>
@@ -558,7 +559,7 @@ export function StudioInsights() {
         </p>
       </Intro>
       <section className="st-wrap st-section">
-        <div className="st-filters" aria-label="Filter insights">
+        <div className="st-filters" role="group" aria-label="Filter insights">
           {["All", "Perspective", "Research", "Data"].map((f) => (
             <button
               key={f}
@@ -569,7 +570,8 @@ export function StudioInsights() {
             </button>
           ))}
         </div>
-        <InsightCards filter={filter} />
+        <p className="sr-only" role="status">{RESEARCH.filter(item => filter === "All" || item.category === filter).length} insights shown{filter === "All" ? "" : ` in ${filter}`}.</p>
+        <InsightCards filter={filter} headingLevel={2} />
       </section>
       <Callout join />
     </Studio>
@@ -619,14 +621,14 @@ function InquiryForm() {
     window.location.href = href;
   };
   return (
-    <form className="st-inquiry" onSubmit={submit}>
+    <form className="st-inquiry" onSubmit={submit} aria-describedby="inquiry-instructions">
       <div className="st-form-row">
         <label>
-          Full name
+          Full name (required)
           <input name="name" autoComplete="name" required maxLength={120} />
         </label>
         <label>
-          Organization
+          Organization (optional)
           <input
             name="organization"
             autoComplete="organization"
@@ -635,7 +637,7 @@ function InquiryForm() {
         </label>
       </div>
       <label>
-        Email
+        Email (required)
         <input
           type="email"
           name="email"
@@ -645,21 +647,17 @@ function InquiryForm() {
         />
       </label>
       <label>
-        What would you like to ask us?
+        What would you like to ask us? (required)
         <textarea name="message" rows={4} required maxLength={4000} />
       </label>
       <button className="st-button st-button--solid" type="submit">
         <ArrowRight size={16} />
         Prepare email
       </button>
-      <p className="st-form-note">
+      <p className="st-form-note" id="inquiry-instructions">
         Opens a draft in your email app for you to review and send.
       </p>
-      {prepared && (
-        <p role="status">
-          Email app didn’t open? <a href={prepared}>Open the draft</a>.
-        </p>
-      )}
+      <p role="status">{prepared && <>Email app didn’t open? <a href={prepared}>Open the draft</a>.</>}</p>
     </form>
   );
 }
