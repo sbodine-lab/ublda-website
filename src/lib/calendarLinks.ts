@@ -9,8 +9,8 @@
 const GCAL_RENDER = 'https://calendar.google.com/calendar/render'
 
 /**
- * The shape the marketing events page passes in. Declared structurally rather
- * than imported so `src/pages/Events.tsx` keeps its own local `Event` type.
+ * The calendar-specific fields of a public club event. Presentation metadata
+ * stays in the shared event content.
  */
 export type MarketingCalendarEvent = {
   /** "October 1, 2026" */

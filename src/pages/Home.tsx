@@ -202,12 +202,6 @@ export default function Home() {
             {[...Array(4)].map((_, setIndex) => (
               <div className="community__logo-set" key={setIndex} aria-hidden={setIndex > 0}>
                 <div className="community__logo-item">
-                  <img src="/partners-ross.png" alt="Michigan Ross School of Business" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
-                  <img src="/partners-occb.png" alt="Office of Community, Culture, and Belonging" loading="lazy" decoding="async" />
-                </div>
-                <div className="community__logo-item">
                   <img src="/partners-blda.webp" alt="Business Leaders for Diverse Abilities" className="community__logo--blda" loading="lazy" decoding="async" />
                 </div>
                 <div className="community__logo-item">
