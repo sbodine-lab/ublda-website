@@ -18,7 +18,6 @@
 .eq-hero { min-height: 750px; grid-template-rows: 80px 1fr 120px; column-gap: 30px; }
 .eq-hero h1 { max-width: 65%; font-size: clamp(68px, 6.65vw, 96px); }
 .eq-hero-sub { max-width: 640px; }
-.eq-hero-sub > span { margin-top: 5px; }
 .eq-story-inner { padding-top: 180px; padding-bottom: 200px; }
 .eq-words { font-size: clamp(42px, 4.7vw, 68px); }
 .eq-story-logos { margin-left: 0 !important; min-height: 155px; gap: 70px; }

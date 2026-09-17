@@ -343,7 +343,6 @@ function Hero({
       <BrandParticles />
       <h1>{title}</h1>
       <p className="eq-hero-sub">
-        <span aria-hidden="true" />
         {description}
       </p>
     </section>

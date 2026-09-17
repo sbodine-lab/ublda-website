@@ -1,0 +1,97 @@
+/* Consulting accessibility: readable motion states, controls, and text growth. */
+.st :is(h1, h2, h3, p, a, button, label, small, summary) { overflow-wrap: anywhere; }
+.st :is(.st-wrap, .st-wrap > *, .st-service-cards > *, .st-form-row > *) { min-width: 0; }
+.st main:focus { outline: none; }
+.st [id] { scroll-margin-block: 28px; }
+.st :is(a, button, summary, input, textarea) { touch-action: manipulation; }
+.st :is(.st-footer-grid a, .st-footer-bottom a, .st-footer-bottom button, .st-dropdown a, .st-text-link, .st-parent-link, .st-filters button) {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.st .st-footer-grid a { display: flex; margin-bottom: 4px; }
+.st button.st-motion-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  margin-left: auto;
+  order: 2;
+}
+.st button:disabled { cursor: default; }
+.st-header-inner { min-height: 144px; height: auto; padding-block: 24px; gap: 20px; }
+.st-navlinks { margin-left: 30px; gap: clamp(18px, 2.6vw, 40px); }
+.st-hero { height: auto; min-height: max(680px, 90svh); max-height: none; padding-bottom: 85px; }
+.st-wait { opacity: 1; }
+@keyframes st-enter {
+  from { transform: translateY(30px); }
+  to { transform: none; }
+}
+.st-paused .st *, .st-paused .st *::before, .st-paused .st *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.st-paused .st-metrics { --shift: 0 !important; }
+.st :is(.st-service-card, .st-insight-card):focus-visible { outline-offset: -5px; outline-color: var(--st-paper); }
+.st .st-insight-card:focus-visible { outline: 3px solid var(--st-accent); outline-offset: 5px; }
+/* Keep the link title and its description together as text grows. */
+.st .st-service-card {
+  display: grid;
+  grid-template-rows: minmax(140px, 1fr) auto auto;
+  gap: 20px;
+  height: auto;
+  min-height: 550px;
+  padding: 28px;
+  align-content: end;
+}
+.st .st-service-card h3 {
+  position: relative;
+  inset: auto;
+  grid-row: 2;
+  z-index: 2;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+}
+.st .st-service-desc {
+  grid-row: 3;
+  position: relative;
+  inset: auto;
+  opacity: 1;
+  transform: none;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.st .st-service-card .st-card-scrim { background: linear-gradient(transparent, #092c49f5 45%); }
+.st .st-service-card:hover h3, .st .st-service-card:focus-visible h3 { opacity: 1; transform: none; }
+.st .st-insight-card h2 { font-size: 28px; line-height: 1.12; margin-top: 16px; }
+.st-inquiry input, .st-inquiry textarea { border-bottom-color: var(--st-muted); }
+.st-inquiry p[role="status"]:empty { margin: 0; }
+@media (max-width: 1200px) and (min-width: 1025px) {
+  .st-header-inner { gap: 16px; }
+  .st-navlinks { margin-left: 0; gap: 18px; }
+}
+@media (max-width: 1024px) {
+  .st-header-inner { min-height: 120px; }
+  .st button.st-menu-toggle { width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 44px; order: 3; }
+  .st-navlinks { margin-left: 0; }
+  .st-navlinks--open { padding-top: 112px; }
+  .st-navlinks--open > * { flex-shrink: 0; }
+  .st-navlinks--open :focus-visible { outline-color: var(--st-paper); }
+  .st .st-service-card { min-height: 480px; }
+}
+@media (max-width: 767px) {
+  .st-header-inner { gap: 12px; }
+  .st-hero { min-height: 80svh; padding-bottom: 0; }
+  .st .st-service-card { min-height: 480px; padding: 24px; }
+  .st .st-insight-card h2 { font-size: 26px; }
+}
+@media (forced-colors: active) {
+  .st :is(a, button, input, textarea, summary):focus-visible { outline: 3px solid Highlight; }
+  .st :is(.st-button, .st-nav-contact, .st-motion-toggle, input, textarea) { border: 1px solid ButtonText; }
+  .st .st-service-card { border: 1px solid CanvasText; }
+}

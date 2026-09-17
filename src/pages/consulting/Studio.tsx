@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactNode,
@@ -19,7 +20,9 @@ import {
 import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 import { LEADERS, SOCIAL } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
+import { useDeviceReducedMotion } from "../../features/equator/motionPreference";
 import "./Studio.css";
+import "./accessibility.css";
 
 export function Button({
   children,
@@ -166,10 +169,24 @@ export function Studio({
   const root = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [about, setAbout] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const aboutButton = useRef<HTMLButtonElement>(null);
+  const [paused, setPaused] = useState(() => {
+    try { return localStorage.getItem("ublda-motion-paused") === "true"; }
+    catch { return false; }
+  });
+  const deviceReducedMotion = useDeviceReducedMotion();
+  const motionPaused = paused || deviceReducedMotion;
   const { pathname, hash } = useLocation();
   const closeMenu = useCallback(() => setOpen(false), []);
   useMenuKeyboard(open, root, ".st-navlinks", ".st-menu-toggle", closeMenu);
+  useEffect(() => {
+    if (!about) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAbout(false);
+    };
+    document.addEventListener("keydown", dismiss);
+    return () => document.removeEventListener("keydown", dismiss);
+  }, [about]);
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 1025px)");
     const onChange = () => {
@@ -183,12 +200,19 @@ export function Studio({
       title === "Home"
         ? "UBLDA Consulting | Student consulting at Michigan Ross"
         : `${title} · UBLDA Consulting`;
+    const frame = requestAnimationFrame(() => {
+      const target = (hash && document.getElementById(hash.slice(1))) || root.current?.querySelector<HTMLElement>("main");
+      if (target) {
+        target.tabIndex = -1;
+        target.focus({ preventScroll: true });
+        if (hash) target.scrollIntoView({ behavior: "instant" });
+        else window.scrollTo({ top: 0, behavior: "instant" });
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [title, pathname, hash]);
+  useLayoutEffect(() => {
     document.documentElement.classList.add("st-root");
-    if (hash)
-      requestAnimationFrame(() =>
-        document.getElementById(hash.slice(1))?.scrollIntoView(),
-      );
-    else window.scrollTo({ top: 0, behavior: "instant" });
     return () => {
       document.documentElement.classList.remove(
         "st-root",
@@ -196,7 +220,11 @@ export function Studio({
         "st-menu-open",
       );
     };
-  }, [title, pathname, hash]);
+  }, []);
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle("st-paused", motionPaused);
+    window.dispatchEvent(new Event("studio-motion"));
+  }, [motionPaused]);
   useEffect(() => {
     document.documentElement.classList.toggle("st-menu-open", open);
     return () => document.documentElement.classList.remove("st-menu-open");
@@ -204,7 +232,6 @@ export function Studio({
   useEffect(() => {
     const node = root.current;
     if (!node) return;
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const items = node.querySelectorAll<HTMLElement>("[data-enter]");
     const observer = new IntersectionObserver(
       (entries) =>
@@ -216,7 +243,7 @@ export function Studio({
         }),
       { threshold: 0.08 },
     );
-    if (!media.matches)
+    if (!motionPaused)
       items.forEach((el) => {
         el.classList.add("st-wait");
         observer.observe(el);
@@ -238,19 +265,22 @@ export function Studio({
     const scroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    window.addEventListener("scroll", scroll, { passive: true });
-    update();
+    if (!motionPaused) {
+      window.addEventListener("scroll", scroll, { passive: true });
+      update();
+    }
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", scroll);
       cancelAnimationFrame(frame);
     };
-  }, [pathname]);
+  }, [pathname, motionPaused]);
   const toggleMotion = () => {
-    document.documentElement.classList.toggle("st-paused", !paused);
     setPaused(!paused);
-    window.dispatchEvent(new Event("studio-motion"));
+    try { localStorage.setItem("ublda-motion-paused", String(!paused)); }
+    catch { /* The control still works when storage is unavailable. */ }
   };
+  const motionLabel = deviceReducedMotion ? "Motion paused by device preference" : paused ? "Resume motion" : "Pause motion";
   return (
     <div
       ref={root}
@@ -276,22 +306,15 @@ export function Studio({
               <ArrowLeft size={13} aria-hidden="true" /> UBLDA home
             </Link>
           </div>
-          <button
-            className="st-menu-toggle"
-            type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="consulting-nav"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X /> : <Menu />}
-          </button>
           <nav
             id="consulting-nav"
             className={`st-navlinks ${open ? "st-navlinks--open" : ""}`}
             aria-label="Consulting navigation"
             onClick={(e) => {
-              if ((e.target as HTMLElement).closest("a")) closeMenu();
+              if ((e.target as HTMLElement).closest("a")) {
+                closeMenu();
+                setAbout(false);
+              }
             }}
           >
             {links.map(([label, to]) => (
@@ -306,13 +329,24 @@ export function Studio({
             <div
               className="st-about"
               onMouseEnter={() => setAbout(true)}
-              onMouseLeave={() => setAbout(false)}
+              onMouseLeave={(e) => {
+                if (!e.currentTarget.contains(document.activeElement)) setAbout(false);
+              }}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) setAbout(false);
+              }}
               onKeyDown={(e) => {
-                if (e.key === "Escape") setAbout(false);
+                if (e.key === "Escape" && about) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setAbout(false);
+                  aboutButton.current?.focus();
+                }
               }}
             >
               <button
                 type="button"
+                ref={aboutButton}
                 aria-expanded={about}
                 aria-controls="consulting-about"
                 onClick={() => setAbout(!about)}
@@ -337,9 +371,23 @@ export function Studio({
               <ArrowLeft size={16} aria-hidden="true" /> UBLDA home
             </Link>
           </nav>
+          <button type="button" className="st-motion-toggle" onClick={toggleMotion}
+            aria-label={motionLabel} aria-pressed={motionPaused} disabled={deviceReducedMotion} inert={open}>
+            {motionPaused ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
+          </button>
+          <button
+            className="st-menu-toggle"
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="consulting-nav"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X /> : <Menu />}
+          </button>
         </div>
       </header>
-      <main id="main-content" inert={open}>
+      <main id="main-content" tabIndex={-1} inert={open}>
         {children}
       </main>
       <div className="st-footer-band" aria-hidden="true" />
@@ -406,9 +454,9 @@ export function Studio({
             <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support">
               Accessibility support
             </a>
-            <button onClick={toggleMotion} aria-pressed={paused}>
-              {paused ? <Play size={13} /> : <Pause size={13} />}
-              {paused ? "Resume motion" : "Pause motion"}
+            <button type="button" onClick={toggleMotion} aria-pressed={motionPaused} disabled={deviceReducedMotion}>
+              {motionPaused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
+              {motionLabel}
             </button>
           </div>
         </div>
