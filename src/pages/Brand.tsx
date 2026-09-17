@@ -761,16 +761,17 @@ export default function Brand() {
 
           <h3 className="brand-subsection">Consulting voice</h3>
           <p className="brand-section__desc">
-            Speak to students first. Explain what analysts work on and how the
-            club connects business with disability inclusion. Use direct verbs
-            and short sentences. Show the team experience and make the next
-            step clear. Keep client work specific and distinguish planned
-            engagements from completed results.
+            Describe who we are and what our teams do for readers who are
+            primarily students. Use complete sentences that connect the work
+            to its purpose without turning every paragraph into a recruitment
+            pitch. Keep commas purposeful and avoid em dashes in marketing
+            copy. Distinguish planned engagements from completed results and
+            use a simple Apply link for consulting applications.
           </p>
           <div className="brand-phrases">
-            <span className="brand-phrase">Build your skills. Put inclusion into practice.</span>
-            <span className="brand-phrase">Learn consulting through client work.</span>
-            <span className="brand-phrase">A team to learn with. A question to work on.</span>
+            <span className="brand-phrase">Business with disability in focus.</span>
+            <span className="brand-phrase">Pro bono consulting at Michigan Ross.</span>
+            <span className="brand-phrase">Part of the UBLDA community.</span>
           </div>
 
           <h3 className="brand-subsection">Key Phrases</h3>

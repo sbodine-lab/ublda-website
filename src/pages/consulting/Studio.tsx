@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 import { LEADERS, SOCIAL } from "./content";
-import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
+import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import "./Studio.css";
 
 export function Button({
@@ -327,12 +327,12 @@ export function Studio({
                 <Link to="/consulting/practice">Our practice</Link>
                 <Link to="/consulting/leadership">Leadership</Link>
                 <Link to="/consulting/partners">Our connections</Link>
-                <Link to="/consulting/contact#join">Join the team</Link>
+                <a href={CONSULTING_FORM_URL}>Apply</a>
               </div>
             </div>
-            <Link to="/consulting/contact#join" className="st-nav-contact">
-              <ArrowRight size={15} /> Join the team
-            </Link>
+            <a href={CONSULTING_FORM_URL} className="st-nav-contact">
+              <ArrowRight size={15} /> Apply
+            </a>
             <Link to="/" className="st-parent-menu">
               <ArrowLeft size={16} aria-hidden="true" /> UBLDA home
             </Link>
@@ -358,7 +358,7 @@ export function Studio({
             </div>
           </div>
           <Link className="st-footer-talk" to="/consulting/contact">
-            Get involved. <ArrowUpRight />
+            Contact us. <ArrowUpRight />
           </Link>
           <div className="st-footer-grid">
             <div>
@@ -381,7 +381,7 @@ export function Studio({
               <h3>About us</h3>
               <Link to="/consulting/leadership">Leadership</Link>
               <Link to="/consulting/partners">Our connections</Link>
-              <Link to="/consulting/contact#join">Join the team</Link>
+              <a href={CONSULTING_FORM_URL}>Apply</a>
               <Link to="/">UBLDA home</Link>
             </div>
             <div>
@@ -425,9 +425,9 @@ export function Callout({ join = false }: { join?: boolean }) {
         <h2>
           {join ? (
             <>
-              Build your consulting skills.
+              Interested in
               <br />
-              Put them to work for a client.
+              UBLDA Consulting?
             </>
           ) : (
             <>
@@ -439,9 +439,10 @@ export function Callout({ join = false }: { join?: boolean }) {
         </h2>
         <div className="st-actions">
           <Button
-            to={join ? "/consulting/contact#join" : "/consulting/contact"}
+            to={join ? undefined : "/consulting/contact"}
+            href={join ? CONSULTING_FORM_URL : undefined}
           >
-            {join ? "Join the team" : "Discuss a project"}
+            {join ? "Apply" : "Discuss a project"}
           </Button>
           <Button to={join ? "/consulting/leadership" : "/consulting/work"}>
             {join ? "Meet the team" : "Explore our work"}

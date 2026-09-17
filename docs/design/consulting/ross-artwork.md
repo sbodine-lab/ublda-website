@@ -1,8 +1,10 @@
-# Ross architectural artwork
+# Ross architectural artwork (retired)
+
+Removed from the website on September 17, 2026 at Sam’s request. The image and caption are no longer used on Home or Practice. This document preserves the asset provenance.
 
 Generated September 16, 2026 with the built-in image_gen tool. Sam requested Ross building art in the Consulting palette. This is a stylized architectural illustration, not a photograph or an institutional logo.
 
-Final website asset: `public/consulting/art/ross-architectural-print.jpg` (1536 × 1024). The generated PNG was encoded as JPEG for delivery without changing the composition. Used on the homepage club section and Practice page with the full composition preserved.
+Former website asset: `public/consulting/art/ross-architectural-print.jpg` (1536 × 1024). The generated PNG was encoded as JPEG for delivery without changing the composition. Previously used on the homepage club section and Practice page with the full composition preserved.
 
 Reference: [Ross School Exterior](https://commons.wikimedia.org/wiki/File:Ross_School_Exterior.jpg), by MichiganRoss, licensed [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). The adapted artwork is distributed under the same license. The figure caption credits the photographer, identifies the AI adaptation and links the source and license. Changes: architectural screenprint style, brand colors, removed people and street clutter. No university marks were added.
 
