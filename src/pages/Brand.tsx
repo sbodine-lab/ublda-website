@@ -89,6 +89,20 @@ export default function Brand() {
             <ColorSwatch name="Gold Soft" hex="#D2A54B15" token="--color-gold-soft" usage="Subtle gold tints (8% opacity)" light />
           </div>
 
+          <h3 className="brand-subsection">UBLDA Consulting</h3>
+          <p className="brand-section__desc">
+            Consulting leads with deep teal and retains UBLDA’s navy and cream.
+            Mint highlights and a teal-to-navy animated background distinguish the practice.
+          </p>
+          <div className="brand-swatch-grid">
+            <ColorSwatch name="Consulting Teal" hex="#126A70" token="--st-accent" usage="Links, buttons, emphasized headings, and metrics" />
+            <ColorSwatch name="Navy" hex="#0A3658" token="--st-ink" usage="Primary text and graphic accents" />
+            <ColorSwatch name="Deep Navy" hex="#07263E" token="--st-dark" usage="Dark pages, footer, and darkest shader bands" />
+            <ColorSwatch name="Mint" hex="#C8E8DF" token="--st-mint" usage="Hero highlights and light buttons on navy" light />
+            <ColorSwatch name="Mist" hex="#E4EEEA" token="--st-surface" usage="Client, research, and recruiting backgrounds" light />
+            <ColorSwatch name="Cream" hex="#FAF9F6" token="--st-paper" usage="Main page background and text on dark surfaces" light />
+          </div>
+
           <h3 className="brand-subsection">Neutrals</h3>
           <div className="brand-swatch-grid brand-swatch-grid--sm">
             <ColorSwatch name="White" hex="#FFFFFF" token="--color-white" usage="Backgrounds, text on dark" light />
@@ -112,7 +126,7 @@ export default function Brand() {
       <section className="brand-section brand-section--alt" id="typography">
         <div className="brand-container">
           <h2 className="brand-section__title">Typography</h2>
-          <p className="brand-section__desc">Plus Jakarta Sans and Instrument Serif are the main site fonts. The consulting homepage uses Manrope for its hero headline.</p>
+          <p className="brand-section__desc">Plus Jakarta Sans and Instrument Serif are the main site fonts. UBLDA Consulting uses DM Sans throughout.</p>
 
           <div className="brand-type-pair">
             <div className="brand-type-card">

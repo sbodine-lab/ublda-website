@@ -60,11 +60,16 @@ export function Bands({ className = "" }: { className?: string }) {
       h = 0,
       visible = true,
       paused = false;
-    const palette = Array.from({ length: 22 }, (_, i) => [
-      10 + (3 * i) / 21,
-      10 + (9 * i) / 21,
-      229 - (204 * i) / 21,
-    ]);
+    const styles = getComputedStyle(el);
+    const rgb = (token: string) => {
+      const hex = styles.getPropertyValue(token).trim().slice(1);
+      return [0, 2, 4].map((offset) => parseInt(hex.slice(offset, offset + 2), 16));
+    };
+    const bright = rgb("--st-band-bright");
+    const dark = rgb("--st-band-dark");
+    const palette = Array.from({ length: 22 }, (_, i) =>
+      bright.map((channel, j) => channel + ((dark[j] - channel) * i) / 21),
+    );
     const colors = [...palette, ...palette.slice(1, -1).reverse()];
     const color = (index: number) => {
       const phase = ((index % 42) + 42) % 42,

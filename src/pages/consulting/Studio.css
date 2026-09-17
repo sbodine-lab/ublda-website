@@ -14,17 +14,26 @@
 }
 html.st-root {
   scroll-behavior: auto;
-  background: #f9f7f7;
+  background: var(--color-cream);
   --announcement-h: 0px;
 }
 html.st-menu-open {
   overflow: hidden;
 }
 .st {
-  --st-blue: #0a0ae5;
-  --st-ink: #11262b;
-  --st-paper: #f9f7f7;
-  --st-dark: #0d1314;
+  /* Consulting extends UBLDA's navy/teal/cream with a deeper teal lead. */
+  --st-accent: #126a70;
+  --st-ink: #0a3658;
+  --st-paper: #faf9f6;
+  --st-dark: #07263e;
+  --st-teal: #67b8b3;
+  --st-mint: #c8e8df;
+  --st-surface: #e4eeea;
+  --st-muted: #53676b;
+  --st-muted-light: #b7cacb;
+  /* Canvas reads these same endpoints; its motion and geometry are unchanged. */
+  --st-band-bright: #14777b;
+  --st-band-dark: #07263e;
   font:
     400 18px/1.5 "Studio Sans",
     sans-serif;
@@ -62,7 +71,7 @@ html.st-menu-open {
   -webkit-tap-highlight-color: transparent;
 }
 .st :focus-visible {
-  outline: 3px solid #7373ff;
+  outline: 3px solid var(--st-accent);
   outline-offset: 6px;
 }
 .st a {
@@ -70,7 +79,7 @@ html.st-menu-open {
 }
 .st em {
   font-style: normal;
-  color: var(--st-blue);
+  color: var(--st-accent);
 }
 .st-wrap {
   width: calc(100% - 120px);
@@ -82,7 +91,7 @@ html.st-menu-open {
   color: var(--st-paper);
 }
 .st--dark em {
-  color: #b9c9ff;
+  color: var(--st-mint);
 }
 .st-header {
   position: relative;
@@ -185,7 +194,7 @@ html.st-menu-open {
   justify-content: space-between;
 }
 .st-dropdown a:hover {
-  color: var(--st-blue);
+  color: var(--st-accent);
 }
 .st-nav-contact {
   border: 1px solid currentColor;
@@ -199,8 +208,8 @@ html.st-menu-open {
   white-space: nowrap;
 }
 .st-nav-contact:hover {
-  background: var(--st-blue);
-  border-color: var(--st-blue);
+  background: var(--st-accent);
+  border-color: var(--st-accent);
   color: white;
 }
 .st button.st-menu-toggle {
@@ -226,9 +235,24 @@ html.st-menu-open {
     border-color 0.3s !important;
 }
 .st .st-button--solid {
-  background: var(--st-blue);
+  background: var(--st-accent);
   color: var(--st-paper);
-  border-color: var(--st-blue) !important;
+  border-color: var(--st-accent) !important;
+}
+.st-hero .st-button--solid {
+  background: var(--st-mint);
+  border-color: var(--st-mint) !important;
+  color: var(--st-ink);
+}
+.st--dark :focus-visible,
+.st-header--light :focus-visible,
+.st-hero :focus-visible,
+.st-callout :focus-visible,
+.st-footer :focus-visible {
+  outline-color: var(--st-mint);
+}
+.st-dropdown :focus-visible {
+  outline-color: var(--st-accent);
 }
 .st-button svg {
   flex-shrink: 0;
@@ -262,7 +286,7 @@ html.st-menu-open {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: #0d1319;
+  background: var(--st-dark);
 }
 .st-hero {
   height: 90vh;
@@ -287,7 +311,7 @@ html.st-menu-open {
 }
 .st-hero h1 span + span {
   text-align: right;
-  color: #cddaff;
+  color: var(--st-mint);
   margin-top: 8px;
 }
 .st-hero .st-actions {
@@ -322,7 +346,7 @@ html.st-menu-open {
 }
 .st-affiliations small {
   font-size: 12px;
-  color: #5d686b;
+  color: var(--st-muted);
   line-height: 1.35;
 }
 .st-statement {
@@ -348,21 +372,21 @@ html.st-menu-open {
   --shift: 0;
   position: relative;
   padding: 92px 0 128px;
-  background: #0a0ae5;
+  background: var(--st-accent);
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, #dddcf9, #0a0ae5 calc(var(--shift) * 100%)) 0% 8%,
-    color-mix(in srgb, #cccbf6, #0a0ae5 calc(var(--shift) * 100%)) 8% 16%,
-    color-mix(in srgb, #bbbaf2, #0a0ae5 calc(var(--shift) * 100%)) 16% 24%,
-    color-mix(in srgb, #aaa8ef, #0a0ae5 calc(var(--shift) * 100%)) 24% 32%,
-    color-mix(in srgb, #9997ec, #0a0ae5 calc(var(--shift) * 100%)) 32% 40%,
-    color-mix(in srgb, #8886e8, #0a0ae5 calc(var(--shift) * 100%)) 40% 48%,
-    color-mix(in srgb, #7775e5, #0a0ae5 calc(var(--shift) * 100%)) 48% 56%,
-    color-mix(in srgb, #5554e5, #0a0ae5 calc(var(--shift) * 100%)) 56% 64%,
-    color-mix(in srgb, #3d3de5, #0a0ae5 calc(var(--shift) * 100%)) 64% 72%,
-    #2626e5 72% 80%,
-    #1818e5 80% 88%,
-    #0a0ae5 88% 100%
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 0%), var(--st-accent) calc(var(--shift) * 100%)) 0% 8%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 9%), var(--st-accent) calc(var(--shift) * 100%)) 8% 16%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 18%), var(--st-accent) calc(var(--shift) * 100%)) 16% 24%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 27%), var(--st-accent) calc(var(--shift) * 100%)) 24% 32%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 36%), var(--st-accent) calc(var(--shift) * 100%)) 32% 40%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 45%), var(--st-accent) calc(var(--shift) * 100%)) 40% 48%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 55%), var(--st-accent) calc(var(--shift) * 100%)) 48% 56%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 64%), var(--st-accent) calc(var(--shift) * 100%)) 56% 64%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 73%), var(--st-accent) calc(var(--shift) * 100%)) 64% 72%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 82%), var(--st-accent) calc(var(--shift) * 100%)) 72% 80%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 91%), var(--st-accent) calc(var(--shift) * 100%)) 80% 88%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 100%), var(--st-accent) calc(var(--shift) * 100%)) 88% 100%
   );
 }
 .st-metrics > .st-wrap > .st-eyebrow {
@@ -386,7 +410,7 @@ html.st-menu-open {
 .st-metric-value {
   font-size: 68.8px;
   line-height: 1.12;
-  color: var(--st-blue);
+  color: var(--st-accent);
   display: block;
   margin-bottom: 90px;
 }
@@ -407,7 +431,7 @@ html.st-menu-open {
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  color: #5a6669;
+  color: var(--st-muted);
   gap: 10px;
 }
 .st-story {
@@ -433,13 +457,13 @@ html.st-menu-open {
   margin: 0 0 36px;
 }
 .st-story h2 span {
-  color: var(--st-blue);
+  color: var(--st-accent);
   display: block;
   margin-top: 30px;
 }
 .st-story p {
   font-size: 21px;
-  color: #566064;
+  color: var(--st-muted);
   max-width: 700px;
 }
 .st-story .st-button {
@@ -496,7 +520,7 @@ html.st-menu-open {
 .st-card-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, #0d1314e6);
+  background: linear-gradient(transparent 30%, #07263ee6);
   transition: background 0.3s;
 }
 .st-service-card h3 {
@@ -534,7 +558,7 @@ html.st-menu-open {
 }
 .st-service-card:hover .st-card-scrim,
 .st-service-card:focus-visible .st-card-scrim {
-  background: #0d131499;
+  background: #07263e99;
 }
 .st-service-card:hover .st-service-desc,
 .st-service-card:focus-visible .st-service-desc {
@@ -542,7 +566,7 @@ html.st-menu-open {
   transform: none;
 }
 .st-access-art {
-  background: #0d1314;
+  background: var(--st-dark);
   position: relative;
   display: flex;
   gap: 9px;
@@ -555,7 +579,7 @@ html.st-menu-open {
   display: block;
   height: 52%;
   width: 12%;
-  background: linear-gradient(#a9c2ff, #2222ff 45%, #0d1314);
+  background: linear-gradient(var(--st-mint), var(--st-band-bright) 45%, var(--st-dark));
   transform: skewY(-25deg);
 }
 .st-access-art span:nth-child(2) {
@@ -587,7 +611,7 @@ html.st-menu-open {
   padding: 64px;
   width: 100%;
   min-height: 430px;
-  background: linear-gradient(90deg, #0d1314d9, transparent 75%);
+  background: linear-gradient(90deg, #07263ed9, transparent 75%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -616,14 +640,14 @@ html.st-menu-open {
 .st-client-feature p:not(.st-eyebrow) {
   font-size: 23px;
   line-height: 1.35;
-  color: #596569;
+  color: var(--st-muted);
 }
 .st-client-feature .st-button {
   margin-top: 20px;
 }
 .st-client-visual {
   min-height: 580px;
-  background: #e7e8f4;
+  background: var(--st-surface);
   padding: 48px;
   display: flex;
   flex-direction: column;
@@ -663,7 +687,7 @@ html.st-menu-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #dfe4ff;
+  background: var(--st-surface);
   position: relative;
   overflow: hidden;
   margin-bottom: 26px;
@@ -684,30 +708,30 @@ html.st-menu-open {
   transform: scale(1.05);
 }
 .st-insight-art--0 {
-  background: repeating-linear-gradient(90deg, #dfe4ff 0 12%, #c2ceff 12% 24%);
-  color: var(--st-blue);
+  background: repeating-linear-gradient(90deg, var(--st-surface) 0 12%, var(--st-mint) 12% 24%);
+  color: var(--st-accent);
 }
 .st-insight-art--1 {
-  background: repeating-linear-gradient(0deg, #111174 0 8%, #1919ab 8% 16%);
-  color: #ececff;
+  background: repeating-linear-gradient(0deg, var(--st-dark) 0 8%, var(--st-ink) 8% 16%);
+  color: var(--st-mint);
 }
 .st-insight-art--2 {
-  background: #c8e1d1;
-  color: #18422b;
+  background: var(--st-mint);
+  color: var(--st-ink);
 }
 .st-insight-art--2:before {
   content: "";
   position: absolute;
   width: 80%;
   height: 80%;
-  border: 1px solid #749c87;
+  border: 1px solid var(--st-teal);
   border-radius: 50%;
   transform: rotate(-30deg);
 }
 .st-insight-card .st-eyebrow {
   font-size: 12px;
   margin-bottom: 14px !important;
-  color: #5a6569;
+  color: var(--st-muted);
 }
 .st-insight-card h3 {
   font-size: 28px;
@@ -727,7 +751,7 @@ html.st-menu-open {
   height: 420px;
   position: relative;
   overflow: hidden;
-  background: #d8dce9;
+  background: var(--st-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -738,20 +762,20 @@ html.st-menu-open {
   line-height: 1;
   letter-spacing: -10px !important;
   z-index: 1;
-  color: #f9f7f7;
+  color: var(--st-paper);
   font-weight: 400;
 }
 .st-person-art > div {
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(0deg, #0a0ae5 0 5%, #2222bb 5% 10%);
+  background: repeating-linear-gradient(0deg, var(--st-accent) 0 5%, var(--st-ink) 5% 10%);
   clip-path: polygon(0 100%, 0 20%, 100% 70%, 100% 100%);
 }
 .st-person-art--1 {
-  background: #c6d6d7;
+  background: var(--st-accent);
 }
 .st-person-art--1 > div {
-  background: repeating-linear-gradient(0deg, #143a41 0 5%, #35676b 5% 10%);
+  background: repeating-linear-gradient(0deg, var(--st-dark) 0 5%, var(--st-ink) 5% 10%);
   clip-path: polygon(0 55%, 100% 5%, 100% 100%, 0 100%);
 }
 .st-person h2 {
@@ -760,7 +784,7 @@ html.st-menu-open {
 }
 .st-person > p:not(.st-eyebrow) {
   font-size: 17px;
-  color: #5d696b;
+  color: var(--st-muted);
   margin-bottom: 14px;
 }
 .st-text-link {
@@ -787,13 +811,13 @@ html.st-menu-open {
   letter-spacing: -1.72px !important;
 }
 .st-intro .st-eyebrow {
-  color: var(--st-blue);
+  color: var(--st-accent);
   font-size: 18px;
 }
 .st-intro-copy {
   font-size: 23px;
   line-height: 1.25;
-  color: #646b6c;
+  color: var(--st-muted);
 }
 .st-intro-copy .st-client-logos {
   margin-bottom: 45px;
@@ -812,11 +836,11 @@ html.st-menu-open {
 }
 .st--dark .st-intro-copy {
   font-size: 33.6px;
-  color: #c8cbcc;
+  color: var(--st-muted-light);
   line-height: 1.145;
 }
 .st--dark .st-intro .st-eyebrow {
-  color: #a9baff;
+  color: var(--st-mint);
 }
 .st-service-row {
   display: grid;
@@ -824,7 +848,7 @@ html.st-menu-open {
   gap: 11%;
   padding-bottom: 52px;
   margin-bottom: 52px;
-  border-bottom: 1px solid #f9f7f744;
+  border-bottom: 1px solid #faf9f644;
 }
 .st-service-row > div:last-child {
   display: flex;
@@ -853,7 +877,7 @@ html.st-menu-open {
 }
 .st-scope-note {
   font-size: 16px;
-  color: #bac2c3;
+  color: var(--st-muted-light);
   max-width: 850px;
   padding-block: 20px 40px;
 }
@@ -901,7 +925,7 @@ html.st-menu-open {
   grid-template-columns: 28% 1fr;
   gap: 10%;
   padding-bottom: 100px;
-  border-bottom: 1px solid #11262b33;
+  border-bottom: 1px solid #0a365833;
   align-items: start;
 }
 .st-work-logo {
@@ -922,7 +946,7 @@ html.st-menu-open {
 .st-work-row p:not(.st-eyebrow) {
   font-size: 20px;
   line-height: 1.45;
-  color: #5e686b;
+  color: var(--st-muted);
 }
 .st-work-row .st-button {
   margin-top: 20px;
@@ -943,11 +967,11 @@ html.st-menu-open {
 .st-timeline article {
   display: flex;
   gap: 20px;
-  border-top: 1px solid #11262b66;
+  border-top: 1px solid #0a365866;
   padding-top: 25px;
 }
 .st-timeline article > span {
-  color: var(--st-blue);
+  color: var(--st-accent);
   font-size: 14px;
 }
 .st-timeline h3 {
@@ -979,7 +1003,7 @@ html.st-menu-open {
   height: 180px;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid #11262b33;
+  border-bottom: 1px solid #0a365833;
   margin-bottom: 24px;
   padding: 35px;
 }
@@ -1033,7 +1057,7 @@ html.st-menu-open {
 }
 .st-partner-grid p {
   font-size: 16px;
-  color: #5d676b;
+  color: var(--st-muted);
 }
 .st-filters {
   display: flex;
@@ -1048,7 +1072,7 @@ html.st-menu-open {
   font-size: 15px;
 }
 .st-filters button {
-  border: 1px solid #11262b44 !important;
+  border: 1px solid #0a365844 !important;
   border-radius: 3px;
   padding: 7px 20px !important;
   font-size: 14px !important;
@@ -1065,14 +1089,14 @@ html.st-menu-open {
 }
 .st-article-stat {
   font-size: 120px;
-  color: var(--st-blue);
+  color: var(--st-accent);
   line-height: 1.2;
 }
 .st-article-stat small {
   font-size: 16px;
   display: block;
   margin-top: 25px;
-  color: #5f6a6e;
+  color: var(--st-muted);
 }
 .st-article h2 {
   font-size: 33.6px;
@@ -1085,7 +1109,7 @@ html.st-menu-open {
 }
 .st-article .st-article-note {
   font-size: 14px;
-  color: #586568;
+  color: var(--st-muted);
   margin-top: 40px;
 }
 .st-contact-emails {
@@ -1098,7 +1122,7 @@ html.st-menu-open {
   gap: 16px;
   align-items: center;
   font-size: 28px;
-  color: var(--st-blue);
+  color: var(--st-accent);
   overflow-wrap: anywhere;
 }
 .st-contact-form {
@@ -1114,7 +1138,7 @@ html.st-menu-open {
 .st-contact-form address {
   font-style: normal;
   font-size: 15px;
-  color: #616d70;
+  color: var(--st-muted);
   margin-top: 65px;
   display: grid;
   gap: 4px;
@@ -1136,7 +1160,7 @@ html.st-menu-open {
 .st-inquiry input,
 .st-inquiry textarea {
   border: 0;
-  border-bottom: 1px solid #11262b77;
+  border-bottom: 1px solid #0a365877;
   background: transparent;
   border-radius: 0;
   color: var(--st-ink);
@@ -1147,7 +1171,7 @@ html.st-menu-open {
 }
 .st-inquiry .st-form-note {
   font-size: 14px;
-  color: #616d70;
+  color: var(--st-muted);
   margin: -12px 0 0;
 }
 .st-inquiry p[role="status"] {
@@ -1157,12 +1181,12 @@ html.st-menu-open {
   text-decoration: underline;
 }
 .st-join {
-  background: #e8e8ef;
+  background: var(--st-surface);
   padding: 110px 0;
   scroll-margin-top: 30px;
 }
 .st-join details {
-  border-top: 1px solid #11262b66;
+  border-top: 1px solid #0a365866;
   padding-block: 28px;
 }
 .st-join summary {
@@ -1212,18 +1236,18 @@ html.st-menu-open {
   height: 240px;
   background: linear-gradient(
     to bottom,
-    #2222ff 0% 8%,
-    #1a1aee 8% 16%,
-    #1212d6 16% 24%,
-    #0c0cbf 24% 32%,
-    #0808a8 32% 40%,
-    #060690 40% 48%,
-    #050578 48% 56%,
-    #040460 56% 64%,
-    #030348 64% 72%,
-    #020233 72% 80%,
-    #01011f 80% 88%,
-    #0d1314 88% 100%
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 0%) 0% 8%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 9%) 8% 16%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 18%) 16% 24%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 27%) 24% 32%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 36%) 32% 40%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 45%) 40% 48%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 55%) 48% 56%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 64%) 56% 64%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 73%) 64% 72%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 82%) 72% 80%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 91%) 80% 88%,
+    color-mix(in srgb, var(--st-teal), var(--st-dark) 100%) 88% 100%
   );
 }
 .st-footer {
@@ -1236,7 +1260,7 @@ html.st-menu-open {
   grid-template-columns: 1fr 1fr;
   gap: 150px;
   padding-bottom: 75px;
-  border-bottom: 1px solid #f9f7f744;
+  border-bottom: 1px solid #faf9f644;
 }
 .st-footer-top h2 {
   font-size: 64px;
@@ -1251,7 +1275,7 @@ html.st-menu-open {
 .st-footer-top small {
   display: block;
   font-size: 13px;
-  color: #9ca9aa;
+  color: var(--st-muted-light);
   margin-top: 24px;
   max-width: 400px;
 }
@@ -1288,17 +1312,17 @@ html.st-menu-open {
   margin-bottom: 14px;
 }
 .st-footer-grid a:hover {
-  color: #b4beff;
+  color: var(--st-mint);
 }
 .st-footer-bottom {
-  border-top: 1px solid #f9f7f733;
+  border-top: 1px solid #faf9f633;
   padding-top: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 25px;
   font-size: 12px;
-  color: #b3babc;
+  color: var(--st-muted-light);
 }
 .st-footer-bottom p {
   margin: 0;
@@ -1809,7 +1833,7 @@ html.st-menu-open {
     filter: brightness(0.65);
   }
   .st-card-scrim {
-    background: linear-gradient(#0d131455, transparent 55%, #0d1314dd);
+    background: linear-gradient(#07263e55, transparent 55%, #07263edd);
   }
   .st-callout {
     margin-top: 75px;
@@ -2118,7 +2142,7 @@ html.st-menu-open {
     scroll-behavior: auto;
   }
 }
-/* Keep the standalone palette independent of the main site's heading tokens. */
+/* Consulting keeps its own text hierarchy while sharing UBLDA brand colors. */
 .st h1,
 .st h2,
 .st h3 {
@@ -2153,7 +2177,7 @@ html.st-menu-open {
   }
   .st-service-card:hover .st-card-scrim,
   .st-service-card:focus-visible .st-card-scrim {
-    background: #0d1314;
+    background: var(--st-dark);
   }
   .st-service-card:not(:hover):not(:focus-visible) .st-service-desc {
     transition-duration: 0.3s;
