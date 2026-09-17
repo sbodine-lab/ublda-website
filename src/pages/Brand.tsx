@@ -759,6 +759,20 @@ export default function Brand() {
             </div>
           </div>
 
+          <h3 className="brand-subsection">Consulting voice</h3>
+          <p className="brand-section__desc">
+            Lead with the business goal. Explain how research helps a client
+            evaluate options and act. Use direct verbs and short sentences.
+            Show ambition through the work we take on and the questions we ask.
+            Support claims with evidence. Keep punctuation light and preserve
+            the distinction between a planned engagement and a proven result.
+          </p>
+          <div className="brand-phrases">
+            <span className="brand-phrase">Expand access. Strengthen your business.</span>
+            <span className="brand-phrase">Research that sharpens decisions.</span>
+            <span className="brand-phrase">Recommendations built for action.</span>
+          </div>
+
           <h3 className="brand-subsection">Key Phrases</h3>
           <div className="brand-phrases">
             {[

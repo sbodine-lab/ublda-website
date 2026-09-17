@@ -181,7 +181,7 @@ export function Studio({
   useEffect(() => {
     document.title =
       title === "Home"
-        ? "UBLDA Consulting — Business. Disability. Possibility."
+        ? "UBLDA Consulting | Business strategy and accessibility"
         : `${title} · UBLDA Consulting`;
     document.documentElement.classList.add("st-root");
     if (hash)
@@ -427,13 +427,13 @@ export function Callout({ join = false }: { join?: boolean }) {
             <>
               Build your consulting skills.
               <br />
-              Make business more inclusive.
+              Put them to work for a client.
             </>
           ) : (
             <>
-              Make inclusion part
+              Bring us your
               <br />
-              of your next decision.
+              next business challenge.
             </>
           )}
         </h2>
@@ -441,7 +441,7 @@ export function Callout({ join = false }: { join?: boolean }) {
           <Button
             to={join ? "/consulting/contact#join" : "/consulting/contact"}
           >
-            {join ? "Join the team" : "Get in touch"}
+            {join ? "Join the team" : "Discuss a project"}
           </Button>
           <Button to={join ? "/consulting/leadership" : "/consulting/work"}>
             {join ? "Meet the team" : "Explore our work"}
