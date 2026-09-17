@@ -741,7 +741,6 @@ function TeamSection({ page = false }: { page?: boolean }) {
                 <span>{board[active].initials}</span>
               </div>
               <h3>{board[active].name}</h3>
-              <p>{board[active].desc}</p>
               <div className="eq-person-meta">
                 <span>{board[active].role}</span>
               </div>
@@ -771,7 +770,6 @@ function TeamSection({ page = false }: { page?: boolean }) {
           <button type="button" className="eq-person-close" aria-label="Close team profile" onClick={() => dialog.current?.close()}><X size={20} aria-hidden="true" /></button>
           <div className="eq-person-art" aria-hidden="true"><AnimatedMark /><span>{person.initials}</span></div>
           <h2 id="eq-profile-title">{person.name}</h2>
-          <p>{person.desc}</p>
           <div className="eq-person-meta">
             <span>{person.role}</span>
             <a href={person.linkedin} target="_blank" rel="noreferrer" aria-label={`${person.name} on LinkedIn`}>LinkedIn<ArrowUpRight size={18} aria-hidden="true" /></a>
