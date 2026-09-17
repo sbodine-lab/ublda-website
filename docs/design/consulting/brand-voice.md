@@ -1,27 +1,31 @@
 # UBLDA Consulting copy direction
 
-September 16, 2026. Sam requested fewer commas and em dashes and a more business-minded voice that feels intelligent, motivated and focused on impact.
+Updated September 17, 2026 following Sam’s feedback on the student-facing copy.
 
-## Voice and primary audience
+## Audience and approach
 
-Students are the primary audience, as Sam clarified after the initial copy pass. Lead with UBLDA's community, what consulting analysts do and how students can take part. Companies remain a secondary audience with contact options and clear service scope.
+Students are the primary readers. Describe the club before inviting them to join: who UBLDA is, what its consulting teams do, the purpose of the client work and the community around it. Write in a calm organizational voice rather than addressing every sentence to a prospective applicant. Companies remain a secondary audience with contact options and a clear service scope.
 
-The homepage now leads with “Build your skills. Put inclusion into practice.” Explain the learning experience through specific work: research a client question, compare options, build a recommendation and present it. Preserve both types of engagement: business consulting for disability-focused organizations and accessibility projects for companies across industries.
+The homepage leads with “Business with disability in focus.” Follow with the consulting division’s identity and two kinds of work: business consulting for disability-focused organizations and accessibility projects for companies across industries. Give the club story, semester approach, first client and project managers priority over external research.
 
-Use concise sentences and active verbs. Avoid em dashes in marketing prose and retain commas only where useful or required by official names. Keep language ambitious and specific without implying guaranteed career outcomes. State the distinction between free general membership and selected consulting analyst roles.
+Use fuller sentences with connected ideas and active verbs. Avoid strings of fragments, excessive commas and em dashes in marketing prose. Headlines can remain brief for readability. Encourage applications sparingly and use “Apply” linked directly to CONSULTING_FORM_URL. Distinguish selected consulting analyst roles from free general membership. The contact form must still explain that it opens an email draft.
 
-The club story, semester experience, first client and project managers take priority on the homepage. External studies live under Insights. Use “Join the team” as the main action. The contact form must still explain that it opens an email draft.
+## Peer club review
+
+Reviewed September 17, 2026:
+
+- [MECC Consulting Group](https://meccconsulting.com/) introduces its student pro bono identity and explains projects and community in descriptive paragraphs with a direct application link.
+- [TAMID at Michigan](https://www.michigantamid.org/) organizes its introduction around the club’s activities and explains what members do within them.
+- [180 Degrees Consulting at Michigan](https://www.180dcmichigan.com/about) describes its clients, project purpose and community before inviting prospective members to engage.
+
+Apply that club-first structure using original UBLDA language. Do not borrow their scale, track records, programs, career outcomes or superlatives.
 
 ## Evidence and boundaries
 
-- IBM Developer voice: direct action, essential words, useful implications and no overselling. https://www.ibm.com/brand/experience-guides/developer/brand/voice/
-- Mailchimp voice and tone: plain language, active voice and clarity. https://styleguide.mailchimp.com/voice-and-tone/
-- Nielsen Norman Group: concise, scannable and objective writing supports usability. https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/
+Club facts are grounded in the UBLDA Brain, including the September 10 kickoff email (document 300) and Sam’s scope clarification (document 324). User direction for this pass is recorded in document 409. The first Fall 2026 engagement and the December national board presentation remain planned. Describe the client’s disability employment and advocacy work without presenting it as a completed UBLDA outcome.
 
-These inform the approach, not a borrowed tone or copied slogan. UBLDA's voice remains its own.
+Preserve names, contact addresses, application timing, eligibility, form behavior and the approved blue identity. Preserve text affiliation with Ross and its Office of Community, Culture, and Belonging. Keep research sources and limitations under Insights. Do not imply legal advice, compliance certification or guaranteed commercial returns.
 
-Keep all research figures, dates, source links and limitations intact. Study associations do not establish causation. Prospective client outcomes are goals, not completed achievements. The Fall 2026 national board presentation remains planned. Do not imply legal advice, compliance certification or guaranteed commercial returns.
+## Visual direction
 
-## Scope and review
-
-Revised shared consulting copy, service descriptions, research interpretations, recruitment text and calls to action across all 14 consulting routes. Preserved names, contact addresses, application timing, eligibility, form behavior and the approved blue identity. Added the Consulting voice to the public brand guide. Review headline wrapping, mobile service cards and long-form text in Chrome before release.
+Remove the Ross building artwork and its caption from both Home and Practice. The homepage club section uses a two-column editorial layout with a heading and descriptive text. Retain the existing abstract art and animated brand colors. Review desktop and mobile layouts in Chrome before release.

@@ -61,25 +61,6 @@ function ServiceCards() {
     </div>
   );
 }
-function RossArtwork() {
-  return (
-    <figure className="st-ross-art">
-      <img
-        src="/consulting/art/ross-architectural-print.jpg"
-        alt="Architectural illustration of the Ross School of Business in navy, cobalt and teal"
-        width="1536"
-        height="1024"
-        loading="lazy"
-        decoding="async"
-      />
-      <figcaption>
-        Ross, illustrated. AI adaptation of a photo by{" "}
-        <a href="https://commons.wikimedia.org/wiki/File:Ross_School_Exterior.jpg">MichiganRoss</a>
-        {" · "}<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>
-      </figcaption>
-    </figure>
-  );
-}
 function InsightCards({ filter = "All" }: { filter?: string }) {
   return (
     <div className="st-insight-cards">
@@ -189,53 +170,55 @@ export function StudioHome() {
         <Bands />
         <div className="st-wrap st-hero-content">
           <h1>
-            <span data-enter>Build your skills.</span>
+            <span data-enter>Business with</span>
             <span data-enter style={enterDelay(250)}>
-              Put inclusion into practice.
+              disability in focus.
             </span>
           </h1>
           <p className="st-hero-summary" data-enter style={enterDelay(400)}>
-            Student-led consulting at Michigan Ross.
-            Real client projects in business strategy and accessibility.
+            We are a student-led consulting club at Michigan Ross working
+            at the intersection of business strategy and disability inclusion.
           </p>
           <div className="st-actions" data-enter style={enterDelay(600)}>
             <Button to="/consulting/work">Our work</Button>
-            <Button to="/consulting/contact#join" solid>Join the team</Button>
+            <Button href={CONSULTING_FORM_URL} solid>Apply</Button>
           </div>
         </div>
       </section>
       <section className="st-wrap st-positioning">
         <div className="st-statement" data-enter>
           <p>
-            Join Michigan students using business skills to advance disability
-            inclusion. UBLDA Consulting is the pro bono consulting division of
-            Undergraduate Business Leaders for Diverse Abilities.
+            UBLDA Consulting is the pro bono consulting division of
+            Undergraduate Business Leaders for Diverse Abilities. We bring
+            Michigan students together to work on business questions that
+            affect people with disabilities and the organizations that serve them.
           </p>
           <p>
-            Take on business challenges for disability-focused organizations.
-            Help companies improve accessibility. Learn to turn your analysis
-            into recommendations with a team beside you.
+            Our teams develop business recommendations for disability-focused
+            organizations and explore how companies across industries can make
+            their services and workplaces more accessible.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
       </section>
       <section className="st-wrap st-club-story" data-enter>
-        <RossArtwork />
+        <h2>Part of a broader<br />UBLDA community.</h2>
         <div>
-          <h2>More than a project team.</h2>
           <p>
-            UBLDA brings students together around disability in business.
-            Through speaker events and community activities, we connect what
-            we learn in class to the people and decisions shaping the workplace.
+            Our club creates a place for students to understand disability
+            through the lens of business and to consider the role they can play
+            in a more inclusive workplace. Consulting is one part of that work
+            alongside speaker events and activities that bring our members together.
           </p>
           <p>
-            Our connection with BLDA at Ross brings undergraduate and MBA
-            students into the same conversation. You can explore the club
-            through general membership or apply for a consulting analyst role.
+            Our connection with Business Leaders for Diverse Abilities at Ross
+            brings undergraduate and MBA students into a shared conversation
+            about disability in business. Members contribute different experiences
+            and perspectives to the questions we explore as a club.
           </p>
           <p>
-            General membership is free and open to all U-M students.
-            Consulting analysts join through an application and interview.
+            General membership is free and open to all U-M students while
+            consulting analysts join through an application and interview process.
           </p>
           <Button to="/">Explore UBLDA</Button>
         </div>
@@ -243,24 +226,24 @@ export function StudioHome() {
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">Your semester<br />on a consulting team.</h2>
-            <p>Four to six analysts. Two project managers. Weekly client work with a midpoint review and a final presentation.</p>
+            <h2 className="st-section-heading">Our approach<br />to client work.</h2>
+            <p>Our Fall 2026 team brings four to six analysts and two project managers together for weekly client work that runs from October through December.</p>
           </div>
           <div className="st-experience-grid">
             <article data-enter>
               <span aria-hidden="true">01</span>
               <h3>Research the business</h3>
-              <p>Understand the client’s question. Gather evidence and learn to separate a useful insight from an assumption.</p>
+              <p>Our analysts investigate the client’s question and gather evidence to understand the business before developing a recommendation.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">02</span>
               <h3>Build a recommendation</h3>
-              <p>Compare options with your teammates. Use feedback from project managers to strengthen your reasoning.</p>
+              <p>The team compares possible approaches and uses feedback from project managers to test its assumptions and strengthen the analysis.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">03</span>
-              <h3>Present your thinking</h3>
-              <p>Explain what you found and why it matters. Connect your analysis to a recommendation the client can evaluate.</p>
+              <h3>Present the findings</h3>
+              <p>A midpoint review and final presentation give the team a structured way to share its findings and explain the reasoning behind its recommendations.</p>
             </article>
           </div>
           <Button to="/consulting/practice">Inside the program</Button>
@@ -306,7 +289,7 @@ export function StudioHome() {
       <section className="st-team-section">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">Meet your<br />project managers.</h2>
+            <h2 className="st-section-heading">Meet our<br />project managers.</h2>
             <Button to="/consulting/leadership">Meet the team</Button>
           </div>
           <People />
@@ -322,9 +305,10 @@ export function StudioServices() {
     <Studio title="Services" dark>
       <Intro title="Services">
         <p>
-          Explore the work our student teams can take on: business strategy
-          for disability-focused organizations and accessibility projects for
-          companies across industries.
+          Our student teams work on business strategy for disability-focused
+          organizations and accessibility projects for companies across
+          industries. These areas guide the questions we explore with clients
+          and the recommendations we develop together.
         </p>
       </Intro>
       <div className="st-wrap st-service-rows">
@@ -345,9 +329,9 @@ export function StudioServices() {
       </div>
       <section className="st-wrap st-scope-note">
         <p>
-          We agree on a business question and a scope our student team can
-          deliver. Our work provides research and recommendations. Legal advice
-          and compliance certification fall outside our services.
+          Each engagement begins with an agreed business question and a scope
+          that our student team can deliver through research and recommendations.
+          Legal advice and compliance certification fall outside our services.
         </p>
       </section>
       <Callout join />
@@ -368,8 +352,8 @@ export function StudioServiceDetail() {
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
-          What you could
-          <br />work on.
+          Our focus
+          <br />in this area.
         </h2>
         <div>
           <p>{area.detail}</p>
@@ -379,7 +363,7 @@ export function StudioServiceDetail() {
               <li key={e}>{e}</li>
             ))}
           </ul>
-          <Button to="/consulting/contact#join">Explore analyst roles</Button>
+          <Button href={CONSULTING_FORM_URL}>Apply</Button>
         </div>
       </section>
       <Callout join />
@@ -400,9 +384,9 @@ export function StudioWork() {
       >
         <ClientLogos />
         <p>
-          Our first client is Arc Thrift Stores of Colorado. Our Fall 2026 team
-          will develop recommendations for a social enterprise that puts
-          disability employment at the heart of its business.
+          Our first engagement brings UBLDA students together with Arc Thrift
+          Stores of Colorado to develop business recommendations for a social
+          enterprise whose work supports disability employment and advocacy.
         </p>
       </Intro>
       <section className="st-wrap st-work-row" data-enter>
@@ -413,13 +397,14 @@ export function StudioWork() {
           <p className="st-eyebrow">Fall 2026</p>
           <h2>Arc Thrift Stores of Colorado</h2>
           <p>
-            A nonprofit thrift retailer supporting Colorado’s Arc chapters and
-            employing people with intellectual and developmental disabilities.
+            Arc Thrift Stores is a nonprofit retailer that supports Colorado’s
+            Arc chapters and employs people with intellectual and developmental
+            disabilities throughout its operations.
           </p>
           <p>
-            Arc Thrift’s CEO sponsors the engagement. Four to six analysts work
-            with two project managers. The team plans to present its
-            recommendations to The Arc’s national board in December.
+            Four to six analysts will work with two project managers on an
+            engagement sponsored by Arc Thrift’s CEO. The team plans to present
+            its recommendations to The Arc’s national board in December.
           </p>
           <Button href="https://arcthrift.com">Visit Arc Thrift Stores</Button>
         </div>
@@ -432,9 +417,10 @@ export function StudioWork() {
         </h2>
         <div>
           <p>
-            The team develops its analysis through weekly working sessions and a
-            midpoint review. The final presentation connects the research to
-            recommendations the client can evaluate.
+            Weekly working sessions and a midpoint review give the team time
+            to develop its analysis and refine its recommendations before the
+            final presentation. Our contribution is a clear account of the
+            research and the business reasoning behind the proposed next steps.
           </p>
           <Button to="/consulting/practice">How we work</Button>
         </div>
@@ -456,20 +442,17 @@ export function StudioPractice() {
         }
       >
         <p>
-          UBLDA Consulting is the student-led consulting division of
-          Undergraduate Business Leaders for Diverse Abilities at Michigan Ross.
-          We work pro bono.
+          UBLDA Consulting brings Michigan undergraduates together to provide
+          pro bono consulting through Undergraduate Business Leaders for
+          Diverse Abilities at Michigan Ross.
         </p>
         <p>
-          As an analyst, you work on business challenges for disability-focused
-          organizations or accessibility projects for companies across industries.
-          You learn by researching a real question and developing a response
-          with your team.
+          Our work spans business challenges for disability-focused organizations
+          and accessibility projects for companies across industries. Analysts
+          contribute to a shared project from the initial research through the
+          final client presentation.
         </p>
       </Intro>
-      <div className="st-wrap st-practice-campus">
-        <RossArtwork />
-      </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
           Focused teams.
@@ -479,20 +462,22 @@ export function StudioPractice() {
         </h2>
         <div>
           <p>
-            You work with fellow analysts and two project managers to research
-            the client’s question. Test your assumptions together and build
-            the case for your recommendation.
+            Each team works with two project managers who guide the research
+            and help analysts turn their findings into a recommendation. Team
+            discussions create space to question assumptions and consider how
+            different perspectives change the analysis.
           </p>
           <p>
-            Weekly deliverables help you practice structuring a problem and
-            explaining your thinking. Use the midpoint review to improve your
-            analysis before the final client presentation.
+            Weekly deliverables keep the project moving toward a defined
+            business question while the midpoint review provides an opportunity
+            to assess the direction of the work. The final presentation brings
+            the research and recommendations together for the client.
           </p>
           <p>
-            Bring curiosity and the discipline to follow through. You do not need
-            prior consulting experience.
+            Students from every undergraduate major and class year are welcome
+            to apply with no prior consulting experience required.
           </p>
-          <Button to="/consulting/contact#join">Join the team</Button>
+          <Button href={CONSULTING_FORM_URL}>Apply</Button>
         </div>
       </section>
       <section className="st-wrap st-section">
@@ -567,8 +552,9 @@ export function StudioInsights() {
         }
       >
         <p>
-          Context for students exploring disability in business. Use these
-          readings to inform your thinking alongside the work of the club.
+          These readings offer students a broader view of disability in
+          business and provide context for the questions our club explores
+          through its projects and conversations.
         </p>
       </Intro>
       <section className="st-wrap st-section">
@@ -693,16 +679,16 @@ export function StudioContact() {
       <Intro
         title={
           <>
-            Find your place
+            Contact
             <br />
-            <em>at UBLDA.</em>
+            <em>UBLDA Consulting.</em>
           </>
         }
       >
         <p>
-          Explore consulting analyst roles or join the wider club. Our project
-          managers can answer questions about the work and application process.
-          Organizations interested in a project can contact us here too.
+          Our project managers are available to answer questions about the
+          club and the consulting application process. They also speak with
+          organizations interested in working with a student team.
         </p>
         <div className="st-contact-emails">
           {LEADERS.map((l) => (
@@ -728,14 +714,14 @@ export function StudioContact() {
         <div className="st-wrap">
           <div className="st-section-top">
             <h2 className="st-section-heading">
-              Build your skills.
+              Fall 2026
               <br />
-              Take on a real business challenge.
+              analyst applications.
             </h2>
             <p>
-              Open to University of Michigan undergraduates of all majors and
-              years. Disabled and non-disabled students are welcome. No
-              consulting experience required.
+              We welcome applications from disabled and non-disabled University
+              of Michigan undergraduates across all majors and class years
+              with no prior consulting experience required.
             </p>
           </div>
           <details open>
@@ -745,8 +731,9 @@ export function StudioContact() {
             <div className="st-opening">
               <div>
                 <p>
-                  Work in a team of four to six analysts with two project managers.
-                  Weekly client work runs from October through December.
+                  Our Fall 2026 team will include four to six analysts working
+                  with two project managers on weekly client work from October
+                  through December.
                 </p>
                 <p>
                   {windowState === "open"
@@ -757,7 +744,7 @@ export function StudioContact() {
                 </p>
                 {windowState === "open" ? (
                   <Button href={CONSULTING_FORM_URL} solid>
-                    Apply for Fall 2026
+                    Apply
                   </Button>
                 ) : (
                   <Button href={CONTACT_MAILTO}>Contact the team</Button>
@@ -772,9 +759,10 @@ export function StudioContact() {
             </summary>
             <div className="st-opening">
               <p>
-                Learn through speaker events and workshops. Connect with students
-                who care about disability in business. General membership is
-                free and open without a selection process.
+                General members take part in speaker events and club activities
+                with other students interested in disability in business.
+                Membership is free and open to all U-M students without a
+                selection process.
               </p>
               <Button href={MEMBERSHIP_FORM_URL}>Join UBLDA</Button>
             </div>
