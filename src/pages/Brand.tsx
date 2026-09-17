@@ -91,16 +91,19 @@ export default function Brand() {
 
           <h3 className="brand-subsection">UBLDA Consulting</h3>
           <p className="brand-section__desc">
-            Consulting leads with deep teal and retains UBLDA’s navy and cream.
-            Mint highlights and a teal-to-navy animated background distinguish the practice.
+            Ink &amp; Persimmon gives Consulting a distinct editorial identity.
+            UBLDA navy anchors warm paper and white surfaces; persimmon marks actions
+            and emphasis. Cool blue and the parent teal appear selectively in artwork.
           </p>
           <div className="brand-swatch-grid">
-            <ColorSwatch name="Consulting Teal" hex="#126A70" token="--st-accent" usage="Links, buttons, emphasized headings, and metrics" />
-            <ColorSwatch name="Navy" hex="#0A3658" token="--st-ink" usage="Primary text and graphic accents" />
-            <ColorSwatch name="Deep Navy" hex="#07263E" token="--st-dark" usage="Dark pages, footer, and darkest shader bands" />
-            <ColorSwatch name="Mint" hex="#C8E8DF" token="--st-mint" usage="Hero highlights and light buttons on navy" light />
-            <ColorSwatch name="Mist" hex="#E4EEEA" token="--st-surface" usage="Client, research, and recruiting backgrounds" light />
-            <ColorSwatch name="Cream" hex="#FAF9F6" token="--st-paper" usage="Main page background and text on dark surfaces" light />
+            <ColorSwatch name="Persimmon" hex="#B63E26" token="--st-accent" usage="Actions, links, selected states, and focused emphasis" />
+            <ColorSwatch name="UBLDA Navy" hex="#0A3658" token="--st-ink" usage="Primary text; connection to the parent brand" />
+            <ColorSwatch name="Ink" hex="#141F2E" token="--st-dark" usage="Dark sections, footer, and shader shadows" />
+            <ColorSwatch name="Paper" hex="#FAF9F6" token="--st-paper" usage="Warm neutral reading surfaces" light />
+            <ColorSwatch name="White" hex="#FFFFFF" token="--st-card" usage="Client and metric panels" light />
+            <ColorSwatch name="Stone" hex="#EEECE7" token="--st-surface" usage="Quiet supporting surfaces" light />
+            <ColorSwatch name="Peach" hex="#FFDDCC" token="--st-highlight" usage="Highlights and focus rings on dark backgrounds" light />
+            <ColorSwatch name="Blue Gray" hex="#DCE4F1" token="--st-cool" usage="Research bands and accessibility artwork" light />
           </div>
 
           <h3 className="brand-subsection">Neutrals</h3>
