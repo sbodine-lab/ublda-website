@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowDown, ArrowUpRight, Plus } from "lucide-react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { buildGCalUrl } from "../../lib/calendarLinks";
 import { events, type ClubEvent } from "../../lib/events";
 
@@ -80,7 +81,7 @@ export function UpcomingEvents({ preview = false }: { preview?: boolean }) {
         {preview ? <Link className="eq-text-link" to="/events">All events<ArrowUpRight size={22} aria-hidden="true" /></Link> : <Link className="eq-text-link" to="#past-events">Explore past events<ArrowDown size={22} aria-hidden="true" /></Link>}
       </div>
       {upcoming.map(event => <UpcomingEvent key={event.id} event={event} preview={preview} />)}
-      {!upcoming.length && <div className="eq-events-empty"><p>We’re planning what’s next. Join UBLDA to hear when new events are announced.</p><Link className="eq-button" to="/join">Join UBLDA<ArrowUpRight size={18} aria-hidden="true" /></Link></div>}
+      {!upcoming.length && <div className="eq-events-empty"><p>We’re planning what’s next. Join UBLDA to hear when new events are announced.</p><a className="eq-button" href={MEMBERSHIP_FORM_URL}>Join UBLDA<ArrowUpRight size={18} aria-hidden="true" /></a></div>}
     </section>
   );
 }

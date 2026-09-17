@@ -237,7 +237,7 @@ function Header({ home, paused, systemMotion, onToggleMotion }: { home: boolean;
         ["/#what-we-stand-for", "What we stand for"],
         ["/events", "Events"],
         ["/team", "Team"],
-        ["/join", "Join UBLDA"],
+        [MEMBERSHIP_FORM_URL, "Join UBLDA"],
         ["/consulting", "UBLDA Consulting"],
       ];
   return (
@@ -795,7 +795,7 @@ function CTA() {
       <BrandParticles closing />
       <h2 data-reveal>Let’s make disability inclusion part of business.</h2>
       <div className="eq-cta-buttons">
-        <Button to="/join">Join UBLDA</Button>
+        <Button to={MEMBERSHIP_FORM_URL}>Join UBLDA</Button>
         <Button to="/events">Come to an event</Button>
       </div>
     </section>
@@ -843,7 +843,7 @@ function Footer() {
           ["/events", "Events"],
           ["/team", "Team"],
           ["/consulting", "Consulting"],
-          ["/join", "Join"],
+          [MEMBERSHIP_FORM_URL, "Join"],
           ["/brand", "Brand"],
           ["/links", "Links"],
           ["/unsubscribe", "Unsubscribe"],
