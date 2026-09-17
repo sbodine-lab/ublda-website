@@ -758,9 +758,6 @@ html.st-menu-open {
   font-size: 33.6px;
   margin-bottom: 12px;
 }
-.st-person .st-eyebrow {
-  margin-bottom: 10px !important;
-}
 .st-person > p:not(.st-eyebrow) {
   font-size: 17px;
   color: #5d696b;
