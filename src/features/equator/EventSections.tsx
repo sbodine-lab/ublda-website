@@ -48,11 +48,11 @@ function UpcomingEvent({ event, preview }: { event: ClubEvent; preview: boolean 
 }
 
 function EventRecap({ event, preview }: { event: ClubEvent; preview: boolean }) {
-  const { hash } = useLocation();
+  const { hash, key: locationKey } = useLocation();
   const detail = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     if (!preview && hash === `#${event.id}` && detail.current) detail.current.open = true;
-  }, [event.id, hash, preview]);
+  }, [event.id, hash, preview, locationKey]);
   return (
     <details className="eq-event-recap" ref={detail} id={preview ? undefined : event.id} onToggle={() => ScrollTrigger.refresh()} onTransitionEnd={() => ScrollTrigger.refresh()}>
       <summary>

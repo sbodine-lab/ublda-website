@@ -176,7 +176,7 @@ export function Studio({
   });
   const deviceReducedMotion = useDeviceReducedMotion();
   const motionPaused = paused || deviceReducedMotion;
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, key: locationKey } = useLocation();
   const closeMenu = useCallback(() => setOpen(false), []);
   useMenuKeyboard(open, root, ".st-navlinks", ".st-menu-toggle", closeMenu);
   useEffect(() => {
@@ -210,7 +210,7 @@ export function Studio({
       }
     });
     return () => cancelAnimationFrame(frame);
-  }, [title, pathname, hash]);
+  }, [title, pathname, hash, locationKey]);
   useLayoutEffect(() => {
     document.documentElement.classList.add("st-root");
     return () => {
