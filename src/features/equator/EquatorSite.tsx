@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { NetworkLogos } from "./NetworkLogos";
+import { RibbonAnchor, RibbonJourney } from "./RibbonJourney";
 import {
   ArrowDown,
   ArrowLeft,
@@ -334,14 +335,16 @@ function Hero({
   title,
   description,
   label,
+  journey = false,
 }: {
   title: ReactNode;
   description: string;
   label?: string;
+  journey?: boolean;
 }) {
   return (
     <section className="eq-hero" id="intro" data-tone="teal" aria-label={label}>
-      <BrandParticles />
+      {journey ? <RibbonAnchor name="learning" hero /> : <BrandParticles />}
       <h1>{title}</h1>
       <p className="eq-hero-sub">
         {description}
@@ -468,6 +471,7 @@ function Values() {
           <span ref={number}>1</span>/5
         </div>
       </div>
+      <RibbonJourney />
       {values.map((v, i) => (
         <div
           className="eq-value-zone"
@@ -1198,6 +1202,7 @@ export default function EquatorSite() {
       <>
         <Splash />
         <Hero
+          journey
           title={
             <>
               Disability inclusion
@@ -1223,6 +1228,7 @@ export default function EquatorSite() {
     content = (
       <>
         <Hero
+          journey
           label="Our Story"
           title={
             <>

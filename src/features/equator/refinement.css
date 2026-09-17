@@ -28,11 +28,6 @@
 .eq-site .eq-value h2 { font-size: clamp(56px, 5.85vw, 84px); line-height: 1.02; }
 .eq-value-copy { grid-column: 4/span 8; column-gap: 40px; }
 .eq-glyph { width: 230px; height: 230px; top: 150px; }
-/* Recognizable symbols reinforce the value beside them. */
-.eq-value-symbol { display: grid; place-items: center; }
-.eq-value-symbol::before { content: ""; position: absolute; inset: 12%; border-radius: 28%; background: #45918b12; }
-.eq-value-symbol svg { position: relative; width: 66%; height: 66%; color: var(--eq-navy); }
-.eq-value-symbol--learning::before, .eq-value-symbol--community::before { background: #bc964017; }
 .eq-explore { width: 48px; height: 48px; justify-content: center; }
 .eq-explore svg, .eq-explore:hover svg { width: 24px; height: 24px; opacity: 1; }
 .eq-program > button { display: flex; align-items: flex-start; padding: 24px; }
