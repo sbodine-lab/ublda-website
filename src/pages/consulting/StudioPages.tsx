@@ -1,15 +1,14 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
-import { Bands, Button, Callout, Intro, Studio } from "./Studio";
+import { ApplicationButton, Bands, Button, Callout, Intro, Studio } from "./Studio";
 import { GenerativeArt } from "./GenerativeArt";
 import { AREAS, RESEARCH } from "./research";
 import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
+import { useConsultingApplication } from "../../lib/useConsultingApplication";
 import {
   APPLY_DEADLINE_LABEL,
-  APPLY_DEADLINE_AT_MS,
-  applyWindow,
   APPLY_WINDOW_SHORT,
   INTERVIEW_WINDOW_SHORT,
   OFFERS_SHORT,
@@ -77,10 +76,13 @@ function InsightCards({ filter = "All", headingLevel = 3 }: { filter?: string; h
             className={`st-insight-art st-insight-art--${RESEARCH.indexOf(item)}`}
           >
             <span>{item.value}</span>
+            <p className="st-metric-label">{item.metricLabel}</p>
             <ArrowUpRight size={32} />
           </div>
           <p className="st-eyebrow">{item.source}</p>
           <Heading>{item.title}</Heading>
+          <p className="st-insight-date">{item.date}</p>
+          <p className="st-insight-context">{item.cardNote}</p>
         </Link>
       ))}
     </div>
@@ -104,7 +106,7 @@ function People({ full = false }: { full?: boolean }) {
             <div />
           </div>
           <h2>{person.name}</h2>
-          <p>{person.role.split(",")[0]}</p>
+          <p>{person.role}</p>
           <a className="st-text-link" href={`mailto:${person.email}`}>
             {person.email}
             <ArrowUpRight size={16} />
@@ -122,14 +124,14 @@ function People({ full = false }: { full?: boolean }) {
 function ClientLogos() {
   return (
     <div className="st-client-logos">
-      <BrandLogo
-        src="/client-the-arc.svg"
-        alt="The Arc — planned national board presentation"
-      />
-      <BrandLogo
-        src="/partners-arc-thrift.png"
-        alt="Arc Thrift Stores — Fall 2026 client"
-      />
+      <figure>
+        <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+        <figcaption>Fall 2026 consulting client</figcaption>
+      </figure>
+      <figure>
+        <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
+        <figcaption>Planned national board presentation</figcaption>
+      </figure>
     </div>
   );
 }
@@ -143,7 +145,7 @@ function Timeline() {
     [
       "Interview",
       INTERVIEW_WINDOW_SHORT,
-      "Two 30-minute conversations at Ross: one behavioral and one technical.",
+      "Behavioral and technical interviews are expected at Ross. Invited applicants will receive confirmed dates and times.",
     ],
     ["Decisions", OFFERS_SHORT, ""],
     ["Kickoff", KICKOFF_SHORT, "Begin weekly project work with your team."],
@@ -182,7 +184,7 @@ export function StudioHome() {
           </p>
           <div className="st-actions" data-enter style={enterDelay(600)}>
             <Button to="/consulting/work">Our work</Button>
-            <Button href={CONSULTING_FORM_URL} solid>Apply</Button>
+            <ApplicationButton solid />
           </div>
         </div>
       </section>
@@ -218,8 +220,9 @@ export function StudioHome() {
             and perspectives to the questions we explore as a club.
           </p>
           <p>
-            General membership is free and open to all U-M students while
-            consulting analysts join through an application and interview process.
+            General membership is free and open to all U-M students. Consulting
+            analyst positions are for U-M undergraduates, selected through an
+            application and interview process.
           </p>
           <Button to="/">Explore UBLDA</Button>
         </div>
@@ -228,7 +231,7 @@ export function StudioHome() {
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
             <h2 className="st-section-heading">Our approach<br />to client work.</h2>
-            <p>Our Fall 2026 team brings four to six analysts and two project managers together for weekly client work that runs from October through December.</p>
+            <p>Our first consulting engagement is planned for October–December 2026, with four to six analysts working alongside two project managers.</p>
           </div>
           <div className="st-experience-grid">
             <article data-enter>
@@ -265,9 +268,9 @@ export function StudioHome() {
             <div>
               <h3>Fall 2026 client</h3>
               <p>
-                Colorado’s nonprofit thrift chain funds the state’s Arc chapters
-                and is one of its largest employers of people with intellectual
-                and developmental disabilities.
+                The nonprofit retailer funds disability advocacy and community
+                programs and employs people with intellectual and developmental
+                disabilities.
               </p>
             </div>
           </div>
@@ -364,7 +367,7 @@ export function StudioServiceDetail() {
               <li key={e}>{e}</li>
             ))}
           </ul>
-          <Button href={CONSULTING_FORM_URL}>Apply</Button>
+          <ApplicationButton />
         </div>
       </section>
       <Callout join />
@@ -385,7 +388,8 @@ export function StudioWork() {
       >
         <ClientLogos />
         <p>
-          Our first engagement brings UBLDA students together with Arc Thrift
+          Our first engagement is planned for October–December 2026, bringing
+          UBLDA students together with Arc Thrift
           Stores of Colorado to develop business recommendations for a social
           enterprise whose work supports disability employment and advocacy.
         </p>
@@ -398,8 +402,8 @@ export function StudioWork() {
           <p className="st-eyebrow">Fall 2026</p>
           <h2>Arc Thrift Stores of Colorado</h2>
           <p>
-            Arc Thrift Stores is a nonprofit retailer that supports Colorado’s
-            Arc chapters and employs people with intellectual and developmental
+            Arc Thrift Stores is a nonprofit retailer that funds disability
+            advocacy and employs people with intellectual and developmental
             disabilities throughout its operations.
           </p>
           <p>
@@ -478,7 +482,7 @@ export function StudioPractice() {
             Students from every undergraduate major and class year are welcome
             to apply with no prior consulting experience required.
           </p>
-          <Button href={CONSULTING_FORM_URL}>Apply</Button>
+          <ApplicationButton />
         </div>
       </section>
       <section className="st-wrap st-section">
@@ -555,7 +559,8 @@ export function StudioInsights() {
         <p>
           These readings offer students a broader view of disability in
           business and provide context for the questions our club explores
-          through its projects and conversations.
+          through its projects and conversations. These are external research findings,
+          not results from UBLDA projects.
         </p>
       </Intro>
       <section className="st-wrap st-section">
@@ -589,7 +594,8 @@ export function StudioInsight() {
       <article className="st-wrap st-article">
         <div className="st-article-stat">
           {item.value}
-          <small>{item.source}</small>
+          <p className="st-article-metric-label">{item.metricLabel}</p>
+          <small>{item.source}<br />{item.date}</small>
         </div>
         <div>
           <h2>What it means for business</h2>
@@ -601,7 +607,7 @@ export function StudioInsight() {
           </a>
           <p className="st-article-note">
             These findings come from independent research. They are not UBLDA
-            project results. Source checked September 16, 2026.
+            project results. Source checked September 17, 2026.
           </p>
           <Button to="/consulting/insights">All insights</Button>
         </div>
@@ -662,16 +668,7 @@ function InquiryForm() {
   );
 }
 export function StudioContact() {
-  const [windowState, setWindowState] = useState(() =>
-    applyWindow(Date.now(), APPLY_DEADLINE_AT_MS),
-  );
-  useEffect(() => {
-    const timer = window.setInterval(
-      () => setWindowState(applyWindow(Date.now(), APPLY_DEADLINE_AT_MS)),
-      30000,
-    );
-    return () => window.clearInterval(timer);
-  }, []);
+  const { state: windowState } = useConsultingApplication();
   return (
     <Studio title="Get in touch">
       <Intro
@@ -753,7 +750,7 @@ export function StudioContact() {
           </details>
           <details>
             <summary>
-              General member <span>Year-round</span>
+              General member <span>Fall 2026 signup</span>
             </summary>
             <div className="st-opening">
               <p>

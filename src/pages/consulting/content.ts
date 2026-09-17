@@ -3,7 +3,7 @@
    (Lloyd Lewis call, 2026-07-28), the operating model (Outreach Meeting
    Guide), and the project-manager assignment (2026-08-18). */
 
-import { APPLY_WINDOW_SHORT, APPLY_DEADLINE_LABEL } from '../../lib/applyForm'
+import { APPLY_WINDOW_SHORT, APPLY_DEADLINE_LABEL, INTERVIEW_WINDOW_SHORT, OFFERS_SHORT, KICKOFF_SHORT } from '../../lib/applyForm'
 
 export const HERO_DESCRIPTION =
   'Work with fellow Michigan students on pro bono client projects in business strategy and accessibility.'
@@ -76,21 +76,21 @@ export const STEPS: Step[] = [
   {
     num: '03',
     title: 'Interview',
-    when: 'Sep 25 to Sep 27',
-    desc: 'Two 30-minute conversations at Ross, one behavioral and one technical.',
+    when: INTERVIEW_WINDOW_SHORT,
+    desc: 'Behavioral and technical interviews are expected at Ross. Confirmed dates and times will be shared with invitees.',
     tone: 'gold',
   },
   {
     num: '04',
     title: 'Offers',
-    when: 'By Sep 29',
-    desc: 'Receive your application decision by September 29.',
+    when: OFFERS_SHORT,
+    desc: 'Final decisions follow interviews.',
     tone: 'cream',
   },
   {
     num: '05',
     title: 'Kickoff',
-    when: 'Week of Oct 5',
+    when: KICKOFF_SHORT,
     desc: 'Begin project work with four to six analysts and two project managers.',
     tone: 'teal',
   },
@@ -127,9 +127,9 @@ export const PARTNER_STATEMENT =
 
 export const PARTNERS = [
   { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities', role: 'MBA community' },
-  { src: '/partners-nestidd.png', alt: 'Nestidd', role: 'Disability-focused business connection' },
+  { src: '/partners-nestidd.png', alt: 'Nestidd', role: 'Past speaker’s organization' },
   { src: '/partners-arc-thrift.png', alt: 'Arc Thrift Stores — Fall 2026 client', role: 'Fall 2026 consulting client' },
-  { src: '/partners-microsoft.png', alt: 'Microsoft — speaker’s organization', role: 'Speaker’s organization' },
+  { src: '/partners-microsoft.png', alt: 'Microsoft — speaker’s organization', role: 'October 2026 speaker’s organization' },
   { src: '/partners-wso.png', alt: 'Wall Street Oasis — club partner', role: 'Club partner' },
 ]
 

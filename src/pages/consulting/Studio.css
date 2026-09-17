@@ -659,8 +659,19 @@ html.st-menu-open {
   align-items: center;
   justify-content: space-between;
 }
+.st-client-logos figure {
+  width: 46%;
+  margin: 0;
+  text-align: center;
+}
+.st-client-logos figcaption {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 18px;
+}
 .st-client-logos img {
-  width: 43%;
+  margin-inline: auto;
+  width: 100%;
   height: 110px;
   object-fit: contain;
 }
@@ -671,22 +682,54 @@ html.st-menu-open {
   gap: 24px;
 }
 .st-insight-art {
-  height: 285px;
-  padding: 28px;
+  min-height: 340px;
+  height: auto;
+  padding: 48px 28px 72px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 16px;
   background: var(--st-surface);
   position: relative;
   overflow: hidden;
   margin-bottom: 26px;
 }
 .st-insight-art > span {
+  flex-shrink: 0;
+  line-height: 1;
   font-size: 96px;
   letter-spacing: -5px !important;
   position: relative;
   z-index: 1;
   transition: transform 0.5s;
+}
+.st-insight-art .st-metric-label {
+  position: relative;
+  z-index: 1;
+  max-width: 28ch;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.4;
+  text-align: center;
+  color: inherit;
+}
+.st-insight-card .st-insight-date {
+  margin: 16px 0 10px;
+  font-size: 14px;
+  color: var(--st-muted);
+}
+.st-insight-card .st-insight-context {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--st-ink);
+}
+.st-article .st-article-metric-label {
+  font-size: 23px;
+  line-height: 1.4;
+  max-width: 27ch;
+  margin: 18px 0 0;
+  color: var(--st-ink);
 }
 .st-insight-art > svg {
   position: absolute;
@@ -1570,7 +1613,7 @@ html.st-menu-open {
     gap: 25px;
   }
   .st-insight-art {
-    height: 230px;
+    min-height: 320px;
   }
   .st-insight-art > span {
     font-size: 72px;
@@ -1867,7 +1910,7 @@ html.st-menu-open {
     gap: 45px;
   }
   .st-insight-art {
-    height: 290px;
+    min-height: 320px;
   }
   .st-insight-art > span {
     font-size: 94px;
@@ -2312,4 +2355,12 @@ html.st-menu-open {
   .st-experience-grid h3 {
     margin-bottom: 14px;
   }
+}
+
+@media (max-width: 900px) {
+  .st-insight-cards { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 901px) {
+  .st-insight-card :is(h2, h3) { min-height: 2.24em; }
 }

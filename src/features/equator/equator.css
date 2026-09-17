@@ -666,7 +666,19 @@
   flex-shrink: 0;
   padding-right: 75px;
 }
+.eq-logo-set figure {
+  width: 180px;
+  margin: 0;
+  text-align: center;
+}
+.eq-logo-set figcaption {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 14px;
+  min-height: 40px;
+}
 .eq-logo-set img {
+  margin-inline: auto;
   width: 160px;
   height: 95px;
   object-fit: contain;

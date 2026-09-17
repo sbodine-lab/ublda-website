@@ -18,9 +18,10 @@ import {
   Play,
   X,
 } from "lucide-react";
+import { useConsultingApplication } from "../../lib/useConsultingApplication";
 import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 import { LEADERS, SOCIAL } from "./content";
-import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
+import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { useDeviceReducedMotion } from "../../features/equator/motionPreference";
 import "./Studio.css";
 import "./accessibility.css";
@@ -48,6 +49,11 @@ export function Button({
       {children}
     </a>
   );
+}
+
+export function ApplicationButton({ solid = false }: { solid?: boolean }) {
+  const application = useConsultingApplication();
+  return <Button href={application.href} solid={solid}>{application.label}</Button>;
 }
 
 /** Reference geometry: 22 bands, 6.59s phase cycle, .72s column offset.
@@ -178,6 +184,7 @@ export function Studio({
   dark?: boolean;
   hero?: boolean;
 }) {
+  const application = useConsultingApplication();
   const root = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [about, setAbout] = useState(false);
@@ -354,11 +361,11 @@ export function Studio({
                 <Link to="/consulting/practice">Our practice</Link>
                 <Link to="/consulting/leadership">Leadership</Link>
                 <Link to="/consulting/partners">Our connections</Link>
-                <a href={CONSULTING_FORM_URL}>Apply</a>
+                <a href={application.href}>{application.label}</a>
               </div>
             </div>
-            <a href={CONSULTING_FORM_URL} className="st-nav-contact">
-              <ArrowRight size={15} /> Apply
+            <a href={application.href} className="st-nav-contact">
+              <ArrowRight size={15} /> {application.label}
             </a>
             <Link to="/" className="st-parent-menu">
               <ArrowLeft size={16} aria-hidden="true" /> UBLDA home
@@ -422,7 +429,7 @@ export function Studio({
               <h3>About us</h3>
               <Link to="/consulting/leadership">Leadership</Link>
               <Link to="/consulting/partners">Our connections</Link>
-              <a href={CONSULTING_FORM_URL}>Apply</a>
+              <a href={application.href}>{application.label}</a>
               <Link to="/">UBLDA home</Link>
             </div>
             <div>
@@ -459,6 +466,7 @@ export function Studio({
 }
 
 export function Callout({ join = false }: { join?: boolean }) {
+  const application = useConsultingApplication();
   return (
     <section className="st-wrap st-callout" data-enter>
       <Bands />
@@ -481,9 +489,9 @@ export function Callout({ join = false }: { join?: boolean }) {
         <div className="st-actions">
           <Button
             to={join ? undefined : "/consulting/contact"}
-            href={join ? CONSULTING_FORM_URL : undefined}
+            href={join ? application.href : undefined}
           >
-            {join ? "Apply" : "Discuss a project"}
+            {join ? application.label : "Discuss a project"}
           </Button>
           <Button to={join ? "/consulting/leadership" : "/consulting/work"}>
             {join ? "Meet the team" : "Explore our work"}
