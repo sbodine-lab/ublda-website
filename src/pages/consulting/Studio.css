@@ -2199,3 +2199,140 @@ html.st-menu-open {
     align-items: start;
   }
 }
+
+/* Student-first club story and semester overview. */
+.st .st-hero-summary {
+  max-width: 650px;
+  margin: 32px auto 0;
+  font-size: 20px;
+  line-height: 1.45;
+  text-align: center;
+}
+.st-hero .st-actions {
+  margin-top: 32px;
+}
+.st-club-story {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(40px, 5vw, 80px);
+  align-items: center;
+}
+.st-club-story h2 {
+  font-size: clamp(32px, 3.2vw, 48px);
+  line-height: 1.08;
+  margin: 0 0 28px;
+}
+.st-club-story p {
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--st-muted);
+}
+.st-club-story .st-button {
+  margin-top: 12px;
+}
+.st-ross-art {
+  margin: 0;
+}
+.st-ross-art img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+}
+.st-ross-art figcaption {
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--st-muted);
+}
+.st-ross-art figcaption a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.st-practice-campus {
+  max-width: 1100px;
+}
+.st-experience {
+  margin-top: 120px;
+  padding-block: 96px;
+  background: var(--st-dark);
+  color: var(--st-paper);
+}
+.st-experience .st-section-top {
+  align-items: flex-end;
+  margin-bottom: 64px;
+}
+.st-experience .st-section-top p {
+  max-width: 420px;
+  color: var(--st-muted-light);
+  font-size: 20px;
+  line-height: 1.5;
+}
+.st-experience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 56px;
+  margin-bottom: 40px;
+}
+.st-experience-grid article > span {
+  display: block;
+  color: var(--st-brand-teal);
+  font-size: 16px;
+  margin-bottom: 22px;
+}
+.st-experience-grid h3 {
+  font-size: 27px;
+  line-height: 1.15;
+  margin: 0 0 20px;
+}
+.st-experience-grid p {
+  color: var(--st-muted-light);
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
+}
+@media (max-width: 1024px) {
+  .st-club-story {
+    grid-template-columns: 1fr;
+  }
+  .st-experience-grid {
+    gap: 28px;
+  }
+  .st-experience-grid h3 {
+    font-size: 24px;
+  }
+}
+@media (max-width: 767px) {
+  .st .st-hero-summary {
+    margin-top: 28px;
+    font-size: 18px;
+    text-align: left;
+  }
+  .st-club-story {
+    gap: 32px;
+  }
+  .st-club-story p {
+    font-size: 18px;
+  }
+  .st-experience {
+    margin-top: 80px;
+    padding-block: 64px;
+  }
+  .st-experience .st-section-top {
+    margin-bottom: 36px;
+  }
+  .st-experience .st-section-top p {
+    font-size: 18px;
+  }
+  .st-experience-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .st-experience-grid article > span {
+    margin-bottom: 12px;
+  }
+  .st-experience-grid h3 {
+    margin-bottom: 14px;
+  }
+}

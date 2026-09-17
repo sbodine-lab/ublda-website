@@ -2,15 +2,15 @@
 
 September 16, 2026. Sam requested fewer commas and em dashes and a more business-minded voice that feels intelligent, motivated and focused on impact.
 
-## Voice
+## Voice and primary audience
 
-Lead with the client's decision or intended outcome. Explain how our work helps: research the market, evaluate options, identify access barriers, recommend a direction. Show intelligence through precise reasoning and useful distinctions. Show ambition through active verbs and concrete objectives.
+Students are the primary audience, as Sam clarified after the initial copy pass. Lead with UBLDA's community, what consulting analysts do and how students can take part. Companies remain a secondary audience with contact options and clear service scope.
 
-Keep sentences focused. Replace stacked clauses with separate sentences. Avoid em dashes in marketing prose. Keep commas where grammar or an official name requires them, including the Office of Community, Culture, and Belonging. Do not remove punctuation from structured data or change official role names to satisfy a cosmetic rule.
+The homepage now leads with “Build your skills. Put inclusion into practice.” Explain the learning experience through specific work: research a client question, compare options, build a recommendation and present it. Preserve both types of engagement: business consulting for disability-focused organizations and accessibility projects for companies across industries.
 
-The homepage promise is “Expand access. Strengthen your business.” Supporting copy must immediately explain both service audiences: business consulting for disability-focused organizations and accessibility consulting for companies across industries. Preserve the student-led and pro bono identity.
+Use concise sentences and active verbs. Avoid em dashes in marketing prose and retain commas only where useful or required by official names. Keep language ambitious and specific without implying guaranteed career outcomes. State the distinction between free general membership and selected consulting analyst roles.
 
-Use clear calls to action such as “Discuss a project” and “Explore the service.” Recruitment copy should make the work tangible and explain eligibility. The contact form must still state that it opens an email draft, not claim that an inquiry has been sent.
+The club story, semester experience, first client and project managers take priority on the homepage. External studies live under Insights. Use “Join the team” as the main action. The contact form must still explain that it opens an email draft.
 
 ## Evidence and boundaries
 

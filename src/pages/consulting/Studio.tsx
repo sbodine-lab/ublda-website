@@ -181,7 +181,7 @@ export function Studio({
   useEffect(() => {
     document.title =
       title === "Home"
-        ? "UBLDA Consulting | Business strategy and accessibility"
+        ? "UBLDA Consulting | Student consulting at Michigan Ross"
         : `${title} · UBLDA Consulting`;
     document.documentElement.classList.add("st-root");
     if (hash)
@@ -330,8 +330,8 @@ export function Studio({
                 <Link to="/consulting/contact#join">Join the team</Link>
               </div>
             </div>
-            <Link to="/consulting/contact" className="st-nav-contact">
-              <ArrowRight size={15} /> Get in touch
+            <Link to="/consulting/contact#join" className="st-nav-contact">
+              <ArrowRight size={15} /> Join the team
             </Link>
             <Link to="/" className="st-parent-menu">
               <ArrowLeft size={16} aria-hidden="true" /> UBLDA home
@@ -358,7 +358,7 @@ export function Studio({
             </div>
           </div>
           <Link className="st-footer-talk" to="/consulting/contact">
-            Let’s talk. <ArrowUpRight />
+            Get involved. <ArrowUpRight />
           </Link>
           <div className="st-footer-grid">
             <div>

@@ -761,16 +761,16 @@ export default function Brand() {
 
           <h3 className="brand-subsection">Consulting voice</h3>
           <p className="brand-section__desc">
-            Lead with the business goal. Explain how research helps a client
-            evaluate options and act. Use direct verbs and short sentences.
-            Show ambition through the work we take on and the questions we ask.
-            Support claims with evidence. Keep punctuation light and preserve
-            the distinction between a planned engagement and a proven result.
+            Speak to students first. Explain what analysts work on and how the
+            club connects business with disability inclusion. Use direct verbs
+            and short sentences. Show the team experience and make the next
+            step clear. Keep client work specific and distinguish planned
+            engagements from completed results.
           </p>
           <div className="brand-phrases">
-            <span className="brand-phrase">Expand access. Strengthen your business.</span>
-            <span className="brand-phrase">Research that sharpens decisions.</span>
-            <span className="brand-phrase">Recommendations built for action.</span>
+            <span className="brand-phrase">Build your skills. Put inclusion into practice.</span>
+            <span className="brand-phrase">Learn consulting through client work.</span>
+            <span className="brand-phrase">A team to learn with. A question to work on.</span>
           </div>
 
           <h3 className="brand-subsection">Key Phrases</h3>
