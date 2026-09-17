@@ -61,7 +61,6 @@ export function StoryArtwork({ kind }: { kind: string }) {
               <br />
               Accessibility at Microsoft
             </span>
-            <img src="/partners-microsoft.png" alt="" />
           </div>
         </>
       )}
