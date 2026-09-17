@@ -656,28 +656,28 @@ function Community() {
           </article>
         ))}
       </div>
-      <div className="eq-network" aria-label="Our community">
+      <section className="eq-network" aria-labelledby="network-heading">
+        <h3 id="network-heading">Our network</h3>
         <div className="eq-marquee">
           <div>
             {[0, 1].map((set) => (
               <div className="eq-logo-set" key={set} aria-hidden={set === 1}>
                 {[
-                  ["blda.webp", "BLDA", "MBA counterpart"],
-                  ["arc-thrift.png", "Arc Thrift Stores", "Fall 2026 client"],
-                  ["nestidd.png", "Nestidd", "Past speaker’s organization"],
-                  ["microsoft.png", "Microsoft", "October 2026 speaker’s organization"],
-                  ["wso.png", "Wall Street Oasis", "Club partner"],
-                ].map(([src, alt, relationship]) => (
+                  ["blda.webp", "BLDA"],
+                  ["arc-thrift.png", "Arc Thrift Stores"],
+                  ["nestidd.png", "Nestidd"],
+                  ["microsoft.png", "Microsoft"],
+                  ["wso.png", "Wall Street Oasis"],
+                ].map(([src, alt]) => (
                   <figure key={src}>
                     <img src={`/partners-${src}`} alt={alt} loading="lazy" />
-                    <figcaption>{relationship}</figcaption>
                   </figure>
                 ))}
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     </section>
   );
 }
