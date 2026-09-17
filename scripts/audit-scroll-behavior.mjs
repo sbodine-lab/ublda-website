@@ -22,6 +22,9 @@ try {
           };
         }
       });
+      // Install audit instrumentation through the browser before navigation;
+      // production keeps its script-src policy intact for page scripts.
+      await page.addInitScript({path:'node_modules/axe-core/axe.min.js'});
       await page.goto(base+route); await page.locator('main h1').waitFor(); await page.evaluate(()=>document.fonts.ready);
       check(`Local fonts only ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>e.name.includes('fonts.googleapis.com')||e.name.includes('fonts.gstatic.com'))));
       check(`No recruiting shader download ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>/\/Table-|\/shaders-|\/Halftone/.test(e.name))));
@@ -65,7 +68,6 @@ try {
       await page.waitForTimeout(100);
       check(`Device reduced motion respected ${route} ${width}`,await toggle.isDisabled());
       await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
-      await page.addScriptTag({path:'node_modules/axe-core/axe.min.js'});
       const violations=await page.evaluate(async()=> (await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa','best-practice']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})));
       check(`Accessibility scan ${route} ${width}`,!violations.length,violations);
       check(`No horizontal overflow ${route} ${width}`,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
