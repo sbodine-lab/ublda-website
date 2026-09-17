@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
+  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   ChevronDown,
@@ -258,16 +259,21 @@ export function Studio({
     >
       <header className={`st-header ${hero || dark ? "st-header--light" : ""}`}>
         <div className="st-wrap st-header-inner">
-          <Link
-            to="/consulting"
-            className="st-logo"
-            aria-label="UBLDA Consulting home"
-          >
-            <img src="/consulting/logos/ublda.svg" alt="" />
-            <span>
-              UBLDA<small>CONSULTING</small>
-            </span>
-          </Link>
+          <div className="st-brand-lockup" inert={open}>
+            <Link
+              to="/consulting"
+              className="st-logo"
+              aria-label="UBLDA Consulting home"
+            >
+              <img src="/consulting/logos/ublda.svg" alt="" />
+              <span>
+                UBLDA<small>CONSULTING</small>
+              </span>
+            </Link>
+            <Link to="/" className="st-parent-link">
+              <ArrowLeft size={13} aria-hidden="true" /> UBLDA home
+            </Link>
+          </div>
           <button
             className="st-menu-toggle"
             type="button"
@@ -320,13 +326,13 @@ export function Studio({
                 <Link to="/consulting/leadership">Leadership</Link>
                 <Link to="/consulting/partners">Our connections</Link>
                 <Link to="/consulting/contact#join">Join the team</Link>
-                <Link to="/">
-                  UBLDA home <ArrowUpRight size={14} />
-                </Link>
               </div>
             </div>
             <Link to="/consulting/contact" className="st-nav-contact">
               <ArrowRight size={15} /> Get in touch
+            </Link>
+            <Link to="/" className="st-parent-menu">
+              <ArrowLeft size={16} aria-hidden="true" /> UBLDA home
             </Link>
           </nav>
         </div>

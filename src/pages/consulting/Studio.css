@@ -119,6 +119,28 @@ html.st-menu-open {
   justify-content: space-between;
   gap: 30px;
 }
+.st-brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  gap: 6px;
+}
+.st-parent-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.st-parent-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.st-navlinks > .st-parent-menu {
+  display: none;
+}
 .st-logo {
   display: flex;
   align-items: center;
@@ -1439,6 +1461,14 @@ html.st-menu-open {
     gap: 8px;
     font-size: 22px;
     text-transform: none;
+  }
+  .st-navlinks > .st-parent-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    border-top: 1px solid #faf9f644;
+    font-size: 16px;
   }
   .st-navlinks > a:not(.st-nav-contact),
   .st-about > button {
