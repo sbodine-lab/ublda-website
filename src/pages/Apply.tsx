@@ -27,7 +27,7 @@ import './Apply.css'
 
 const steps = [
   { name: 'Apply', detail: `${APPLY_WINDOW_SHORT} · ${APPLY_CLOSE_TIME_SHORT}` },
-  { name: 'Interviews', detail: `${INTERVIEW_WINDOW_SHORT} · behavioral + technical` },
+  { name: 'Interview', detail: `${INTERVIEW_WINDOW_SHORT} · one round: behavioral questions + a simple case` },
   { name: 'Offers', detail: OFFERS_SHORT },
   { name: 'Kickoff', detail: KICKOFF_SHORT },
 ]
@@ -376,8 +376,8 @@ export default function Apply() {
                     required
                   />
                   <span>
-                    I can make two short interview rounds September 25–27 and roughly
-                    4–5 hours a week for the fall project.
+                    I can attend one interview round with behavioral questions and a simple case,
+                    and commit roughly 4–5 hours a week to the fall project.
                   </span>
                 </label>
 

@@ -3,7 +3,7 @@
    (Lloyd Lewis call, 2026-07-28), the operating model (Outreach Meeting
    Guide), and the project-manager assignment (2026-08-18). */
 
-import { APPLY_WINDOW_SHORT, APPLY_DEADLINE_LABEL, INTERVIEW_WINDOW_SHORT, OFFERS_SHORT, KICKOFF_SHORT } from '../../lib/applyForm'
+import { APPLY_WINDOW_SHORT, APPLY_DEADLINE_LABEL, INTERVIEW_WINDOW_SHORT, INTERVIEW_FORMAT, OFFERS_SHORT, KICKOFF_SHORT } from '../../lib/applyForm'
 
 export const HERO_DESCRIPTION =
   'Work with fellow Michigan students on pro bono client projects in business strategy and accessibility.'
@@ -77,7 +77,7 @@ export const STEPS: Step[] = [
     num: '03',
     title: 'Interview',
     when: INTERVIEW_WINDOW_SHORT,
-    desc: 'Behavioral and technical interviews are expected at Ross. Confirmed dates and times will be shared with invitees.',
+    desc: `${INTERVIEW_FORMAT} Interviews are expected at Ross; confirmed dates and times will be shared with invitees.`,
     tone: 'gold',
   },
   {

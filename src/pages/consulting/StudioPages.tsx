@@ -11,6 +11,7 @@ import {
   APPLY_DEADLINE_LABEL,
   APPLY_WINDOW_SHORT,
   INTERVIEW_WINDOW_SHORT,
+  INTERVIEW_FORMAT,
   OFFERS_SHORT,
   KICKOFF_SHORT,
 } from "../../lib/applyForm";
@@ -145,7 +146,7 @@ function Timeline() {
     [
       "Interview",
       INTERVIEW_WINDOW_SHORT,
-      "Behavioral and technical interviews are expected at Ross. Invited applicants will receive confirmed dates and times.",
+      `${INTERVIEW_FORMAT} Interviews are expected at Ross; invited applicants will receive confirmed dates and times.`,
     ],
     ["Decisions", OFFERS_SHORT, ""],
     ["Kickoff", KICKOFF_SHORT, "Begin weekly project work with your team."],
