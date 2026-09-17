@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useConsultingApplication } from "../../lib/useConsultingApplication";
 import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
-import { LEADERS, SOCIAL } from "./content";
+import { CONTACT_MAILTO, SOCIAL } from "./content";
 import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { useDeviceReducedMotion } from "../../features/equator/motionPreference";
 import "./Studio.css";
@@ -434,11 +434,7 @@ export function Studio({
             </div>
             <div>
               <h3>Contact</h3>
-              {LEADERS.map((l) => (
-                <a href={`mailto:${l.email}`} key={l.email}>
-                  {l.email}
-                </a>
-              ))}
+              <a href={CONTACT_MAILTO}>alexfors@umich.edu</a>
               {SOCIAL.map((s) => (
                 <a href={s.href} key={s.href}>
                   {s.label} ↗
@@ -451,7 +447,7 @@ export function Studio({
               © {new Date().getFullYear()} UBLDA Consulting · University of
               Michigan · Ann Arbor
             </p>
-            <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support">
+            <a href="mailto:alexfors@umich.edu?subject=Accessibility%20support">
               Accessibility support
             </a>
             <button type="button" onClick={toggleMotion} aria-pressed={motionPaused} disabled={deviceReducedMotion}>

@@ -31,8 +31,8 @@ export default function Footer() {
 
             <div className="footer__col">
               <h3 className="footer__heading">Connect</h3>
-              <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="footer__link">Email us</a>
-              <p className="footer__contact-note">General questions: Cooper Perry, Executive VP</p>
+              <a href="mailto:snaber@umich.edu?subject=Question%20for%20UBLDA" className="footer__link">Email us</a>
+              <p className="footer__contact-note">General questions: Samantha Naber</p>
               <a href="https://www.instagram.com/michiganublda/" target="_blank" rel="noopener noreferrer" className="footer__link footer__link--social">
                 Instagram
               </a>
@@ -54,7 +54,7 @@ export default function Footer() {
           </p>
           <div className="footer__utility">
             <Link to="/unsubscribe" className="footer__a11y-link">Unsubscribe from emails</Link>
-            <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support" className="footer__a11y-link">Accessibility support</a>
+            <a href="mailto:snaber@umich.edu?subject=Accessibility%20support" className="footer__a11y-link">Accessibility support</a>
             <Link to="/workspace" className="footer__leadership-link">
               Leadership login
               <ArrowRight aria-hidden="true" size={12} strokeWidth={1.5} />

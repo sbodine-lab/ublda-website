@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Applications open September 2 at noon.' })
   }
   if (window === 'closed') {
-    return res.status(400).json({ error: 'Applications closed September 22. Email sbodine@umich.edu about late submissions.' })
+    return res.status(400).json({ error: 'Applications closed September 22. Email alexfors@umich.edu about late submissions.' })
   }
 
   const body = bodyRecord(req.body)
@@ -138,6 +138,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const message = typeof data === 'string' ? data : data?.message
       return res.status(400).json({ error: message || 'Your application could not be submitted.' })
     }
-    return res.status(500).json({ error: 'Failed to submit. Please try again or email sbodine@umich.edu.' })
+    return res.status(500).json({ error: 'Failed to submit. Please try again or email alexfors@umich.edu.' })
   }
 }

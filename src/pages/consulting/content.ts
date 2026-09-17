@@ -138,7 +138,7 @@ export const LEADERS = [
 ]
 
 export const CONTACT_MAILTO =
-  'mailto:alexfors@umich.edu,sdeyoun@umich.edu?subject=UBLDA%20Consulting%20inquiry'
+  'mailto:alexfors@umich.edu?subject=UBLDA%20Consulting%20inquiry'
 
 export const SOCIAL = [
   { label: 'Instagram', href: 'https://www.instagram.com/michiganublda/' },

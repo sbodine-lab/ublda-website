@@ -673,7 +673,7 @@ export default function Brand() {
             <div className="brand-slide-mock brand-slide-mock--closing">
               <div className="brand-slide-mock__content">
                 <h3>Thank You</h3>
-                <p>cooperry@umich.edu</p>
+                <p>snaber@umich.edu</p>
                 <img src="/logo.png" alt="" className="brand-slide-mock__logo" />
               </div>
               <span className="brand-slide-mock__label">Closing Slide</span>
@@ -862,7 +862,7 @@ export default function Brand() {
               <h4>Contact</h4>
               <table>
                 <tbody>
-                  <tr><td>General</td><td>cooperry@umich.edu</td></tr>
+                  <tr><td>General</td><td>snaber@umich.edu</td></tr>
                   <tr><td>Sam Bodine</td><td>sbodine@umich.edu</td></tr>
                   <tr><td>Alexa Chiang</td><td>achiang@umich.edu</td></tr>
                   <tr><td>Instagram</td><td>@michiganublda</td></tr>

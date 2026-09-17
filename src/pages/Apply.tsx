@@ -112,10 +112,10 @@ export default function Apply() {
         setResubmission(Boolean(data.resubmission))
         setSubmitted(true)
       } else {
-        setError(data.error || 'Something went wrong. Try again, or email your application to sbodine@umich.edu.')
+        setError(data.error || 'Something went wrong. Try again, or email your application to alexfors@umich.edu.')
       }
     } catch {
-      setError('Something went wrong. Try again, or email your application to sbodine@umich.edu.')
+      setError('Something went wrong. Try again, or email your application to alexfors@umich.edu.')
     } finally {
       setSubmitting(false)
     }
@@ -196,7 +196,7 @@ export default function Apply() {
                     <h3 className="apply-notice__title">Applications closed September 22</h3>
                     <p className="apply-notice__desc">
                       Missed it? Email{' '}
-                      <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>
+                      <a href="mailto:alexfors@umich.edu" className="join-contact__email">alexfors@umich.edu</a>
                       {' '}— late applications are read if seats remain — or{' '}
                       <a href={MEMBERSHIP_FORM_URL} className="join-contact__email">join the mailing list</a>
                       {' '}for the winter cycle.
@@ -219,7 +219,7 @@ export default function Apply() {
                     ? 'We already had an application from you; this newest one is the one we read. '
                     : ''}
                   You're also signed up as a UBLDA member — no separate form needed. Interview invites go out Wednesday, September 23. Questions before then:{' '}
-                  <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>.
+                  <a href="mailto:alexfors@umich.edu" className="join-contact__email">alexfors@umich.edu</a>.
                 </p>
               </div>
             </Reveal>
@@ -437,7 +437,7 @@ export default function Apply() {
             <p className="join-contact__desc">
               Apply anyway. We read every application, and the team is chosen on
               interest and follow-through, not a resume. Questions first:{' '}
-              <a href="mailto:sbodine@umich.edu" className="join-contact__email">sbodine@umich.edu</a>.
+              <a href="mailto:alexfors@umich.edu" className="join-contact__email">alexfors@umich.edu</a>.
             </p>
           </Reveal>
         </div>
