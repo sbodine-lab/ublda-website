@@ -20,13 +20,13 @@ These are precedents and principles, not rules governing UBLDA. Our recommendati
 
 ## Wordmark
 
-The header uses an original stacked type composition: UBLDA in DM Sans Medium, Consulting in DM Sans Regular. Both lines remain together at their designed proportions. There is no parent pictorial mark, Block M, Ross mark, or new independent icon in this identity.
+The header uses an original stacked type composition: UBLDA in DM Sans Bold, CONSULTING in a smaller, tracked DM Sans Semibold (650). Both lines remain together at their designed proportions. There is no parent pictorial mark, Block M, Ross mark, or new independent icon in this identity.
 
 Outlined SVG assets (no font dependency):
 - public/consulting/logos/consulting-wordmark-color.svg — parent navy + cobalt on light backgrounds.
 - public/consulting/logos/consulting-wordmark-white.svg — warm white on dark backgrounds.
 
-The website reverses the same artwork to white over the hero. Keep surrounding clear space of at least one quarter of the wordmark height, with more where possible; do not compress or stretch it. Minimum website width is 112px. The public /brand page previews and offers both assets. Regenerate from the existing fonts using scripts/design/generate-consulting-wordmark.py (fontTools required).
+The website reverses the same artwork to white over the hero. Keep surrounding clear space of at least one quarter of the wordmark height, with more where possible; do not compress or stretch it. Website width is 116px on desktop and 104px on mobile. The public /brand page previews and offers both assets. Regenerate from the existing fonts using scripts/design/generate-consulting-wordmark.py (fontTools required).
 
 Keep the visible UBLDA home link to the parent website. Campus affiliation and OCCB partnership remain text only. The parent organization keeps its existing logo and palette.
 
@@ -46,7 +46,7 @@ Keep the visible UBLDA home link to the parent website. Campus affiliation and O
 | Muted text | #59616B / #C1C8D2 | Secondary text on light / dark |
 | Shader endpoints | #385B9E → #092C49 | Blue to parent-related navy |
 
-Avoid the previous full-site teal tint and all red/persimmon/peach treatments. Light and dark areas have distinct jobs. White client/metric panels stay separate from the page; service artwork varies across cobalt ribbon, pale-blue arches and restrained iris weave. Teal appears in the perspective and practice art. It is not applied to every surface.
+Avoid the previous full-site teal tint and all red/persimmon/peach treatments. Light and dark areas have distinct jobs. White metric panels stay separate from the page; client information uses an open two-column section with each logo paired directly with its description; service artwork varies across cobalt ribbon, pale-blue arches and restrained iris weave. Teal appears in the perspective and practice art. It is not applied to every surface.
 
 ## Motion and verification
 
@@ -55,3 +55,5 @@ No changes to band geometry, 6.59-second phase timing, 720ms column delay, scrol
 Calculated color contrast: cobalt/warm white 6.34:1; cobalt/stone 5.79:1; muted text/stone 5.44:1; navy/ice blue 10.20:1; white text over brightest shader endpoint 6.32:1; ice-blue text over that endpoint 5.43:1; muted light text/deep navy 8.49:1. RGB interpolation between the shader endpoints stays within those luminance bounds.
 
 Chrome QA includes desktop and mobile visual review, the wordmark on light/dark backgrounds, layout at responsive breakpoints, all consulting routes, flat-background text contrast and parent-site navigation. Flat-background checks exclude artwork overlays and canvas, which need separate visual and endpoint checks; this is not a full accessibility audit.
+
+September 16 refinement: Sam requested a smaller, firmer wordmark and removal of the blue-topped client panel. The revised wordmark uses heavier outlined lettering; the client section has no enclosing card or border. Bold/semibold sources are static instances of the official Google Fonts DM Sans variable font (opsz 14, weights 700/650), distributed under public/consulting/OFL-wordmark.txt.

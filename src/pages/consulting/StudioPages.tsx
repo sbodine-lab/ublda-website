@@ -285,26 +285,30 @@ export function StudioHome() {
       >
         <div className="st-client-copy">
           <h2 id="client-heading">Arc Thrift Stores of Colorado</h2>
-          <p>
-            Colorado’s nonprofit thrift chain funds the state’s Arc chapters and
-            is one of its largest employers of people with intellectual and
-            developmental disabilities.
-          </p>
-          <p>
-            Our Fall 2026 team will present to The Arc’s national board at the
-            end of the semester.
-          </p>
           <Button to="/consulting/work">Meet our client</Button>
         </div>
-        <div className="st-client-marks">
-          <figure>
+        <div className="st-client-details">
+          <div className="st-client-detail">
             <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
-            <figcaption>Fall 2026 client</figcaption>
-          </figure>
-          <figure>
+            <div>
+              <h3>Fall 2026 client</h3>
+              <p>
+                Colorado’s nonprofit thrift chain funds the state’s Arc chapters
+                and is one of its largest employers of people with intellectual
+                and developmental disabilities.
+              </p>
+            </div>
+          </div>
+          <div className="st-client-detail">
             <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
-            <figcaption>National board presentation</figcaption>
-          </figure>
+            <div>
+              <h3>National board presentation</h3>
+              <p>
+                Our Fall 2026 team will present to The Arc’s national board at
+                the end of the semester.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
       <section className="st-wrap st-section">

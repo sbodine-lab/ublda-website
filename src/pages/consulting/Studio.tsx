@@ -268,8 +268,8 @@ export function Studio({
               <img
                 src="/consulting/logos/consulting-wordmark-color.svg"
                 alt="UBLDA Consulting"
-                width="140"
-                height="70"
+                width="116"
+                height="48"
               />
             </Link>
             <Link to="/" className="st-parent-link">

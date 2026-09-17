@@ -247,13 +247,13 @@ export default function Brand() {
           <div className="brand-logo-grid">
             <div className="brand-logo-card">
               <div className="brand-logo-card__preview">
-                <img src="/consulting/logos/consulting-wordmark-color.svg" alt="UBLDA Consulting wordmark" width="200" height="100" />
+                <img src="/consulting/logos/consulting-wordmark-color.svg" alt="UBLDA Consulting wordmark" width="200" height="84" />
               </div>
               <a href="/consulting/logos/consulting-wordmark-color.svg" download>Download color SVG</a>
             </div>
             <div className="brand-logo-card">
               <div className="brand-logo-card__preview brand-logo-card__preview--dark">
-                <img src="/consulting/logos/consulting-wordmark-white.svg" alt="UBLDA Consulting wordmark in white" width="200" height="100" />
+                <img src="/consulting/logos/consulting-wordmark-white.svg" alt="UBLDA Consulting wordmark in white" width="200" height="84" />
               </div>
               <a href="/consulting/logos/consulting-wordmark-white.svg" download>Download white SVG</a>
             </div>
