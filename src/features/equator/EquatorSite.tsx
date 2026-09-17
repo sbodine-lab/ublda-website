@@ -1087,9 +1087,9 @@ function UnsubscribePage() {
 }
 
 export default function EquatorSite() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, key: locationKey } = useLocation();
   const root = useRef<HTMLDivElement>(null);
-  const previousPath = useRef(pathname);
+  const previousLocation = useRef(locationKey);
   const systemMotion = useDeviceReducedMotion();
   const [paused, setPaused] = useState(() => {
     try { return localStorage.getItem("ublda-motion-paused") === "true"; }
@@ -1150,11 +1150,7 @@ export default function EquatorSite() {
       "/unsubscribe": "Unsubscribe",
     };
     document.title = `${titles[pathname] || "UBLDA"} — UBLDA · Michigan Ross`;
-    const old = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = "auto";
-    window.scrollTo(0, 0);
-    if (previousPath.current !== pathname) root.current?.querySelector<HTMLElement>("main")?.focus({ preventScroll: true });
-    previousPath.current = pathname;
+    let disposed = false;
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -1189,28 +1185,40 @@ export default function EquatorSite() {
     addEventListener("scroll", scroll, { passive: true });
     addEventListener("resize", scroll);
     update();
-    const refresh = () => ScrollTrigger.refresh();
+    const refresh = () => { if (!disposed) ScrollTrigger.refresh(); };
     document.fonts.ready.then(refresh);
     return () => {
+      disposed = true;
       cancelAnimationFrame(frame);
       removeEventListener("scroll", scroll);
       removeEventListener("resize", scroll);
-      document.documentElement.style.scrollBehavior = old;
     };
   }, [home, pathname]);
   useEffect(() => {
-    if (!hash) return;
-    const id = decodeURIComponent(hash.slice(1));
-    const frame = requestAnimationFrame(() => {
-      const target = document.getElementById(id);
-      if (!target) return;
-      target.scrollIntoView({ behavior: "instant", block: "start" });
-      const heading = id === "main-content" ? target : target.querySelector<HTMLElement>("h1, h2, h3") || target;
-      heading.setAttribute("tabindex", "-1");
-      heading.focus({ preventScroll: true });
+    let disposed = false;
+    let frame = 0;
+    // Wait for page typography and its scroll measurements before following a
+    // destination. A new history key also covers repeated clicks on the same URL.
+    document.fonts.ready.then(() => {
+      if (disposed) return;
+      frame = requestAnimationFrame(() => {
+        if (disposed) return;
+        let id = hash.slice(1);
+        try { id = decodeURIComponent(id); } catch { /* Keep malformed fragments harmless. */ }
+        const target = id ? document.getElementById(id) : root.current?.querySelector<HTMLElement>("main");
+        if (!target) return;
+        if (hash) target.scrollIntoView({ behavior: "instant", block: "start" });
+        else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        if (hash || previousLocation.current !== locationKey) {
+          const heading = id && id !== "main-content" ? target.querySelector<HTMLElement>("h1, h2, h3") || target : target;
+          heading.setAttribute("tabindex", "-1");
+          heading.focus({ preventScroll: true });
+        }
+        previousLocation.current = locationKey;
+      });
     });
-    return () => cancelAnimationFrame(frame);
-  }, [hash, pathname]);
+    return () => { disposed = true; cancelAnimationFrame(frame); };
+  }, [hash, pathname, locationKey]);
   let content: ReactNode;
   if (home)
     content = (
