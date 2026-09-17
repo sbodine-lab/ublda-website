@@ -26,9 +26,10 @@ export const APPLY_WINDOW_PROSE = 'September 2–22'
 export const APPLY_OPENS_PROSE = 'September 2'
 export const APPLY_CLOSES_PROSE = 'September 22'
 export const APPLY_CLOSE_TIME_SHORT = 'closes 11:30 PM ET'
-export const INTERVIEW_WINDOW_SHORT = 'Sept 25–27'
-export const OFFERS_SHORT = 'By Tuesday, Sept 29'
-export const KICKOFF_SHORT = 'Week of Oct 5'
+// September 10 update: exact interview and offer dates remain unconfirmed.
+export const INTERVIEW_WINDOW_SHORT = 'Late September'
+export const OFFERS_SHORT = 'After interviews'
+export const KICKOFF_SHORT = 'Early October (planned)'
 
 export type ApplyWindow = 'before' | 'open' | 'closed'
 

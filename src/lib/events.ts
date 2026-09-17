@@ -1,6 +1,9 @@
 export interface ClubEvent {
   id: string
   isoDate: string
+  /** Exact ending with UTC offset, so listings retire in every visitor timezone. */
+  endsAt?: string
+  archiveDescription?: string
   preview?: string
   date: string
   month: string
@@ -21,6 +24,8 @@ export const events: ClubEvent[] = [
   {
     id: 'alli-hirt-microsoft',
     isoDate: '2026-10-01',
+    endsAt: '2026-10-01T20:00:00-04:00',
+    archiveDescription: 'The October 1 program was scheduled as a conversation with Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft, about her career and accessibility in everyday products. The announced format paired an in-person student gathering at Ross with Alli joining by video from Seattle.',
     date: 'October 1, 2026',
     month: 'Oct',
     day: '1',
@@ -89,3 +94,15 @@ export const events: ClubEvent[] = [
     past: true,
   },
 ]
+
+/** Legacy recaps remain archived. Dated announcements expire automatically. */
+export function isPastEvent(event: ClubEvent, now: number): boolean {
+  if (event.past) return true
+  if (event.endsAt) return now >= Date.parse(event.endsAt)
+  const localDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: event.timezone || 'America/Detroit', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date(now))
+  return event.isoDate < localDate
+}
+
+export const EVENT_BOUNDARIES = events.flatMap(event => event.endsAt ? [Date.parse(event.endsAt)] : [])

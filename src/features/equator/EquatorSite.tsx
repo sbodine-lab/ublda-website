@@ -542,7 +542,7 @@ const stories = [
   {
     title: "A conversation with Microsoft",
     art: "microsoft",
-    text: "On October 1, join us at Ross for a conversation with Alli Hirt, Director of Accessibility Engineering at Microsoft. Alli joins live by video from Seattle. 7–8 PM ET; attendance is free.",
+    text: "Our speaker program connects students with leaders working on accessibility, including Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft. See our events page for dates, formats, and details.",
     link: "/events",
   },
   {
@@ -662,18 +662,16 @@ function Community() {
             {[0, 1].map((set) => (
               <div className="eq-logo-set" key={set} aria-hidden={set === 1}>
                 {[
-                  ["blda.webp", "BLDA"],
-                  ["arc-thrift.png", "Arc Thrift Stores — consulting client"],
-                  ["nestidd.png", "Nestidd — past speaker"],
-                  ["microsoft.png", "Microsoft — speaker’s organization"],
-                  ["wso.png", "Wall Street Oasis"],
-                ].map(([src, alt]) => (
-                  <img
-                    key={src}
-                    src={`/partners-${src}`}
-                    alt={alt}
-                    loading="lazy"
-                  />
+                  ["blda.webp", "BLDA", "MBA counterpart"],
+                  ["arc-thrift.png", "Arc Thrift Stores", "Fall 2026 client"],
+                  ["nestidd.png", "Nestidd", "Past speaker’s organization"],
+                  ["microsoft.png", "Microsoft", "October 2026 speaker’s organization"],
+                  ["wso.png", "Wall Street Oasis", "Club partner"],
+                ].map(([src, alt, relationship]) => (
+                  <figure key={src}>
+                    <img src={`/partners-${src}`} alt={alt} loading="lazy" />
+                    <figcaption>{relationship}</figcaption>
+                  </figure>
                 ))}
               </div>
             ))}
@@ -913,7 +911,7 @@ function JoinPage() {
               business.
             </p>
             <p>
-              General membership is open to all U-M students. It is separate
+              General membership is free and open to all U-M students. It is separate
               from the consulting team application.
             </p>
             <Button to={MEMBERSHIP_FORM_URL}>Join UBLDA</Button>
@@ -926,7 +924,9 @@ function JoinPage() {
             </h3>
             <p>
               UBLDA Consulting is our pro bono student consulting program. Work
-              with a team on real business questions for a client.
+              with a team on real business questions for a client. Analyst positions
+              are open to U-M undergraduates across all majors and class years,
+              through a separate application and interview process.
             </p>
             <p>
               {state === "closed"

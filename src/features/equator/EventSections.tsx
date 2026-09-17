@@ -3,8 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowDown, ArrowUpRight, Plus } from "lucide-react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
+import { useClock } from "../../lib/useClock";
 import { buildGCalUrl } from "../../lib/calendarLinks";
-import { events, type ClubEvent } from "../../lib/events";
+import { events, EVENT_BOUNDARIES, isPastEvent, type ClubEvent } from "../../lib/events";
 
 function EventDate({ event }: { event: ClubEvent }) {
   return (
@@ -65,7 +66,7 @@ function EventRecap({ event, preview }: { event: ClubEvent; preview: boolean }) 
         <span className="eq-event-expand" aria-hidden="true"><Plus /></span>
       </summary>
       <div className="eq-event-recap-copy">
-        <p>{event.description}</p>
+        <p>{event.archiveDescription || event.description}</p>
         <p className="eq-event-location">{event.location}{event.time && <><br />{event.time.replace(" - ", " – ")} ET</>}</p>
       </div>
     </details>
@@ -73,7 +74,8 @@ function EventRecap({ event, preview }: { event: ClubEvent; preview: boolean }) 
 }
 
 export function UpcomingEvents({ preview = false }: { preview?: boolean }) {
-  const upcoming = events.filter(event => !event.past);
+  const now = useClock(...EVENT_BOUNDARIES);
+  const upcoming = events.filter(event => !isPastEvent(event, now)).sort((a, b) => a.isoDate.localeCompare(b.isoDate));
   return (
     <section className="eq-section eq-upcoming-events" id={preview ? "events" : "upcoming-events"} data-tone={preview ? "teal" : "cream"} aria-labelledby="upcoming-events-title">
       <div className="eq-events-heading">
@@ -87,7 +89,8 @@ export function UpcomingEvents({ preview = false }: { preview?: boolean }) {
 }
 
 export function PastEvents({ preview = false }: { preview?: boolean }) {
-  const past = events.filter(event => event.past);
+  const now = useClock(...EVENT_BOUNDARIES);
+  const past = events.filter(event => isPastEvent(event, now)).sort((a, b) => b.isoDate.localeCompare(a.isoDate));
   return (
     <section className={`eq-section eq-event-archive${preview ? " eq-event-archive--preview" : ""}`} id={preview ? "recent-events" : "past-events"} data-tone="gold" aria-labelledby="past-events-title">
       <div className="eq-events-heading">
