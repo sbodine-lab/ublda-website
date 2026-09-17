@@ -55,19 +55,19 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement) {
     meshes.push(mesh);
   }
   return {
-    paint(progress: number, seconds: number, movement: number) {
+    paint(progress: number, seconds: number) {
       const stage = Math.min(4, Math.max(0, progress));
       const from = Math.floor(stage), to = Math.min(4, from + 1);
       const fraction = stage - from;
-      const blend = fraction * fraction * (3 - 2 * fraction);
+      const blend = fraction ** 3 * (fraction * (fraction * 6 - 15) + 10);
       for (const mesh of meshes) {
         mesh.morphTargetInfluences!.fill(0);
         mesh.morphTargetInfluences![from] = 1 - blend;
         mesh.morphTargetInfluences![to] += blend;
       }
       sculpture.rotation.set(-.2 + Math.sin(seconds * .47) * .08,
-        -.24 + Math.sin(seconds * .32) * .18 + Math.sin(blend * Math.PI) * .4,
-        -.08 + Math.sin(seconds * .39) * .04 + movement * .07);
+        -.24 + Math.sin(seconds * .32) * .18 + Math.sin(blend * Math.PI) ** 2 * .22,
+        -.08 + Math.sin(seconds * .39) * .04);
       sculpture.position.y = Math.sin(seconds * .65) * .035;
       renderer.render(scene, camera);
     },
