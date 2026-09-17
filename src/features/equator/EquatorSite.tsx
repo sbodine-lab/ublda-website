@@ -540,7 +540,7 @@ function Programs() {
 }
 const stories = [
   {
-    title: "A conversation with Microsoft",
+    title: "A conversation with Alli Hirt",
     art: "microsoft",
     text: "Our speaker program connects students with leaders working on accessibility, including Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft. See our events page for dates, formats, and details.",
     link: "/events",
@@ -666,7 +666,6 @@ function Community() {
                   ["blda.webp", "BLDA"],
                   ["arc-thrift.png", "Arc Thrift Stores"],
                   ["nestidd.png", "Nestidd"],
-                  ["microsoft.png", "Microsoft"],
                   ["wso.png", "Wall Street Oasis"],
                 ].map(([src, alt]) => (
                   <figure key={src}>

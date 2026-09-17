@@ -409,8 +409,7 @@
 .community__logo-item:nth-child(1) img { height: 50px; }  /* BLDA */
 .community__logo-item:nth-child(2) img { height: 38px; }  /* Nestidd */
 .community__logo-item:nth-child(3) img { height: 90px; }  /* Arc Thrift */
-.community__logo-item:nth-child(4) img { height: 36px; }  /* Microsoft */
-.community__logo-item:nth-child(5) img { height: 44px; }  /* WSO */
+.community__logo-item:nth-child(4) img { height: 44px; }  /* WSO */
 
 .community__logo--blda {
   border-radius: var(--radius-sm);

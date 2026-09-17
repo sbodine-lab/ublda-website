@@ -57,7 +57,6 @@
 .eq-art-event strong { font-size: clamp(110px, 13vw, 195px); font-weight: 400; line-height: .8; letter-spacing: -.07em; }
 .eq-art-event > span { font-size: 25px; }
 .eq-art-foot { position: absolute; bottom: 127px; left: 28px; right: 28px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 19px; line-height: 1.2; z-index: 1; }
-.eq-art-foot img { width: 115px; height: 38px; object-fit: contain; mix-blend-mode: multiply; }
 .eq-story-art--arc { background: #e9d8af; }
 .eq-art-partner { margin: auto; padding-bottom: 125px; position: relative; z-index: 1; }
 .eq-art-partner img { width: min(270px, 22vw); max-height: 180px; object-fit: contain; }

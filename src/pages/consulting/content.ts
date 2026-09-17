@@ -129,7 +129,6 @@ export const PARTNERS = [
   { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities', role: 'MBA community' },
   { src: '/partners-nestidd.png', alt: 'Nestidd', role: 'Past speaker’s organization' },
   { src: '/partners-arc-thrift.png', alt: 'Arc Thrift Stores — Fall 2026 client', role: 'Fall 2026 consulting client' },
-  { src: '/partners-microsoft.png', alt: 'Microsoft — speaker’s organization', role: 'October 2026 speaker’s organization' },
   { src: '/partners-wso.png', alt: 'Wall Street Oasis — club partner', role: 'Club partner' },
 ]
 

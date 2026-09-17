@@ -22,7 +22,6 @@ const enterDelay = (ms: number) =>
 const LOGO_ASSETS: Record<string, string> = {
   "/partners-arc-thrift.png": "/consulting/logos/arc-thrift.svg",
   "/partners-nestidd.png": "/consulting/logos/nestidd.svg",
-  "/partners-microsoft.png": "/consulting/logos/microsoft.svg",
 };
 
 function BrandLogo({ src, alt }: { src: string; alt: string }) {
