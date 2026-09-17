@@ -51,9 +51,9 @@ export const AREAS = [
   {
     id: "strategy",
     title: "Strategy & growth",
-    desc: "Identify growth opportunities and evaluate the next move for your disability-focused organization.",
+    desc: "Research markets and compare growth options for organizations with a disability mission.",
     detail:
-      "We research your market and compare strategic options. The resulting business case helps your team assess opportunities and choose a direction.",
+      "Research the client’s market and compare strategic options. Practice building a business case that connects evidence to a clear recommendation.",
     examples: [
       "Market and competitor research",
       "Program and growth opportunities",
@@ -63,9 +63,9 @@ export const AREAS = [
   {
     id: "accessibility",
     title: "Accessible experiences",
-    desc: "Identify access barriers in your products and services. Prioritize practical improvements.",
+    desc: "Study how people use products and services. Recommend ways to remove access barriers.",
     detail:
-      "We examine how disabled people find information and use your services. Our research helps your team understand barriers and evaluate improvements.",
+      "Examine how disabled people find information and use a client’s services. Learn to identify barriers and evaluate practical improvements.",
     examples: [
       "Websites and app experiences",
       "Documents and communications",
@@ -75,9 +75,9 @@ export const AREAS = [
   {
     id: "workplace",
     title: "Inclusive workplaces",
-    desc: "Find ways to make hiring and everyday work more accessible to disabled people.",
+    desc: "Examine hiring and workplace practices through the lens of disability inclusion.",
     detail:
-      "We study the path from recruitment to everyday work. Our recommendations help your team assess how workplace processes and support could better serve disabled employees.",
+      "Study the path from recruitment to everyday work. Research how workplace processes and support could better serve disabled employees, then develop recommendations with your team.",
     examples: [
       "Recruiting and hiring experiences",
       "Onboarding and employee communication",
