@@ -3,11 +3,11 @@ import { useDeviceReducedMotion, useMotionPaused } from "./motionPreference";
 import { ribbonNames, ribbonSilhouette } from "./ribbonGeometry";
 import "./ribbon.css";
 
-export function RibbonAnchor({ name, hero = false }: { name: string; hero?: boolean }) {
+export function RibbonAnchor({ name }: { name: string }) {
   const stage = Math.max(0, ribbonNames.indexOf(name));
   const id = useId().replace(/:/g, "");
   return (
-    <div className={hero ? "eq-brand-particles eq-ribbon-anchor eq-ribbon-hero" : "eq-glyph eq-ribbon-anchor"} data-ribbon-stage={stage} aria-hidden="true">
+    <div className="eq-glyph eq-ribbon-anchor" data-ribbon-stage={stage} aria-hidden="true">
       <svg viewBox="0 0 300 300" fill="none">
         <defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
           <stop stopColor="#fff" /><stop offset=".5" stopColor="#faf7ee" /><stop offset="1" stopColor="#7fa49b" />
@@ -28,44 +28,13 @@ export function RibbonJourney() {
     const section = canvas?.closest<HTMLElement>(".eq-values");
     if (!canvas || !section || reduced || paused) return;
     const anchors = [...section.querySelectorAll<HTMLElement>(".eq-ribbon-anchor")];
-    const scope = section.closest(".eq-site");
-    const hero = scope?.querySelector<HTMLElement>(".eq-hero");
-    const heroAnchor = hero?.querySelector<HTMLElement>(".eq-ribbon-hero");
-    const story = scope?.querySelector<HTMLElement>(".eq-story");
-    const allAnchors = heroAnchor ? [heroAnchor, ...anchors] : anchors;
     const zones = [...section.querySelectorAll<HTMLElement>(".eq-value-zone")];
     let disposed = false, visible = false, loading = false, frame = 0, previous = 0, elapsed = 0;
     let progress = 0, target = 0, centerX = 0, centerY = 0, size = 300;
-    let current = 0, moving = false, drawVisible = false;
+    let current = 0, compact = false, drawVisible = false;
     let renderer: Awaited<ReturnType<typeof import("./ribbonRenderer")["createRibbonRenderer"]>> | undefined;
     const measure = () => {
-      const compact = innerWidth <= 768 || innerHeight <= 750 || section.dataset.static === "true";
-      const sectionRect = section.getBoundingClientRect();
-      const heroRect = hero?.getBoundingClientRect();
-      if (heroAnchor && heroRect && sectionRect.top > innerHeight * .72) {
-        allAnchors.forEach(anchor => { anchor.dataset.live = "false"; });
-        if (heroRect.bottom > innerHeight * .2) {
-          const rect = heroAnchor.getBoundingClientRect();
-          size = rect.width; centerX = rect.left + size / 2; centerY = rect.top + rect.height / 2;
-          target = 2;
-          heroAnchor.dataset.live = String(Boolean(renderer) && visible);
-        } else {
-          // Carry the sculpture down the story's existing empty left margin.
-          // Narrow screens keep artwork in its reserved space above the text.
-          const text = story?.querySelector(".eq-words")?.getBoundingClientRect();
-          size = compact ? 0 : Math.min(190, (text?.left ?? 0) - 35);
-          centerX = (text?.left ?? 0) / 2;
-          const storyTop = story?.getBoundingClientRect().top ?? 0;
-          centerY = innerHeight * .46 + Math.sin(storyTop / 650) * 45;
-          target = 1;
-        }
-        canvas.style.width = canvas.style.height = `${Math.max(0, size)}px`;
-        canvas.style.transform = `translate3d(${centerX - size / 2}px,${centerY - size / 2}px,0)`;
-        canvas.style.opacity = renderer && visible && size > 100 && (heroRect.bottom > 0 || (story?.getBoundingClientRect().bottom ?? 0) > 0) ? "1" : "0";
-        drawVisible = canvas.style.opacity === "1";
-        canvas.dataset.stage = String(target); moving = true; start(); return;
-      }
-      if (heroAnchor) heroAnchor.dataset.live = "false";
+      compact = innerWidth <= 768 || innerHeight <= 750 || section.dataset.static === "true";
       const tops = zones.map(zone => zone.getBoundingClientRect().top);
       if (compact) {
         current = anchors.reduce((best, anchor, i) => Math.abs(anchor.getBoundingClientRect().top - innerHeight * .28) < Math.abs(anchors[best].getBoundingClientRect().top - innerHeight * .28) ? i : best, 0);
@@ -75,19 +44,18 @@ export function RibbonJourney() {
         const next = tops[current + 1];
         target = current + (next === undefined ? 0 : Math.max(0, Math.min(1, (innerHeight * .7 - next) / (innerHeight * .7 - 170))));
       }
-      const rect = anchors[current].getBoundingClientRect();
-      const blend = target - Math.floor(target);
-      const flight = compact ? 0 : Math.sin(blend * Math.PI);
+      // Every sticky panel shares its bottom boundary. The first anchor is
+      // therefore a continuous rail for the entire desktop sequence: switching
+      // shapes must not switch DOM positions or reveal a second silhouette.
+      const rect = anchors[compact ? current : 0].getBoundingClientRect();
       size = compact ? rect.width : Math.min(340, rect.width * 1.4);
-      centerX = rect.left + rect.width / 2 + flight * 18;
-      centerY = rect.top + rect.height / 2 - flight * 48;
+      centerX = rect.left + rect.width / 2;
+      centerY = rect.top + rect.height / 2;
       canvas.style.width = canvas.style.height = `${size}px`;
-      canvas.style.transform = `translate3d(${centerX - size / 2}px,${centerY - size / 2}px,0)`;
       canvas.style.opacity = renderer && visible && rect.bottom > 68 && rect.top < innerHeight ? "1" : "0";
-      anchors.forEach((anchor, i) => { anchor.dataset.live = String(i === current && visible && Boolean(renderer)); });
+      anchors.forEach((anchor, i) => { anchor.dataset.live = String((!compact || i === current) && visible && Boolean(renderer)); });
       drawVisible = canvas.style.opacity === "1";
       canvas.dataset.stage = String(target);
-      moving = true;
       start();
     };
     const tick = (time: number) => {
@@ -98,9 +66,13 @@ export function RibbonJourney() {
       previous = time;
       elapsed += delta;
       const difference = target - progress;
-      progress += difference * Math.min(1, delta * 14);
-      if (Math.abs(difference) < .002) { progress = target; moving = false; }
-      renderer.paint(progress, elapsed, moving ? difference : 0);
+      progress += difference * (1 - Math.exp(-7 * delta));
+      // Keep translation and geometry on the same smoothed clock. Squared sine
+      // has zero slope at each endpoint, so the drift never snaps or reverses
+      // abruptly when one form becomes the next.
+      const flight = compact ? 0 : Math.sin((progress % 1) * Math.PI) ** 2;
+      canvas.style.transform = `translate3d(${centerX - size / 2 + flight * 12}px,${centerY - size / 2 - flight * 20}px,0)`;
+      renderer.paint(progress, elapsed);
       frame = requestAnimationFrame(tick);
     };
     function start() { if (!frame && visible && drawVisible && renderer && !document.hidden) { previous = performance.now(); frame = requestAnimationFrame(tick); } }
@@ -113,7 +85,7 @@ export function RibbonJourney() {
       visible = visibleSections.size > 0;
       if (!visible) {
         cancelAnimationFrame(frame); frame = 0; canvas.style.opacity = "0";
-        allAnchors.forEach(anchor => { anchor.dataset.live = "false"; });
+        anchors.forEach(anchor => { anchor.dataset.live = "false"; });
       } else if (!renderer && !loading) {
         loading = true;
         import("./ribbonRenderer").then(({ createRibbonRenderer }) => {
@@ -124,8 +96,6 @@ export function RibbonJourney() {
       } else measure();
     });
     observer.observe(section);
-    if (heroAnchor && hero) observer.observe(hero);
-    if (heroAnchor && story) observer.observe(story);
     const resize = new ResizeObserver(measure);
     resize.observe(section);
     anchors.forEach(anchor => resize.observe(anchor));
@@ -138,7 +108,7 @@ export function RibbonJourney() {
       removeEventListener("scroll", measure); removeEventListener("resize", measure);
       document.removeEventListener("visibilitychange", visibility);
       renderer?.dispose(); canvas.style.opacity = "0";
-      allAnchors.forEach(anchor => { anchor.dataset.live = "false"; });
+      anchors.forEach(anchor => { anchor.dataset.live = "false"; });
     };
   }, [paused, reduced]);
   return <canvas key={`${paused}-${reduced}`} ref={canvasRef} className="eq-ribbon-flight" aria-hidden="true" />;

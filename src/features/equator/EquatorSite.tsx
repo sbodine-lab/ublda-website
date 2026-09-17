@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { NetworkLogos } from "./NetworkLogos";
-import { RibbonAnchor, RibbonJourney } from "./RibbonJourney";
+import { RibbonJourney } from "./RibbonJourney";
 import {
   ArrowDown,
   ArrowLeft,
@@ -335,16 +335,16 @@ function Hero({
   title,
   description,
   label,
-  journey = false,
+  artwork = true,
 }: {
   title: ReactNode;
   description: string;
   label?: string;
-  journey?: boolean;
+  artwork?: boolean;
 }) {
   return (
     <section className="eq-hero" id="intro" data-tone="teal" aria-label={label}>
-      {journey ? <RibbonAnchor name="learning" hero /> : <BrandParticles />}
+      {artwork && <BrandParticles />}
       <h1>{title}</h1>
       <p className="eq-hero-sub">
         {description}
@@ -1202,7 +1202,7 @@ export default function EquatorSite() {
       <>
         <Splash />
         <Hero
-          journey
+          artwork={false}
           title={
             <>
               Disability inclusion
@@ -1228,7 +1228,7 @@ export default function EquatorSite() {
     content = (
       <>
         <Hero
-          journey
+          artwork={false}
           label="Our Story"
           title={
             <>
