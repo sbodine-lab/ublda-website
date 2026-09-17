@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { NetworkLogos } from "./NetworkLogos";
 import {
   ArrowDown,
   ArrowLeft,
@@ -658,24 +659,7 @@ function Community() {
       </div>
       <section className="eq-network" aria-labelledby="network-heading">
         <h3 id="network-heading">Our network</h3>
-        <div className="eq-marquee">
-          <div>
-            {[0, 1].map((set) => (
-              <div className="eq-logo-set" key={set} aria-hidden={set === 1}>
-                {[
-                  ["blda.webp", "BLDA"],
-                  ["arc-thrift.png", "Arc Thrift Stores"],
-                  ["nestidd.png", "Nestidd"],
-                  ["wso.png", "Wall Street Oasis"],
-                ].map(([src, alt]) => (
-                  <figure key={src}>
-                    <img src={`/partners-${src}`} alt={alt} loading="lazy" />
-                  </figure>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <NetworkLogos />
       </section>
     </section>
   );
