@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { Bands, Button, Callout, Intro, Studio } from "./Studio";
+import { GenerativeArt } from "./GenerativeArt";
 import { AREAS, RESEARCH } from "./research";
 import { LEADERS, PARTNERS, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
@@ -37,34 +38,8 @@ function BrandLogo({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function ServiceArt({
-  area,
-  full = false,
-}: {
-  area: (typeof AREAS)[number];
-  full?: boolean;
-}) {
-  return area.image ? (
-    <img
-      src={area.image}
-      srcSet={`${area.imageSmall} 960w, ${area.image} 2400w`}
-      sizes={full ? "100vw" : "(max-width: 700px) 100vw, 45vw"}
-      className={`st-service-photo st-service-photo--${area.id}`}
-      alt={area.imageAlt}
-      width="2400"
-      height="1600"
-      loading="lazy"
-      decoding="async"
-    />
-  ) : (
-    <div className="st-access-art" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-      <span />
-      <span />
-    </div>
-  );
+function ServiceArt({ area }: { area: (typeof AREAS)[number] }) {
+  return <GenerativeArt kind={area.id} />;
 }
 function ServiceCards() {
   return (
@@ -280,15 +255,8 @@ export function StudioHome() {
       </section>
       <Metrics />
       <section className="st-wrap st-story" data-enter>
-        <div className="st-story-photo">
-          <img
-            src="/consulting/ross-study.jpg"
-            width="800"
-            height="1200"
-            decoding="async"
-            alt="Students working together around a study table at Michigan Ross"
-            loading="lazy"
-          />
+        <div className="st-story-art">
+          <GenerativeArt kind="perspective" />
         </div>
         <div>
           <h2>
@@ -416,7 +384,7 @@ export function StudioServiceDetail() {
         <p>{area.desc}</p>
       </Intro>
       <div className="st-wrap st-detail-art">
-        <ServiceArt area={area} full />
+        <ServiceArt area={area} />
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
@@ -516,23 +484,8 @@ export function StudioPractice() {
           on business strategy and inclusion.
         </p>
       </Intro>
-      <div className="st-wrap st-campus-image">
-        <picture>
-          <source
-            media="(max-width: 700px)"
-            srcSet="/consulting/ross-wintergarden.jpg"
-            width="900"
-            height="1200"
-          />
-          <img
-            src="/consulting/ross-common-full.jpg"
-            width="1658"
-            height="447"
-            loading="lazy"
-            decoding="async"
-            alt="Students studying and gathering in the Michigan Ross Winter Garden"
-          />
-        </picture>
+      <div className="st-wrap st-practice-art">
+        <GenerativeArt kind="practice" />
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
