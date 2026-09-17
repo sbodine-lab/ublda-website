@@ -21,19 +21,22 @@ html.st-menu-open {
   overflow: hidden;
 }
 .st {
-  /* Consulting extends UBLDA's navy/teal/cream with a deeper teal lead. */
-  --st-accent: #126a70;
+  /* Ink & Persimmon: parent navy anchors a distinct, warm consulting identity. */
+  --st-accent: #b63e26;
   --st-ink: #0a3658;
   --st-paper: #faf9f6;
-  --st-dark: #07263e;
-  --st-teal: #67b8b3;
-  --st-mint: #c8e8df;
-  --st-surface: #e4eeea;
-  --st-muted: #53676b;
-  --st-muted-light: #b7cacb;
-  /* Canvas reads these same endpoints; its motion and geometry are unchanged. */
-  --st-band-bright: #14777b;
-  --st-band-dark: #07263e;
+  --st-dark: #141f2e;
+  --st-brand-teal: #67b8b3;
+  --st-highlight: #ffddcc;
+  --st-surface: #eeece7;
+  --st-card: #ffffff;
+  --st-cool: #dce4f1;
+  --st-muted: #59616b;
+  --st-muted-light: #c1c8d2;
+  --st-rule: #0a365826;
+  /* Keep the shader geometry and timing; only its color endpoints change. */
+  --st-band-bright: #ad3c24;
+  --st-band-dark: #141f2e;
   font:
     400 18px/1.5 "Studio Sans",
     sans-serif;
@@ -91,7 +94,7 @@ html.st-menu-open {
   color: var(--st-paper);
 }
 .st--dark em {
-  color: var(--st-mint);
+  color: var(--st-highlight);
 }
 .st-header {
   position: relative;
@@ -240,8 +243,8 @@ html.st-menu-open {
   border-color: var(--st-accent) !important;
 }
 .st-hero .st-button--solid {
-  background: var(--st-mint);
-  border-color: var(--st-mint) !important;
+  background: var(--st-highlight);
+  border-color: var(--st-highlight) !important;
   color: var(--st-ink);
 }
 .st--dark :focus-visible,
@@ -249,7 +252,7 @@ html.st-menu-open {
 .st-hero :focus-visible,
 .st-callout :focus-visible,
 .st-footer :focus-visible {
-  outline-color: var(--st-mint);
+  outline-color: var(--st-highlight);
 }
 .st-dropdown :focus-visible {
   outline-color: var(--st-accent);
@@ -311,7 +314,7 @@ html.st-menu-open {
 }
 .st-hero h1 span + span {
   text-align: right;
-  color: var(--st-mint);
+  color: var(--st-highlight);
   margin-top: 8px;
 }
 .st-hero .st-actions {
@@ -372,21 +375,21 @@ html.st-menu-open {
   --shift: 0;
   position: relative;
   padding: 92px 0 128px;
-  background: var(--st-accent);
+  background: var(--st-ink);
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 0%), var(--st-accent) calc(var(--shift) * 100%)) 0% 8%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 9%), var(--st-accent) calc(var(--shift) * 100%)) 8% 16%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 18%), var(--st-accent) calc(var(--shift) * 100%)) 16% 24%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 27%), var(--st-accent) calc(var(--shift) * 100%)) 24% 32%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 36%), var(--st-accent) calc(var(--shift) * 100%)) 32% 40%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 45%), var(--st-accent) calc(var(--shift) * 100%)) 40% 48%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 55%), var(--st-accent) calc(var(--shift) * 100%)) 48% 56%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 64%), var(--st-accent) calc(var(--shift) * 100%)) 56% 64%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 73%), var(--st-accent) calc(var(--shift) * 100%)) 64% 72%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 82%), var(--st-accent) calc(var(--shift) * 100%)) 72% 80%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 91%), var(--st-accent) calc(var(--shift) * 100%)) 80% 88%,
-    color-mix(in srgb, color-mix(in srgb, var(--st-surface), var(--st-accent) 100%), var(--st-accent) calc(var(--shift) * 100%)) 88% 100%
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 0%), var(--st-ink) calc(var(--shift) * 100%)) 0% 8%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 9%), var(--st-ink) calc(var(--shift) * 100%)) 8% 16%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 18%), var(--st-ink) calc(var(--shift) * 100%)) 16% 24%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 27%), var(--st-ink) calc(var(--shift) * 100%)) 24% 32%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 36%), var(--st-ink) calc(var(--shift) * 100%)) 32% 40%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 45%), var(--st-ink) calc(var(--shift) * 100%)) 40% 48%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 55%), var(--st-ink) calc(var(--shift) * 100%)) 48% 56%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 64%), var(--st-ink) calc(var(--shift) * 100%)) 56% 64%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 73%), var(--st-ink) calc(var(--shift) * 100%)) 64% 72%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 82%), var(--st-ink) calc(var(--shift) * 100%)) 72% 80%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 91%), var(--st-ink) calc(var(--shift) * 100%)) 80% 88%,
+    color-mix(in srgb, color-mix(in srgb, var(--st-cool), var(--st-ink) 100%), var(--st-ink) calc(var(--shift) * 100%)) 88% 100%
   );
 }
 .st-metrics > .st-wrap > .st-eyebrow {
@@ -400,7 +403,7 @@ html.st-menu-open {
 .st-metric {
   min-height: 400px;
   padding: 34px;
-  background: var(--st-paper);
+  background: var(--st-card);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -514,7 +517,7 @@ html.st-menu-open {
 .st-card-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, #07263ee6);
+  background: linear-gradient(transparent 30%, #141f2ee6);
   transition: background 0.3s;
 }
 .st-service-card h3 {
@@ -552,7 +555,7 @@ html.st-menu-open {
 }
 .st-service-card:hover .st-card-scrim,
 .st-service-card:focus-visible .st-card-scrim {
-  background: #07263e99;
+  background: #141f2e99;
 }
 .st-service-card:hover .st-service-desc,
 .st-service-card:focus-visible .st-service-desc {
@@ -576,7 +579,7 @@ html.st-menu-open {
   padding: 64px;
   width: 100%;
   min-height: 430px;
-  background: linear-gradient(90deg, #07263ed9, transparent 75%);
+  background: linear-gradient(90deg, #141f2ed9, transparent 75%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -597,7 +600,9 @@ html.st-menu-open {
   gap: 72px;
   margin-top: 120px;
   padding: 64px;
-  background: var(--st-surface);
+  background: var(--st-card);
+  border: 1px solid var(--st-rule);
+  border-top: 3px solid var(--st-accent);
   align-items: center;
 }
 .st-client-feature h2 {
@@ -685,15 +690,15 @@ html.st-menu-open {
   transform: scale(1.05);
 }
 .st-insight-art--0 {
-  background: repeating-linear-gradient(90deg, var(--st-surface) 0 12%, var(--st-mint) 12% 24%);
+  background: repeating-linear-gradient(90deg, var(--st-surface) 0 12%, var(--st-highlight) 12% 24%);
   color: var(--st-accent);
 }
 .st-insight-art--1 {
   background: repeating-linear-gradient(0deg, var(--st-dark) 0 8%, var(--st-ink) 8% 16%);
-  color: var(--st-mint);
+  color: var(--st-highlight);
 }
 .st-insight-art--2 {
-  background: var(--st-mint);
+  background: var(--st-highlight);
   color: var(--st-ink);
 }
 .st-insight-art--2:before {
@@ -701,7 +706,7 @@ html.st-menu-open {
   position: absolute;
   width: 80%;
   height: 80%;
-  border: 1px solid var(--st-teal);
+  border: 1px solid var(--st-brand-teal);
   border-radius: 50%;
   transform: rotate(-30deg);
 }
@@ -817,7 +822,7 @@ html.st-menu-open {
   line-height: 1.145;
 }
 .st--dark .st-intro .st-eyebrow {
-  color: var(--st-mint);
+  color: var(--st-highlight);
 }
 .st-service-row {
   display: grid;
@@ -1201,18 +1206,18 @@ html.st-menu-open {
   height: 240px;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 0%) 0% 8%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 9%) 8% 16%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 18%) 16% 24%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 27%) 24% 32%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 36%) 32% 40%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 45%) 40% 48%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 55%) 48% 56%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 64%) 56% 64%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 73%) 64% 72%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 82%) 72% 80%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 91%) 80% 88%,
-    color-mix(in srgb, var(--st-teal), var(--st-dark) 100%) 88% 100%
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 0%) 0% 8%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 9%) 8% 16%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 18%) 16% 24%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 27%) 24% 32%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 36%) 32% 40%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 45%) 40% 48%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 55%) 48% 56%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 64%) 56% 64%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 73%) 64% 72%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 82%) 72% 80%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 91%) 80% 88%,
+    color-mix(in srgb, var(--st-cool), var(--st-dark) 100%) 88% 100%
   );
 }
 .st-footer {
@@ -1277,7 +1282,7 @@ html.st-menu-open {
   margin-bottom: 14px;
 }
 .st-footer-grid a:hover {
-  color: var(--st-mint);
+  color: var(--st-highlight);
 }
 .st-footer-bottom {
   border-top: 1px solid #faf9f633;
@@ -1793,7 +1798,7 @@ html.st-menu-open {
     filter: brightness(0.65);
   }
   .st-card-scrim {
-    background: linear-gradient(#07263e55, transparent 55%, #07263edd);
+    background: linear-gradient(#141f2e55, transparent 55%, #141f2edd);
   }
   .st-callout {
     margin-top: 75px;
@@ -2119,7 +2124,7 @@ html.st-menu-open {
     scroll-behavior: auto;
   }
 }
-/* Consulting keeps its own text hierarchy while sharing UBLDA brand colors. */
+/* Consulting retains the parent navy and typography hierarchy. */
 .st h1,
 .st h2,
 .st h3 {

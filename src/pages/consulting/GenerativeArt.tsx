@@ -31,18 +31,18 @@ export function GenerativeArt({ kind }: { kind: ArtKind }) {
       <svg viewBox={wide ? "0 0 1600 600" : "0 0 1000 1200"} preserveAspectRatio="xMidYMid slice" focusable="false">
         <defs>
           <linearGradient id={`${id}-ribbon`} x1="0" y1="0" x2="1" y2="1">
-            <stop className="st-art-stop--mint" />
-            <stop offset=".48" className="st-art-stop--teal" />
-            <stop offset="1" className="st-art-stop--accent" />
+            <stop className="st-art-stop--light" />
+            <stop offset=".48" className="st-art-stop--mid" />
+            <stop offset="1" className="st-art-stop--deep" />
           </linearGradient>
           <linearGradient id={`${id}-reverse`} x1="1" y1="0" x2="0" y2="1">
-            <stop className="st-art-stop--accent" />
-            <stop offset=".55" className="st-art-stop--teal" />
-            <stop offset="1" className="st-art-stop--mint" />
+            <stop className="st-art-stop--deep" />
+            <stop offset=".55" className="st-art-stop--mid" />
+            <stop offset="1" className="st-art-stop--light" />
           </linearGradient>
           <radialGradient id={`${id}-glow`}>
-            <stop className="st-art-stop--accent" stopOpacity=".65" />
-            <stop offset="1" className="st-art-stop--accent" stopOpacity="0" />
+            <stop className="st-art-stop--deep" stopOpacity=".65" />
+            <stop offset="1" className="st-art-stop--deep" stopOpacity="0" />
           </radialGradient>
         </defs>
         <ellipse cx={wide ? 800 : 500} cy={wide ? 300 : 520} rx={wide ? 1000 : 680} ry={wide ? 500 : 780} fill={`url(#${id}-glow)`} />
