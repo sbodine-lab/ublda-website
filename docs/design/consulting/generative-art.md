@@ -10,7 +10,7 @@ Original procedural SVG artwork replaces the photos:
 - Workplace: two interwoven families of curves.
 - Practice: a panoramic wave field, cropped responsively on mobile.
 
-The art inherits Consulting's navy, deep teal, logo teal, and mint CSS tokens. Vectors stay sharp at any resolution. It is decorative and hidden from assistive technology; meaningful adjacent headings and link names remain. Partner marks retain their own colors. The existing hero and callout canvas shader is unchanged.
+The artwork uses the current Consulting navy/cobalt palette with parent-teal perspective contours, blue strategy ribbons, light-blue accessibility arches, restrained iris workplace weave, and blue/teal practice waves. See subbrand-palette.md for the current identity. Vectors stay sharp at any resolution. It is decorative and hidden from assistive technology; meaningful adjacent headings and link names remain. Partner marks retain their own colors. The hero and callout canvas keep their geometry and motion; their endpoints follow the current palette.
 
 Slow CSS transforms animate only when artwork is in view and the tab is visible. The footer Pause motion control pauses all art, and reduced-motion preferences disable these animations. There are no new dependencies, remote assets, or image-generation services.
 

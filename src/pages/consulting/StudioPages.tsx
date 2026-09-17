@@ -238,13 +238,13 @@ export function StudioHome() {
         </div>
         <div className="st-statement" data-enter>
           <p>
-            We’re a student consulting practice working at the
-            intersection of business and disability inclusion.
+            UBLDA Consulting is the student-led, pro bono consulting division of
+            Undergraduate Business Leaders for Diverse Abilities.
           </p>
           <p>
-            We bring research, analysis, and fresh perspectives to
-            disability-focused organizations and accessibility teams. Pro bono.
-            Built around a real business question.
+            We help disability-focused organizations solve business challenges
+            and help companies across industries improve accessibility—in their
+            products, services, and workplaces.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
@@ -340,8 +340,8 @@ export function StudioServices() {
     <Studio title="Services" dark>
       <Intro title="Services">
         <p>
-          We help organizations make better business decisions with disability
-          inclusion in view.
+          Business strategy for disability-focused organizations.
+          Accessibility consulting for companies across industries.
         </p>
       </Intro>
       <div className="st-wrap st-service-rows">
@@ -478,8 +478,9 @@ export function StudioPractice() {
           Business Leaders for Diverse Abilities at Michigan Ross.
         </p>
         <p>
-          We work with disability-focused organizations and accessibility teams
-          on business strategy and inclusion.
+          We support disability-focused organizations with business strategy
+          and help companies across industries with accessibility research,
+          programs, and workplace inclusion.
         </p>
       </Intro>
       <div className="st-wrap st-practice-art">
