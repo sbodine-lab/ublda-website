@@ -275,7 +275,7 @@ function Header({ home, paused, systemMotion, onToggleMotion }: { home: boolean;
             {text}
           </Link>
         ))}
-        <a href="mailto:cooperry@umich.edu" aria-label="Email UBLDA">
+        <a href="mailto:snaber@umich.edu" aria-label="Email UBLDA">
           <Mail size={22} />
           <span className="eq-mobile-label">Email us</span>
         </a>
@@ -795,9 +795,9 @@ function Footer() {
           <br />
           701 Tappan Avenue, Ann Arbor
         </a>
-        <a href="mailto:cooperry@umich.edu">
+        <a href="mailto:snaber@umich.edu">
           <Mail size={20} />
-          Email us
+          Questions? Email Samantha Naber
         </a>
         <div className="eq-footer-social">
           <a href="https://www.linkedin.com/company/ublda/">
@@ -830,7 +830,7 @@ function Footer() {
             {label}
           </Link>
         ))}
-        <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support">
+        <a href="mailto:snaber@umich.edu?subject=Accessibility%20support">
           Accessibility support
         </a>
       </nav>
@@ -939,7 +939,7 @@ function JoinPage() {
           ],
           [
             "How can I request accessibility support?",
-            "Email Cooper Perry at cooperry@umich.edu with questions or access needs for an event.",
+            "Email Samantha Naber at snaber@umich.edu with questions or access needs for an event.",
           ],
         ].map(([q, a]) => (
           <details key={q}>
@@ -1028,7 +1028,7 @@ function LinksPage() {
           ["/team", "Meet the team"],
           ["https://www.instagram.com/michiganublda/", "Instagram"],
           ["https://www.linkedin.com/company/ublda/", "LinkedIn"],
-          ["mailto:cooperry@umich.edu", "Get in touch"],
+          ["mailto:snaber@umich.edu", "Get in touch"],
         ].map(([url, label]) => (
           <Button key={url} to={url}>
             {label}

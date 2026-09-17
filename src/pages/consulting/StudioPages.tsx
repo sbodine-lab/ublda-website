@@ -617,17 +617,34 @@ export function StudioInsight() {
   );
 }
 function InquiryForm() {
-  const [prepared, setPrepared] = useState("");
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const body = `Name: ${data.get("name")}\nOrganization: ${data.get("organization")}\nEmail: ${data.get("email")}\n\n${data.get("message")}`;
-    const href = `${CONTACT_MAILTO}&body=${encodeURIComponent(body)}`;
-    setPrepared(href);
-    window.location.href = href;
+    if (status === "sending" || status === "sent") return;
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
+    setStatus("sending");
+    setError("");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        signal: AbortSignal.timeout(20000),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success !== true) throw new Error(result.error || "Your message could not be sent. Please try again.");
+      form.reset();
+      setStatus("sent");
+    } catch (err) {
+      setError(err instanceof Error && err.name === "Error" ? err.message : "Your message could not be sent. Please try again.");
+      setStatus("error");
+    }
   };
   return (
-    <form className="st-inquiry" onSubmit={submit} aria-describedby="inquiry-instructions">
+    <form className="st-inquiry" onSubmit={submit} aria-describedby="inquiry-instructions" aria-busy={status === "sending"}>
+      <div hidden aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
       <div className="st-form-row">
         <label>
           Full name (required)
@@ -656,14 +673,15 @@ function InquiryForm() {
         What would you like to ask us? (required)
         <textarea name="message" rows={4} required maxLength={4000} />
       </label>
-      <button className="st-button st-button--solid" type="submit">
+      <button className="st-button st-button--solid" type="submit" disabled={status === "sending" || status === "sent"}>
         <ArrowRight size={16} />
-        Prepare email
+        {status === "sending" ? "Sending…" : status === "sent" ? "Message sent" : "Send message"}
       </button>
       <p className="st-form-note" id="inquiry-instructions">
-        Opens a draft in your email app for you to review and send.
+        Sends your message to Alex Forstner, with Cooper Perry, Alexa Chiang, and Sam Bodine copied.
       </p>
-      <p role="status">{prepared && <>Email app didn’t open? <a href={prepared}>Open the draft</a>.</>}</p>
+      <p role="status">{status === "sent" && "Your message has been sent. Alex will reply to the email address you provided."}</p>
+      {status === "error" && <p role="alert">{error} <a href={CONTACT_MAILTO}>Email Alex directly</a>.</p>}
     </form>
   );
 }
@@ -681,17 +699,11 @@ export function StudioContact() {
         }
       >
         <p>
-          Our project managers are available to answer questions about the
-          club and the consulting application process. They also speak with
-          organizations interested in working with a student team.
+          For all questions about UBLDA Consulting, applications, or working
+          with a student team, contact Alex Forstner.
         </p>
         <div className="st-contact-emails">
-          {LEADERS.map((l) => (
-            <a key={l.email} href={`mailto:${l.email}`}>
-              {l.email}
-              <ArrowUpRight size={22} />
-            </a>
-          ))}
+          <a href={CONTACT_MAILTO}>alexfors@umich.edu<ArrowUpRight size={22} /></a>
         </div>
       </Intro>
       <section className="st-wrap st-contact-form" id="contact-form">
@@ -735,7 +747,7 @@ export function StudioContact() {
                     ? `Apply by ${APPLY_DEADLINE_LABEL}.`
                     : windowState === "before"
                       ? "Fall 2026 applications open September 2."
-                      : "The Fall 2026 application deadline has passed. Contact the project managers about future opportunities."}
+                      : "The Fall 2026 application deadline has passed. Contact Alex Forstner about future opportunities."}
                 </p>
                 {windowState === "open" ? (
                   <Button href={CONSULTING_FORM_URL} solid>

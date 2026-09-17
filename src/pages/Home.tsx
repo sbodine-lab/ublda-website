@@ -362,15 +362,15 @@ export default function Home() {
                   Join UBLDA
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </a>
-                <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA" className="btn btn--ghost">
+                <a href="mailto:snaber@umich.edu?subject=Question%20for%20UBLDA" className="btn btn--ghost">
                   Contact us
                 </a>
               </div>
             </Reveal>
             <Reveal delay={0.3}>
               <p className="cta__contact">
-                Questions? Cooper Perry, our Executive VP, answers them:{' '}
-                <a href="mailto:cooperry@umich.edu?subject=Question%20for%20UBLDA">cooperry@umich.edu</a>
+                Questions? Contact Samantha Naber:{' '}
+                <a href="mailto:snaber@umich.edu?subject=Question%20for%20UBLDA">snaber@umich.edu</a>
               </p>
             </Reveal>
           </div>

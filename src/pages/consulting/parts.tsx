@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from '../../lib/forms'
 import { APPLY_CLOSES_PROSE } from '../../lib/applyForm'
-import { CONTACT_MAILTO, LEADERS, PAGE_LINKS, SOCIAL } from './content'
+import { CONTACT_MAILTO, PAGE_LINKS, SOCIAL } from './content'
 
 export type Theme = 'dark' | 'light'
 
@@ -230,7 +230,7 @@ export function ConsultingFooter() {
           </div>
           <div className="pc-footer__col pc-footer__col--contact">
             <p className="pc-footer__big">Partner with us</p>
-            {LEADERS.map((p) => (
+            {[{ name: "Alex Forstner", role: "Consulting inquiries", email: "alexfors@umich.edu" }].map((p) => (
               <p key={p.email} className="pc-footer__person">
                 <span className="pc-footer__small">
                   {p.name} &middot; {p.role}
@@ -252,7 +252,7 @@ export function ConsultingFooter() {
       <div className="pc-footer__bottom">
         <div className="pc-footer__legal">
           <Link to="/unsubscribe" className="pc-footer__small">Unsubscribe from emails</Link>
-          <a href="mailto:cooperry@umich.edu?subject=Accessibility%20support" className="pc-footer__small">
+          <a href="mailto:alexfors@umich.edu?subject=Accessibility%20support" className="pc-footer__small">
             Accessibility support
           </a>
           <span className="pc-footer__small pc-footer__legal-mid">University of Michigan</span>

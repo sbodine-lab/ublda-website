@@ -9,6 +9,7 @@ import {
   type SpeakerOpsIdentityVerifier,
 } from './server/speakerOpsService.ts'
 import { handleOperationsRequest } from './server/operationsService.ts'
+import { sendContactInquiry } from './server/contactService.ts'
 import { getLocalWeather } from './server/weatherService.ts'
 import { getCraftNightState, handleCraftNightAction } from './server/craftNightService.ts'
 
@@ -53,6 +54,12 @@ const sendJson = (res: ServerResponse, statusCode: number, payload: unknown) => 
 const devApiPlugin = () => ({
   name: 'ublda-dev-api',
   configureServer(server: import('vite').ViteDevServer) {
+    server.middlewares.use('/api/contact', async (req: IncomingMessage, res: ServerResponse) => {
+      if (req.method !== 'POST') { sendJson(res, 405, { error: 'Method not allowed' }); return }
+      const result = await sendContactInquiry(await readJsonBody(req), req.socket.remoteAddress || 'local')
+      sendJson(res, result.status, result.body)
+    })
+
     server.middlewares.use('/api/weather', async (req: IncomingMessage, res: ServerResponse) => {
       if (req.method !== 'GET') {
         res.setHeader('Allow', 'GET')
