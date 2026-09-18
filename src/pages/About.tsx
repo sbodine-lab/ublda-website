@@ -10,7 +10,7 @@ const values = [
   },
   {
     title: 'Client Work',
-    desc: 'Through UBLDA Consulting, students research business questions for disability-focused organizations and accessibility teams. Each project ends with recommendations for the client.',
+    desc: 'Our first UBLDA Consulting engagement is planned for Fall 2026. Students will research a business question and develop recommendations with guidance from project managers.',
   },
   {
     title: 'Student Leadership',
@@ -18,7 +18,7 @@ const values = [
   },
   {
     title: 'Education & Advocacy',
-    desc: 'Our speakers and workshops examine disability in business, including employment and access to products and services.',
+    desc: 'Our speaker events explore disability in business. Additional educational programming and workshops are in development.',
   },
 ]
 
@@ -41,8 +41,8 @@ export default function About() {
             <p className="about__intro">
               Undergraduate Business Leaders for Diverse Abilities brings together
               U-M students interested in disability inclusion in business. Based
-              at Michigan Ross, we run speaker events and workshops alongside
-              our pro bono consulting program.
+              at Michigan Ross, we hold speaker events and are preparing for our
+              first pro bono consulting engagement in Fall 2026.
             </p>
           </Reveal>
         </div>

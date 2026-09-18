@@ -57,9 +57,9 @@ export const AREAS = [
   {
     id: "strategy",
     title: "Strategy & growth",
-    desc: "Our teams research markets and evaluate growth opportunities for organizations with a disability mission.",
+    desc: "We can help your organization research a market, compare opportunities, and think through its next step.",
     detail:
-      "We examine the client’s market and compare strategic options to develop a business case grounded in research. The work connects an organization’s goals with the opportunities and constraints that shape its decisions.",
+      "A project could explore a market, compare similar organizations, or weigh options for a new program. We would agree on a focused business question with you, then use research to develop recommendations for your team to consider.",
     examples: [
       "Market and competitor research",
       "Program and growth opportunities",
@@ -69,9 +69,9 @@ export const AREAS = [
   {
     id: "accessibility",
     title: "Accessible experiences",
-    desc: "Our teams study how people use products and services to identify barriers and recommend more accessible experiences.",
+    desc: "We can help you explore barriers people may encounter when using your organization’s information, services, or programs.",
     detail:
-      "We explore how disabled people find information and use a client’s services to understand where access breaks down. Our recommendations focus on practical improvements that respond to those experiences.",
+      "A project could review a customer journey, compare how organizations share information, or research ways to make a program easier to access. The scope would depend on your goals, the information available, and what a student team can reasonably investigate.",
     examples: [
       "Websites and app experiences",
       "Documents and communications",
@@ -81,9 +81,9 @@ export const AREAS = [
   {
     id: "workplace",
     title: "Inclusive workplaces",
-    desc: "Our teams examine hiring and workplace practices to understand how organizations can better support disabled employees.",
+    desc: "We can help you research ways to make hiring, onboarding, and employee communication more inclusive.",
     detail:
-      "We study the path from recruitment to everyday work and research how workplace processes could better serve disabled employees. The team uses those findings to recommend improvements in how an organization supports its people.",
+      "A project could compare published workplace practices, review recruiting materials, or explore questions about the employee experience. Together, we would choose a manageable research question and identify the information needed to develop useful recommendations.",
     examples: [
       "Recruiting and hiring experiences",
       "Onboarding and employee communication",
