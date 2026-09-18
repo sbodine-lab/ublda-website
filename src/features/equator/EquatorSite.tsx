@@ -117,7 +117,7 @@ const programs = [
   ],
   [
     "Student consulting",
-    "Apply business skills to real client questions through our pro bono consulting program. UBLDA Consulting selects its team through a separate application and interview.",
+    "Our first client engagement is planned for Fall 2026. Apply to UBLDA Consulting through a separate application and interview to join the student team.",
     "/consulting",
   ],
   [
@@ -137,7 +137,7 @@ const programs = [
   ],
   [
     "Education & workshops",
-    "Our education team is developing programming on business and disability. Join the club to hear about new workshops as they are announced.",
+    "Our education team is developing programming on business and disability. Workshops have not launched yet; join the club to hear when they’re ready.",
     "/events",
   ],
   [
@@ -547,7 +547,7 @@ const stories = [
   {
     title: "Learning through client work",
     art: "arc",
-    text: "Our Fall 2026 pro bono consulting engagement is with Arc Thrift Stores of Colorado. Students will research business questions and develop recommendations through UBLDA Consulting.",
+    text: "Our first pro bono consulting engagement is planned for Fall 2026 with Arc Thrift Stores of Colorado. Students will research business questions and develop recommendations through UBLDA Consulting.",
     link: "/consulting",
   },
   {

@@ -25,7 +25,7 @@ const pillars = [
   {
     title: 'Career Preparation',
     description:
-      'Learn through client projects and workshops on business strategy and accessibility. UBLDA Consulting selects its analyst team through an application and interview.',
+      'Apply for our first Fall 2026 consulting team to learn through client work. Educational programming is in development; workshop details will follow when ready.',
     icon: '02',
   },
   {
@@ -40,7 +40,7 @@ const benefits = [
   { label: 'Networking', icon: '→' },
   { label: 'Career Development', icon: '→' },
   { label: 'Speaker Sessions', icon: '→' },
-  { label: 'Workshops', icon: '→' },
+  { label: 'Workshops in development', icon: '→' },
   { label: 'MBA Connections', icon: '→' },
   { label: 'Hands-on Consulting', icon: '→' },
   { label: 'Community Events', icon: '→' },
@@ -98,8 +98,8 @@ export default function Home() {
 
             <p className="hero__sub hero__entrance hero__entrance--sub">
               UBLDA is a student organization at Michigan Ross focused on disability
-              inclusion in business. Join us for speaker events and workshops or
-              apply for our pro bono consulting team. All U-M students are welcome.
+              inclusion in business. Join us for speaker events and club activities or
+              apply for our first pro bono consulting team. All U-M students are welcome.
             </p>
 
             <div className="hero__actions hero__entrance hero__entrance--actions">

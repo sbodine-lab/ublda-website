@@ -183,7 +183,7 @@ export function StudioHome() {
             at the intersection of business strategy and disability inclusion.
           </p>
           <div className="st-actions" data-enter style={enterDelay(600)}>
-            <Button to="/consulting/work">Our work</Button>
+            <Button to="/consulting/work">Meet our first client</Button>
             <ApplicationButton solid />
           </div>
         </div>
@@ -197,9 +197,9 @@ export function StudioHome() {
             affect people with disabilities and the organizations that serve them.
           </p>
           <p>
-            Our teams develop business recommendations for disability-focused
-            organizations and explore how companies across industries can make
-            their services and workplaces more accessible.
+            Our first client engagement is planned for Fall 2026 with Arc Thrift
+            Stores of Colorado. For future projects, we welcome conversations
+            about business strategy, accessibility, and workplace inclusion.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
@@ -230,24 +230,24 @@ export function StudioHome() {
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">Our approach<br />to client work.</h2>
+            <h2 className="st-section-heading">Our plan<br />for client work.</h2>
             <p>Our first consulting engagement is planned for October–December 2026, with four to six analysts working alongside two project managers.</p>
           </div>
           <div className="st-experience-grid">
             <article data-enter>
               <span aria-hidden="true">01</span>
               <h3>Research the business</h3>
-              <p>Our analysts investigate the client’s question and gather evidence to understand the business before developing a recommendation.</p>
+              <p>Analysts will investigate the client’s question and gather evidence before developing a recommendation.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">02</span>
               <h3>Build a recommendation</h3>
-              <p>The team compares possible approaches and uses feedback from project managers to test its assumptions and strengthen the analysis.</p>
+              <p>The team will compare possible approaches and use feedback from project managers to test its assumptions and strengthen the analysis.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">03</span>
               <h3>Present the findings</h3>
-              <p>A midpoint review and final presentation give the team a structured way to share its findings and explain the reasoning behind its recommendations.</p>
+              <p>The planned midpoint review and final presentation will give the team a way to share findings and explain its recommendations.</p>
             </article>
           </div>
           <Button to="/consulting/practice">Inside the program</Button>
@@ -287,7 +287,7 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
-        <h2 className="st-section-heading">The questions<br />our teams explore.</h2>
+        <h2 className="st-section-heading">How we could<br />help your organization.</h2>
         <ServiceCards />
       </section>
       <section className="st-team-section">
@@ -306,13 +306,13 @@ export function StudioHome() {
 
 export function StudioServices() {
   return (
-    <Studio title="Services" dark>
-      <Intro title="Services">
+    <Studio title="How we can help" dark>
+      <Intro title="How we can help">
         <p>
-          Our student teams work on business strategy for disability-focused
-          organizations and accessibility projects for companies across
-          industries. These areas guide the questions we explore with clients
-          and the recommendations we develop together.
+          Have a business question with a disability focus? These are possible
+          areas for a pro bono student project. Our first engagement is planned
+          for Fall 2026; we’re interested in shaping future projects with
+          organizations whose questions fit our team’s skills and a semester’s timeline.
         </p>
       </Intro>
       <div className="st-wrap st-service-rows">
@@ -325,7 +325,7 @@ export function StudioServices() {
               <h2>{area.title}</h2>
               <p>{area.desc}</p>
               <Button to={`/consulting/services/${area.id}`}>
-                Explore the service
+                Explore project ideas
               </Button>
             </div>
           </section>
@@ -333,12 +333,12 @@ export function StudioServices() {
       </div>
       <section className="st-wrap st-scope-note">
         <p>
-          Each engagement begins with an agreed business question and a scope
-          that our student team can deliver through research and recommendations.
-          Legal advice and compliance certification fall outside our services.
+          We would agree on the question, scope, and expected output with you
+          before committing to a project. Our focus is student research and
+          recommendations. We do not offer legal advice or compliance certification.
         </p>
       </section>
-      <Callout join />
+      <Callout />
     </Studio>
   );
 }
@@ -356,8 +356,8 @@ export function StudioServiceDetail() {
       </div>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
-          Our focus
-          <br />in this area.
+          What a project
+          <br />could look like.
         </h2>
         <div>
           <p>{area.detail}</p>
@@ -367,22 +367,23 @@ export function StudioServiceDetail() {
               <li key={e}>{e}</li>
             ))}
           </ul>
-          <ApplicationButton />
+          <p>These are possible directions for a future project. We would confirm the scope and fit with your organization before work begins.</p>
+          <Button to="/consulting/contact">Discuss a project</Button>
         </div>
       </section>
-      <Callout join />
+      <Callout />
     </Studio>
   );
 }
 export function StudioWork() {
   return (
-    <Studio title="Our work">
+    <Studio title="Our first client">
       <Intro
         title={
           <>
-            Business strategy.
+            Our first
             <br />
-            <em>Disability impact.</em>
+            <em>client engagement.</em>
           </>
         }
       >
@@ -399,7 +400,7 @@ export function StudioWork() {
           <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
         </div>
         <div>
-          <p className="st-eyebrow">Fall 2026</p>
+          <p className="st-eyebrow">Planned for Fall 2026</p>
           <h2>Arc Thrift Stores of Colorado</h2>
           <p>
             Arc Thrift Stores is a nonprofit retailer that funds disability
@@ -422,12 +423,12 @@ export function StudioWork() {
         </h2>
         <div>
           <p>
-            Weekly working sessions and a midpoint review give the team time
-            to develop its analysis and refine its recommendations before the
-            final presentation. Our contribution is a clear account of the
-            research and the business reasoning behind the proposed next steps.
+            The Fall 2026 plan includes weekly working sessions, a midpoint
+            review, and a final presentation. The team will aim to give the
+            client a clear account of its research and the reasoning behind
+            its recommendations.
           </p>
-          <Button to="/consulting/practice">How we work</Button>
+          <Button to="/consulting/practice">Our program</Button>
         </div>
       </section>
       <Callout join />
@@ -436,7 +437,7 @@ export function StudioWork() {
 }
 export function StudioPractice() {
   return (
-    <Studio title="Our practice">
+    <Studio title="Our program">
       <Intro
         title={
           <>
@@ -452,10 +453,10 @@ export function StudioPractice() {
           Diverse Abilities at Michigan Ross.
         </p>
         <p>
-          Our work spans business challenges for disability-focused organizations
-          and accessibility projects for companies across industries. Analysts
-          contribute to a shared project from the initial research through the
-          final client presentation.
+          We’re preparing for our first engagement in October–December 2026
+          with Arc Thrift Stores of Colorado. The program is designed to give
+          students experience researching a business question and developing
+          recommendations with guidance from two project managers.
         </p>
       </Intro>
       <section className="st-wrap st-detail-body" data-enter>
@@ -467,16 +468,16 @@ export function StudioPractice() {
         </h2>
         <div>
           <p>
-            Each team works with two project managers who guide the research
-            and help analysts turn their findings into a recommendation. Team
-            discussions create space to question assumptions and consider how
-            different perspectives change the analysis.
+            The Fall 2026 team will include four to six analysts and two project
+            managers. Project managers will guide the research and help analysts
+            turn findings into recommendations, with time for the team to question
+            assumptions and consider different perspectives.
           </p>
           <p>
-            Weekly deliverables keep the project moving toward a defined
-            business question while the midpoint review provides an opportunity
-            to assess the direction of the work. The final presentation brings
-            the research and recommendations together for the client.
+            Our planned format includes weekly deliverables, a midpoint review,
+            and a final client presentation. These milestones will give students
+            opportunities to discuss their research, receive feedback, and
+            revise their recommendations.
           </p>
           <p>
             Students from every undergraduate major and class year are welcome
@@ -559,7 +560,7 @@ export function StudioInsights() {
         <p>
           These readings offer students a broader view of disability in
           business and provide context for the questions our club explores
-          through its projects and conversations. These are external research findings,
+          as we prepare for client work. These are external research findings,
           not results from UBLDA projects.
         </p>
       </Intro>
@@ -700,7 +701,9 @@ export function StudioContact() {
       >
         <p>
           For all questions about UBLDA Consulting, applications, or working
-          with a student team, contact Alex Forstner.
+          with a student team, contact Alex Forstner. If you have a potential
+          project, tell us about your organization and the question you’d like
+          to explore so we can discuss scope, timing, and fit.
         </p>
         <div className="st-contact-emails">
           <a href={CONTACT_MAILTO}>alexfors@umich.edu<ArrowUpRight size={22} /></a>

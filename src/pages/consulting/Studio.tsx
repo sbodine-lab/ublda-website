@@ -168,8 +168,8 @@ export function Bands({ className = "" }: { className?: string }) {
 }
 
 const links = [
-  ["Work", "/consulting/work"],
-  ["Practice", "/consulting/practice"],
+  ["Our client", "/consulting/work"],
+  ["Program", "/consulting/practice"],
   ["Services", "/consulting/services"],
   ["Insights", "/consulting/insights"],
 ];
@@ -358,7 +358,7 @@ export function Studio({
                 className="st-dropdown"
                 hidden={!about}
               >
-                <Link to="/consulting/practice">Our practice</Link>
+                <Link to="/consulting/practice">Our program</Link>
                 <Link to="/consulting/leadership">Leadership</Link>
                 <Link to="/consulting/partners">Our connections</Link>
                 <a href={application.href}>{application.label}</a>
@@ -420,9 +420,9 @@ export function Studio({
               </Link>
             </div>
             <div>
-              <h3>Our work</h3>
+              <h3>Our first client</h3>
               <Link to="/consulting/work">Arc Thrift Stores</Link>
-              <Link to="/consulting/practice">How we work</Link>
+              <Link to="/consulting/practice">Our program</Link>
               <Link to="/consulting/insights">Research & insights</Link>
             </div>
             <div>
@@ -490,7 +490,7 @@ export function Callout({ join = false }: { join?: boolean }) {
             {join ? application.label : "Discuss a project"}
           </Button>
           <Button to={join ? "/consulting/leadership" : "/consulting/work"}>
-            {join ? "Meet the team" : "Explore our work"}
+            {join ? "Meet the team" : "Meet our first client"}
           </Button>
         </div>
       </div>

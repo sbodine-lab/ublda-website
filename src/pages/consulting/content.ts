@@ -12,7 +12,7 @@ export const STATEMENT_1 =
   'UBLDA Consulting is the pro bono consulting program of Undergraduate Business Leaders for Diverse Abilities at Michigan Ross. Our first client is Arc Thrift Stores of Colorado.'
 
 export const STATEMENT_2 =
-  'As an analyst, you work in a team of four to six with two project managers. You’ll research the client’s business question and develop recommendations for a final presentation.'
+  'As an analyst, you’ll work in a team of four to six with two project managers. You’ll research the client’s business question and develop recommendations for a final presentation.'
 
 export interface Service {
   id: string
@@ -146,9 +146,9 @@ export const SOCIAL = [
 ]
 
 export const PAGE_LINKS = [
-  { label: 'Practice', to: '/consulting/practice' },
+  { label: 'Program', to: '/consulting/practice' },
   { label: 'Leadership', to: '/consulting/leadership' },
-  { label: 'Work', to: '/consulting/work' },
+  { label: 'Our client', to: '/consulting/work' },
   { label: 'Services', to: '/consulting/services' },
   { label: 'Partners', to: '/consulting/partners' },
   { label: 'Contact', to: '/consulting/contact' },

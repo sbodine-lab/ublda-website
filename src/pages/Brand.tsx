@@ -715,13 +715,13 @@ export default function Brand() {
       <section className="brand-section brand-section--alt" id="voice">
         <div className="brand-container">
           <h2 className="brand-section__title">Brand Voice</h2>
-          <p className="brand-section__desc">Explain what we do and who can take part. Name the project or activity instead of promising impact. Describe unconfirmed programs as plans.</p>
+          <p className="brand-section__desc">Explain what is available, what is planned, and who can take part. Describe possible project areas as offerings to discuss, and only claim completed work when it has happened.</p>
 
           <div className="brand-voice-grid">
             <div className="brand-voice-card">
               <h4>State What We Do</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "We consult for disability-focused organizations and accessibility teams."
+                <span className="brand-voice-card__yes">Yes:</span> "We welcome project ideas in business strategy and disability inclusion."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "It's time to DEMAND that business includes disabled people!!!"
@@ -751,7 +751,7 @@ export default function Brand() {
             <div className="brand-voice-card">
               <h4>Use Plain Language</h4>
               <div className="brand-voice-card__example">
-                <span className="brand-voice-card__yes">Yes:</span> "We research the client’s question and recommend what to do next."
+                <span className="brand-voice-card__yes">Yes:</span> "A project could explore your business question and recommend possible next steps."
               </div>
               <div className="brand-voice-card__example">
                 <span className="brand-voice-card__no">No:</span> "We provide dynamic solutions for every stakeholder."
@@ -761,11 +761,11 @@ export default function Brand() {
 
           <h3 className="brand-subsection">Consulting voice</h3>
           <p className="brand-section__desc">
-            Describe who we are and what our teams do for readers who are
+            Describe who we are and what a student project could offer readers who are
             primarily students. Use complete sentences that connect the work
             to its purpose without turning every paragraph into a recruitment
             pitch. Keep commas purposeful and avoid em dashes in marketing
-            copy. Distinguish planned engagements from completed results and
+            copy. Distinguish possible offerings and planned engagements from completed results and
             use a simple Apply link for consulting applications.
           </p>
           <div className="brand-phrases">
