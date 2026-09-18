@@ -123,7 +123,7 @@ export const CLIENT = {
 }
 
 export const PARTNER_STATEMENT =
-  'UBLDA is a student organization affiliated with the Stephen M. Ross School of Business and works with its Office of Community, Culture, and Belonging.'
+  'UBLDA is a student organization affiliated with the Stephen M. Ross School of Business.'
 
 export const PARTNERS = [
   { src: '/partners-blda.webp', alt: 'Business Leaders for Diverse Abilities', role: 'MBA community' },
