@@ -230,24 +230,24 @@ export function StudioHome() {
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">Our plan<br />for client work.</h2>
-            <p>Our first consulting engagement is planned for October–December 2026, with four to six analysts working alongside two project managers.</p>
+            <h2 className="st-section-heading">How the<br />project works.</h2>
+            <p>Our Fall 2026 engagement runs from October through December, with four to six analysts working alongside two project managers.</p>
           </div>
           <div className="st-experience-grid">
             <article data-enter>
               <span aria-hidden="true">01</span>
               <h3>Research the business</h3>
-              <p>Analysts will investigate the client’s question and gather evidence before developing a recommendation.</p>
+              <p>Analysts investigate the client’s question and gather evidence before developing a recommendation.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">02</span>
               <h3>Build a recommendation</h3>
-              <p>The team will compare possible approaches and use feedback from project managers to test its assumptions and strengthen the analysis.</p>
+              <p>The team compares possible approaches and uses feedback from project managers to test its assumptions and strengthen the analysis.</p>
             </article>
             <article data-enter>
               <span aria-hidden="true">03</span>
               <h3>Present the findings</h3>
-              <p>The planned midpoint review and final presentation will give the team a way to share findings and explain its recommendations.</p>
+              <p>A midpoint review and final presentation give the team a way to share findings and explain its recommendations.</p>
             </article>
           </div>
           <Button to="/consulting/practice">Inside the program</Button>
