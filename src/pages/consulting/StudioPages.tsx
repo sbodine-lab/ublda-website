@@ -82,7 +82,6 @@ function InsightCards({ filter = "All", headingLevel = 3 }: { filter?: string; h
           <p className="st-eyebrow">{item.source}</p>
           <Heading>{item.title}</Heading>
           <p className="st-insight-date">{item.date}</p>
-          <p className="st-insight-context">{item.cardNote}</p>
         </Link>
       ))}
     </div>

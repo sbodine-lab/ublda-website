@@ -7,7 +7,6 @@ export const RESEARCH = [
     date: "March 2023",
     value: "1.3B",
     metricLabel: "people worldwide experience significant disability",
-    cardNote: "WHO’s estimate represents about one in six people worldwide.",
     title: "Disability and market strategy.",
     summary:
       "An estimated 1.3 billion people worldwide experience significant disability, which represents about one in six people.",
@@ -24,7 +23,6 @@ export const RESEARCH = [
     date: "November 2023",
     value: "1.6×",
     metricLabel: "the revenue for disability-inclusion leaders compared with other companies in the study",
-    cardNote: "An association in the study, not evidence that inclusion alone caused higher revenue.",
     title: "Disability inclusion and business performance.",
     summary:
       "Disability-inclusion leaders in Accenture’s study generated 1.6 times the revenue of other participating companies.",
@@ -41,7 +39,6 @@ export const RESEARCH = [
     date: "March 2026 · 2025 data",
     value: "38.1%",
     metricLabel: "of U.S. people with a disability ages 16–64 were employed in 2025",
-    cardNote: "An employment-to-population ratio, not an unemployment rate; based on 11 months of data.",
     title: "A broader view of workforce opportunity.",
     summary:
       "BLS reports that 38.1% of U.S. people with a disability ages 16–64 were employed in 2025.",
