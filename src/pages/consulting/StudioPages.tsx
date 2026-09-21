@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { ApplicationButton, Button, Callout, Intro, Studio } from "./Studio";
 import { GenerativeArt } from "./GenerativeArt";
+import { BusinessCase } from "./BusinessCase";
 import { AREAS, RESEARCH } from "./research";
 import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
@@ -213,6 +214,7 @@ export function StudioHome() {
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
       </section>
+      <BusinessCase />
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
@@ -617,7 +619,7 @@ export function StudioInsight() {
           </a>
           <p className="st-article-note">
             These findings come from independent research. They are not UBLDA
-            project results. Source checked September 17, 2026.
+            project results. Source checked {item.checkedAt ?? "September 17, 2026"}.
           </p>
           <Button to="/consulting/insights">All insights</Button>
         </div>

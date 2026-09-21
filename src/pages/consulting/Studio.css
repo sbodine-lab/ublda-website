@@ -747,6 +747,14 @@ html.st-menu-open {
   background: repeating-linear-gradient(0deg, var(--st-dark) 0 8%, var(--st-ink) 8% 16%);
   color: var(--st-highlight);
 }
+.st-insight-art--3 {
+  background: linear-gradient(130deg, var(--st-accent), var(--st-dark));
+  color: var(--st-paper);
+}
+.st-insight-art--4 {
+  background: var(--st-cool);
+  color: var(--st-ink);
+}
 .st-insight-art--2 {
   background: var(--st-highlight);
   color: var(--st-ink);
