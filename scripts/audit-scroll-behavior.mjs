@@ -36,6 +36,11 @@ try {
       check(`Local fonts only ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>e.name.includes('fonts.googleapis.com')||e.name.includes('fonts.gstatic.com'))));
       check(`No recruiting shader download ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>/\/Table-|\/shaders-|\/Halftone/.test(e.name))));
       if (route === '/consulting') {
+        await page.locator('.st-hero .st-actions .st-button:not(.st-button--solid)').hover();
+        await page.waitForTimeout(350);
+        const heroHoverViolations = await page.evaluate(async()=> (await window.axe.run('.st-hero .st-actions',{runOnly:{type:'rule',values:['color-contrast']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})));
+        check(`Hero CTA hover contrast ${width}`,!heroHoverViolations.length,heroHoverViolations);
+        await page.mouse.move(0,0);
         const glass = page.locator('.st-ross-shader');
         const heroCanvas = glass.locator('canvas');
         await page.waitForFunction(()=>document.querySelector('.st-ross-shader')?.dataset.ready==='true');
