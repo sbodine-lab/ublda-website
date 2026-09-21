@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from '../../lib/forms'
+import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL, REMOVAL_FORM_URL } from '../../lib/forms'
 import { APPLY_CLOSES_PROSE } from '../../lib/applyForm'
 import { CONTACT_MAILTO, PAGE_LINKS, SOCIAL } from './content'
 
@@ -251,7 +251,7 @@ export function ConsultingFooter() {
       </div>
       <div className="pc-footer__bottom">
         <div className="pc-footer__legal">
-          <Link to="/unsubscribe" className="pc-footer__small">Unsubscribe from emails</Link>
+          <a href={REMOVAL_FORM_URL} className="pc-footer__small">Unsubscribe from emails</a>
           <a href="mailto:alexfors@umich.edu?subject=Accessibility%20support" className="pc-footer__small">
             Accessibility support
           </a>

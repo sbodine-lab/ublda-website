@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import AnnouncementBanner from './components/AnnouncementBanner'
-import { CONSULTING_FORM_URL } from './lib/forms'
+import { CONSULTING_FORM_URL, REMOVAL_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 const Home = lazy(() => import('./pages/Home'))
 const EquatorSite = lazy(() => import('./features/equator/EquatorSite'))
@@ -24,7 +24,6 @@ const ConsultingInsights = lazy(() => import('./pages/consulting/StudioPages').t
 const ConsultingInsight = lazy(() => import('./pages/consulting/StudioPages').then(m => ({ default: m.StudioInsight })))
 const ConsultingServiceDetail = lazy(() => import('./pages/consulting/StudioPages').then(m => ({ default: m.StudioServiceDetail })))
 const Join = lazy(() => import('./pages/Join'))
-const Unsubscribe = lazy(() => import('./pages/Unsubscribe'))
 const Links = lazy(() => import('./pages/Links'))
 const Brand = lazy(() => import('./pages/Brand'))
 const HousingIntelligence = lazy(() => import('./pages/HousingIntelligence'))
@@ -73,7 +72,7 @@ export default function App() {
   const { pathname } = useLocation()
   // Public club and Consulting pages use local fonts. Fetch the older Google
   // font families only for routes that actually use them (workspace, table, etc.).
-  const publicPage = ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe'].includes(pathname)
+  const publicPage = ['/', '/about', '/events', '/team', '/join', '/brand', '/links'].includes(pathname)
   const consultingPage = matchesPrefix(pathname, ['/consulting', '/advisory'])
   useTabEasterEgg(!publicPage && !consultingPage)
   useEffect(() => {
@@ -90,6 +89,7 @@ export default function App() {
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
   // The club design is scoped to public pages; Consulting and operations retain their own UI.
+  if (pathname === '/unsubscribe') return <ExternalRedirect to={REMOVAL_FORM_URL} />
   if (publicPage) {
     return <Suspense fallback={<PageFallback />}><EquatorSite /></Suspense>
   }
@@ -118,7 +118,7 @@ export default function App() {
           Skip to main content
         </a>
       )}
-      {!inStandalone && pathname !== '/unsubscribe' && <AnnouncementBanner />}
+      {!inStandalone && <AnnouncementBanner />}
       {!inStandalone && <Nav />}
       <ScrollToTop enabled={!inStandalone} />
       <Suspense fallback={<PageFallback />}>
@@ -141,7 +141,6 @@ export default function App() {
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
-          <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="/apply" element={<ExternalRedirect to={CONSULTING_FORM_URL} />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />

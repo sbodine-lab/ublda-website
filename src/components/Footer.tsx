@@ -1,4 +1,4 @@
-import { MEMBERSHIP_FORM_URL } from '../lib/forms'
+import { MEMBERSHIP_FORM_URL, REMOVAL_FORM_URL } from '../lib/forms'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import './Footer.css'
@@ -53,7 +53,7 @@ export default function Footer() {
             University of Michigan &middot; Stephen M. Ross School of Business
           </p>
           <div className="footer__utility">
-            <Link to="/unsubscribe" className="footer__a11y-link">Unsubscribe from emails</Link>
+            <a href={REMOVAL_FORM_URL} className="footer__a11y-link">Unsubscribe from emails</a>
             <a href="mailto:snaber@umich.edu?subject=Accessibility%20support" className="footer__a11y-link">Accessibility support</a>
             <Link to="/workspace" className="footer__leadership-link">
               Leadership login
