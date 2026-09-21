@@ -16,7 +16,7 @@ Open-source options evaluated:
 
 Sam selected the infinity sculpture as the useful form and requested recognizable symbols that relate to each value, continuous mobile morphing, and more of Equator's background movement. This supersedes the September 21 mobile fallback-only behavior.
 
-The three original ribbon strips now form a group of people (inclusion), the retained infinity (shared purpose), an open book with a center fold (learning), layered speech bubbles (listening), and a heart (community and care). Equal-distance curve samples share a topology with the infinity. The existing ivory/teal material, eased morphs, and gentle 3D movement remain.
+The three original ribbon strips now form a group of people (inclusion), the retained infinity (shared purpose), an open book with a center fold (learning), a listening ear with an inner fold and incoming sound wave (listening), and a heart (community and care). Sam subsequently asked to replace the speech bubbles because they did not fit “Lead with curiosity. Listen with care.” The ear makes that connection direct and uses the same three ribbon strips. Equal-distance curve samples share a topology with the infinity. The existing ivory/teal material, eased morphs, and gentle 3D movement remain.
 
 Phones, touch tablets, short windows, and enlarged text use flowing copy under a native CSS sticky sculpture shelf. One canvas stays in that shelf instead of hopping among five cards. Desktop keeps the pinned text composition with a shared sculpture position bounded by the values section. The morph timeline moves in either scroll direction and holds a complete symbol while its copy is read. The visible value counter uses that same timeline.
 
