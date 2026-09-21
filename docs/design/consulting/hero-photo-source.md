@@ -28,3 +28,15 @@ Sam requested using a Ross photo with Paper Design's paned glass treatment as th
 Rendered using the actual Paper Design `FlutedGlass` shader from `@paper-design/shaders-react` 0.0.80 in Chrome WebGL2 at 1333 × 1000. Settings: lines, prism, size 0.9, distortion 0.09, shadows 0.055, highlights 0.065, angle/shift/stretch/blur/edges/grain/speed 0, fit cover, background #f8f7f3, shadow #0a3658, highlight #ffffff. Exported at WebP quality 88. The glass treatment is baked into the asset; the hero loads it with high priority as a normal image, adding no runtime shader bundle, GPU context, or animation. The original photo remains unchanged.
 
 Paper reference: https://shaders.paper.design/fluted-glass. The hero uses a responsive cover crop and a dark overlay for white text and controls.
+
+## Bird's-eye hero composition, September 21
+
+Sam requested a grander Ross hero, then preferred a bird's-eye/top-down view using a real photograph if available. The current hero uses a real high-angle aerial showing the terracotta building, glass-roofed atrium, and green terraces. It is an oblique bird's-eye photograph, not a vertical survey or AI-generated scene.
+
+Source page: https://architizer.com/projects/stephen-m-ross-school-of-business-university-of-michigan/
+Image: https://architizer-prod.imgix.net/mediadata/projects/532009/bfa13173.jpg?auto=format%2Ccompress&cs=strip&q=80&w=2160
+Source dimensions: 2160 × 1440. Retrieved September 21, 2026. Source: KPF project photography on Architizer. No individual photographer or open reuse license is identified on the project page. No open license is asserted here. This photograph records an earlier phase of the campus; no claim about its capture date or current building configuration is made in the hero.
+
+The actual Paper FlutedGlass shader is rendered at 2160 × 1440 with close pane spacing (size 0.9), distortion 0.018, shadows 0.055, and highlights 0.065. All other shader settings above are retained, with a 3,000,000 maximum pixel count. A centered 1.025× render scale trims the glass shader's edge artifacts. The restrained distortion preserves the roof geometry.
+
+WebP exports at quality 88: ross-hero-glass-2160.webp and ross-hero-glass-1080.webp use a 2160 × 1215 landscape crop beginning 70px below the rendered image's top. ross-hero-glass-mobile.webp uses the source rectangle x=780, y=0, width=1200, height=1440, exported at 900 × 1080. The native picture element selects the portrait asset on phones. The portrait fills the lower 74% of the mobile hero and fades into the navigation background, allowing more of Ross to remain visible. Desktop hero height follows 16:9 proportions within 620–1000px with a 42% vertical focal position. Both retain a gradient for legible white controls and headings. The glass treatment is baked into the images; no runtime shader is added.
