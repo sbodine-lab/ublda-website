@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type FormEvent } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
-import { ApplicationButton, Bands, Button, Callout, Intro, Studio } from "./Studio";
+import { ApplicationButton, Button, Callout, Intro, Studio } from "./Studio";
 import { GenerativeArt } from "./GenerativeArt";
 import { AREAS, RESEARCH } from "./research";
 import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
@@ -168,8 +168,17 @@ function Timeline() {
 export function StudioHome() {
   return (
     <Studio title="Home" hero>
-      <section className="st-hero">
-        <Bands />
+      <section className="st-hero st-hero--photo">
+        <img
+          className="st-hero-photo"
+          src="/consulting/ross-paned-glass.webp"
+          alt=""
+          aria-hidden="true"
+          width={1333}
+          height={1000}
+          fetchPriority="high"
+          decoding="async"
+        />
         <div className="st-wrap st-hero-content">
           <h1>
             <span data-enter>Business with</span>
@@ -226,18 +235,8 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-club-story" data-enter>
-        <div className="st-club-art">
-          <img
-            src="/consulting/ross-paned-glass.jpg"
-            alt="The Ross School of Business entrance with a textured glass treatment"
-            width={1333}
-            height={1000}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
+        <h2>Part of a broader<br />UBLDA community.</h2>
         <div>
-          <h2>Part of a broader<br />UBLDA community.</h2>
           <p>
             Our club creates a place for students to understand disability
             through the lens of business and to consider the role they can play

@@ -57,7 +57,7 @@ try {
       const paints=()=>canvas.evaluate(el=>window.__canvasPaints.get(el)||0);
       const active=await paints(); await page.waitForTimeout(300);
       check(`Visible artwork animates ${route} ${width}`,(await paints())>active);
-      await page.locator('footer').scrollIntoViewIfNeeded(); await page.waitForTimeout(250);
+      await page.locator(route==='/'?'footer':'.st-hero h1').scrollIntoViewIfNeeded(); await page.waitForTimeout(250);
       const stopped=await paints(); await page.waitForTimeout(300);
       check(`Offscreen artwork stops painting ${route} ${width}`,(await paints())===stopped);
       await canvas.scrollIntoViewIfNeeded(); await page.waitForTimeout(250);
