@@ -408,11 +408,9 @@ export function Studio({
         <div className="st-wrap">
           <div className="st-footer-top">
             <h2>
-              Business.
+              Learn about disability
               <br />
-              Disability.
-              <br />
-              Possibility.
+              and business with UBLDA.
             </h2>
             <div>
               <Button href={MEMBERSHIP_FORM_URL}>Join the community</Button>
@@ -491,7 +489,7 @@ export function Callout({ join = false }: { join?: boolean }) {
             <>
               Bring us your
               <br />
-              next business challenge.
+              business question.
             </>
           )}
         </h2>

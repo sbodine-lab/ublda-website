@@ -188,15 +188,18 @@ export function StudioHome() {
       <section className="st-wrap st-positioning">
         <div className="st-statement" data-enter>
           <p>
-            UBLDA Consulting is the pro bono consulting division of
-            Undergraduate Business Leaders for Diverse Abilities. We bring
-            Michigan students together to work on business questions that
-            affect people with disabilities and the organizations that serve them.
+            UBLDA Consulting launched in Fall 2026 as the pro bono consulting
+            program of Undergraduate Business Leaders for Diverse Abilities,
+            bringing Michigan undergraduates together to research business
+            questions for disability-focused organizations and accessibility
+            teams within companies.
           </p>
           <p>
-            Our first client engagement is planned for Fall 2026 with Arc Thrift
-            Stores of Colorado. For future projects, we welcome conversations
-            about business strategy, accessibility, and workplace inclusion.
+            Our first client is Arc Thrift Stores of Colorado, a nonprofit
+            retailer that employs people with intellectual and developmental
+            disabilities and funds disability advocacy. Our October–December
+            engagement will conclude with a presentation to The Arc’s national
+            board in December.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
@@ -229,26 +232,25 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-club-story" data-enter>
-        <h2>Part of a broader<br />UBLDA community.</h2>
+        <h2>The club behind<br />the program</h2>
         <div>
           <p>
-            Our club creates a place for students to understand disability
-            through the lens of business and to consider the role they can play
-            in a more inclusive workplace. Consulting is one part of that work
-            alongside speaker events and activities that bring our members together.
+            UBLDA brings students together to learn about disability in business
+            through speaker events, club activities, and the consulting program,
+            with opportunities to hear from people working in these fields and
+            get to know other students with similar interests.
           </p>
           <p>
-            Our connection with Business Leaders for Diverse Abilities at Ross
-            brings undergraduate and MBA students into a shared conversation
-            about disability in business. Members contribute different experiences
-            and perspectives to the questions we explore as a club.
+            Business Leaders for Diverse Abilities is our MBA counterpart at
+            Ross, connecting our undergraduate community with graduate students
+            who also care about disability and business.
           </p>
           <p>
-            General membership is free and open to all U-M students. Consulting
-            analyst positions are for U-M undergraduates, selected through an
-            application and interview process.
+            General membership is free and open to all U-M students, while
+            consulting analyst positions are open to U-M undergraduates through
+            an application and interview process.
           </p>
-          <Button to="/">Explore UBLDA</Button>
+          <Button to="/">About UBLDA</Button>
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
@@ -282,8 +284,9 @@ export function StudioHome() {
             <div>
               <h3>National board presentation</h3>
               <p>
-                Our Fall 2026 team plans to present its recommendations to
-                The Arc’s national board at the end of the semester.
+                The Fall 2026 engagement concludes with our student team
+                presenting its recommendations to The Arc’s national board
+                in December.
               </p>
             </div>
           </div>
@@ -307,10 +310,12 @@ export function StudioServices() {
     <Studio title="How we can help" dark>
       <Intro title="How we can help">
         <p>
-          Have a business question with a disability focus? These are possible
-          areas for a pro bono student project. Our first engagement is planned
-          for Fall 2026; we’re interested in shaping future projects with
-          organizations whose questions fit our team’s skills and a semester’s timeline.
+          We take on business questions for disability-focused organizations
+          and accessibility questions for teams within companies, with each
+          pro bono project scoped to the research a student team can complete
+          over a semester. Arc Thrift Stores of Colorado is our first client
+          following the program’s Fall 2026 launch; the areas below describe
+          potential future projects.
         </p>
       </Intro>
       <div className="st-wrap st-service-rows">
@@ -323,7 +328,7 @@ export function StudioServices() {
               <h2>{area.title}</h2>
               <p>{area.desc}</p>
               <Button to={`/consulting/services/${area.id}`}>
-                Explore project ideas
+                View project ideas
               </Button>
             </div>
           </section>
@@ -331,9 +336,10 @@ export function StudioServices() {
       </div>
       <section className="st-wrap st-scope-note">
         <p>
-          We would agree on the question, scope, and expected output with you
-          before committing to a project. Our focus is student research and
-          recommendations. We do not offer legal advice or compliance certification.
+          Before accepting a project, we would agree on the research question,
+          available information, timeline, and recommendations your team needs.
+          Our work consists of student research and business recommendations,
+          rather than legal advice or compliance certification.
         </p>
       </section>
       <Callout />
@@ -359,13 +365,13 @@ export function StudioServiceDetail() {
         </h2>
         <div>
           <p>{area.detail}</p>
-          <h3>Topics a project could explore</h3>
+          <h3>Possible project topics</h3>
           <ul>
             {area.examples.map((e) => (
               <li key={e}>{e}</li>
             ))}
           </ul>
-          <p>These are possible directions for a future project. We would confirm the scope and fit with your organization before work begins.</p>
+          <p>We would agree on a research question and project scope with your organization before taking on any of these topics.</p>
           <Button to="/consulting/contact">Discuss a project</Button>
         </div>
       </section>
@@ -387,10 +393,10 @@ export function StudioWork() {
       >
         <ClientLogos />
         <p>
-          Our first engagement is planned for October–December 2026, bringing
-          UBLDA students together with Arc Thrift
-          Stores of Colorado to develop business recommendations for a social
-          enterprise whose work supports disability employment and advocacy.
+          UBLDA Consulting launched in Fall 2026 with Arc Thrift Stores of
+          Colorado as our first client, and our student team will work on the
+          engagement from October through December before presenting its
+          recommendations to The Arc’s national board.
         </p>
       </Intro>
       <section className="st-wrap st-work-row" data-enter>
@@ -398,7 +404,7 @@ export function StudioWork() {
           <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
         </div>
         <div>
-          <p className="st-eyebrow">Planned for Fall 2026</p>
+          <p className="st-eyebrow">Our first client · Fall 2026</p>
           <h2>Arc Thrift Stores of Colorado</h2>
           <p>
             Arc Thrift Stores is a nonprofit retailer that funds disability
@@ -406,25 +412,25 @@ export function StudioWork() {
             disabilities throughout its operations.
           </p>
           <p>
-            Four to six analysts will work with two project managers on an
-            engagement sponsored by Arc Thrift’s CEO. The team plans to present
-            its recommendations to The Arc’s national board in December.
+            The engagement is sponsored by Arc Thrift’s CEO and brings together
+            four to six analysts and two project managers, with weekly project
+            work leading to the December presentation.
           </p>
           <Button href="https://arcthrift.com">Visit Arc Thrift Stores</Button>
         </div>
       </section>
       <section className="st-wrap st-detail-body">
         <h2>
-          A business question.
+          How we’ll work
           <br />
-          A clear recommendation.
+          with Arc Thrift
         </h2>
         <div>
           <p>
-            The Fall 2026 plan includes weekly working sessions, a midpoint
-            review, and a final presentation. The team will aim to give the
-            client a clear account of its research and the reasoning behind
-            its recommendations.
+            Weekly working sessions and a midpoint review give analysts time
+            to compare their research and revise their recommendations before
+            the final presentation, where the team will explain its findings
+            and the evidence behind them.
           </p>
           <Button to="/consulting/practice">Our program</Button>
         </div>
@@ -439,43 +445,40 @@ export function StudioPractice() {
       <Intro
         title={
           <>
-            Ambitious thinking.
+            How our consulting
             <br />
-            <em>Disciplined work.</em>
+            <em>program works</em>
           </>
         }
       >
         <p>
-          UBLDA Consulting brings Michigan undergraduates together to provide
-          pro bono consulting through Undergraduate Business Leaders for
-          Diverse Abilities at Michigan Ross.
+          Launched in Fall 2026, UBLDA Consulting is a pro bono program where
+          Michigan undergraduates work in small teams on business and
+          accessibility questions for client organizations.
         </p>
         <p>
-          We’re preparing for our first engagement in October–December 2026
-          with Arc Thrift Stores of Colorado. The program is designed to give
-          students experience researching a business question and developing
-          recommendations with guidance from two project managers.
+          Our first client is Arc Thrift Stores of Colorado, and the
+          October–December engagement gives analysts experience researching
+          a business question and developing recommendations with guidance
+          from two project managers.
         </p>
       </Intro>
       <section className="st-wrap st-detail-body" data-enter>
         <h2>
-          Focused teams.
-          <br />Critical thinking.
+          What analysts
           <br />
-          Practical recommendations.
+          will work on
         </h2>
         <div>
           <p>
-            The Fall 2026 team will include four to six analysts and two project
-            managers. Project managers will guide the research and help analysts
-            turn findings into recommendations, with time for the team to question
-            assumptions and consider different perspectives.
+            Four to six analysts will work with two project managers to research
+            the client’s business question, compare possible approaches, and
+            develop recommendations that they can explain and support with evidence.
           </p>
           <p>
-            Our planned format includes weekly deliverables, a midpoint review,
-            and a final client presentation. These milestones will give students
-            opportunities to discuss their research, receive feedback, and
-            revise their recommendations.
+            Weekly deliverables, a midpoint review, and a final presentation
+            give the team regular opportunities to review the research and
+            improve its recommendations with feedback from the project managers.
           </p>
           <p>
             Students from every undergraduate major and class year are welcome
@@ -519,9 +522,9 @@ export function StudioPartners() {
       <Intro
         title={
           <>
-            A community
+            Organizations
             <br />
-            <em>around the work.</em>
+            <em>connected to UBLDA</em>
           </>
         }
       >
@@ -549,17 +552,18 @@ export function StudioInsights() {
       <Intro
         title={
           <>
-            Disability inclusion.
+            Research on disability
             <br />
-            <em>A broader perspective.</em>
+            <em>in business</em>
           </>
         }
       >
         <p>
-          These readings offer students a broader view of disability in
-          business and provide context for the questions our club explores
-          as we prepare for client work. These are external research findings,
-          not results from UBLDA projects.
+          These studies examine disability in hiring, employment, and business
+          performance, giving students and organizations evidence to consider
+          when making decisions about their own practices. Each article links
+          to the original source and explains what the research does and does
+          not establish.
         </p>
       </Intro>
       <section className="st-wrap st-section">
@@ -605,8 +609,8 @@ export function StudioInsight() {
             Read the original source <ArrowUpRight size={18} />
           </a>
           <p className="st-article-note">
-            These findings come from independent research. They are not UBLDA
-            project results. Source checked {item.checkedAt ?? "September 17, 2026"}.
+            These findings come from the cited researchers and organizations,
+            rather than UBLDA client projects. Source checked {item.checkedAt ?? "September 17, 2026"}.
           </p>
           <Button to="/consulting/insights">All insights</Button>
         </div>
@@ -698,10 +702,10 @@ export function StudioContact() {
         }
       >
         <p>
-          For all questions about UBLDA Consulting, applications, or working
-          with a student team, contact Alex Forstner. If you have a potential
-          project, tell us about your organization and the question you’d like
-          to explore so we can discuss scope, timing, and fit.
+          Contact Alex Forstner about the consulting program, analyst
+          applications, or a potential project, including your organization’s
+          name and the business or accessibility question you’d like a student
+          team to research.
         </p>
         <div className="st-contact-emails">
           <a href={CONTACT_MAILTO}>alexfors@umich.edu<ArrowUpRight size={22} /></a>
@@ -709,7 +713,7 @@ export function StudioContact() {
       </Intro>
       <section className="st-wrap st-contact-form" id="contact-form">
         <div>
-          <h2>Start a conversation</h2>
+          <h2>Contact the team</h2>
           <address>
             {ROSS_ADDRESS.map((l) => (
               <span key={l}>{l}</span>
