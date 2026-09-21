@@ -1,8 +1,6 @@
 /* BOI reference: broad stepped columns, a close pair of offset headline lines,
-   and a centered action group. Keep Consulting's cobalt and parent navy. */
+   and a centered action group. Colors inherit the shared consulting palette. */
 .st-hero {
-  --st-band-bright: #244bc0;
-  --st-band-dark: #081c35;
   min-height: max(680px, 90svh);
   padding-bottom: 80px;
 }

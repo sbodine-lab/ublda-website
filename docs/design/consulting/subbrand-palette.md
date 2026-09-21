@@ -1,5 +1,17 @@
 # UBLDA Consulting — service-division identity
 
+## Current direction — September 21, 2026
+
+Sam requested more consistent colors and a closer match to the original Board of Innovation reference. Live reference inspection confirmed electric blue `#0A0AE5`, charcoal `#0D1319`, off-white `#F9F7F7`, dark text `#11262B`, and pale-blue emphasis `#CDDAFF`. These now define the consulting palette. The parent UBLDA website keeps its existing identity.
+
+The hero, callout bands, primary buttons, illustration gradients, program cards, leadership artwork, and footer share those roles. There are no separate hero blue endpoints, teal illustration palettes, or purple service palettes. The consulting wordmark uses charcoal/dark text for UBLDA and electric blue for CONSULTING, with its existing geometry and full-name lockup preserved.
+
+The homepage follows the reference composition more closely: a headline and actions over animated bands, a centered statement, three large light cards over a stepped background, an illustration/text split, large service cards, a full-width callout, and client/team sections. The three cards describe program stages, not fabricated performance metrics. UBLDA facts and application destinations remain intact. Mobile layout, 30fps decorative canvas painting, pause, reduced motion, and offscreen suspension are preserved.
+
+Verification: build and 163 tests pass; lint has zero errors and four existing generated-code warnings. All fourteen consulting routes pass automated accessibility, horizontal-overflow, and shared-palette checks at 320px and 1440px. Phone/tablet/landscape interaction checks and screenshot review supplement those scans. This is browser emulation, not physical-device testing.
+
+## Historical direction — September 16 (superseded palette)
+
 September 16, 2026. Supersedes Ink & Persimmon after Sam rejected red and requested a clearer subbrand relationship, a new wordmark, and colors grounded in professional brand-architecture practice.
 
 ## Architecture and positioning

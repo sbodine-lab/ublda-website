@@ -177,10 +177,6 @@ export function StudioHome() {
               disability in focus.
             </span>
           </h1>
-          <p className="st-hero-summary" data-enter style={enterDelay(400)}>
-            We are a student-led consulting club at Michigan Ross working
-            at the intersection of business strategy and disability inclusion.
-          </p>
           <div className="st-actions" data-enter style={enterDelay(600)}>
             <Button to="/consulting/work">Meet our first client</Button>
             <ApplicationButton solid />
@@ -201,29 +197,6 @@ export function StudioHome() {
             about business strategy, accessibility, and workplace inclusion.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
-        </div>
-      </section>
-      <section className="st-wrap st-club-story" data-enter>
-        <h2>Part of a broader<br />UBLDA community.</h2>
-        <div>
-          <p>
-            Our club creates a place for students to understand disability
-            through the lens of business and to consider the role they can play
-            in a more inclusive workplace. Consulting is one part of that work
-            alongside speaker events and activities that bring our members together.
-          </p>
-          <p>
-            Our connection with Business Leaders for Diverse Abilities at Ross
-            brings undergraduate and MBA students into a shared conversation
-            about disability in business. Members contribute different experiences
-            and perspectives to the questions we explore as a club.
-          </p>
-          <p>
-            General membership is free and open to all U-M students. Consulting
-            analyst positions are for U-M undergraduates, selected through an
-            application and interview process.
-          </p>
-          <Button to="/">Explore UBLDA</Button>
         </div>
       </section>
       <section className="st-experience">
@@ -252,6 +225,35 @@ export function StudioHome() {
           <Button to="/consulting/practice">Inside the program</Button>
         </div>
       </section>
+      <section className="st-wrap st-club-story" data-enter>
+        <div className="st-club-art"><GenerativeArt kind="perspective" /></div>
+        <div>
+          <h2>Part of a broader<br />UBLDA community.</h2>
+          <p>
+            Our club creates a place for students to understand disability
+            through the lens of business and to consider the role they can play
+            in a more inclusive workplace. Consulting is one part of that work
+            alongside speaker events and activities that bring our members together.
+          </p>
+          <p>
+            Our connection with Business Leaders for Diverse Abilities at Ross
+            brings undergraduate and MBA students into a shared conversation
+            about disability in business. Members contribute different experiences
+            and perspectives to the questions we explore as a club.
+          </p>
+          <p>
+            General membership is free and open to all U-M students. Consulting
+            analyst positions are for U-M undergraduates, selected through an
+            application and interview process.
+          </p>
+          <Button to="/">Explore UBLDA</Button>
+        </div>
+      </section>
+      <section className="st-wrap st-section" data-enter>
+        <h2 className="st-section-heading">How we could<br />help your organization.</h2>
+        <ServiceCards />
+      </section>
+      <Callout join />
       <section
         className="st-wrap st-client-feature"
         aria-labelledby="client-heading"
@@ -285,10 +287,6 @@ export function StudioHome() {
           </div>
         </div>
       </section>
-      <section className="st-wrap st-section" data-enter>
-        <h2 className="st-section-heading">How we could<br />help your organization.</h2>
-        <ServiceCards />
-      </section>
       <section className="st-team-section">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
@@ -298,7 +296,6 @@ export function StudioHome() {
           <People />
         </div>
       </section>
-      <Callout join />
     </Studio>
   );
 }
