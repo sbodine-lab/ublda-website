@@ -89,27 +89,27 @@ export const RESEARCH = [
       "BCG’s 2023 report draws on employee self-identification, including disabilities and health conditions that limit a major life activity. The survey covers nearly 28,000 employees in 16 countries. Its 25% finding describes that sample, not a census of every workplace. It uses a different population and definition from WHO’s global estimate.",
   },
   {
-    id: "removing-hiring-barriers",
-    topic: "Hiring & talent",
+    id: "accommodations-and-retention",
+    topic: "Supporting talent",
     studentRelevance:
-      "Whether you recruit for a student organization or later hire at work, examining how you assess candidates can help you recognize barriers that keep qualified people from getting a fair look.",
+      "As you lead a student team or prepare to manage people at work, learning how to respond to access needs can help talented people keep contributing and build a future with the organization.",
     studentApplication:
-      "Review an application or interview process you help run and ask whether each requirement measures something necessary for the role and whether candidates have an accessible way to demonstrate it.",
+      "In a management case or internship, consider how the organization responds when someone needs an adjustment and how it could assess whether that support helps people stay and do their work.",
     category: "Research",
-    source: "Ameri et al. · ILR Review",
-    date: "March 2018",
+    source: "Job Accommodation Network",
+    date: "September 2025",
     checkedAt: "September 21, 2026",
-    value: "26%",
+    value: "85%",
     metricLabel:
-      "fewer expressions of employer interest when accounting applicants disclosed a disability in a field experiment",
-    title: "Qualified talent can face barriers before the interview.",
+      "of surveyed employers who made accommodations reported improved employee retention",
+    title: "Accommodations help employers retain talent.",
     summary:
-      "A field experiment involving 6,016 accounting job applications found 26% less employer interest in applications that disclosed a disability than in those that did not.",
-    url: "https://journals.sagepub.com/doi/10.1177/0019793917717474",
+      "In the Job Accommodation Network’s employer survey, 85% of those reporting benefits after making workplace accommodations cited increased employee retention.",
+    url: "https://askjan.org/topics/costs.cfm",
     takeaway:
-      "Hiring processes can overlook qualified candidates before they have a chance to demonstrate their skills. Reviewing selection criteria and making recruitment accessible helps employers examine where their own processes may exclude talent.",
+      "Helping an employee stay in their role can preserve experience and working relationships that take time to replace, giving managers a business reason to understand and respond to individual access needs.",
     context:
-      "Researchers from Rutgers, Syracuse and Binghamton sent fictional applications to accounting vacancies. Cover letters disclosed a spinal cord injury, disclosed an autism diagnosis using the terminology of the study, or did not mention disability. The 26% is a relative difference in expressions of employer interest, not a percentage-point gap or a hiring rate. The experiment concerns these roles and disability disclosures; it does not measure every disability or occupation. Published online in 2017 and in the March 2018 issue of ILR Review.",
+      "JAN’s September 2025 report draws on 5,406 responses from employers who contacted the service between 2019 and 2024. The retention figure is a self-reported benefit among employers who made accommodations, not an 85% increase in retention or a result representative of every employer. The survey does not establish causation.",
   },
 ];
 

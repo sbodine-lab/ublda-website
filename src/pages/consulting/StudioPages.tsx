@@ -587,6 +587,7 @@ export function StudioInsights() {
 }
 export function StudioInsight() {
   const { insight } = useParams();
+  if (insight === "removing-hiring-barriers") return <Navigate to="/consulting/insights/accommodations-and-retention" replace />;
   const item = RESEARCH.find((r) => r.id === insight);
   if (!item) return <Navigate to="/consulting/insights" replace />;
   return (

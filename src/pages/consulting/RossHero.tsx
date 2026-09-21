@@ -21,14 +21,18 @@ export function RossHero() {
     let previous = 0;
     let painted = 0;
 
-    // Halftone CMYK has no time uniform. Gently vary ink gain through Paper's
-    // mount API, without moving the building or reloading the image.
+    // Drift the printing grid over the stationary image in a slow 48-second orbit.
+    // Paper's mount API updates uniforms without rebuilding or reloading textures.
     const tick = (now: number) => {
       elapsed += previous ? Math.min(now - previous, 100) : 0;
       previous = now;
       if (mount && now - painted >= 1000 / 30) {
-        const wave = Math.sin(elapsed * Math.PI * 2 / 18000);
-        mount.setUniforms({ u_gainC: 0.12 + wave * 0.06, u_gainM: -wave * 0.04, u_gridNoise: 0.14 + wave * 0.08 });
+        const phase = elapsed * Math.PI * 2 / 48000;
+        const wave = Math.sin(phase);
+        mount.setUniforms({
+          u_ubldaGridDrift: [Math.sin(phase) * 8, (Math.cos(phase) - 1) * 5],
+          u_gainC: 0.12 + wave * 0.06, u_gainM: -wave * 0.04,
+        });
         host.style.setProperty("--st-halftone-opacity", String(0.52 + wave * 0.06));
         painted = now;
       }
@@ -72,7 +76,21 @@ export function RossHero() {
         const noise = paper.getShaderNoiseTexture();
         await noise?.decode();
         if (disposed) return;
-        mount = new paper.ShaderMount(host, paper.halftoneCmykFragmentShader, {
+        // Paper 0.0.80 exposes no CMYK grid-position control. Extend only its
+        // grid coordinates, then undo that offset when sampling the image so
+        // Ross remains aligned with the native-image layer underneath.
+        const substitutions = [
+          ["uniform float u_gridNoise;", "uniform float u_gridNoise;\nuniform vec2 u_ubldaGridDrift;"],
+          ["vec2 uvGrid = (uv - .5) / pad;", "vec2 uvGrid = (uv - .5) / pad + u_ubldaGridDrift;"],
+          ["return uvGrid * pad + 0.5;", "return (uvGrid - u_ubldaGridDrift) * pad + 0.5;"],
+        ];
+        let fragment = paper.halftoneCmykFragmentShader;
+        for (const [source, replacement] of substitutions) {
+          if (!fragment.includes(source)) throw new Error("Paper CMYK grid contract changed");
+          fragment = fragment.replace(source, replacement);
+        }
+        mount = new paper.ShaderMount(host, fragment, {
+          u_ubldaGridDrift: [0, 0],
           u_image: photo,
           u_noiseTexture: noise,
           u_colorBack: paper.getShaderColorFromString("#f8f7f3"),
