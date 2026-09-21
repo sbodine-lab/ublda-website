@@ -23,6 +23,11 @@ try {
             return original.apply(this,args);
           };
         }
+        const drawArrays = WebGL2RenderingContext.prototype.drawArrays;
+        WebGL2RenderingContext.prototype.drawArrays = function(...args) {
+          window.__canvasPaints.set(this.canvas,(window.__canvasPaints.get(this.canvas)||0)+1);
+          return drawArrays.apply(this,args);
+        };
       });
       // Install audit instrumentation through the browser before navigation;
       // production keeps its script-src policy intact for page scripts.
@@ -31,6 +36,25 @@ try {
       check(`Local fonts only ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>e.name.includes('fonts.googleapis.com')||e.name.includes('fonts.gstatic.com'))));
       check(`No recruiting shader download ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>/\/Table-|\/shaders-|\/Halftone/.test(e.name))));
       if (route === '/consulting') {
+        const glass = page.locator('.st-ross-glass');
+        const heroCanvas = glass.locator('canvas');
+        await page.waitForFunction(()=>document.querySelector('.st-ross-glass')?.dataset.ready==='true');
+        const heroPaints = ()=>heroCanvas.evaluate(el=>window.__canvasPaints.get(el)||0);
+        const moving = await heroPaints(); await page.waitForTimeout(300);
+        check(`Ross glass renders live motion ${width}`,(await heroPaints())>moving);
+        await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
+        const frozen = await heroPaints(); await page.waitForTimeout(300);
+        check(`Pause freezes Ross glass ${width}`,(await heroPaints())===frozen);
+        await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
+        check(`Resume restarts Ross glass ${width}`,(await heroPaints())>frozen);
+        await page.locator('footer').scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
+        const offscreen = await heroPaints(); await page.waitForTimeout(250);
+        check(`Offscreen Ross glass stops rendering ${width}`,(await heroPaints())===offscreen);
+        await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+        await page.emulateMedia({reducedMotion:'reduce'}); await page.waitForTimeout(200);
+        const reduced = await heroPaints(); await page.waitForTimeout(250);
+        check(`Device reduced motion freezes Ross glass ${width}`,(await heroPaints())===reduced);
+        await page.emulateMedia({reducedMotion:'no-preference'});
         const menu = page.locator('.st-navlinks');
         const about = page.getByRole('button', {name:'About us',exact:true});
         if (width < 1025) {
@@ -138,6 +162,14 @@ try {
       check(`Accessibility scan ${route} ${width}`,!violations.length,violations);
       check(`No horizontal overflow ${route} ${width}`,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
       await page.screenshot({path:`${output}/${route==='/'?'club':'consulting'}-${width}.png`});
+      if (route === '/consulting') {
+        await page.locator('.st-ross-glass canvas').evaluate(canvas=>canvas.getContext('webgl2').getExtension('WEBGL_lose_context').loseContext());
+        await page.waitForFunction(()=>document.querySelector('.st-ross-glass').dataset.ready==='false');
+        check(`WebGL context loss reveals the Ross image fallback ${width}`,await page.locator('.st-ross-hero').evaluate(el=>{
+          const image=el.querySelector('img');
+          return image.complete && image.naturalWidth>0 && getComputedStyle(el.querySelector('.st-ross-glass')).opacity==='0';
+        }));
+      }
       await context.close();
     }
   }

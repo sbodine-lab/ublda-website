@@ -4,6 +4,7 @@ import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { ApplicationButton, Button, Callout, Intro, Studio } from "./Studio";
 import { GenerativeArt } from "./GenerativeArt";
 import { BusinessCase } from "./BusinessCase";
+import { RossHero } from "./RossHero";
 import { AREAS, RESEARCH } from "./research";
 import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
@@ -170,26 +171,12 @@ export function StudioHome() {
   return (
     <Studio title="Home" hero>
       <section className="st-hero st-hero--photo">
-        <picture>
-          <source media="(max-width: 767px)" srcSet="/consulting/ross-hero-glass-mobile.webp" />
-          <img
-            className="st-hero-photo"
-            src="/consulting/ross-hero-glass-2160.webp"
-            srcSet="/consulting/ross-hero-glass-1080.webp 1080w, /consulting/ross-hero-glass-2160.webp 2160w"
-            sizes="100vw"
-            alt=""
-            aria-hidden="true"
-            width={2160}
-            height={1215}
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
+        <RossHero />
         <div className="st-wrap st-hero-content">
           <h1>
             <span data-enter>Business with</span>
             <span data-enter style={enterDelay(250)}>
-              disability in focus.
+              accessibility in mind.
             </span>
           </h1>
           <div className="st-actions" data-enter style={enterDelay(600)}>

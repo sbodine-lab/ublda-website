@@ -1,4 +1,20 @@
-# Consulting hero photograph
+# Consulting hero image history
+
+## Current: overhead visualization and live glass, September 21
+
+Sam preferred a straight-down view and explicitly authorized image generation if a suitable real photograph could not be found. The current hero is an **AI-generated architectural visualization**, not a documentary aerial photograph or an exact survey of the present campus. The earlier photographic versions below are retained as design history.
+
+Generated with the built-in ImageGen tool, using KPF's published aerial as an architectural reference: https://www.kpf.com/story/the-making-of-university-of-michigan-stephen-m-ross-school-of-business. The reference is credited there to Aerial Associates. Reference image: https://e1.nmcdn.io/assets/kpf2024/wp-content/uploads/imported-files/1-1588_1_000_N200_Aerial-Associates-1440x960.webp. The generated view approximates the reference's roof arrangement; it must not be repurposed as evidence of the building's exact footprint or current condition.
+
+Current assets: `public/consulting/ross-overhead-1672.webp` (1672 × 941), `ross-overhead-1080.webp` (1080 × 608), and `ross-overhead-mobile.webp` (784 × 941, a crop beginning at x=630). WebP quality 91. The original generated PNG is retained in the local `outputs/ross-overhead/generated.png` working folder and the tool's generated-image directory.
+
+`RossHero.tsx` loads the actual Paper Fluted Glass shader lazily using Paper's vanilla `ShaderMount` API. Native lines/prism treatment: size 0.68, distortion 0.025, shadows 0.18, highlights 0.1; blur, edge softness, stretch and grain are zero. A 24-second sine cycle adjusts texture shift by ±0.18 and highlights by ±0.025. Fluted Glass has no time uniform, so motion uses documented optical uniforms rather than an ineffective `speed` setting. The roof remains stationary apart from slight optical refraction. Rendering is capped at 30 updates/second, 900,000 pixels on phones and 2,200,000 on larger screens.
+
+Motion freezes for the existing pause control, device reduced motion, hidden tabs, and offscreen content. The ordinary responsive image remains underneath as a fallback for unsupported WebGL, a failed module/texture load, or context loss. No text is embedded in the image. The headline is now “Business with accessibility in mind.”
+
+### Final generation prompt
+
+Create a refined photorealistic architectural visualization for a website hero: the Stephen M. Ross School of Business at the University of Michigan, viewed from DIRECTLY OVERHEAD, straight down, true 90 degree nadir camera. The attached actual aerial photograph is the architectural reference, not the target camera angle. Preserve its recognizable footprint and roof arrangement: broad rectangular glass Winter Garden atrium roof in the middle, elongated terracotta-red perimeter blocks with flat pale roofs, rectangular green planted roof terraces, the connected academic complex to its left, tree-lined Tappan Avenue on its right, mature green trees and neighboring collegiate stone buildings. Reconstruct the camera directly above the main Ross building, with roof planes parallel to the image plane, no horizon, no sky, no side facades, no isometric or oblique camera. This is an artistic architectural visualization, not a claim of an exact survey or documentary photograph. Keep plausible actual architectural identity, do not invent grand extra towers. Landscape 16:9 composition, wide enough to show the main Ross footprint nearly complete with a little campus context, main building filling middle and right two thirds, tree canopy and secondary roof context toward left. Crisp precise roof details and clear glass atrium grid, muted sage greenery, warm terracotta, soft limestone, calm overcast early autumn light, delicate realistic shadows. Sophisticated editorial architectural photography quality. Absolutely no blur, no frost, no glass pane effect across the image, no tilt-shift, no text, no logos, no overlay; the website will add its own subtle live glass shader afterward. Save the generated image to a local file.
 
 ## Fluted-glass trial, September 9
 
