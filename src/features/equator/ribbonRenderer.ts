@@ -5,7 +5,7 @@ import { ribbonPoint } from "./ribbonGeometry";
 export function createRibbonRenderer(canvas: HTMLCanvasElement) {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-  renderer.setSize(420, 420, false);
+  let renderSize = 0;
   renderer.setClearColor(0, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -55,6 +55,12 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement) {
     meshes.push(mesh);
   }
   return {
+    resize(size: number) {
+      const next = Math.max(1, Math.round(size));
+      if (next === renderSize) return;
+      renderSize = next;
+      renderer.setSize(next, next, false);
+    },
     paint(progress: number, seconds: number) {
       const stage = Math.min(4, Math.max(0, progress));
       const from = Math.floor(stage), to = Math.min(4, from + 1);

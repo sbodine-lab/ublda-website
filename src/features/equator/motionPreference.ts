@@ -11,8 +11,8 @@ const subscribe = (callback: () => void) => {
 };
 export const useDeviceReducedMotion = () => useSyncExternalStore(subscribe, () => matchMedia(query).matches, () => false);
 
-// Touch layouts keep decorative motion inside each section instead of moving a
-// fixed WebGL canvas across a native scrolling page. Subscribe for rotation.
+// Touch and short layouts use a native sticky art shelf with flowing copy.
+// Subscribe for rotation so desktop pinning never traps enlarged phone text.
 const compactQuery = "(max-width: 768px), (max-height: 750px), (pointer: coarse)";
 const subscribeCompact = (callback: () => void) => {
   const media = matchMedia(compactQuery);

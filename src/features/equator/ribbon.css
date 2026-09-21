@@ -1,5 +1,31 @@
 .eq-ribbon-anchor { background: none; border: 0; }
 .eq-ribbon-anchor svg { width: 100%; height: 100%; overflow: visible; }
 .eq-ribbon-anchor[data-live="true"] svg { opacity: 0; }
+.eq-ribbon-rail { display: contents; }
+.eq-ribbon-rail > .eq-ribbon-anchor { display: none; }
 .eq-ribbon-flight { position: fixed; left: 0; top: 0; width: 300px; height: 300px; z-index: 4; pointer-events: none; opacity: 0; }
+/* A native sticky shelf replaces the old mobile canvas handoffs. Its opaque
+   backing gives the sculpture its own space, even while long copy scrolls. */
+.eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail {
+  display: block; position: sticky; top: 68px; height: clamp(140px, 24svh, 210px);
+  z-index: 5; background: var(--eq-gold); pointer-events: none;
+}
+.eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail::after {
+  content: ""; position: absolute; inset: auto 0 -20px; height: 20px;
+  background: var(--eq-gold);
+}
+.eq-values[data-static="true"][data-animated="true"] .eq-ribbon-flight {
+  position: absolute; left: 50%; top: 0;
+}
+.eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail > .eq-ribbon-anchor {
+  display: block; position: absolute; inset: 0; margin: auto;
+  width: min(220px, 24svh); height: 100%; opacity: 0;
+}
+.eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail > .eq-ribbon-anchor:first-child { opacity: 1; }
+.eq-values[data-static="true"][data-animated="true"] .eq-value-zone .eq-ribbon-anchor { display: none; }
+.eq-values[data-static="true"][data-animated="true"] .eq-value-zone { scroll-margin-top: calc(68px + clamp(140px, 24svh, 210px)); }
+@media (max-height: 500px) {
+  .eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail { height: 90px; }
+  .eq-values[data-static="true"][data-animated="true"] .eq-ribbon-rail > .eq-ribbon-anchor { width: 110px; }
+}
 @media (prefers-reduced-motion: reduce) { .eq-ribbon-flight { display: none; } }
