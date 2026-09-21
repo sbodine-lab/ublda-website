@@ -34,7 +34,6 @@
 .st-experience .st-wrap > .st-button { background: transparent; color: var(--st-paper); border-color: currentColor !important; }
 .st-experience .st-wrap > .st-button:hover { background: var(--st-paper); color: var(--st-accent); }
 .st-club-story { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 80px; padding-top: 120px; }
-.st-club-art { aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; }
 .st-club-story h2 { font-size: 34px; line-height: 1.15; }
 .st-club-story p { font-size: 20px; line-height: 1.5; }
 .st-club-story .st-button { display: flex; margin-left: auto; }
@@ -67,7 +66,6 @@
   .st-experience-grid article > span { font-size: 56px; margin-bottom: 40px; }
   .st-experience-grid h3 { font-size: 26px; }
   .st-club-story { grid-template-columns: 1fr; padding-top: 64px; gap: 32px; }
-  .st-club-art { aspect-ratio: 4 / 3; }
   .st-club-story h2 { font-size: 32px; }
   .st-club-story p { font-size: 18px; }
   .st-section { padding-top: 72px; }
@@ -82,3 +80,11 @@
   .st-hero-content { padding-block: 150px 56px; }
   .st-hero .st-actions { margin-top: 48px; }
 }
+
+/* The Ross photograph carries the Paper glass treatment; the shade protects
+   the white headline, navigation, and buttons across every image crop. */
+.st-hero--photo { overflow: hidden; background: var(--st-dark); isolation: isolate; }
+.st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; }
+.st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d1319b8, #0d13199e 45%, #0d1319ad); }
+.st-hero--photo .st-hero-content { z-index: 2; }
+@media (max-width: 767px) { .st-hero-photo { object-position: 58% center; } }
