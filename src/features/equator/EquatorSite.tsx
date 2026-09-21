@@ -823,7 +823,7 @@ function Footer() {
           [MEMBERSHIP_FORM_URL, "Join"],
           ["/brand", "Brand"],
           ["/links", "Links"],
-          ["/unsubscribe", "Unsubscribe"],
+          [REMOVAL_FORM_URL, "Unsubscribe"],
           ["/workspace", "Leadership login"],
         ].map(([url, label]) => (
           <Link key={url} to={url}>
@@ -1038,27 +1038,6 @@ function LinksPage() {
     </>
   );
 }
-function UnsubscribePage() {
-  return (
-    <>
-      <Hero
-        label="Membership"
-        title={
-          <>
-            Keep your inbox
-            <br />
-            your own.
-          </>
-        }
-        description="Use our removal form to leave the UBLDA mailing list."
-      />
-      <section className="eq-section" data-tone="cream">
-        <Button to={REMOVAL_FORM_URL}>Open removal form</Button>
-      </section>
-    </>
-  );
-}
-
 export default function EquatorSite() {
   const { pathname, hash, key: locationKey } = useLocation();
   const root = useRef<HTMLDivElement>(null);
@@ -1257,7 +1236,7 @@ export default function EquatorSite() {
   else if (pathname === "/join") content = <JoinPage />;
   else if (pathname === "/brand") content = <BrandPage />;
   else if (pathname === "/links") content = <LinksPage />;
-  else content = <UnsubscribePage />;
+  else content = null;
   return (
     <MotionPreference value={motionPaused}>
     <div
