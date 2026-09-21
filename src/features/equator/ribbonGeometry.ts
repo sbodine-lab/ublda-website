@@ -1,4 +1,4 @@
-// Original ribbon sculptures: people, shared purpose, learning, dialogue, care.
+// Original ribbon sculptures: people, shared purpose, learning, listening, care.
 // Every form keeps three strips and the same vertex order for continuous morphs.
 export const ribbonNames = [
   "inclusion",
@@ -73,34 +73,49 @@ const book: Curve[] = [
   line([0, 0.57], [0, -0.77]),
   line([0, -0.77], [0, 0.57]),
 ];
-const speech: Curve[] = [
+// A listening ear: outer rim, inner fold, and an incoming sound wave.
+// Each part remains a ribbon strip, so the sculpture shares the morph topology.
+const earRim: Curve[] = [
   [
-    [-0.82, 0.72],
-    [-1.1, 0.72],
-    [-1.1, 0.48],
-    [-1.1, 0.18],
+    [-0.68, 0.18],
+    [-0.82, 1.24],
+    [0.86, 1.35],
+    [0.8, 0.38],
   ],
   [
-    [-1.1, 0.18],
-    [-1.1, -0.2],
-    [-1.05, -0.35],
-    [-0.82, -0.35],
-  ],
-  line([-0.82, -0.35], [-0.88, -0.72]),
-  line([-0.88, -0.72], [-0.38, -0.35]),
-  [
-    [-0.38, -0.35],
-    [0.14, -0.35],
-    [0.86, -0.46],
-    [0.86, 0.18],
+    [0.8, 0.38],
+    [0.81, -0.05],
+    [0.36, -0.2],
+    [0.25, -0.66],
   ],
   [
-    [0.86, 0.18],
-    [0.86, 0.6],
-    [0.74, 0.72],
-    [0.48, 0.72],
+    [0.25, -0.66],
+    [0.12, -1.22],
+    [-0.62, -1.08],
+    [-0.56, -0.55],
   ],
-  line([0.48, 0.72], [-0.82, 0.72]),
+];
+const earFold: Curve[] = [
+  [
+    [-0.3, 0.25],
+    [-0.38, 0.91],
+    [0.43, 0.89],
+    [0.38, 0.3],
+  ],
+  [
+    [0.38, 0.3],
+    [0.36, -0.03],
+    [-0.03, 0.07],
+    [-0.08, -0.34],
+  ],
+];
+const soundWave: Curve[] = [
+  [
+    [-1.03, 0.67],
+    [-1.34, 0.27],
+    [-1.35, -0.13],
+    [-1.05, -0.53],
+  ],
 ];
 const heart: Curve[] = [
   [
@@ -162,9 +177,10 @@ const outlines = [
   sample(person),
   undefined,
   sample(book),
-  sample(speech),
+  undefined,
   sample(heart),
 ];
+const listeningParts = [sample(earRim), sample(earFold), sample(soundWave)];
 export function ribbonPoint(
   stage: number,
   band: number,
@@ -183,6 +199,10 @@ export function ribbonPoint(
         0.38 * Math.cos(a) + b * 0.16,
       ];
     }
+    if (stage === 3) {
+      const [x, y] = listeningParts[band](p);
+      return [x + 0.18, y, b * 0.12 + 0.08 * Math.sin(p * Math.PI)];
+    }
     let [x, y] = outlines[stage]!(p);
     if (stage === 0) {
       const scale = band === 1 ? 0.9 : 0.72;
@@ -192,11 +212,6 @@ export function ribbonPoint(
     if (stage === 2) {
       x *= 1 - b * 0.035;
       y = y * 0.86 + b * 0.14;
-    }
-    if (stage === 3) {
-      const scale = 1 - b * 0.13;
-      x = x * scale + b * 0.11;
-      y = y * scale - b * 0.13;
     }
     if (stage === 4) {
       const scale = 1 - b * 0.17;
@@ -211,7 +226,8 @@ export function ribbonPoint(
   const dx = after[0] - before[0],
     dy = after[1] - before[1],
     length = Math.hypot(dx, dy) || 1;
-  const width = stage === 0 ? 0.046 : stage === 1 ? 0.075 : 0.04;
+  const width =
+    stage === 0 ? 0.046 : stage === 1 ? 0.075 : stage === 3 ? 0.065 : 0.04;
   const depth =
     stage === 1
       ? 0.26 + Math.sin(t + band * 0.6) * 0.078
