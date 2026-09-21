@@ -54,3 +54,7 @@ Rechecked the live BOI reference at 1440px and 390px. The consulting hero now us
 The parent homepage now exposes phone navigation immediately and uses shorter opening sections. Touch/compact layouts keep all five value illustrations in their own cards, skip the floating WebGL ribbon, and avoid scroll-scrubbed text. Wide desktop layouts retain the animated ribbon. Rotating an open phone menu back to desktop restores page scrolling.
 
 Regression coverage is in `scripts/audit-scroll-behavior.mjs` (including actual touch capability, anchored illustrations, renderer download avoidance, and menu resize recovery). Browser captures and the viewport/interaction matrix are saved under `outputs/mobile-qa/` in the working checkout.
+
+## Reference consistency — September 21, 2026
+
+The follow-up aligns the whole consulting system with BOI's measured electric-blue/charcoal palette, replacing the earlier mixture of parent navy, cobalt, teal, and iris. See the current section in [subbrand-palette.md](subbrand-palette.md). The hero now contains only its headline and actions; program stages use large cards over stepped blue bands; the community story has an abstract illustration; the callout spans the viewport. The hero, callout, and artwork share the same color tokens, verified by the consulting accessibility audit.

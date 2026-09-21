@@ -22,6 +22,14 @@ try {
         return {
           title: document.title, h1Count: document.querySelectorAll('h1').length,
           overflow: document.documentElement.scrollWidth > innerWidth,
+          consistentPalette: [...document.querySelectorAll('.st-bands, .st-art')].every(el => {
+            const style = getComputedStyle(el);
+            return el.matches('.st-bands')
+              ? style.getPropertyValue('--st-band-bright').trim() === style.getPropertyValue('--st-accent').trim()
+                && style.getPropertyValue('--st-band-dark').trim() === style.getPropertyValue('--st-dark').trim()
+              : style.getPropertyValue('--art-deep').trim() === style.getPropertyValue('--st-accent').trim()
+                && style.getPropertyValue('--art-light').trim() === style.getPropertyValue('--st-highlight').trim();
+          }),
           violations: scan.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })),
           incomplete: scan.incomplete.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) })),
         };
@@ -34,4 +42,4 @@ try {
   await writeFile(output + '/automated.json', JSON.stringify({ base, checkedAt: new Date().toISOString(), reports, errors }, null, 2));
   await browser.close();
 }
-process.exit(errors.length || reports.some(r => r.overflow || r.violations.length) ? 1 : 0);
+process.exit(errors.length || reports.some(r => r.overflow || !r.consistentPalette || r.violations.length) ? 1 : 0);

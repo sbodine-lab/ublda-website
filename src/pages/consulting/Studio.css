@@ -14,29 +14,29 @@
 }
 html.st-root {
   scroll-behavior: auto;
-  background: var(--color-cream);
+  background: #f9f7f7;
   --announcement-h: 0px;
 }
 html.st-menu-open {
   overflow: hidden;
 }
 .st {
-  /* UBLDA Consulting: parent navy/teal with a cobalt service-division accent. */
-  --st-accent: #3559a8;
-  --st-ink: #0a3658;
-  --st-paper: #faf9f6;
-  --st-dark: #092c49;
-  --st-brand-teal: #67b8b3;
-  --st-highlight: #e0e8ff;
-  --st-surface: #eeefed;
+  /* One reference-aligned palette for every consulting surface. */
+  --st-accent: #0a0ae5;
+  --st-ink: #11262b;
+  --st-paper: #f9f7f7;
+  --st-dark: #0d1319;
+  --st-line-accent: var(--st-accent);
+  --st-highlight: #cddaff;
+  --st-surface: #f0eeee;
   --st-card: #ffffff;
-  --st-cool: #e5eaf4;
+  --st-cool: #e8e8fc;
   --st-muted: #59616b;
   --st-muted-light: #c1c8d2;
-  --st-rule: #0a365826;
+  --st-rule: #11262b26;
   /* Keep the shader geometry and timing; only its color endpoints change. */
-  --st-band-bright: #385b9e;
-  --st-band-dark: #092c49;
+  --st-band-bright: var(--st-accent);
+  --st-band-dark: var(--st-dark);
   font:
     400 18px/1.5 "Studio Sans",
     sans-serif;
@@ -254,9 +254,9 @@ html.st-menu-open {
   border-color: var(--st-accent) !important;
 }
 .st-hero .st-button--solid {
-  background: var(--st-highlight);
-  border-color: var(--st-highlight) !important;
-  color: var(--st-ink);
+  background: var(--st-accent);
+  border-color: var(--st-accent) !important;
+  color: var(--st-paper);
 }
 .st--dark :focus-visible,
 .st-header--light :focus-visible,
@@ -535,7 +535,7 @@ html.st-menu-open {
 .st-card-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 30%, #092c49e6);
+  background: linear-gradient(transparent 30%, #0d1319e6);
   transition: background 0.3s;
 }
 .st-service-card h3 {
@@ -573,7 +573,7 @@ html.st-menu-open {
 }
 .st-service-card:hover .st-card-scrim,
 .st-service-card:focus-visible .st-card-scrim {
-  background: #092c4999;
+  background: #0d131999;
 }
 .st-service-card:hover .st-service-desc,
 .st-service-card:focus-visible .st-service-desc {
@@ -597,7 +597,7 @@ html.st-menu-open {
   padding: 64px;
   width: 100%;
   min-height: 430px;
-  background: linear-gradient(90deg, #092c49d9, transparent 75%);
+  background: linear-gradient(90deg, #0d1319d9, transparent 75%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -756,7 +756,7 @@ html.st-menu-open {
   position: absolute;
   width: 80%;
   height: 80%;
-  border: 1px solid var(--st-brand-teal);
+  border: 1px solid var(--st-line-accent);
   border-radius: 50%;
   transform: rotate(-30deg);
 }
@@ -880,7 +880,7 @@ html.st-menu-open {
   gap: 11%;
   padding-bottom: 52px;
   margin-bottom: 52px;
-  border-bottom: 1px solid #faf9f644;
+  border-bottom: 1px solid #f9f7f744;
 }
 .st-service-row > div:last-child {
   display: flex;
@@ -951,7 +951,7 @@ html.st-menu-open {
   grid-template-columns: 28% 1fr;
   gap: 10%;
   padding-bottom: 100px;
-  border-bottom: 1px solid #0a365833;
+  border-bottom: 1px solid #11262b33;
   align-items: start;
 }
 .st-work-logo {
@@ -993,7 +993,7 @@ html.st-menu-open {
 .st-timeline article {
   display: flex;
   gap: 20px;
-  border-top: 1px solid #0a365866;
+  border-top: 1px solid #11262b66;
   padding-top: 25px;
 }
 .st-timeline article > span {
@@ -1029,7 +1029,7 @@ html.st-menu-open {
   height: 180px;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid #0a365833;
+  border-bottom: 1px solid #11262b33;
   margin-bottom: 24px;
   padding: 35px;
 }
@@ -1086,7 +1086,7 @@ html.st-menu-open {
   font-size: 15px;
 }
 .st-filters button {
-  border: 1px solid #0a365844 !important;
+  border: 1px solid #11262b44 !important;
   border-radius: 3px;
   padding: 7px 20px !important;
   font-size: 14px !important;
@@ -1174,7 +1174,7 @@ html.st-menu-open {
 .st-inquiry input,
 .st-inquiry textarea {
   border: 0;
-  border-bottom: 1px solid #0a365877;
+  border-bottom: 1px solid #11262b77;
   background: transparent;
   border-radius: 0;
   color: var(--st-ink);
@@ -1200,7 +1200,7 @@ html.st-menu-open {
   scroll-margin-top: 30px;
 }
 .st-join details {
-  border-top: 1px solid #0a365866;
+  border-top: 1px solid #11262b66;
   padding-block: 28px;
 }
 .st-join summary {
@@ -1274,7 +1274,7 @@ html.st-menu-open {
   grid-template-columns: 1fr 1fr;
   gap: 150px;
   padding-bottom: 75px;
-  border-bottom: 1px solid #faf9f644;
+  border-bottom: 1px solid #f9f7f744;
 }
 .st-footer-top h2 {
   font-size: 64px;
@@ -1329,7 +1329,7 @@ html.st-menu-open {
   color: var(--st-highlight);
 }
 .st-footer-bottom {
-  border-top: 1px solid #faf9f633;
+  border-top: 1px solid #f9f7f733;
   padding-top: 28px;
   display: flex;
   align-items: center;
@@ -1495,7 +1495,7 @@ html.st-menu-open {
     align-items: center;
     gap: 8px;
     margin-top: 24px;
-    border-top: 1px solid #faf9f644;
+    border-top: 1px solid #f9f7f744;
     font-size: 16px;
   }
   .st-navlinks > a:not(.st-nav-contact),
@@ -1855,7 +1855,7 @@ html.st-menu-open {
     filter: brightness(0.65);
   }
   .st-card-scrim {
-    background: linear-gradient(#092c4955, transparent 55%, #092c49dd);
+    background: linear-gradient(#0d131955, transparent 55%, #0d1319dd);
   }
   .st-callout {
     margin-top: 75px;
@@ -2297,7 +2297,7 @@ html.st-menu-open {
 }
 .st-experience-grid article > span {
   display: block;
-  color: var(--st-brand-teal);
+  color: var(--st-line-accent);
   font-size: 16px;
   margin-bottom: 22px;
 }

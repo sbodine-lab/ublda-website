@@ -26,6 +26,7 @@ import { useDeviceReducedMotion } from "../../features/equator/motionPreference"
 import "./Studio.css";
 import "./accessibility.css";
 import "./mobile.css";
+import "./reference.css";
 
 export function Button({
   children,

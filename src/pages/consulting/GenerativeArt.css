@@ -4,9 +4,9 @@
   height: 100%;
   overflow: hidden;
   isolation: isolate;
-  --art-light: #e0e8ff;
-  --art-mid: #87a3f0;
-  --art-deep: #3559a8;
+  --art-light: var(--st-highlight);
+  --art-mid: color-mix(in srgb, var(--st-accent), var(--st-highlight) 45%);
+  --art-deep: var(--st-accent);
   background: var(--st-dark);
 }
 .st-art > svg {
@@ -17,30 +17,8 @@
 .st-art-stop--light { stop-color: var(--art-light); }
 .st-art-stop--mid { stop-color: var(--art-mid); }
 .st-art-stop--deep { stop-color: var(--art-deep); }
-.st-art--perspective {
-  --art-light: #dcf1ed;
-  --art-mid: #67b8b3;
-  --art-deep: #286773;
-  background: var(--st-dark);
-}
-.st-art--accessibility {
-  --art-light: #b8cbf0;
-  --art-mid: #5576b2;
-  --art-deep: #183f6b;
-  background: var(--st-cool);
-}
-.st-art--workplace {
-  --art-light: #e7e2ff;
-  --art-mid: #a29cdc;
-  --art-deep: #5c5798;
-  background: #192944;
-}
-.st-art--practice {
-  --art-light: #e5ebff;
-  --art-mid: #67b8b3;
-  --art-deep: #385daa;
-  background: var(--st-dark);
-}
+.st-art--accessibility { background: var(--st-cool); }
+.st-art--workplace { background: var(--st-dark); }
 .st-art svg > g {
   transform-box: view-box;
   transform-origin: center;
