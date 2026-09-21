@@ -27,8 +27,9 @@ export function RossHero() {
       elapsed += previous ? Math.min(now - previous, 100) : 0;
       previous = now;
       if (mount && now - painted >= 1000 / 30) {
-        const wave = Math.sin(elapsed * Math.PI * 2 / 24000);
-        mount.setUniforms({ u_gainC: 0.18 + wave * 0.025, u_gainM: -wave * 0.015 });
+        const wave = Math.sin(elapsed * Math.PI * 2 / 18000);
+        mount.setUniforms({ u_gainC: 0.12 + wave * 0.06, u_gainM: -wave * 0.04, u_gridNoise: 0.14 + wave * 0.08 });
+        host.style.setProperty("--st-halftone-opacity", String(0.52 + wave * 0.06));
         painted = now;
       }
       frame = requestAnimationFrame(tick);
@@ -79,11 +80,11 @@ export function RossHero() {
           u_colorM: paper.getShaderColorFromString("#fc519f"),
           u_colorY: paper.getShaderColorFromString("#ffd800"),
           u_colorK: paper.getShaderColorFromString("#0d1319"),
-          u_size: 0.28, u_type: paper.HalftoneCmykTypes.ink,
-          u_contrast: 1.08, u_softness: 0.7, u_gridNoise: 0.15,
-          u_grainSize: 0.5, u_grainMixer: 0, u_grainOverlay: 0.02,
-          u_floodC: 0.08, u_floodM: 0, u_floodY: 0, u_floodK: 0,
-          u_gainC: 0.18, u_gainM: 0, u_gainY: 0.12, u_gainK: -0.04,
+          u_size: 0.18, u_type: paper.HalftoneCmykTypes.ink,
+          u_contrast: 1, u_softness: 0.85, u_gridNoise: 0.14,
+          u_grainSize: 0.5, u_grainMixer: 0, u_grainOverlay: 0.01,
+          u_floodC: 0.04, u_floodM: 0, u_floodY: 0, u_floodK: 0,
+          u_gainC: 0.12, u_gainM: 0, u_gainY: 0.08, u_gainK: -0.04,
           u_fit: paper.ShaderFitOptions.cover, u_scale: 1,
           u_rotation: 0, u_offsetX: 0, u_offsetY: 0,
           u_originX: 0.5, u_originY: 0.5, u_worldWidth: 0, u_worldHeight: 0,

@@ -41,7 +41,7 @@ export const RESEARCH = [
     date: "March 2026 · 2025 data",
     value: "38.1%",
     metricLabel: "of U.S. people with a disability ages 16–64 were employed in 2025",
-    title: "A broader view of workforce opportunity.",
+    title: "Disability and employment in the United States.",
     summary:
       "BLS reports that 38.1% of U.S. people with a disability ages 16–64 were employed in 2025.",
     url: "https://www.bls.gov/news.release/archives/disabl_03032026.htm",
@@ -92,9 +92,9 @@ export const AREAS = [
   {
     id: "strategy",
     title: "Strategy & growth",
-    desc: "We can help your organization research a market, compare opportunities, and think through its next step.",
+    desc: "A student team could research a market or compare options for a new program, giving your organization evidence to use in its business decisions.",
     detail:
-      "A project could explore a market, compare similar organizations, or weigh options for a new program. We would agree on a focused business question with you, then use research to develop recommendations for your team to consider.",
+      "For an organization considering a new program or a change in its business, a project could compare similar organizations, estimate demand, and examine the costs and trade-offs of different options. We would agree on the question and available information before deciding what the team can research in a semester.",
     examples: [
       "Market and competitor research",
       "Program and growth opportunities",
@@ -104,9 +104,9 @@ export const AREAS = [
   {
     id: "accessibility",
     title: "Accessible experiences",
-    desc: "We can help you explore barriers people may encounter when using your organization’s information, services, or programs.",
+    desc: "A project could examine the barriers disabled people encounter when using your services or information and compare ways your organization could address them.",
     detail:
-      "A project could review a customer journey, compare how organizations share information, or research ways to make a program easier to access. The scope would depend on your goals, the information available, and what a student team can reasonably investigate.",
+      "A student team could review the steps involved in using a service, compare how organizations publish information, or research ways to make an event or program more accessible. The work would depend on the materials and input available to the team, with recommendations limited to what the research supports.",
     examples: [
       "Websites and app experiences",
       "Documents and communications",
@@ -116,9 +116,9 @@ export const AREAS = [
   {
     id: "workplace",
     title: "Inclusive workplaces",
-    desc: "We can help you research ways to make hiring, onboarding, and employee communication more inclusive.",
+    desc: "A student team could review hiring, onboarding, or employee communications to identify questions your organization should consider about disability access.",
     detail:
-      "A project could compare published workplace practices, review recruiting materials, or explore questions about the employee experience. Together, we would choose a manageable research question and identify the information needed to develop useful recommendations.",
+      "A project could compare published workplace practices or review recruiting and onboarding materials, using the findings to recommend changes for your organization to consider. We would define the question with your team and work within the information it can share.",
     examples: [
       "Recruiting and hiring experiences",
       "Onboarding and employee communication",

@@ -15,8 +15,8 @@ export function BusinessCase() {
     <section className="st-wrap st-business-case" aria-labelledby="business-case-heading">
       <div className="st-business-case-heading" data-enter>
         <div className="st-business-case-intro">
-          <p>Accessibility shapes who can take part as a customer, colleague or candidate. The research makes the business relevance clear.</p>
-          <Button to="/consulting/insights">Explore the research</Button>
+          <p>Disability affects how people use products, apply for jobs, and take part at work, which gives businesses a reason to consider accessibility in decisions about customers and employees. These studies examine the scale of disability and the barriers people encounter.</p>
+          <Button to="/consulting/insights">Read the research</Button>
         </div>
         <h2 id="business-case-heading">The business case<br />for accessibility.</h2>
       </div>
