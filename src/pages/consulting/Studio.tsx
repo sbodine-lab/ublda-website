@@ -27,6 +27,7 @@ import "./Studio.css";
 import "./accessibility.css";
 import "./mobile.css";
 import "./reference.css";
+import "./navigation.css";
 
 export function Button({
   children,
@@ -196,6 +197,7 @@ export function Studio({
   const [open, setOpen] = useState(false);
   const [about, setAbout] = useState(false);
   const aboutButton = useRef<HTMLButtonElement>(null);
+  const aboutGroup = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(() => {
     try { return localStorage.getItem("ublda-motion-paused") === "true"; }
     catch { return false; }
@@ -205,15 +207,22 @@ export function Studio({
   const previousPathname = useRef<string | null>(null);
   const samePageScrollBehavior = useEffectEvent(() => motionPaused ? "instant" as const : "smooth" as const);
   const { pathname, hash, key: locationKey } = useLocation();
-  const closeMenu = useCallback(() => setOpen(false), []);
+  const closeMenu = useCallback(() => { setOpen(false); setAbout(false); }, []);
   useMenuKeyboard(open, root, ".st-navlinks", ".st-menu-toggle", closeMenu);
   useEffect(() => {
     if (!about) return;
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === "Escape") setAbout(false);
     };
+    const dismissOutside = (event: PointerEvent) => {
+      if (!aboutGroup.current?.contains(event.target as Node)) setAbout(false);
+    };
     document.addEventListener("keydown", dismiss);
-    return () => document.removeEventListener("keydown", dismiss);
+    document.addEventListener("pointerdown", dismissOutside);
+    return () => {
+      document.removeEventListener("keydown", dismiss);
+      document.removeEventListener("pointerdown", dismissOutside);
+    };
   }, [about]);
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 1025px)");
@@ -328,17 +337,14 @@ export function Studio({
               <Link
                 key={to}
                 to={to}
-                aria-current={pathname === to ? "page" : undefined}
+                aria-current={pathname === to ? "page" : pathname.startsWith(`${to}/`) ? "location" : undefined}
               >
                 {label}
               </Link>
             ))}
             <div
               className="st-about"
-              onMouseEnter={() => setAbout(true)}
-              onMouseLeave={(e) => {
-                if (!e.currentTarget.contains(document.activeElement)) setAbout(false);
-              }}
+              ref={aboutGroup}
               onBlur={(e) => {
                 if (!e.currentTarget.contains(e.relatedTarget)) setAbout(false);
               }}
@@ -358,7 +364,7 @@ export function Studio({
                 aria-controls="consulting-about"
                 onClick={() => setAbout(!about)}
               >
-                About us <ChevronDown size={13} />
+                About us <ChevronDown size={14} aria-hidden="true" />
               </button>
               <div
                 id="consulting-about"
@@ -388,7 +394,7 @@ export function Studio({
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="consulting-nav"
-            onClick={() => setOpen(!open)}
+            onClick={() => { setAbout(false); setOpen(!open); }}
           >
             {open ? <X /> : <Menu />}
           </button>
