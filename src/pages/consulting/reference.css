@@ -84,7 +84,14 @@
 /* The Ross photograph carries the Paper glass treatment; the shade protects
    the white headline, navigation, and buttons across every image crop. */
 .st-hero--photo { overflow: hidden; background: var(--st-dark); isolation: isolate; }
-.st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 52%; }
-.st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d1319b8, #0d13199e 45%, #0d1319ad); }
+.st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; }
+.st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d13199e, #0d131980 45%, #0d131970); }
 .st-hero--photo .st-hero-content { z-index: 2; }
-@media (max-width: 767px) { .st-hero-photo { object-position: 58% center; } }
+@media (min-width: 1025px) {
+  .st-hero--photo { height: clamp(620px, 56.25vw, 1000px); min-height: 0; }
+  .st-hero--photo .st-hero-content { padding-block: clamp(180px, 16.9vw, 300px) 100px; }
+}
+@media (max-width: 767px) {
+  .st-hero-photo { top: auto; height: 74%; object-position: center; mask-image: linear-gradient(180deg, transparent, #000 22%); }
+  .st-hero--photo::before { background: linear-gradient(180deg, #0d1319 20%, #0d1319b3 37%, #0d131980 62%, #0d131950); }
+}
