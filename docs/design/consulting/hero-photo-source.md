@@ -1,6 +1,14 @@
 # Consulting hero image history
 
-## Current: overhead visualization and live glass, September 21
+## Current: CMYK halftone, September 21
+
+Sam requested Paper's Halftone CMYK shader over the same overhead Ross visualization. The source image, responsive crops, headline, and generated-image provenance below remain the same. The glass effect is replaced by the actual `halftoneCmykFragmentShader` from Paper 0.0.80, using its supplied noise texture and vanilla mount API.
+
+Settings: ink type, size 0.28, contrast 1.08, softness 0.7, grid noise 0.15, grain size 0.5, grain mixer 0, grain overlay 0.02. Paper color #f8f7f3, cyan #00b4ff, magenta #fc519f, yellow #ffd800, black #0d1319. Cyan flood 0.08; other floods 0. Cyan gain 0.18, magenta gain 0, yellow gain 0.12, black gain -0.04. A gentle 24-second cycle varies cyan gain by ±0.025 and magenta gain by ∓0.015. The image position and dot grid stay fixed. All existing pause, reduced-motion, visibility, render-budget, and fallback behavior is retained. A dark translucent background protects the outlined hero CTA against the print texture.
+
+Reference: https://shaders.paper.design/halftone-cmyk. The installed API uses `HalftoneCmyk`/`halftoneCmykFragmentShader`; settings follow its documented CMYK controls.
+
+## Overhead visualization and live glass, September 21
 
 Sam preferred a straight-down view and explicitly authorized image generation if a suitable real photograph could not be found. The current hero is an **AI-generated architectural visualization**, not a documentary aerial photograph or an exact survey of the present campus. The earlier photographic versions below are retained as design history.
 

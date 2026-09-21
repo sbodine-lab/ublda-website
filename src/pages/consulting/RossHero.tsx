@@ -4,10 +4,10 @@ import type { ShaderMount } from "@paper-design/shaders";
 /** The image stays visible if WebGL, the lazy module, or the texture fails. */
 export function RossHero() {
   const image = useRef<HTMLImageElement>(null);
-  const glass = useRef<HTMLDivElement>(null);
+  const shader = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const host = glass.current;
+    const host = shader.current;
     const photo = image.current;
     if (!host || !photo) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -21,14 +21,14 @@ export function RossHero() {
     let previous = 0;
     let painted = 0;
 
-    // Fluted Glass has no time uniform. Animate its documented optical
-    // controls through Paper's mount API, without React renders or image reloads.
+    // Halftone CMYK has no time uniform. Gently vary ink gain through Paper's
+    // mount API, without moving the building or reloading the image.
     const tick = (now: number) => {
       elapsed += previous ? Math.min(now - previous, 100) : 0;
       previous = now;
       if (mount && now - painted >= 1000 / 30) {
         const wave = Math.sin(elapsed * Math.PI * 2 / 24000);
-        mount.setUniforms({ u_shift: wave * 0.18, u_highlights: 0.10 + wave * 0.025 });
+        mount.setUniforms({ u_gainC: 0.18 + wave * 0.025, u_gainM: -wave * 0.015 });
         painted = now;
       }
       frame = requestAnimationFrame(tick);
@@ -68,24 +68,27 @@ export function RossHero() {
     void (async () => {
       try {
         const [paper] = await Promise.all([import("@paper-design/shaders"), photo.decode()]);
+        const noise = paper.getShaderNoiseTexture();
+        await noise?.decode();
         if (disposed) return;
-        mount = new paper.ShaderMount(host, paper.flutedGlassFragmentShader, {
+        mount = new paper.ShaderMount(host, paper.halftoneCmykFragmentShader, {
           u_image: photo,
-          u_colorBack: paper.getShaderColorFromString("#0d1319"),
-          u_colorShadow: paper.getShaderColorFromString("#000000"),
-          u_colorHighlight: paper.getShaderColorFromString("#ffffff"),
-          u_shadows: 0.18, u_highlights: 0.1,
-          u_size: 0.68, u_shape: paper.GlassGridShapes.lines,
-          u_distortionShape: paper.GlassDistortionShapes.prism,
-          u_distortion: 0.025, u_shift: 0, u_angle: 0,
-          u_blur: 0, u_edges: 0, u_stretch: 0,
-          u_marginLeft: 0, u_marginRight: 0, u_marginTop: 0, u_marginBottom: 0,
-          u_grainMixer: 0, u_grainOverlay: 0,
+          u_noiseTexture: noise,
+          u_colorBack: paper.getShaderColorFromString("#f8f7f3"),
+          u_colorC: paper.getShaderColorFromString("#00b4ff"),
+          u_colorM: paper.getShaderColorFromString("#fc519f"),
+          u_colorY: paper.getShaderColorFromString("#ffd800"),
+          u_colorK: paper.getShaderColorFromString("#0d1319"),
+          u_size: 0.28, u_type: paper.HalftoneCmykTypes.ink,
+          u_contrast: 1.08, u_softness: 0.7, u_gridNoise: 0.15,
+          u_grainSize: 0.5, u_grainMixer: 0, u_grainOverlay: 0.02,
+          u_floodC: 0.08, u_floodM: 0, u_floodY: 0, u_floodK: 0,
+          u_gainC: 0.18, u_gainM: 0, u_gainY: 0.12, u_gainK: -0.04,
           u_fit: paper.ShaderFitOptions.cover, u_scale: 1,
           u_rotation: 0, u_offsetX: 0, u_offsetY: 0,
           u_originX: 0.5, u_originY: 0.5, u_worldWidth: 0, u_worldHeight: 0,
         }, { alpha: false, antialias: false }, 0, 0, 1,
-        mobile.matches ? 900_000 : 2_200_000, ["u_image"]);
+        mobile.matches ? 900_000 : 2_200_000);
         mount.canvasElement.addEventListener("webglcontextlost", contextLost);
         host.dataset.ready = "true";
         sync();
@@ -119,7 +122,7 @@ export function RossHero() {
           srcSet="/consulting/ross-overhead-1080.webp 1080w, /consulting/ross-overhead-1672.webp 1672w"
           sizes="100vw" width={1672} height={941} fetchPriority="high" decoding="async" />
       </picture>
-      <div ref={glass} className="st-ross-glass" />
+      <div ref={shader} className="st-ross-shader" />
     </div>
   );
 }

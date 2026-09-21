@@ -81,16 +81,17 @@
   .st-hero .st-actions { margin-top: 48px; }
 }
 
-/* The Ross visualization carries the Paper glass treatment; the shade protects
+/* The Ross visualization carries the Paper halftone treatment; the shade protects
    the white headline, navigation, and buttons across every image crop. */
 .st-hero--photo { overflow: hidden; background: var(--st-dark); isolation: isolate; }
-.st-ross-hero, .st-ross-glass { position: absolute; inset: 0; pointer-events: none; }
+.st-ross-hero, .st-ross-shader { position: absolute; inset: 0; pointer-events: none; }
 .st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.st-ross-glass { opacity: 0; }
-.st-ross-glass[data-ready="true"] { opacity: 1; }
-.st-ross-glass canvas { display: block; width: 100%; height: 100%; }
+.st-ross-shader { opacity: 0; }
+.st-ross-shader[data-ready="true"] { opacity: 1; }
+.st-ross-shader canvas { display: block; width: 100%; height: 100%; }
 .st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d13199e, #0d131980 45%, #0d131970); }
 .st-hero--photo .st-hero-content { z-index: 2; }
+.st-hero--photo .st-button:not(.st-button--solid) { background: #0d131999; }
 @media (min-width: 1025px) {
   .st-hero--photo { height: clamp(620px, 56.25vw, 1000px); min-height: 0; }
   .st-hero--photo .st-hero-content { padding-block: clamp(180px, 16.9vw, 300px) 100px; }
