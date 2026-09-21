@@ -46,3 +46,11 @@ Added primary-source research (checked Sept 16, 2026):
 ## Verification
 
 Build, 153 repository tests, and lint (four existing generated-file warnings). Chrome visual review at desktop and mobile sizes; all 14 consulting routes checked at 390px for horizontal overflow and missing images. Navigation focus, Escape handling, insight filters, contact validation, reduced motion, and production verification are recorded in the release handoff.
+
+## Mobile and hero refinement — September 21, 2026
+
+Rechecked the live BOI reference at 1440px and 390px. The consulting hero now uses a closer pair of larger, offset desktop lines, centered mobile typography/actions, more distinct cobalt-to-navy bands, and a compact phone header. Content and application destinations are preserved. At 320px the actions stack; hero height grows with text and in landscape. Mobile bands paint at 30fps and continue honoring pause, reduced motion, visibility, and resize.
+
+The parent homepage now exposes phone navigation immediately and uses shorter opening sections. Touch/compact layouts keep all five value illustrations in their own cards, skip the floating WebGL ribbon, and avoid scroll-scrubbed text. Wide desktop layouts retain the animated ribbon. Rotating an open phone menu back to desktop restores page scrolling.
+
+Regression coverage is in `scripts/audit-scroll-behavior.mjs` (including actual touch capability, anchored illustrations, renderer download avoidance, and menu resize recovery). Browser captures and the viewport/interaction matrix are saved under `outputs/mobile-qa/` in the working checkout.

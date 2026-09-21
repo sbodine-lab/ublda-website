@@ -1,0 +1,55 @@
+/* Native phone scrolling: readable sections and artwork that stays in place. */
+@media (max-width: 768px) {
+  .eq-header { padding-inline: max(20px, env(safe-area-inset-left)); }
+  .eq-header nav { padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+  .eq-splash { min-height: 0; padding: 100px 20px 88px; }
+  .eq-splash-brand { gap: 12px; }
+  .eq-logo-stage { width: min(240px, 64vw); }
+  .eq-affiliation { padding: 0; font-size: 16px; line-height: 1.5; }
+  .eq-hero--text { min-height: 0; display: flex; flex-direction: column; gap: 32px; padding: 72px 20px; }
+  .eq-hero--text h1 { font-size: clamp(38px, 10.8vw, 64px); }
+  .eq-hero--text .eq-hero-sub { align-self: start; line-height: 1.45; }
+  .eq-story-inner { padding-block: 64px; gap: 28px; }
+  .eq-words { font-size: clamp(28px, 7.6vw, 40px); line-height: 1.18; }
+  .eq-words > span { opacity: 1 !important; }
+  .eq-values[data-static="true"] .eq-value-zone { padding-block: 40px; }
+  .eq-value-zone + .eq-value-zone { border-top: 1px solid #0a365826; }
+  .eq-values[data-static="true"] .eq-value { gap: 24px; }
+  .eq-glyph { width: 112px; height: 112px; }
+  .eq-site .eq-value h2 { font-size: clamp(32px, 8.7vw, 46px); line-height: 1.08; }
+  .eq-value-copy { font-size: 17px; line-height: 1.5; }
+  .eq-section { padding-block: 64px; }
+  .eq-program > button { min-height: 88px; }
+  .eq-program h3 { font-size: 23px; }
+  .eq-carousel { overscroll-behavior-x: contain; }
+  .eq-story-card { scroll-snap-align: start; }
+  .eq-cta { min-height: 0; gap: 32px; padding-block: 80px; }
+}
+@media (max-width: 768px), (max-height: 750px), (pointer: coarse) {
+  .eq-ribbon-flight { display: none; }
+  .eq-ribbon-anchor[data-live="true"] svg { opacity: 1; }
+}
+
+/* A landscape phone and a touch tablet still need a reachable menu. */
+@media (min-width: 769px) and (max-width: 1024px) and (pointer: coarse) {
+  .eq-header { height: 68px; gap: 12px; padding-inline: 24px; }
+  .eq-wordmark { margin-right: auto; transform: none; font-size: 24px; }
+  .eq-wordmark > span { display: inline; font-size: 14px; }
+  .eq-header .eq-menu { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; pointer-events: auto; z-index: 2; order: 2; }
+  .eq-motion-toggle { margin: 0; order: 1; }
+  .eq-header nav {
+    position: fixed; inset: 0; margin: 0; padding: 90px 24px 32px;
+    background: var(--eq-teal); color: var(--eq-navy);
+    flex-direction: column; align-items: flex-start; justify-content: flex-start;
+    gap: 12px; overflow-y: auto; transform: translateY(-110%);
+    opacity: 1; visibility: hidden; pointer-events: none;
+  }
+  .eq-header nav a { font-size: 30px; line-height: 1.15; min-height: 44px; flex-shrink: 0; white-space: normal; }
+  .eq-header nav a[aria-label] { font-size: 21px; gap: 10px; }
+  .eq-header nav a::after { display: none; }
+  .eq-header--open nav { transform: none; visibility: visible; pointer-events: auto; }
+  .eq-header--open :is(.eq-wordmark, .eq-menu) { z-index: 2; color: var(--eq-navy); }
+  .eq-mobile-label { display: inline; }
+  .eq-splash { min-height: 0; padding: 96px 24px 88px; }
+  .eq-logo-stage { width: 240px; }
+}

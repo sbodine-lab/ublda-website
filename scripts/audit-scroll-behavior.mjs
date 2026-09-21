@@ -9,7 +9,7 @@ const check=(name,pass,detail)=>{checks.push({name,pass,detail});console.log(JSO
 try {
   for(const width of [1440,390]) {
     for(const route of ['/', '/consulting']) {
-      const context = await browser.newContext({viewport:{width,height:900},reducedMotion:'no-preference'});
+      const context = await browser.newContext({viewport:{width,height:900},hasTouch:width<769,reducedMotion:'no-preference'});
       const page=await context.newPage();
       page.on('pageerror',e=>errors.push({route,width,message:e.message}));
       await page.addInitScript(()=>{
@@ -28,7 +28,32 @@ try {
       await page.goto(base+route); await page.locator('main h1').waitFor(); await page.evaluate(()=>document.fonts.ready);
       check(`Local fonts only ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>e.name.includes('fonts.googleapis.com')||e.name.includes('fonts.gstatic.com'))));
       check(`No recruiting shader download ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>/\/Table-|\/shaders-|\/Halftone/.test(e.name))));
-      const canvas=page.locator(route==='/'?'.eq-brand-particles canvas':'.st-bands').first();
+      if (route === '/' && width === 1440) {
+        await page.setViewportSize({width:390,height:900});
+        await page.getByRole('button', {name:'Open menu',exact:true}).click();
+        await page.setViewportSize({width:1440,height:900});
+        await page.waitForFunction(() => !document.querySelector('main').inert);
+        check('Resizing an open phone menu restores page scrolling', await page.evaluate(() => document.body.style.overflow !== 'hidden'));
+      }
+      if (route === '/' && width < 769) {
+        check('Phone menu is available before scrolling', await page.getByRole('button', {name:'Open menu',exact:true}).isVisible());
+        await page.setViewportSize({width:844,height:390});
+        await page.getByRole('button', {name:'Open menu',exact:true}).click();
+        check('Landscape phone menu opens and locks its background', await page.locator('main').evaluate(el => el.inert));
+        await page.getByRole('button', {name:'Close menu',exact:true}).click();
+        await page.setViewportSize({width,height:900});
+        await page.locator('.eq-value-zone').first().scrollIntoViewIfNeeded();
+        await page.waitForTimeout(150);
+        check('Phone values keep all five illustrations in their cards', await page.locator('.eq-values').evaluate(el =>
+          el.dataset.static === 'true' && [...el.querySelectorAll('.eq-ribbon-anchor svg')].every(svg => getComputedStyle(svg).opacity === '1')));
+        check('Phone scroll does not load the floating WebGL renderer', await page.evaluate(() =>
+          !performance.getEntriesByType('resource').some(e => /ribbonRenderer/.test(e.name))));
+        for (const value of await page.locator('.eq-value-zone').all()) {
+          await value.scrollIntoViewIfNeeded();
+          check('Phone value text remains readable after scrolling', await value.locator('article').evaluate(el => getComputedStyle(el).opacity === '1'));
+        }
+      }
+      const canvas=page.locator(route==='/'?'.eq-logo-stage canvas':'.st-bands').first();
       await canvas.scrollIntoViewIfNeeded(); await page.waitForTimeout(300);
       const paints=()=>canvas.evaluate(el=>window.__canvasPaints.get(el)||0);
       const active=await paints(); await page.waitForTimeout(300);
