@@ -2,6 +2,11 @@
 export const RESEARCH = [
   {
     id: "disability-is-not-a-niche",
+    topic: "Customers & markets",
+    studentRelevance:
+      "When you research a market for class or an internship, including disabled customers helps you understand who can use a product and whose needs a business may be missing.",
+    studentApplication:
+      "In your next customer research project, consider who is represented in the sample and whether the research itself is accessible to the people you want to hear from.",
     category: "Perspective",
     source: "World Health Organization",
     date: "March 2023",
@@ -19,6 +24,11 @@ export const RESEARCH = [
   },
   {
     id: "the-business-case",
+    topic: "Company performance",
+    studentRelevance:
+      "If you study finance or strategy, disability inclusion deserves a place in how you assess a company’s management, alongside careful questions about what its performance data can actually tell you.",
+    studentApplication:
+      "When discussing this study in a case analysis, distinguish the observed association from a claim that inclusion caused higher revenue, then ask what evidence you would need to evaluate a particular company.",
     category: "Research",
     source: "Accenture · Disability:IN · AAPD",
     date: "November 2023",
@@ -36,6 +46,11 @@ export const RESEARCH = [
   },
   {
     id: "employment-and-access",
+    topic: "Work & opportunity",
+    studentRelevance:
+      "For students studying labor markets or planning a career in management, disability employment data raises questions about who has access to work and how employers find and support talent.",
+    studentApplication:
+      "When using this figure in coursework, distinguish the employment-to-population ratio from the unemployment rate and investigate the reasons behind a gap before recommending a hiring policy.",
     category: "Data",
     source: "U.S. Bureau of Labor Statistics",
     date: "March 2026 · 2025 data",
@@ -52,6 +67,11 @@ export const RESEARCH = [
   },
   {
     id: "disability-in-the-workforce",
+    topic: "Teams & workplaces",
+    studentRelevance:
+      "As you join internships and lead student teams, knowing how to make meetings, documents, and shared tools accessible helps you support people without assuming everyone works the same way.",
+    studentApplication:
+      "For a group project or student organization, review how people receive information and contribute to meetings, and provide a way to request adjustments privately.",
     category: "Data",
     source: "Boston Consulting Group",
     date: "May 2023",
@@ -70,6 +90,11 @@ export const RESEARCH = [
   },
   {
     id: "removing-hiring-barriers",
+    topic: "Hiring & talent",
+    studentRelevance:
+      "Whether you recruit for a student organization or later hire at work, examining how you assess candidates can help you recognize barriers that keep qualified people from getting a fair look.",
+    studentApplication:
+      "Review an application or interview process you help run and ask whether each requirement measures something necessary for the role and whether candidates have an accessible way to demonstrate it.",
     category: "Research",
     source: "Ameri et al. · ILR Review",
     date: "March 2018",

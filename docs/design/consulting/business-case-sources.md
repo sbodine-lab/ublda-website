@@ -16,3 +16,9 @@ BCG supplies the MBB perspective; ILR Review supplies peer-reviewed university r
 The decorative workplace and strategy photos are existing licensed Pexels assets documented in [image-polish.md](./image-polish.md). They illustrate business settings, not research participants or UBLDA members. No new photography or logos were sourced.
 
 Design follows the reference's oversized figures, offset section heading, unequal card widths, photographic panels, blue gradient and outlined light panel. Mobile uses one column with natural content height. Native links expose source names and dates, with visible focus outlines. The section uses the existing entrance animation and pause/reduced-motion support, without animated counters.
+
+## Student audience
+
+Updated September 21, 2026: Michigan students interested in business are the primary audience, with companies secondary. Each homepage card now pairs the unchanged, attributed finding with a practical connection to customer research, accessible teamwork, company analysis, or fair recruitment. Insights articles put student applications before employer implications and retain research methods and limitations. These applications are UBLDA’s interpretation, not additional findings or claims that the cited studies tested student organizations.
+
+The figures and original sources were rechecked for this update, including the BLS employment-to-population ratio used in Insights. The global disability estimate is not a uniform addressable market; the financial comparison is not a causal return on accessibility; the hiring experiment does not establish hiring outcomes across all roles.

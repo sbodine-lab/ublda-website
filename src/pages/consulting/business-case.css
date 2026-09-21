@@ -21,11 +21,13 @@
   background: linear-gradient(110deg, #0d1319c7, #0d131970), linear-gradient(0deg, #0d1319b8, transparent 80%);
 }
 .st-evidence-card--talent::before { background: linear-gradient(115deg, #10274feb, #10274f99), linear-gradient(0deg, #0d1319b8, transparent); }
-.st-evidence-value { display: block; font-size: clamp(76px, 7.6vw, 112px); line-height: 1; letter-spacing: -0.055em; margin-bottom: 64px; }
+.st-evidence-topic { margin: 0 0 20px; font-size: 18px; line-height: 1.35; font-weight: 500; }
+.st-evidence-value { display: block; font-size: clamp(76px, 7.6vw, 112px); line-height: 1; letter-spacing: -0.055em; margin-bottom: 40px; }
 .st-evidence-card--performance .st-evidence-value { color: var(--st-accent); }
 .st-evidence-copy { width: 100%; }
-.st-evidence-copy p { max-width: 650px; margin: 0 0 28px; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.15; text-wrap: pretty; }
-.st-evidence-card--workforce .st-evidence-copy p { font-size: clamp(25px, 2.1vw, 32px); }
+.st-evidence-metric { max-width: 650px; margin: 0 0 20px; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.15; text-wrap: pretty; }
+.st-evidence-card--workforce .st-evidence-metric { font-size: clamp(25px, 2.1vw, 32px); }
+.st-evidence-relevance { max-width: 640px; margin: 0 0 28px; font-size: 18px; line-height: 1.45; text-wrap: pretty; }
 .st-evidence-source { display: flex; align-items: end; justify-content: space-between; gap: 20px; font-size: 14px; line-height: 1.4; }
 .st-evidence-source svg { flex: 0 0 auto; transition: transform 200ms ease; }
 .st-evidence-card:hover .st-evidence-source > span { text-decoration: underline; text-underline-offset: 4px; }
@@ -35,7 +37,7 @@
 @media (max-width: 1024px) {
   .st-business-case-heading { gap: 40px; }
   .st-evidence-card { grid-column: span 6; padding: 28px; }
-  .st-evidence-copy p, .st-evidence-card--workforce .st-evidence-copy p { font-size: 26px; }
+  .st-evidence-metric, .st-evidence-card--workforce .st-evidence-metric { font-size: 26px; }
 }
 @media (max-width: 767px) {
   .st-business-case { padding-block: 8px 64px; }
@@ -44,8 +46,8 @@
   .st-business-case-intro p { font-size: 18px; }
   .st-evidence-grid { grid-template-columns: 1fr; gap: 16px; }
   .st-evidence-card { grid-column: auto; min-height: 370px; padding: 26px; }
-  .st-evidence-value { font-size: 84px; margin-bottom: 48px; }
-  .st-evidence-copy p, .st-evidence-card--workforce .st-evidence-copy p { font-size: 26px; }
+  .st-evidence-value { font-size: 84px; margin-bottom: 32px; }
+  .st-evidence-metric, .st-evidence-card--workforce .st-evidence-metric { font-size: 26px; }
   .st-evidence-source { font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) {
