@@ -379,8 +379,8 @@ export function Studio({
             </Link>
           </nav>
           <button type="button" className="st-motion-toggle" onClick={toggleMotion}
-            aria-label={motionLabel} aria-pressed={motionPaused} disabled={deviceReducedMotion} inert={open}>
-            {motionPaused ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
+            aria-label={motionLabel} title={motionLabel} aria-pressed={motionPaused} disabled={deviceReducedMotion} inert={open}>
+            {motionPaused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
           </button>
           <button
             className="st-menu-toggle"
