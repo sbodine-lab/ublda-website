@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from "react";
-import { useDeviceReducedMotion, useMotionPaused } from "./motionPreference";
+import { useCompactMotion, useDeviceReducedMotion, useMotionPaused } from "./motionPreference";
 import { ribbonNames, ribbonSilhouette } from "./ribbonGeometry";
 import "./ribbon.css";
 
@@ -23,10 +23,11 @@ export function RibbonJourney() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const paused = useMotionPaused();
   const reduced = useDeviceReducedMotion();
+  const compactLayout = useCompactMotion();
   useEffect(() => {
     const canvas = canvasRef.current;
     const section = canvas?.closest<HTMLElement>(".eq-values");
-    if (!canvas || !section || reduced || paused) return;
+    if (!canvas || !section || reduced || paused || compactLayout) return;
     const anchors = [...section.querySelectorAll<HTMLElement>(".eq-ribbon-anchor")];
     const zones = [...section.querySelectorAll<HTMLElement>(".eq-value-zone")];
     let disposed = false, visible = false, loading = false, frame = 0, previous = 0, elapsed = 0;
@@ -110,6 +111,6 @@ export function RibbonJourney() {
       renderer?.dispose(); canvas.style.opacity = "0";
       anchors.forEach(anchor => { anchor.dataset.live = "false"; });
     };
-  }, [paused, reduced]);
+  }, [paused, reduced, compactLayout]);
   return <canvas key={`${paused}-${reduced}`} ref={canvasRef} className="eq-ribbon-flight" aria-hidden="true" />;
 }

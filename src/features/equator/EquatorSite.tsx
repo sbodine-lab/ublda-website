@@ -36,11 +36,17 @@ import {
 import { useClock } from "../../lib/useClock";
 import { board } from "./content";
 import { UpcomingEvents, PastEvents } from "./EventSections";
-import { MotionPreference, useDeviceReducedMotion } from "./motionPreference";
+import {
+  MotionPreference,
+  useCompactMotion,
+  useMotionPaused,
+  useDeviceReducedMotion,
+} from "./motionPreference";
 import "./equator.css";
 import "./refinement.css";
 import "./events.css";
 import "./accessibility.css";
+import "./mobile.css";
 
 gsap.registerPlugin(ScrollTrigger);
 const values = [
@@ -187,6 +193,12 @@ function Header({ home, paused, systemMotion, onToggleMotion }: { home: boolean;
   const nav = useRef<HTMLElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
   const { pathname } = useLocation();
+  useEffect(() => {
+    const desktop = matchMedia("(min-width: 1025px), (min-width: 769px) and (pointer: fine)");
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -343,7 +355,7 @@ function Hero({
   artwork?: boolean;
 }) {
   return (
-    <section className="eq-hero" id="intro" data-tone="teal" aria-label={label}>
+    <section className={`eq-hero${artwork ? "" : " eq-hero--text"}`} id="intro" data-tone="teal" aria-label={label}>
       {artwork && <BrandParticles />}
       <h1>{title}</h1>
       <p className="eq-hero-sub">
@@ -407,9 +419,17 @@ function Story({ full = false }: { full?: boolean }) {
 function Values() {
   const ref = useRef<HTMLElement>(null);
   const number = useRef<HTMLSpanElement>(null);
+  const compact = useCompactMotion();
+  const paused = useMotionPaused();
+  const [oversized, setOversized] = useState(false);
+  const staticLayout = compact || paused || oversized;
   useEffect(() => {
     const section = ref.current;
     if (!section) return;
+    if (staticLayout) {
+      ScrollTrigger.refresh();
+      return;
+    }
     const panels = [...section.querySelectorAll<HTMLElement>(".eq-value-zone")];
     // Enlarged or widely spaced text must never be trapped in a sticky panel.
     let disposed = false;
@@ -418,8 +438,7 @@ function Values() {
       if (disposed || !fontsReady || section.dataset.static === "true") return;
       const tooTall = panels.some(panel => (panel.firstElementChild as HTMLElement).offsetHeight > innerHeight - 68);
       if (tooTall) {
-        section.dataset.static = "true";
-        ScrollTrigger.refresh();
+        setOversized(true);
       }
     });
     document.fonts.ready.then(() => {
@@ -457,12 +476,13 @@ function Values() {
       removeEventListener("resize", scroll);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [staticLayout]);
   return (
     <section
       ref={ref}
       id="what-we-stand-for"
       className="eq-values"
+      data-static={staticLayout || undefined}
       data-tone="gold"
       aria-label="What we stand for"
     >
@@ -1061,7 +1081,7 @@ export default function EquatorSite() {
     if (motionPaused) return;
     const context = gsap.context(() => {
       const media = gsap.matchMedia();
-      media.add("(prefers-reduced-motion: no-preference)", () => {
+      media.add("(prefers-reduced-motion: no-preference) and (min-width: 769px) and (pointer: fine)", () => {
         gsap.utils.toArray<HTMLElement>(".eq-words").forEach((p) =>
           gsap.fromTo(
             p.querySelectorAll("span[aria-hidden]"),
@@ -1110,15 +1130,16 @@ export default function EquatorSite() {
         const r = section.getBoundingClientRect();
         return r.top <= 80 && r.bottom > 80;
       });
-      const start = innerWidth > 768 ? innerHeight / 2 - 34 : 0;
+      const mobileHeader = innerWidth <= 768 || (innerWidth <= 1024 && matchMedia("(pointer: coarse)").matches);
+      const start = mobileHeader ? 0 : innerHeight / 2 - 34;
       const y = home ? Math.max(0, start - scrollY) : 0;
-      const scale = home ? 1 + Math.max(0, 1 - scrollY / (innerHeight * 0.65)) * 0.5 : 1;
+      const scale = home && !mobileHeader ? 1 + Math.max(0, 1 - scrollY / (innerHeight * 0.65)) * 0.5 : 1;
       const yValue = `${y}px`, scaleValue = String(scale);
       if (wordmark && wordmark.style.getPropertyValue("--brand-y") !== yValue)
         wordmark.style.setProperty("--brand-y", yValue);
       if (wordmark && wordmark.style.getPropertyValue("--brand-scale") !== scaleValue)
         wordmark.style.setProperty("--brand-scale", scaleValue);
-      const visible = String(!home || scrollY > innerHeight * 0.35);
+      const visible = String(mobileHeader || !home || scrollY > innerHeight * 0.35);
       if (el.dataset.navVisible !== visible) el.dataset.navVisible = visible;
       const tone = section?.dataset.tone || "teal";
       if (el.dataset.headerTone !== tone) el.dataset.headerTone = tone;

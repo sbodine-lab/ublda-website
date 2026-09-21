@@ -210,7 +210,7 @@ export function ParticleLogo({ colored = false }: { colored?: boolean }) {
       }
       if (previous) elapsed += Math.min((now - previous) / 1000, 0.08);
       previous = now;
-      const interval = 1000 / (colored ? 60 : 30);
+      const interval = 1000 / (colored && innerWidth > 768 ? 60 : 30);
       if (now - lastPaint >= interval) {
         paint(elapsed);
         lastPaint = now - ((now - lastPaint) % interval);
@@ -234,6 +234,7 @@ export function ParticleLogo({ colored = false }: { colored?: boolean }) {
     );
     observer.observe(parent);
     const pointer = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
       const bounds = parent.getBoundingClientRect();
       aimX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 12;
       aimY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 12;

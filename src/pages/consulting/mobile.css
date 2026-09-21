@@ -1,0 +1,53 @@
+/* BOI reference: broad stepped columns, a close pair of offset headline lines,
+   and a centered action group. Keep Consulting's cobalt and parent navy. */
+.st-hero {
+  --st-band-bright: #244bc0;
+  --st-band-dark: #081c35;
+  min-height: max(680px, 90svh);
+  padding-bottom: 80px;
+}
+.st-hero-content { padding-top: clamp(210px, 26svh, 280px); }
+.st-hero h1 {
+  max-width: 1120px;
+  margin-inline: auto;
+  font-size: clamp(64px, 6.7vw, 104px);
+  line-height: 1.02;
+  letter-spacing: -.045em !important;
+}
+.st-hero h1 span + span { margin-top: 4px; }
+.st .st-hero-summary { max-width: 600px; margin-top: 36px; font-size: 18px; line-height: 1.5; }
+.st-hero .st-actions { margin-top: 32px; }
+.st-hero .st-button { min-height: 48px; }
+
+@media (max-width: 1024px) {
+  .st-hero h1 { font-size: clamp(54px, 7vw, 76px); }
+  .st-hero h1 span { max-width: none; }
+}
+@media (max-width: 767px) {
+  .st-wrap { width: calc(100% - 40px); }
+  .st-header-inner { min-height: 104px; padding-block: 16px; gap: 12px; }
+  .st-brand-lockup { gap: 2px; }
+  .st-logo img { width: 108px; }
+  .st-parent-link { font-size: 12px; }
+  .st-menu-open .st-menu-toggle { right: 20px; top: 30px; }
+  .st-navlinks--open { padding: 120px 24px max(32px, env(safe-area-inset-bottom)); }
+  .st-hero { min-height: min(760px, 90svh); padding-bottom: 0; display: flex; align-items: center; }
+  .st-hero-content { padding-block: 164px 72px; }
+  .st-hero h1 { font-size: clamp(36px, 9.8vw, 68px); line-height: 1.06; text-align: center; }
+  .st-hero h1 span + span { margin-top: 4px; text-align: center; text-wrap: balance; }
+  .st .st-hero-summary { max-width: 420px; font-size: 16px; line-height: 1.5; text-align: center; margin-top: 28px; }
+  .st-hero .st-actions { justify-content: center; gap: 10px; margin-top: 28px; }
+  .st-hero .st-button { padding-inline: 16px; }
+  .st .st-service-card { min-height: 420px; grid-template-rows: minmax(100px, 1fr) auto auto; gap: 16px; }
+  .st .st-service-desc { font-size: 16px; }
+  .st-positioning { padding-block: 56px 64px; }
+  .st :is(.st-inquiry input, .st-inquiry textarea, .st-inquiry select) { font-size: 16px; }
+}
+@media (max-width: 360px) {
+  .st-hero .st-actions { flex-direction: column; align-items: stretch; }
+  .st-hero .st-button { width: 100%; justify-content: center; }
+}
+@media (max-height: 500px) and (max-width: 1024px) {
+  .st-hero { min-height: 0; }
+  .st-hero-content { padding-block: 150px 56px; }
+}

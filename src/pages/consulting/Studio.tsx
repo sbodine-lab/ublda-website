@@ -25,6 +25,7 @@ import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { useDeviceReducedMotion } from "../../features/equator/motionPreference";
 import "./Studio.css";
 import "./accessibility.css";
+import "./mobile.css";
 
 export function Button({
   children,
@@ -72,7 +73,8 @@ export function Bands({ className = "" }: { className?: string }) {
       visible = false,
       paused = false,
       elapsed = 2200,
-      previous = 0;
+      previous = 0,
+      lastPaint = 0;
     const styles = getComputedStyle(el);
     const rgb = (token: string) => {
       const hex = styles.getPropertyValue(token).trim().slice(1);
@@ -116,7 +118,11 @@ export function Bands({ className = "" }: { className?: string }) {
     const tick = (time: number) => {
       if (previous) elapsed += Math.min(time - previous, 50);
       previous = time;
-      draw(elapsed);
+      const interval = 1000 / (w <= 768 ? 30 : 60);
+      if (time - lastPaint >= interval) {
+        draw(elapsed);
+        lastPaint = time - ((time - lastPaint) % interval);
+      }
       frame = requestAnimationFrame(tick);
     };
     const sync = () => {
