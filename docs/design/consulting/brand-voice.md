@@ -2,6 +2,8 @@
 
 Updated September 17, 2026 following Sam’s feedback on the student-facing copy.
 
+September 21 update: Sam requested a prominent research-backed business-case section after the homepage introduction. This supersedes the instruction below to keep all research under Insights. Use the verified sources and presentation in [business-case-sources.md](./business-case-sources.md); keep the fuller study context on the insight pages.
+
 ## Audience and approach
 
 Students are the primary readers. Describe the club before inviting them to join: who UBLDA is, what its consulting teams do, the purpose of the client work and the community around it. Write in a calm organizational voice rather than addressing every sentence to a prospective applicant. Companies remain a secondary audience with contact options and a clear service scope.

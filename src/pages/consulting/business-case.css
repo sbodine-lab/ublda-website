@@ -1,0 +1,58 @@
+.st-business-case { padding-block: 40px 120px; }
+.st-business-case-heading { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 80px; margin-bottom: 72px; }
+.st-business-case-heading h2 { margin: 0; font-size: clamp(40px, 4.1vw, 64px); line-height: 1.06; }
+.st-business-case-intro { max-width: 430px; }
+.st-business-case-intro p { font-size: 20px; line-height: 1.45; color: var(--st-muted); margin-bottom: 24px; }
+.st-evidence-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; }
+.st-evidence-card {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-width: 0; min-height: 460px; padding: 36px; border-radius: 4px;
+  color: var(--st-paper); text-decoration: none; background: var(--st-dark);
+}
+.st-evidence-card--reach { grid-column: span 8; }
+.st-evidence-card--workforce { grid-column: span 4; background: linear-gradient(130deg, var(--st-accent) 20%, var(--st-dark)); }
+.st-evidence-card--performance { grid-column: span 5; color: var(--st-ink); background: transparent; border: 1px solid var(--st-accent); }
+.st-evidence-card--talent { grid-column: span 7; }
+.st-evidence-card--performance, .st-evidence-card--talent { min-height: 420px; }
+.st-evidence-photo { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.st-evidence-card--reach::before, .st-evidence-card--talent::before {
+  content: ""; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, #0d1319c7, #0d131970), linear-gradient(0deg, #0d1319b8, transparent 80%);
+}
+.st-evidence-card--talent::before { background: linear-gradient(115deg, #10274feb, #10274f99), linear-gradient(0deg, #0d1319b8, transparent); }
+.st-evidence-value { display: block; font-size: clamp(76px, 7.6vw, 112px); line-height: 1; letter-spacing: -0.055em; margin-bottom: 64px; }
+.st-evidence-card--performance .st-evidence-value { color: var(--st-accent); }
+.st-evidence-copy { width: 100%; }
+.st-evidence-copy p { max-width: 650px; margin: 0 0 28px; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.15; text-wrap: pretty; }
+.st-evidence-card--workforce .st-evidence-copy p { font-size: clamp(25px, 2.1vw, 32px); }
+.st-evidence-source { display: flex; align-items: end; justify-content: space-between; gap: 20px; font-size: 14px; line-height: 1.4; }
+.st-evidence-source svg { flex: 0 0 auto; transition: transform 200ms ease; }
+.st-evidence-card:hover .st-evidence-source > span { text-decoration: underline; text-underline-offset: 4px; }
+.st-evidence-card:hover .st-evidence-source svg { transform: translate(2px, -2px); }
+.st .st-evidence-card:focus-visible { outline: 3px solid var(--st-accent); outline-offset: 5px; }
+/* Two equal columns on tablets keep the narrower research copy readable. */
+@media (max-width: 1024px) {
+  .st-business-case-heading { gap: 40px; }
+  .st-evidence-card { grid-column: span 6; padding: 28px; }
+  .st-evidence-copy p, .st-evidence-card--workforce .st-evidence-copy p { font-size: 26px; }
+}
+@media (max-width: 767px) {
+  .st-business-case { padding-block: 8px 64px; }
+  .st-business-case-heading { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 24px; margin-bottom: 32px; }
+  .st-business-case-heading h2 { font-size: 38px; }
+  .st-business-case-intro p { font-size: 18px; }
+  .st-evidence-grid { grid-template-columns: 1fr; gap: 16px; }
+  .st-evidence-card { grid-column: auto; min-height: 370px; padding: 26px; }
+  .st-evidence-value { font-size: 84px; margin-bottom: 48px; }
+  .st-evidence-copy p, .st-evidence-card--workforce .st-evidence-copy p { font-size: 26px; }
+  .st-evidence-source { font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-evidence-source svg { transition: none; }
+}
+@media (forced-colors: active) {
+  .st-evidence-card { border: 1px solid CanvasText; }
+  .st-evidence-photo, .st-evidence-card::before { display: none; }
+  .st .st-evidence-card:focus-visible { outline-color: Highlight; }
+}
