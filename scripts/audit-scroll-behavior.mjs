@@ -45,11 +45,21 @@ try {
         const heroCanvas = glass.locator('canvas');
         await page.waitForFunction(()=>document.querySelector('.st-ross-shader')?.dataset.ready==='true');
         const heroPaints = ()=>heroCanvas.evaluate(el=>window.__canvasPaints.get(el)||0);
+        const gridPosition = () => heroCanvas.evaluate(el => {
+          const gl = el.getContext('webgl2');
+          const program = gl.getParameter(gl.CURRENT_PROGRAM);
+          return Array.from(gl.getUniform(program, gl.getUniformLocation(program, 'u_ubldaGridDrift')));
+        });
+        const initialGrid = await gridPosition();
         const moving = await heroPaints(); await page.waitForTimeout(300);
+        const movedGrid = await gridPosition();
+        check(`Ross halftone grid coordinates animate ${width}`,
+          JSON.stringify(initialGrid)!==JSON.stringify(movedGrid) && movedGrid.every(Number.isFinite), {initialGrid,movedGrid});
         check(`Ross shader renders live motion ${width}`,(await heroPaints())>moving);
         await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
+        const frozenGrid = await gridPosition();
         const frozen = await heroPaints(); await page.waitForTimeout(300);
-        check(`Pause freezes Ross shader ${width}`,(await heroPaints())===frozen);
+        check(`Pause freezes Ross shader ${width}`,(await heroPaints())===frozen && JSON.stringify(await gridPosition())===JSON.stringify(frozenGrid));
         await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
         check(`Resume restarts Ross shader ${width}`,(await heroPaints())>frozen);
         await page.locator('footer').scrollIntoViewIfNeeded(); await page.waitForTimeout(200);

@@ -7,7 +7,7 @@ const CARDS = [
   { id: "disability-is-not-a-niche", theme: "reach", image: "workplace-meeting" },
   { id: "disability-in-the-workforce", theme: "workforce" },
   { id: "the-business-case", theme: "performance" },
-  { id: "removing-hiring-barriers", theme: "talent", image: "strategy-meeting" },
+  { id: "accommodations-and-retention", theme: "talent", image: "strategy-meeting" },
 ];
 
 export function BusinessCase() {
