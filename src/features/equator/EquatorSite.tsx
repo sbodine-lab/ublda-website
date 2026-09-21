@@ -313,7 +313,7 @@ function Header({ home, paused, systemMotion, onToggleMotion }: { home: boolean;
         disabled={systemMotion}
         onClick={onToggleMotion}
       >
-        {paused ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
+        {paused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
       </button>
     </header>
   );

@@ -11,12 +11,14 @@
   width: 44px;
   height: 44px;
   margin-left: 14px;
-  border: 1px solid currentColor !important;
+  /* Keep the generous hit area while showing only the compact motion icon. */
+  border: 1px solid transparent !important;
   border-radius: 50%;
   background: transparent;
   pointer-events: auto;
   z-index: 2;
 }
+.eq-motion-toggle:not(:disabled):hover { background: color-mix(in srgb, currentColor 9%, transparent); }
 .eq-motion-toggle:disabled { cursor: default; }
 .eq-header nav { margin-left: auto; }
 .eq-site[data-motion-paused="true"] *,
