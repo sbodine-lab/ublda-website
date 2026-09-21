@@ -35,6 +35,7 @@
 .st-experience .st-wrap > .st-button:hover { background: var(--st-paper); color: var(--st-accent); }
 .st-club-story { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 80px; padding-top: 120px; }
 .st-club-art { aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; }
+.st-club-art > img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .st-club-story h2 { font-size: 34px; line-height: 1.15; }
 .st-club-story p { font-size: 20px; line-height: 1.5; }
 .st-club-story .st-button { display: flex; margin-left: auto; }

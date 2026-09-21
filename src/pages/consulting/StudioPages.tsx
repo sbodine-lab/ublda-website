@@ -226,7 +226,16 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-club-story" data-enter>
-        <div className="st-club-art"><GenerativeArt kind="perspective" /></div>
+        <div className="st-club-art">
+          <img
+            src="/consulting/ross-paned-glass.jpg"
+            alt="The Ross School of Business entrance with a textured glass treatment"
+            width={1333}
+            height={1000}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
         <div>
           <h2>Part of a broader<br />UBLDA community.</h2>
           <p>

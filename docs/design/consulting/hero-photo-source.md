@@ -20,3 +20,11 @@ Local asset: public/ross-modern-exterior.jpg
 Retrieved: 2026-09-08
 
 The official Ross campus page identifies this as the Michigan Ross building at sunset. The filename dates the photograph to 2017; the 2024 path does not establish the capture date. Used for a local design trial at Sam's request to show the actual modern Ross building. Paper Halftone CMYK maps it to the site's navy and teal palette at render time. The original image file is unmodified.
+
+## Community photograph, September 21
+
+Sam requested replacing the abstract artwork beside “Part of a broader UBLDA community” with a Ross photograph treated as paned glass. `public/consulting/ross-paned-glass.jpg` is a derivative of the existing, previously selected `ross-front-entrance.jpg` above. It retains that source and credit.
+
+Rendered using the actual Paper Design `FlutedGlass` shader from `@paper-design/shaders-react` 0.0.80 in Chrome WebGL2 at 1333 × 1000. Settings: lines, prism, size 0.95, distortion 0.2, shadows 0.12, highlights 0.12, angle/shift/stretch/blur/edges/grain/speed 0, fit cover, background #f8f7f3, shadow #0a3658, highlight #ffffff. Exported at JPEG quality 86. The glass treatment is baked into the asset and lazy-loaded as a normal image, so this section adds no runtime shader bundle, GPU context, or animation. The original photo remains unchanged.
+
+Paper reference: https://shaders.paper.design/fluted-glass. Desktop uses the existing portrait crop and mobile the existing 4:3 crop.
