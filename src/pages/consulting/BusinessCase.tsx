@@ -15,10 +15,10 @@ export function BusinessCase() {
     <section className="st-wrap st-business-case" aria-labelledby="business-case-heading">
       <div className="st-business-case-heading" data-enter>
         <div className="st-business-case-intro">
-          <p>Disability affects how people use products, apply for jobs, and take part at work, which gives businesses a reason to consider accessibility in decisions about customers and employees. These studies examine the scale of disability and the barriers people encounter.</p>
+          <p>For Michigan students interested in business, accessibility is part of learning how to understand customers, evaluate a company, and manage a team. These studies show why it belongs in the decisions you practice in class and will make at work.</p>
           <Button to="/consulting/insights">Read the research</Button>
         </div>
-        <h2 id="business-case-heading">The business case<br />for accessibility.</h2>
+        <h2 id="business-case-heading">Why accessibility belongs<br />in your business education.</h2>
       </div>
       <div className="st-evidence-grid">
         {CARDS.map(({ id, theme, image }) => {
@@ -38,9 +38,13 @@ export function BusinessCase() {
                   decoding="async"
                 />
               )}
-              <span className="st-evidence-value">{item.value}</span>
+              <div>
+                <h3 className="st-evidence-topic">{item.topic}</h3>
+                <span className="st-evidence-value">{item.value}</span>
+              </div>
               <div className="st-evidence-copy">
-                <p>{item.metricLabel}.</p>
+                <p className="st-evidence-metric">{item.metricLabel}.</p>
+                <p className="st-evidence-relevance">{item.studentRelevance}</p>
                 <span className="st-evidence-source">
                   <span>{item.source}<br />{item.date}</span>
                   <ArrowUpRight size={24} aria-hidden="true" />

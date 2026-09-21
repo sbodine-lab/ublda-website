@@ -559,11 +559,11 @@ export function StudioInsights() {
         }
       >
         <p>
-          These studies examine disability in hiring, employment, and business
-          performance, giving students and organizations evidence to consider
-          when making decisions about their own practices. Each article links
-          to the original source and explains what the research does and does
-          not establish.
+          For Michigan students preparing for careers in business, these studies
+          connect accessibility with customer research, hiring, team management,
+          and company performance. Each article suggests ways to apply that
+          thinking in coursework or student leadership, explains its relevance
+          to employers, and links to the original research with its limitations.
         </p>
       </Intro>
       <section className="st-wrap st-section">
@@ -601,6 +601,9 @@ export function StudioInsight() {
           <small>{item.source}<br />{item.date}</small>
         </div>
         <div>
+          <h2>Why it matters as a business student</h2>
+          <p>{item.studentRelevance}</p>
+          <p>{item.studentApplication}</p>
           <h2>What it means for business</h2>
           <p>{item.takeaway}</p>
           <h2>What the data shows</h2>
