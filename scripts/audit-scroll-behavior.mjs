@@ -2,13 +2,15 @@ import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 const base = process.argv[2] || 'http://127.0.0.1:5180';
 const output = process.argv[3] || 'outputs/scroll-behavior';
+const routes = process.argv[4] ? [process.argv[4]] : ['/', '/consulting'];
+if (routes.some(route => !['/', '/consulting'].includes(route))) throw new Error('Expected / or /consulting');
 await mkdir(output, {recursive:true});
 const browser = await chromium.launch({headless:true,channel:'chrome'});
 const checks=[], errors=[];
 const check=(name,pass,detail)=>{checks.push({name,pass,detail});console.log(JSON.stringify(checks.at(-1)));};
 try {
   for(const width of [1440,390]) {
-    for(const route of ['/', '/consulting']) {
+    for(const route of routes) {
       const context = await browser.newContext({viewport:{width,height:900},hasTouch:width<769,reducedMotion:'no-preference'});
       const page=await context.newPage();
       page.on('pageerror',e=>errors.push({route,width,message:e.message}));
@@ -28,6 +30,46 @@ try {
       await page.goto(base+route); await page.locator('main h1').waitFor(); await page.evaluate(()=>document.fonts.ready);
       check(`Local fonts only ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>e.name.includes('fonts.googleapis.com')||e.name.includes('fonts.gstatic.com'))));
       check(`No recruiting shader download ${route} ${width}`,await page.evaluate(()=>!performance.getEntriesByType('resource').some(e=>/\/Table-|\/shaders-|\/Halftone/.test(e.name))));
+      if (route === '/consulting') {
+        const menu = page.locator('.st-navlinks');
+        const about = page.getByRole('button', {name:'About us',exact:true});
+        if (width < 1025) {
+          const toggle = page.getByRole('button', {name:'Open menu',exact:true});
+          await toggle.focus(); await page.keyboard.press('Space');
+          await page.waitForFunction(()=>document.querySelector('.st-navlinks > a')===document.activeElement);
+          check('Phone navigation isolates the page and moves focus inside',await page.locator('main').evaluate(el=>el.inert));
+          await page.keyboard.press('Shift+Tab');
+          check('Phone navigation wraps backward to its close control',await page.locator('.st-menu-toggle').evaluate(el=>el===document.activeElement));
+          await page.keyboard.press('Tab');
+          check('Phone navigation wraps forward to the first link',await menu.locator('a').first().evaluate(el=>el===document.activeElement));
+        }
+        await about.focus(); await page.keyboard.press('Space');
+        check(`About disclosure opens from the keyboard ${width}`,await about.getAttribute('aria-expanded')==='true');
+        const navigationViolations = await page.evaluate(async()=> (await window.axe.run('.st-header',{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}})).violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})));
+        check(`Expanded navigation accessibility scan ${width}`,!navigationViolations.length,navigationViolations);
+        const smallTargets = await page.locator('.st-header').evaluate(el=>[...el.querySelectorAll('a,button')].filter(node=>node.getClientRects().length && !node.closest('[inert]') && node.getBoundingClientRect().height<44).map(node=>node.textContent));
+        check(`Navigation targets remain at least 44px high ${width}`,!smallTargets.length,smallTargets);
+        await page.keyboard.press('Tab');
+        check(`About disclosure links are in tab order ${width}`,await page.locator('#consulting-about a').first().evaluate(el=>el===document.activeElement));
+        await page.keyboard.press('Escape');
+        check(`Escape closes the disclosure and restores focus ${width}`,await about.getAttribute('aria-expanded')==='false' && await about.evaluate(el=>el===document.activeElement));
+        if (width < 1025) {
+          check('Closing the submenu keeps the phone navigation open',await menu.evaluate(el=>el.classList.contains('st-navlinks--open')));
+          await page.keyboard.press('Escape');
+          check('Escape closes phone navigation and restores its trigger',await page.locator('.st-menu-toggle').evaluate(el=>el===document.activeElement && el.getAttribute('aria-expanded')==='false'));
+          await page.setViewportSize({width:844,height:390});
+          await page.getByRole('button',{name:'Open menu',exact:true}).click();
+          const panel = await menu.boundingBox();
+          check('Landscape menu stays within the viewport and can scroll',panel.y+panel.height<=390 && await menu.evaluate(el=>getComputedStyle(el).overflowY==='auto'));
+          await page.setViewportSize({width:1440,height:900});
+          await page.waitForFunction(()=>!document.querySelector('main').inert);
+          check('Phone-to-desktop resize releases background scrolling',await page.evaluate(()=>!document.documentElement.classList.contains('st-menu-open')));
+          await page.setViewportSize({width,height:900});
+        } else {
+          await about.click(); await page.locator('main h1').click();
+          check('Clicking outside the desktop disclosure dismisses it',await about.getAttribute('aria-expanded')==='false');
+        }
+      }
       if (route === '/' && width === 1440) {
         await page.setViewportSize({width:390,height:900});
         await page.getByRole('button', {name:'Open menu',exact:true}).click();
