@@ -44,10 +44,9 @@ try {
         await page.setViewportSize({width,height:900});
         await page.locator('.eq-value-zone').first().scrollIntoViewIfNeeded();
         await page.waitForTimeout(150);
-        check('Phone values keep all five illustrations in their cards', await page.locator('.eq-values').evaluate(el =>
-          el.dataset.static === 'true' && [...el.querySelectorAll('.eq-ribbon-anchor svg')].every(svg => getComputedStyle(svg).opacity === '1')));
-        check('Phone scroll does not load the floating WebGL renderer', await page.evaluate(() =>
-          !performance.getEntriesByType('resource').some(e => /ribbonRenderer/.test(e.name))));
+        await page.waitForFunction(() => document.querySelector('.eq-ribbon-flight').dataset.progress !== undefined);
+        check('Phone values use a stable sticky sculpture shelf', await page.locator('.eq-ribbon-rail').evaluate(el => getComputedStyle(el).position === 'sticky'));
+        check('Phone scroll loads the morphing WebGL artwork', await page.locator('.eq-ribbon-flight').evaluate(el => getComputedStyle(el).opacity === '1'));
         for (const value of await page.locator('.eq-value-zone').all()) {
           await value.scrollIntoViewIfNeeded();
           check('Phone value text remains readable after scrolling', await value.locator('article').evaluate(el => getComputedStyle(el).opacity === '1'));

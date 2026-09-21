@@ -12,16 +12,20 @@ Open-source options evaluated:
 - particle-morph: https://github.com/mmdalipour/particle-morph — MIT particle morphing approach; adds React Three Fiber and particle-heavy aesthetics, not needed for the ribbon.
 - MisterPrada/morph-particles: https://github.com/MisterPrada/morph-particles — relevant scroll/GPU experiment, but no license file was found in the displayed repository listing. Not used.
 
-## Visual meaning
+## September 21 revision
 
-One persistent Three.js canvas follows the values section, starting with Inclusion, from the start. At Sam’s request, the ribbon artwork was removed from the hero and story margin. Three related sheets transform into an open arch (inclusion), converging/interwoven paths (different experiences and shared purpose), unfolding pages (learning), facing arcs (listening/dialogue), and a bridge (community carried forward). Geometry and choreography are original; no stock icon silhouettes or decorative boxes remain.
+Sam selected the infinity sculpture as the useful form and requested recognizable symbols that relate to each value, continuous mobile morphing, and more of Equator's background movement. This supersedes the September 21 mobile fallback-only behavior.
 
-The sculpture has ivory faces and teal shading. The panels retain their existing headings and copy. On phones the artwork stays in its allocated space above each heading; it does not travel over text. On wide desktops a continuous position beside the values prevents jumps between panels. A gentle drift and the geometry share one smoothed animation clock; quintic interpolation eases each shape into the next with zero endpoint velocity and acceleration. Static fallback silhouettes remain hidden throughout the desktop sequence so a second shape never flashes into view during a handoff.
+The three original ribbon strips now form a group of people (inclusion), the retained infinity (shared purpose), an open book with a center fold (learning), layered speech bubbles (listening), and a heart (community and care). Equal-distance curve samples share a topology with the infinity. The existing ivory/teal material, eased morphs, and gentle 3D movement remain.
 
-## Implementation boundaries
+Phones, touch tablets, short windows, and enlarged text use flowing copy under a native CSS sticky sculpture shelf. One canvas stays in that shelf instead of hopping among five cards. Desktop keeps the pinned text composition with a shared sculpture position bounded by the values section. The morph timeline moves in either scroll direction and holds a complete symbol while its copy is read. The visible value counter uses that same timeline.
 
-Three.js is dynamically imported when the artwork enters view. One WebGL context serves the values section on the homepage and About page. The hero and story have no ribbon renderer or ribbon artwork. Other public page hero treatments are unchanged. Rendering pauses outside visible artwork, in hidden tabs, and under the site's Pause control. Reduced-motion, unsupported WebGL, and loading use vector renderings of the same original surfaces. Three.js license distributed at `/licenses/three-LICENSE.txt`.
+The introduction adds an original full-bleed field of flowing strands in UBLDA colors. It adapts the broad ambient movement of Equator's bird/cloud backgrounds without copying its media. Scroll-based text and element reveals run on phones as well as desktop.
+
+## Rendering and fallbacks
+
+Three.js loads as the values section enters view. One WebGL context serves the values on the home and About pages; the introduction uses a lightweight 2D canvas. The renderer matches its actual displayed size, caps pixel ratio at 1.5, and draws at 30fps on compact layouts (60fps on desktop). The background also draws at 30fps. Both stop drawing offscreen or in hidden tabs. The site Pause control and device reduced-motion preference retain static artwork and fully readable copy. Unsupported WebGL and context loss preserve the corresponding SVG form. Three.js license remains at `/licenses/three-LICENSE.txt`.
 
 ## Verification
 
-Build and 156 existing tests pass; lint has no errors (four pre-existing generated-file warnings). Browser checks at widths 320, 390, 768, 1024, 1440, and 2560 show no horizontal overflow. Visually checked the hero and story removal, retained values, and mobile layout. Confirmed animation changes pixels, resumes after Pause, hides offscreen, and retains five static value illustrations with reduced motion or unavailable WebGL. Homepage and About page each mount one journey canvas; no page errors observed.
+`node scripts/audit-brand-motion.mjs <base>` verifies all five stages at 320x568, 390x844, 844x390, 1024x768, and 1440x900, stable sculpture positions, continuous reverse morphs, frame activity/offscreen suspension, Pause, reduced motion, overflow, accessibility, and all five no-WebGL fallbacks. `scripts/audit-scroll-behavior.mjs` retains navigation, menus, pause, and accessibility coverage for the homepage and consulting. Screenshots and audit output live in ignored `outputs/brand-motion/`.

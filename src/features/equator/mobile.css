@@ -11,7 +11,6 @@
   .eq-hero--text .eq-hero-sub { align-self: start; line-height: 1.45; }
   .eq-story-inner { padding-block: 64px; gap: 28px; }
   .eq-words { font-size: clamp(28px, 7.6vw, 40px); line-height: 1.18; }
-  .eq-words > span { opacity: 1 !important; }
   .eq-values[data-static="true"] .eq-value-zone { padding-block: 40px; }
   .eq-value-zone + .eq-value-zone { border-top: 1px solid #0a365826; }
   .eq-values[data-static="true"] .eq-value { gap: 24px; }
@@ -24,10 +23,6 @@
   .eq-carousel { overscroll-behavior-x: contain; }
   .eq-story-card { scroll-snap-align: start; }
   .eq-cta { min-height: 0; gap: 32px; padding-block: 80px; }
-}
-@media (max-width: 768px), (max-height: 750px), (pointer: coarse) {
-  .eq-ribbon-flight { display: none; }
-  .eq-ribbon-anchor[data-live="true"] svg { opacity: 1; }
 }
 
 /* A landscape phone and a touch tablet still need a reachable menu. */
@@ -53,3 +48,7 @@
   .eq-splash { min-height: 0; padding: 96px 24px 88px; }
   .eq-logo-stage { width: 240px; }
 }
+
+/* Full-bleed strands echo the reference's ambient field in UBLDA colors. */
+.eq-brand-current { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mask-image: linear-gradient(110deg, transparent, #000 65%); }
+@media (max-width: 768px) { .eq-brand-current { mask-image: linear-gradient(transparent 10%, #000 95%); } }

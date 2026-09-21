@@ -1,47 +1,233 @@
-// Original parametric artwork. Each state shares a topology so it can unfold
-// continuously: an opening, joined paths, pages, a dialogue, and a bridge.
-export const ribbonNames = ["inclusion", "shared", "learning", "listening", "community"];
-export function ribbonPoint(stage: number, band: number, u: number, v: number): [number, number, number] {
-  const t = u * Math.PI * 2;
-  const b = band - 1;
-  if (stage === 2) {
-    const x = (u * 2 - 1) * 1.28;
-    const fold = Math.abs(u * 2 - 1);
-    return [x, -.45 + .65 * Math.pow(fold, .65) + b * .14 + .06 * v * v,
-      v * .72 + .18 * Math.sin(fold * Math.PI) + b * .10 * fold];
-  }
-  const center = (p: number): [number, number, number] => {
-    if (stage === 0) {
-      const a = -.18 + p * (Math.PI + .36);
-      const r = .97 + b * .19;
-      return [Math.cos(a) * r, Math.sin(a) * r - .35, b * .12 + .16 * Math.sin(a * 2)];
+// Original ribbon sculptures: people, shared purpose, learning, dialogue, care.
+// Every form keeps three strips and the same vertex order for continuous morphs.
+export const ribbonNames = [
+  "inclusion",
+  "shared",
+  "learning",
+  "listening",
+  "community",
+];
+type Point = [number, number];
+type Curve = [Point, Point, Point, Point];
+const line = (a: Point, b: Point): Curve => [a, a, b, b];
+const person: Curve[] = [
+  [
+    [0, 0.98],
+    [0.45, 0.98],
+    [0.46, 0.37],
+    [0.19, 0.28],
+  ],
+  [
+    [0.19, 0.28],
+    [0.2, 0.16],
+    [0.53, 0.17],
+    [0.54, -0.34],
+  ],
+  [
+    [0.54, -0.34],
+    [0.55, -0.51],
+    [-0.55, -0.51],
+    [-0.54, -0.34],
+  ],
+  [
+    [-0.54, -0.34],
+    [-0.53, 0.17],
+    [-0.2, 0.16],
+    [-0.19, 0.28],
+  ],
+  [
+    [-0.19, 0.28],
+    [-0.46, 0.37],
+    [-0.45, 0.98],
+    [0, 0.98],
+  ],
+];
+const book: Curve[] = [
+  [
+    [0, 0.57],
+    [-0.35, 0.88],
+    [-0.77, 0.87],
+    [-1.13, 0.77],
+  ],
+  line([-1.13, 0.77], [-1.13, -0.62]),
+  [
+    [-1.13, -0.62],
+    [-0.69, -0.5],
+    [-0.31, -0.5],
+    [0, -0.77],
+  ],
+  [
+    [0, -0.77],
+    [0.31, -0.5],
+    [0.69, -0.5],
+    [1.13, -0.62],
+  ],
+  line([1.13, -0.62], [1.13, 0.77]),
+  [
+    [1.13, 0.77],
+    [0.77, 0.87],
+    [0.35, 0.88],
+    [0, 0.57],
+  ],
+  // Follow the center fold and return along it; a narrow taper avoids a cap.
+  line([0, 0.57], [0, -0.77]),
+  line([0, -0.77], [0, 0.57]),
+];
+const speech: Curve[] = [
+  [
+    [-0.82, 0.72],
+    [-1.1, 0.72],
+    [-1.1, 0.48],
+    [-1.1, 0.18],
+  ],
+  [
+    [-1.1, 0.18],
+    [-1.1, -0.2],
+    [-1.05, -0.35],
+    [-0.82, -0.35],
+  ],
+  line([-0.82, -0.35], [-0.88, -0.72]),
+  line([-0.88, -0.72], [-0.38, -0.35]),
+  [
+    [-0.38, -0.35],
+    [0.14, -0.35],
+    [0.86, -0.46],
+    [0.86, 0.18],
+  ],
+  [
+    [0.86, 0.18],
+    [0.86, 0.6],
+    [0.74, 0.72],
+    [0.48, 0.72],
+  ],
+  line([0.48, 0.72], [-0.82, 0.72]),
+];
+const heart: Curve[] = [
+  [
+    [0, 0.52],
+    [-0.83, 1.42],
+    [-1.78, 0.28],
+    [0, -0.98],
+  ],
+  [
+    [0, -0.98],
+    [1.78, 0.28],
+    [0.83, 1.42],
+    [0, 0.52],
+  ],
+];
+// Equal-distance samples prevent short edges from bunching up during a morph.
+function sample(curves: Curve[]) {
+  const points: Point[] = [],
+    lengths: number[] = [];
+  let total = 0;
+  curves.forEach((curve) => {
+    for (let i = 0; i < 80; i++) {
+      const t = i / 80,
+        q = 1 - t;
+      const p: Point = [0, 1].map(
+        (axis) =>
+          q ** 3 * curve[0][axis] +
+          3 * q * q * t * curve[1][axis] +
+          3 * q * t * t * curve[2][axis] +
+          t ** 3 * curve[3][axis],
+      ) as Point;
+      if (points.length)
+        total += Math.hypot(p[0] - points.at(-1)![0], p[1] - points.at(-1)![1]);
+      points.push(p);
+      lengths.push(total);
     }
+  });
+  const last = curves.at(-1)![3];
+  total += Math.hypot(last[0] - points.at(-1)![0], last[1] - points.at(-1)![1]);
+  points.push(last);
+  lengths.push(total);
+  return (u: number): Point => {
+    const distance = Math.max(0, Math.min(1, u)) * total;
+    let low = 0,
+      high = lengths.length - 1;
+    while (high - low > 1) {
+      const mid = (low + high) >> 1;
+      if (lengths[mid] < distance) low = mid;
+      else high = mid;
+    }
+    const t = (distance - lengths[low]) / (lengths[high] - lengths[low] || 1);
+    return [
+      points[low][0] + (points[high][0] - points[low][0]) * t,
+      points[low][1] + (points[high][1] - points[low][1]) * t,
+    ];
+  };
+}
+const outlines = [
+  sample(person),
+  undefined,
+  sample(book),
+  sample(speech),
+  sample(heart),
+];
+export function ribbonPoint(
+  stage: number,
+  band: number,
+  u: number,
+  v: number,
+): [number, number, number] {
+  const b = band - 1,
+    t = u * Math.PI * 2;
+  const center = (p: number): [number, number, number] => {
     if (stage === 1) {
       const a = p * Math.PI * 2;
-      return [1.12 * Math.sin(a), .52 * Math.sin(a * 2) + b * .19, .38 * Math.cos(a) + b * .16];
+      // The infinity form Sam selected, including its original layered spacing.
+      return [
+        1.12 * Math.sin(a),
+        0.52 * Math.sin(a * 2) + b * 0.19,
+        0.38 * Math.cos(a) + b * 0.16,
+      ];
+    }
+    let [x, y] = outlines[stage]!(p);
+    if (stage === 0) {
+      const scale = band === 1 ? 0.9 : 0.72;
+      x = x * scale + b * 0.83;
+      y = y * scale - (band === 1 ? 0 : 0.16);
+    }
+    if (stage === 2) {
+      x *= 1 - b * 0.035;
+      y = y * 0.86 + b * 0.14;
     }
     if (stage === 3) {
-      const side = band === 1 ? -1 : 1;
-      const a = -.7 * Math.PI + p * 1.4 * Math.PI;
-      return [side * (.35 + .63 * Math.cos(a)), .74 * Math.sin(a), b * .26 + .12 * Math.cos(a)];
+      const scale = 1 - b * 0.13;
+      x = x * scale + b * 0.11;
+      y = y * scale - b * 0.13;
     }
-    const x = (p * 2 - 1) * 1.3;
-    return [x, band === 1 ? -.42 : .65 * Math.sin(p * Math.PI) - .42,
-      b * .42];
+    if (stage === 4) {
+      const scale = 1 - b * 0.17;
+      x *= scale;
+      y *= scale;
+    }
+    return [x, y, b * 0.16 + 0.06 * Math.sin(p * Math.PI * 2)];
   };
-  const c = center(u), before = center(u - .001), after = center(u + .001);
-  const dx = after[0] - before[0], dy = after[1] - before[1];
-  const length = Math.hypot(dx, dy) || 1;
-  const width = stage === 3 ? .10 : .075;
-  const twist = stage === 1 ? Math.sin(t + band * .6) * .65 : Math.sin(t * .5) * .2;
-  return [c[0] - dy / length * v * width, c[1] + dx / length * v * width,
-    c[2] + v * (.26 + twist * .12)];
+  const c = center(u),
+    before = center(Math.max(0, u - 0.001)),
+    after = center(Math.min(1, u + 0.001));
+  const dx = after[0] - before[0],
+    dy = after[1] - before[1],
+    length = Math.hypot(dx, dy) || 1;
+  const width = stage === 0 ? 0.046 : stage === 1 ? 0.075 : 0.04;
+  const depth =
+    stage === 1
+      ? 0.26 + Math.sin(t + band * 0.6) * 0.078
+      : stage === 0
+        ? 0.1
+        : 0.14;
+  return [
+    c[0] - (dy / length) * v * width,
+    c[1] + (dx / length) * v * width,
+    c[2] + v * depth,
+  ];
 }
-
 export function ribbonSilhouette(stage: number, band: number) {
   const project = (u: number, v: number) => {
     const [x, y, z] = ribbonPoint(stage, band, u, v);
     return `${(150 + x * 87 + z * 20).toFixed(2)},${(154 - y * 87 + z * 29).toFixed(2)}`;
   };
-  return `M${Array.from({ length: 81 }, (_, i) => project(i / 80, -1)).join("L")}L${Array.from({ length: 81 }, (_, i) => project(1 - i / 80, 1)).join("L")}Z`;
+  return `M${Array.from({ length: 161 }, (_, i) => project(i / 160, -1)).join("L")}L${Array.from({ length: 161 }, (_, i) => project(1 - i / 160, 1)).join("L")}Z`;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { NetworkLogos } from "./NetworkLogos";
+import { BrandCurrent } from "./BrandCurrent";
 import { RibbonJourney } from "./RibbonJourney";
 import {
   ArrowDown,
@@ -356,7 +357,7 @@ function Hero({
 }) {
   return (
     <section className={`eq-hero${artwork ? "" : " eq-hero--text"}`} id="intro" data-tone="teal" aria-label={label}>
-      {artwork && <BrandParticles />}
+      {artwork ? <BrandParticles /> : <BrandCurrent />}
       <h1>{title}</h1>
       <p className="eq-hero-sub">
         {description}
@@ -418,7 +419,6 @@ function Story({ full = false }: { full?: boolean }) {
 }
 function Values() {
   const ref = useRef<HTMLElement>(null);
-  const number = useRef<HTMLSpanElement>(null);
   const compact = useCompactMotion();
   const paused = useMotionPaused();
   const [oversized, setOversized] = useState(false);
@@ -452,8 +452,6 @@ function Values() {
       // Measure the entire stack before changing opacity: interleaving the two
       // forces a fresh layout for each sticky panel on every scroll frame.
       const tops = panels.map(panel => panel.getBoundingClientRect().top);
-      const index = tops.reduce((active, top, i) => top < 160 ? i : active, 0);
-      if (number.current) number.current.textContent = String(index + 1);
       panels.forEach((panel, i) => {
         const content = panel.firstElementChild as HTMLElement;
         const fade = tops[i + 1] !== undefined
@@ -483,12 +481,13 @@ function Values() {
       id="what-we-stand-for"
       className="eq-values"
       data-static={staticLayout || undefined}
+      data-animated={!paused || undefined}
       data-tone="gold"
       aria-label="What we stand for"
     >
       <div className="eq-value-counter" aria-hidden="true">
         <div>
-          <span ref={number}>1</span>/5
+          <span>1</span>/5
         </div>
       </div>
       <RibbonJourney />
@@ -1081,7 +1080,7 @@ export default function EquatorSite() {
     if (motionPaused) return;
     const context = gsap.context(() => {
       const media = gsap.matchMedia();
-      media.add("(prefers-reduced-motion: no-preference) and (min-width: 769px) and (pointer: fine)", () => {
+      media.add("(prefers-reduced-motion: no-preference)", () => {
         gsap.utils.toArray<HTMLElement>(".eq-words").forEach((p) =>
           gsap.fromTo(
             p.querySelectorAll("span[aria-hidden]"),
