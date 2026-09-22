@@ -57,27 +57,56 @@ vec3 rossCar(vec3 background, vec2 p, float offset, float direction, vec2 sample
   return mix(background, car, body);
 }
 vec3 rossPerson(vec3 background, vec2 p, vec2 start, vec2 end, float offset, vec3 coat) {
-  float phase = fract(u_sceneTime / 115. + offset);
-  vec2 center = mix(start, end, phase);
+  vec2 forward = normalize(end - start);
+  vec2 side = vec2(forward.y, -forward.x);
+  float phase = fract(u_sceneTime * 5.5 / length(end - start) + offset);
+  float step = sin(u_sceneTime * 8. + offset * 23.);
+  vec2 center = mix(start, end, phase) + side * step * .25;
   vec2 delta = p - center;
-  if (length(delta) > 6.) return background;
-  float fade = smoothstep(0., .045, phase) * (1. - smoothstep(.955, 1., phase));
-  float shadow = 1. - smoothstep(.4, 2.4, length((delta - vec2(1.4, 2.)) / vec2(.8, 1.3)));
-  background *= 1. - shadow * .35 * fade;
-  float body = 1. - smoothstep(.5, 1.4, length(delta / vec2(1., 1.5)));
+  if (length(delta) > 8.) return background;
+  float fade = smoothstep(0., .025, phase) * (1. - smoothstep(.975, 1., phase));
+  float shadow = 1. - smoothstep(.5, 2.5, length((delta - vec2(2., 3.)) / vec2(.9, 1.5)));
+  background *= 1. - shadow * .46 * fade;
+  // Orient each walker along the path, with alternating feet and arm swing.
+  vec2 local = vec2(dot(delta, side), -dot(delta, forward));
+  float leftFoot = length((local - vec2(-.7, 2. + step * .6)) / vec2(.65, 1.));
+  float rightFoot = length((local - vec2(.7, 2. - step * .6)) / vec2(.65, 1.));
+  float feet = 1. - smoothstep(.55, 1.1, min(leftFoot, rightFoot));
+  background = mix(background, vec3(.13, .16, .18), feet * fade);
+  float arms = min(length(local - vec2(-1.7, step * .7)), length(local - vec2(1.7, -step * .7)));
+  background = mix(background, coat * .85, (1. - smoothstep(.45, .95, arms)) * fade);
+  float body = 1. - smoothstep(.75, 1.25, length(local / vec2(1.5, 1.65)));
   background = mix(background, coat, body * fade);
-  float head = 1. - smoothstep(.4, 1., length(delta - vec2(0., -.9)));
-  return mix(background, vec3(.38, .29, .22), head * fade);
+  float head = 1. - smoothstep(.65, 1.25, length(local - vec2(0., -1.35)));
+  return mix(background, vec3(.49, .36, .26), head * fade);
 }
+
 vec3 rossStreetLife(vec3 color, vec2 uv) {
   vec2 p = uv * vec2(1672., 941.);
-  color = rossCar(color, p, 345., 1., vec2(1442., 528.));
-  color = rossCar(color, p, 910., 1., vec2(1442., 579.));
-  color = rossCar(color, p, 520., -1., vec2(1441., 233.));
+  // Five evenly spaced vehicles in each direction keep the street active.
+  color = rossCar(color, p, 15., 1., vec2(1442., 579.));
+  color = rossCar(color, p, 315., 1., vec2(1442., 528.));
+  color = rossCar(color, p, 615., 1., vec2(1441., 233.));
+  color = rossCar(color, p, 915., 1., vec2(1442., 579.));
+  color = rossCar(color, p, 1215., 1., vec2(1441., 233.));
+  color = rossCar(color, p, 150., -1., vec2(1441., 233.));
+  color = rossCar(color, p, 450., -1., vec2(1442., 579.));
+  color = rossCar(color, p, 750., -1., vec2(1442., 528.));
+  color = rossCar(color, p, 1050., -1., vec2(1442., 579.));
+  color = rossCar(color, p, 1350., -1., vec2(1441., 233.));
+  // Walkers stay on the east sidewalk and the broad southern entrance paths.
   color = rossPerson(color, p, vec2(1411., 145.), vec2(1411., 830.), .16, vec3(.17,.23,.28));
-  color = rossPerson(color, p, vec2(1400., 820.), vec2(1400., 145.), .54, vec3(.57,.35,.24));
+  color = rossPerson(color, p, vec2(1411., 145.), vec2(1411., 830.), .47, vec3(.74,.43,.19));
+  color = rossPerson(color, p, vec2(1411., 145.), vec2(1411., 830.), .79, vec3(.24,.39,.48));
+  color = rossPerson(color, p, vec2(1400., 820.), vec2(1400., 145.), .21, vec3(.65,.34,.25));
+  color = rossPerson(color, p, vec2(1400., 820.), vec2(1400., 145.), .54, vec3(.17,.24,.31));
+  color = rossPerson(color, p, vec2(1400., 820.), vec2(1400., 145.), .87, vec3(.66,.59,.43));
+  color = rossPerson(color, p, vec2(765., 850.), vec2(1190., 850.), .07, vec3(.54,.29,.21));
   color = rossPerson(color, p, vec2(765., 850.), vec2(1190., 850.), .37, vec3(.17,.25,.35));
-  color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .82, vec3(.4,.37,.3));
+  color = rossPerson(color, p, vec2(765., 850.), vec2(1190., 850.), .71, vec3(.70,.53,.25));
+  color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .18, vec3(.23,.38,.36));
+  color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .50, vec3(.17,.23,.28));
+  color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .82, vec3(.58,.35,.26));
   return color;
 }
 `;
