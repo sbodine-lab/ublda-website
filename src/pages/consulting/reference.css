@@ -95,7 +95,7 @@
 .st-ross-hero, .st-ross-shader { position: absolute; inset: 0; pointer-events: none; }
 .st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .st-ross-shader { opacity: 0; }
-.st-ross-shader[data-ready="true"] { opacity: var(--st-halftone-opacity, .52); }
+.st-ross-shader[data-ready="true"] { opacity: 1; }
 .st-ross-shader canvas { display: block; width: 100%; height: 100%; }
 .st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d1319b3, #0d131980 42%, #0d131959 85%); }
 .st-hero--photo .st-hero-content { z-index: 2; }
@@ -107,6 +107,7 @@
   .st-hero--photo .st-hero-content { padding-block: clamp(180px, 16.9vw, 300px) 100px; }
 }
 @media (max-width: 767px) {
+  .st-hero-photo { object-position: 88% center; }
   .st-ross-hero { top: 72px; height: calc(100% - 72px); mask-image: linear-gradient(180deg, transparent, #000 12%); }
   .st-hero--photo::before { background: linear-gradient(180deg, #0d1319a6, #0d131980 40%, #0d131950 80%); }
 }

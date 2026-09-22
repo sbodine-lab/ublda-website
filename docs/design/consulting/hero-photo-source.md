@@ -2,11 +2,13 @@
 
 ## Current: CMYK halftone, September 21
 
-Sam requested Paper's Halftone CMYK shader over the same overhead Ross visualization. The source image, responsive crops, headline, and generated-image provenance below remain the same. The glass effect is replaced by the actual `halftoneCmykFragmentShader` from Paper 0.0.80, using its supplied noise texture and vanilla mount API.
+The hero uses the existing generated Ross visualization with Paper 0.0.80's `halftoneCmykFragmentShader`, its noise texture, and vanilla `ShaderMount` API. `rossSceneShader.ts` extends the fragment shader with localized tree-canopy displacement, three moving vehicles sampled from the source image, and four small pedestrians following the walkways. Curbside vehicles remain parked. Vehicles follow continuous rounded turns into the upper street, with loops occurring outside the frame. The camera and building geometry remain fixed; no new image generation or video asset is involved.
 
-Latest refinement: ink type, size 0.18, contrast 1, softness 0.85, grid noise 0.14, grain size 0.5, grain mixer 0, grain overlay 0.01. Paper color #f8f7f3, cyan #00b4ff, magenta #fc519f, yellow #ffd800, black #0d1319. Cyan flood 0.04; other floods 0. Cyan gain 0.12, magenta gain 0, yellow gain 0.08, black gain -0.04.
+Ink settings: size 0.18, contrast 1, softness 0.85, grid noise 0.14, grain size 0.5, grain mixer 0, grain overlay 0.01. Paper color #f8f7f3, cyan #00b4ff, magenta #fc519f, yellow #ffd800, black #0d1319. Cyan flood 0.04; other floods 0. Cyan gain 0.12, magenta gain 0, yellow gain 0.08, black gain -0.04. A 48-second orbit drifts the printing grid and varies cyan/magenta gain. The shader mixes the animated image and halftone internally at 46–58%, keeping the tree movement aligned through both layers.
 
-An 18-second sine cycle varies cyan gain by ±0.06, magenta gain by ∓0.04, and grid noise by ±0.08, while blending the rendered effect over the unchanged image at 46–58% opacity. The subtle movement is in the ink texture, not the camera or the building. Pause, reduced motion, hidden/offscreen suspension, render budgets, and fallback behavior are retained. The frame loop freezes both shader uniforms and layer opacity.
+Scene time runs at 1× at the top and smoothly increases toward 4× as 85% of the hero scrolls above the viewport. Speed changes ease over 650ms, and integrated time prevents position jumps. The existing pause control, device reduced motion, hidden-tab suspension, and offscreen suspension stop the entire scene and halftone together. Rendering remains capped at 30 updates/second, 900,000 pixels on phones and 2,200,000 on larger screens. The native image stays underneath for load failure, unsupported WebGL, and context loss.
+
+Phones now use the full responsive source image with an 88% horizontal focal position, retaining the main roof and moving traffic in one frame. The shader crop matches the native fallback. The older pre-cropped mobile asset is no longer selected by this hero.
 
 The mobile image now begins 72px below the hero top with a short 12% edge fade, replacing the lower-74% image and longer vignette. The overlay is lighter toward the bottom; both headline lines are white for contrast. The outlined hero CTA retains its dark background and light hover state.
 
