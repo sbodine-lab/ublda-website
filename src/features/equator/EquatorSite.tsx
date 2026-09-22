@@ -372,12 +372,6 @@ function Story({ full = false }: { full?: boolean }) {
           We’re students with different backgrounds and ambitions, brought
           together by one belief: disability inclusion belongs in business.
         </Words>
-        <div className="eq-story-logos" data-reveal>
-          <img
-            src="/partners-blda.webp"
-            alt="Business Leaders for Diverse Abilities"
-          />
-        </div>
         <Words>
           At Michigan Ross, we’re building a community around that belief.
         </Words>
