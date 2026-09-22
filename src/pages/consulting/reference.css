@@ -10,6 +10,14 @@
 .st .st-button--solid:hover { background: var(--st-dark); border-color: var(--st-dark) !important; }
 .st-positioning { padding-block: 112px 120px; }
 .st-statement { line-height: 1.18; }
+.st-positioning + .st-client-feature { margin-top: 0; margin-bottom: 80px; }
+.st-service-inquiry { margin-top: 32px; }
+.st-team-section + .st-business-case { padding-top: 120px; }
+.st-business-case + .st-callout { margin-top: 0; }
+@media (max-width: 767px) {
+  .st-positioning + .st-client-feature { margin-bottom: 48px; }
+  .st-team-section + .st-business-case { padding-top: 64px; }
+}
 .st-experience { position: relative; margin: 0; padding-block: 64px 100px; color: var(--st-ink); background: var(--st-paper); isolation: isolate; }
 .st-experience::before {
   content: ""; position: absolute; inset: 230px 0 0; z-index: -1;

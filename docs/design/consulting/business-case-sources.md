@@ -1,6 +1,6 @@
 # Homepage business case
 
-Sam requested this section September 21, 2026, using the supplied Board of Innovation statistics grid as the visual reference. It follows the club introduction and uses four cards linked directly to original sources. The Insights pages retain methods, scope and limitations.
+Sam requested this section September 21, 2026, using the supplied Board of Innovation statistics grid as the visual reference. It now follows the homepage’s program, client and team sections and uses four cards linked directly to original sources. The Insights pages retain methods, scope and limitations.
 
 Sources verified September 21, 2026:
 
@@ -26,3 +26,7 @@ The figures and original sources were rechecked for this update, including the B
 Sam requested a more motivating alternative to the 26% hiring-barrier card. The September 2025 JAN report was verified on September 21, 2026: it draws on 5,406 responses from employers who contacted JAN in 2019–2024; 85% of employers reporting accommodation benefits cited increased retention. Replaced the homepage card and Insights entry; the former article URL redirects to the new accommodations article.
 
 The Ross hero retains the subtle Paper CMYK appearance and adds a 48-second grid drift. A narrow extension to Paper 0.0.80 offsets halftone grid coordinates and compensates image-sampling coordinates, leaving the building stationary. Pause, reduced motion, hidden-tab/offscreen suspension and native-image fallback remain in place.
+
+## Balanced audience update
+
+Sam’s later September 21 direction (Brain note 517) supersedes the student-first homepage framing above. The research section now appears after the project managers, under “Accessibility in business,” and uses shared business implications on the cards. The homepage uses one shared introduction rather than audience-choice panels (Sam’s subsequent correction, Brain note 518); study findings and original source links are unchanged. Student applications remain available within the detailed Insights articles, alongside organizational implications.

@@ -181,7 +181,6 @@ export function StudioHome() {
           </h1>
           <div className="st-actions" data-enter style={enterDelay(600)}>
             <Button to="/consulting/work">Meet our first client</Button>
-            <ApplicationButton solid />
           </div>
         </div>
       </section>
@@ -195,16 +194,49 @@ export function StudioHome() {
             teams within companies.
           </p>
           <p>
-            Our first client is Arc Thrift Stores of Colorado, a nonprofit
-            retailer that employs people with intellectual and developmental
-            disabilities and funds disability advocacy. Our October–December
-            engagement will conclude with a presentation to The Arc’s national
-            board in December.
+            Each engagement centers on a question the client needs to answer,
+            giving students practice in research, analysis, and presenting
+            recommendations while keeping the work tied to the organization’s
+            priorities.
           </p>
           <p className="st-campus-affiliation">{PARTNER_STATEMENT}</p>
         </div>
       </section>
-      <BusinessCase />
+      <section
+        className="st-wrap st-client-feature"
+        aria-labelledby="client-heading"
+        data-enter
+      >
+        <div className="st-client-copy">
+          <p className="st-eyebrow">Our first client · Fall 2026</p>
+          <h2 id="client-heading">Arc Thrift Stores of Colorado</h2>
+          <Button to="/consulting/work">Meet our client</Button>
+        </div>
+        <div className="st-client-details">
+          <div className="st-client-detail">
+            <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
+            <div>
+              <h3>Fall 2026 client</h3>
+              <p>
+                The nonprofit retailer funds disability advocacy and community
+                programs and employs people with intellectual and developmental
+                disabilities.
+              </p>
+            </div>
+          </div>
+          <div className="st-client-detail">
+            <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
+            <div>
+              <h3>National board presentation</h3>
+              <p>
+                Our October–December engagement will conclude with the student
+                team presenting its recommendations to The Arc’s national board
+                in December 2026.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
@@ -254,42 +286,10 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
-        <h2 className="st-section-heading">How we could<br />help your organization.</h2>
+        <h2 className="st-section-heading">The questions<br />we could take on.</h2>
         <ServiceCards />
-      </section>
-      <Callout join />
-      <section
-        className="st-wrap st-client-feature"
-        aria-labelledby="client-heading"
-        data-enter
-      >
-        <div className="st-client-copy">
-          <h2 id="client-heading">Arc Thrift Stores of Colorado</h2>
-          <Button to="/consulting/work">Meet our client</Button>
-        </div>
-        <div className="st-client-details">
-          <div className="st-client-detail">
-            <BrandLogo src="/partners-arc-thrift.png" alt="Arc Thrift Stores" />
-            <div>
-              <h3>Fall 2026 client</h3>
-              <p>
-                The nonprofit retailer funds disability advocacy and community
-                programs and employs people with intellectual and developmental
-                disabilities.
-              </p>
-            </div>
-          </div>
-          <div className="st-client-detail">
-            <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
-            <div>
-              <h3>National board presentation</h3>
-              <p>
-                The Fall 2026 engagement concludes with our student team
-                presenting its recommendations to The Arc’s national board
-                in December.
-              </p>
-            </div>
-          </div>
+        <div className="st-service-inquiry">
+          <Button to="/consulting/contact">Discuss a project</Button>
         </div>
       </section>
       <section className="st-team-section">
@@ -301,6 +301,8 @@ export function StudioHome() {
           <People />
         </div>
       </section>
+      <BusinessCase />
+      <Callout join />
     </Studio>
   );
 }
@@ -559,11 +561,10 @@ export function StudioInsights() {
         }
       >
         <p>
-          For Michigan students preparing for careers in business, these studies
-          connect accessibility with customer research, hiring, team management,
-          and company performance. Each article suggests ways to apply that
-          thinking in coursework or student leadership, explains its relevance
-          to employers, and links to the original research with its limitations.
+          These studies examine how disability and accessibility relate to
+          customers, employment, and company performance. Each article connects
+          the findings to decisions organizations make and questions students
+          can explore, with links to the original research and its limitations.
         </p>
       </Intro>
       <section className="st-wrap st-section">
