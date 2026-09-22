@@ -30,12 +30,19 @@ float rossBox(vec2 p, vec2 halfSize, float radius) {
   vec2 d = abs(p) - halfSize + radius;
   return length(max(d, 0.)) + min(max(d.x, d.y), 0.) - radius;
 }
+// Constrain vehicle pixels (including their shadows) to the pictured pavement.
+float rossRoadMask(vec2 p) {
+  float vertical = max(max(1449. - p.x, p.x - 1494.), 80. - p.y);
+  float upper = max(abs(p.y - (76. + (p.x - 1500.) * .168)) - 20., 1440. - p.x);
+  return 1. - smoothstep(0., 1., min(vertical, upper));
+}
+
 vec3 rossCar(vec3 background, vec2 p, float offset, float direction, vec2 sampleCenter) {
   // Cars travel on the clear lanes; the photographed curbside cars stay parked.
   float travel = mod(u_sceneTime * 19. + offset, 1500.);
   float distance = direction > 0. ? travel - 300. : 1200. - travel;
   float lane = direction > 0. ? 1461. : 1482.;
-  float cornerY = direction > 0. ? 120. : 140.;
+  float cornerY = direction > 0. ? 108. : 127.;
   vec2 center = vec2(lane, cornerY + distance);
   float angle = 0.;
   // A continuous, constant-speed arc turns into the sloped upper street.
@@ -83,6 +90,7 @@ vec3 rossPerson(vec3 background, vec2 p, vec2 start, vec2 end, float offset, vec
 
 vec3 rossStreetLife(vec3 color, vec2 uv) {
   vec2 p = uv * vec2(1672., 941.);
+  vec3 ground = color;
   // Five evenly spaced vehicles in each direction keep the street active.
   color = rossCar(color, p, 15., 1., vec2(1442., 579.));
   color = rossCar(color, p, 315., 1., vec2(1442., 528.));
@@ -94,6 +102,7 @@ vec3 rossStreetLife(vec3 color, vec2 uv) {
   color = rossCar(color, p, 750., -1., vec2(1442., 528.));
   color = rossCar(color, p, 1050., -1., vec2(1442., 579.));
   color = rossCar(color, p, 1350., -1., vec2(1441., 233.));
+  color = mix(ground, color, rossRoadMask(p));
   // Walkers stay on the east sidewalk and the broad southern entrance paths.
   color = rossPerson(color, p, vec2(1411., 145.), vec2(1411., 830.), .16, vec3(.17,.23,.28));
   color = rossPerson(color, p, vec2(1411., 145.), vec2(1411., 830.), .47, vec3(.74,.43,.19));
@@ -107,7 +116,27 @@ vec3 rossStreetLife(vec3 color, vec2 uv) {
   color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .18, vec3(.23,.38,.36));
   color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .50, vec3(.17,.23,.28));
   color = rossPerson(color, p, vec2(1180., 865.), vec2(765., 865.), .82, vec3(.58,.35,.26));
-  return color;
+  // Activity on the west paths, plaza, and courtyard balances the east street.
+  color = rossPerson(color, p, vec2(152., 333.), vec2(152., 428.), .22, vec3(.66,.39,.20));
+  color = rossPerson(color, p, vec2(158., 428.), vec2(158., 333.), .68, vec3(.17,.25,.35));
+  color = rossPerson(color, p, vec2(84., 421.), vec2(220., 421.), .15, vec3(.20,.32,.39));
+  color = rossPerson(color, p, vec2(220., 429.), vec2(84., 429.), .64, vec3(.64,.32,.22));
+  color = rossPerson(color, p, vec2(119., 579.), vec2(119., 649.), .26, vec3(.19,.29,.35));
+  color = rossPerson(color, p, vec2(125., 649.), vec2(125., 579.), .73, vec3(.70,.49,.22));
+  color = rossPerson(color, p, vec2(93., 605.), vec2(185., 605.), .17, vec3(.55,.28,.22));
+  color = rossPerson(color, p, vec2(185., 613.), vec2(93., 613.), .62, vec3(.16,.25,.32));
+  color = rossPerson(color, p, vec2(702., 522.), vec2(702., 698.), .24, vec3(.65,.44,.24));
+  color = rossPerson(color, p, vec2(709., 698.), vec2(709., 522.), .70, vec3(.17,.24,.31));
+  color = rossPerson(color, p, vec2(596., 694.), vec2(717., 694.), .18, vec3(.20,.34,.39));
+  color = rossPerson(color, p, vec2(717., 702.), vec2(596., 702.), .63, vec3(.59,.32,.23));
+  if (distance(color, ground) < .0001) return ground;
+  // Sample the animated source canopy, before CMYK tinting, to occlude street
+  // activity beneath green/gold leaves. This follows each branch as it sways.
+  vec3 source = texture(u_image, rossWindUV(uv)).rgb;
+  float brightness = max(max(source.r, source.g), max(source.b, .04));
+  float foliage = smoothstep(.035, .10, (source.g - source.b) / brightness)
+    * smoothstep(.62, .84, source.g / max(source.r, .03));
+  return mix(color, ground, foliage);
 }
 `;
 
