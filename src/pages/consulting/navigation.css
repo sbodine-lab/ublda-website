@@ -49,7 +49,7 @@
   .st-header .st-menu-toggle svg { width: 28px; height: 28px; }
 }
 @media (max-width: 767px) {
-  .st-header .st-header-inner { width: calc(100% - 60px); min-height: 104px; padding-block: 22px; }
+  .st-header .st-header-inner { width: calc(100% - 2 * var(--st-gutter)); min-height: 104px; padding-block: 22px; }
   .st-header .st-navlinks--open { inset: 112px 12px auto; }
   .st-header .st-logo img { width: 108px; }
   .st-header .st-parent-link { font-size: 11px; }
