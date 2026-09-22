@@ -1,7 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { NetworkLogos } from "./NetworkLogos";
-import { BrandCurrent } from "./BrandCurrent";
 import { RibbonJourney } from "./RibbonJourney";
 import {
   ArrowDown,
@@ -357,7 +356,7 @@ function Hero({
 }) {
   return (
     <section className={`eq-hero${artwork ? "" : " eq-hero--text"}`} id="intro" data-tone="teal" aria-label={label}>
-      {artwork ? <BrandParticles /> : <BrandCurrent />}
+      {artwork && <BrandParticles />}
       <h1>{title}</h1>
       <p className="eq-hero-sub">
         {description}
