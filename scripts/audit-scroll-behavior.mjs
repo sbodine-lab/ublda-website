@@ -50,16 +50,33 @@ try {
           const program = gl.getParameter(gl.CURRENT_PROGRAM);
           return Array.from(gl.getUniform(program, gl.getUniformLocation(program, 'u_ubldaGridDrift')));
         });
+        const sceneClock = () => heroCanvas.evaluate(el => {
+          const gl = el.getContext('webgl2');
+          return gl.getUniform(gl.getParameter(gl.CURRENT_PROGRAM), gl.getUniformLocation(gl.getParameter(gl.CURRENT_PROGRAM), 'u_sceneTime'));
+        });
+        const initialScene = await sceneClock();
         const initialGrid = await gridPosition();
         const moving = await heroPaints(); await page.waitForTimeout(300);
         const movedGrid = await gridPosition();
         check(`Ross halftone grid coordinates animate ${width}`,
           JSON.stringify(initialGrid)!==JSON.stringify(movedGrid) && movedGrid.every(Number.isFinite), {initialGrid,movedGrid});
         check(`Ross shader renders live motion ${width}`,(await heroPaints())>moving);
+        check(`Ross scene time advances ${width}`,(await sceneClock())>initialScene);
+        await page.evaluate(()=>window.scrollTo({top:document.querySelector('.st-hero').offsetHeight*.55,behavior:'instant'}));
+        await page.waitForTimeout(1400);
+        const fastSpeed = Number(await glass.getAttribute('data-scene-speed'));
+        const fastStart = await sceneClock(); await page.waitForTimeout(400);
+        const fastDelta = await sceneClock()-fastStart;
+        check(`Scrolling accelerates the visible Ross scene ${width}`,fastSpeed>2 && fastSpeed<=4 && fastDelta>.6,{fastSpeed,fastDelta});
+        await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+        await page.waitForTimeout(1800);
+        const slowSpeed = Number(await glass.getAttribute('data-scene-speed'));
+        check(`Returning to the hero slows the scene ${width}`,slowSpeed<1.2,{slowSpeed});
         await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
+        const frozenScene = await sceneClock();
         const frozenGrid = await gridPosition();
         const frozen = await heroPaints(); await page.waitForTimeout(300);
-        check(`Pause freezes Ross shader ${width}`,(await heroPaints())===frozen && JSON.stringify(await gridPosition())===JSON.stringify(frozenGrid));
+        check(`Pause freezes Ross shader ${width}`,(await heroPaints())===frozen && JSON.stringify(await gridPosition())===JSON.stringify(frozenGrid) && await sceneClock()===frozenScene);
         await page.locator('.st-motion-toggle').click(); await page.waitForTimeout(150);
         check(`Resume restarts Ross shader ${width}`,(await heroPaints())>frozen);
         await page.locator('footer').scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
@@ -67,8 +84,9 @@ try {
         check(`Offscreen Ross shader stops rendering ${width}`,(await heroPaints())===offscreen);
         await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
         await page.emulateMedia({reducedMotion:'reduce'}); await page.waitForTimeout(200);
+        const reducedScene = await sceneClock();
         const reduced = await heroPaints(); await page.waitForTimeout(250);
-        check(`Device reduced motion freezes Ross shader ${width}`,(await heroPaints())===reduced);
+        check(`Device reduced motion freezes Ross shader ${width}`,(await heroPaints())===reduced && await sceneClock()===reducedScene);
         await page.emulateMedia({reducedMotion:'no-preference'});
         const menu = page.locator('.st-navlinks');
         const about = page.getByRole('button', {name:'About us',exact:true});
