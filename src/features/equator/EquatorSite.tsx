@@ -54,7 +54,7 @@ const values = [
     title: (
       <>
         Who business
-        <br />
+        <br />{' '}
         includes
       </>
     ),
@@ -66,7 +66,7 @@ const values = [
     title: (
       <>
         Students with different
-        <br />experiences
+        <br />{' '}experiences
       </>
     ),
     icon: "shared",
@@ -77,7 +77,7 @@ const values = [
     title: (
       <>
         Learn from people
-        <br />doing the work
+        <br />{' '}doing the work
       </>
     ),
     icon: "learning",
@@ -88,7 +88,7 @@ const values = [
     title: (
       <>
         Questions are
-        <br />welcome
+        <br />{' '}welcome
       </>
     ),
     icon: "listening",
@@ -99,7 +99,7 @@ const values = [
     title: (
       <>
         Learning across
-        <br />Ross
+        <br />{' '}Ross
       </>
     ),
     icon: "community",
@@ -386,7 +386,7 @@ function Story({ full = false }: { full?: boolean }) {
           <div className="eq-story-origin" data-reveal>
             <h2>
               How UBLDA
-              <br />
+              <br />{' '}
               began
             </h2>
             <p>
@@ -597,7 +597,7 @@ function Community() {
     >
       <h2 data-reveal>
         Who we learn from
-        <br />
+        <br />{' '}
         and work with
       </h2>
       <div className="eq-carousel-controls">
@@ -705,7 +705,7 @@ function TeamSection({ page = false }: { page?: boolean }) {
         ) : (
           <h2 data-reveal>
             Meet UBLDA’s
-            <br />
+            <br />{' '}
             student leaders
           </h2>
         )}
@@ -854,7 +854,7 @@ function EventsPage() {
         title={
           <>
             Events at
-            <br />
+            <br />{' '}
             UBLDA
           </>
         }
@@ -878,7 +878,7 @@ function JoinPage() {
         title={
           <>
             Join
-            <br />
+            <br />{' '}
             UBLDA
           </>
         }
@@ -971,7 +971,7 @@ function BrandPage() {
         title={
           <>
             The UBLDA
-            <br />
+            <br />{' '}
             brand
           </>
         }
@@ -1023,7 +1023,7 @@ function LinksPage() {
         title={
           <>
             UBLDA
-            <br />
+            <br />{' '}
             links
           </>
         }
