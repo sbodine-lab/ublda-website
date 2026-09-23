@@ -53,25 +53,25 @@ const values = [
   {
     title: (
       <>
-        Who business
+        Disability inclusion
         <br />{' '}
-        includes
+        in business
       </>
     ),
     icon: "inclusion",
-    a: "Hiring, product design and customer service all involve decisions about access. We ask who those decisions serve and whose needs are missing.",
-    b: "Our events bring those questions into conversations at Ross.",
+    a: "We explore how businesses can support employees with disabilities and make their products and services accessible.",
+    b: "At our events, students hear from business leaders and discuss what better access looks like in practice.",
   },
   {
     title: (
       <>
-        Students with different
-        <br />{' '}experiences
+        Connect with
+        <br />{' '}other students
       </>
     ),
     icon: "shared",
     a: "UBLDA welcomes disabled and non-disabled students from every school at U-M. You do not need a business major to join.",
-    b: "Members learn alongside people whose experiences differ from their own.",
+    b: "Meet other students who care about disability inclusion and learn from each other’s experiences.",
   },
   {
     title: (
@@ -87,8 +87,8 @@ const values = [
   {
     title: (
       <>
-        Questions are
-        <br />{' '}welcome
+        Listen and
+        <br />{' '}ask questions
       </>
     ),
     icon: "listening",
@@ -98,8 +98,8 @@ const values = [
   {
     title: (
       <>
-        Learning across
-        <br />{' '}Ross
+        A community
+        <br />{' '}at Ross
       </>
     ),
     icon: "community",

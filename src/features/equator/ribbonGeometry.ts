@@ -1,4 +1,4 @@
-// Original ribbon sculptures: people, shared purpose, learning, listening, care.
+// Original ribbon sculptures: people, connections, learning, listening, community.
 // Every form keeps three strips and the same vertex order for continuous morphs.
 export const ribbonNames = [
   "inclusion",
@@ -192,11 +192,12 @@ export function ribbonPoint(
   const center = (p: number): [number, number, number] => {
     if (stage === 1) {
       const a = p * Math.PI * 2;
-      // The infinity form Sam selected, including its original layered spacing.
+      // Three linked rings represent connections between students.
+      // Alternating depth makes adjacent rings pass through each other.
       return [
-        1.12 * Math.sin(a),
-        0.52 * Math.sin(a * 2) + b * 0.19,
-        0.38 * Math.cos(a) + b * 0.16,
+        0.58 * Math.cos(a) + b * 0.69,
+        0.52 * Math.sin(a),
+        (band === 1 ? -1 : 1) * 0.24 * Math.sin(a),
       ];
     }
     if (stage === 3) {
