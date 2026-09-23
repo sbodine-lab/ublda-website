@@ -53,61 +53,58 @@ const values = [
   {
     title: (
       <>
-        Inclusion,
+        Who business
         <br />
-        from the start
+        includes
       </>
     ),
     icon: "inclusion",
-    a: "Disability inclusion belongs in the decisions that shape businesses: who gets hired, what gets built, and whose needs get heard.",
-    b: "We bring that conversation to Michigan Ross, and make space for students to take part.",
+    a: "Hiring, product design and customer service all involve decisions about access. We ask who those decisions serve and whose needs are missing.",
+    b: "Our events bring those questions into conversations at Ross.",
   },
   {
     title: (
       <>
-        Different experiences.
-        <br />A shared purpose.
+        Students with different
+        <br />experiences
       </>
     ),
     icon: "shared",
-    a: "We bring together disabled and non-disabled students, across majors and backgrounds, around a common goal.",
-    b: "A business community where people with disabilities can participate, contribute, and lead.",
+    a: "UBLDA welcomes disabled and non-disabled students from every school at U-M. You do not need a business major to join.",
+    b: "Members learn alongside people whose experiences differ from their own.",
   },
   {
     title: (
       <>
-        Learning grounded
-        <br />
-        in real experience
+        Learn from people
+        <br />doing the work
       </>
     ),
     icon: "learning",
-    a: "Meet leaders working at the intersection of business and disability. Ask questions, explore their decisions, and learn from the people doing the work.",
-    b: "From conversations with business leaders to student consulting projects, we connect ideas with practice.",
+    a: "Our speaker events put students in conversation with leaders working on disability in business.",
+    b: "This fall, our first consulting team will research a client’s business question and present recommendations.",
   },
   {
     title: (
       <>
-        Lead with curiosity.
-        <br />
-        Listen with care.
+        Questions are
+        <br />welcome
       </>
     ),
     icon: "listening",
-    a: "You don’t need a background in disability advocacy to get involved. Bring your questions, your perspective, and a willingness to learn.",
-    b: "We want members to listen closely, challenge assumptions, and help shape what comes next.",
+    a: "You can come to an event without knowing much about disability advocacy. Listen and ask what you want to understand better.",
+    b: "What students hear at UBLDA can inform how they study and work.",
   },
   {
     title: (
       <>
-        Build community.
-        <br />
-        Carry it forward.
+        Learning across
+        <br />Ross
       </>
     ),
     icon: "community",
-    a: "Our connection with BLDA, our MBA counterpart at Ross, brings undergraduate and graduate students together around a shared mission.",
-    b: "We’re building relationships and experiences that students can take into their careers and communities.",
+    a: "Our connection with BLDA, the MBA organization at Ross, brings undergraduate and graduate students into the same conversation.",
+    b: "Members can meet MBA students who also care about disability in business.",
   },
 ];
 const programs = [
@@ -327,10 +324,10 @@ function Splash() {
       <div className="eq-splash-brand">
         <LogoStage />
         <p className="eq-affiliation">
-          Undergraduate Business Leaders for Diverse Abilities (UBLDA) is a
-          student organization that advances disability inclusion in business
-          through education, community, and consulting and is affiliated with the
-          Stephen M. Ross School of Business.
+          Undergraduate Business Leaders for Diverse Abilities (UBLDA) brings
+          students together to learn about disability in business through events,
+          community and consulting. UBLDA is a student organization affiliated
+          with the Stephen M. Ross School of Business.
         </p>
       </div>
       <a
@@ -369,25 +366,28 @@ function Story({ full = false }: { full?: boolean }) {
     <section className="eq-story" id="our-story" data-tone="cream">
       <div className="eq-story-inner">
         <Words>
-          We’re students with different backgrounds and ambitions, brought
-          together by one belief: disability inclusion belongs in business.
+          We’re undergraduates at Michigan Ross working to make disability part
+          of the business conversation.
         </Words>
         <Words>
-          At Michigan Ross, we’re building a community around that belief.
+          At our events, students hear directly from people making decisions
+          about employment, products and services.
         </Words>
         <Words indent>
-          Through conversations that challenge us. Through relationships that
-          connect us. Through work that puts our learning into practice.
+          UBLDA also brings students together outside the classroom. This fall,
+          our first consulting team will research a question for Arc Thrift
+          Stores of Colorado.
         </Words>
         <Words indent>
-          We’re UBLDA. And there’s a place for you here.
+          All U-M students can join the club, whether or not they apply for
+          consulting.
         </Words>
         {full && (
           <div className="eq-story-origin" data-reveal>
             <h2>
-              A shared mission.
+              How UBLDA
               <br />
-              An undergraduate chapter.
+              began
             </h2>
             <p>
               UBLDA began with a conversation. After being admitted to Michigan,
@@ -396,14 +396,14 @@ function Story({ full = false }: { full?: boolean }) {
               undergraduates.
             </p>
             <p>
-              Today, our student team brings that mission to life through
-              speaker conversations, community events, and pro bono consulting.
-              We welcome students from every school at U-M.
+              Today, UBLDA holds speaker conversations and community events.
+              Our first pro bono consulting engagement is planned for Fall 2026.
+              Students from every school at U-M are welcome.
             </p>
           </div>
         )}
         <Link className="eq-text-link" to={full ? "/join" : "/about"}>
-          {full ? "Become part of the story" : "More about UBLDA"}
+          {full ? "Join UBLDA" : "More about UBLDA"}
           <ArrowUpRight size={22} />
         </Link>
       </div>
@@ -512,13 +512,12 @@ function Programs() {
       data-tone="cream"
     >
       <h2 data-reveal>
-        A place to learn.
-        <br />A chance to contribute.
+        How students take part in UBLDA
       </h2>
       <p className="eq-intro" data-reveal>
-        Explore business through the lens of disability inclusion. Find a
-        conversation, a community, or a project that makes you want to get
-        involved.
+        Come to an event or meet students who care about disability in business.
+        UBLDA Consulting has a separate application for undergraduates who want
+        to work on a client project.
       </p>
       <div className="eq-program-grid">
         {programs.map(([title, text, url], i) => (
@@ -557,19 +556,19 @@ function Programs() {
 }
 const stories = [
   {
-    title: "Learning through client work",
+    title: "Our first consulting client",
     art: "arc",
     text: "Our first pro bono consulting engagement is planned for Fall 2026 with Arc Thrift Stores of Colorado. Students will research business questions and develop recommendations through UBLDA Consulting.",
     link: "/consulting",
   },
   {
-    title: "Connected through BLDA",
+    title: "Our connection with BLDA",
     art: "blda",
     text: "UBLDA is the undergraduate counterpart to BLDA at Michigan Ross. Our shared mission connects students across programs through disability advocacy and community.",
     link: "/about",
   },
   {
-    title: "Conversations that stay with us",
+    title: "Leaders we’ve heard from",
     art: "conversations",
     text: "Past speakers include Lloyd Lewis, CEO of Arc Thrift Stores, and Andrew Parker, CEO and co-founder of Nestidd. We learn directly from leaders working in disability-focused businesses.",
     link: "/events",
@@ -597,9 +596,9 @@ function Community() {
       data-tone="cream"
     >
       <h2 data-reveal>
-        Our mission,
+        Who we learn from
         <br />
-        in good company.
+        and work with
       </h2>
       <div className="eq-carousel-controls">
         <button
@@ -705,15 +704,14 @@ function TeamSection({ page = false }: { page?: boolean }) {
           </h1>
         ) : (
           <h2 data-reveal>
-            Students leading
+            Meet UBLDA’s
             <br />
-            with purpose.
+            student leaders
           </h2>
         )}
         <p className="eq-intro">
-          We’re a student-run organization. Our executive board brings together
-          different interests and experiences to build UBLDA’s programs,
-          partnerships, and community.
+          Our executive board plans events, manages the club’s programs and
+          works with speakers and project partners.
         </p>
       </div>
       <div
@@ -782,7 +780,7 @@ function CTA() {
   return (
     <section className="eq-cta" data-tone="cream">
       <BrandParticles closing />
-      <h2 data-reveal>Let’s make disability inclusion part of business.</h2>
+      <h2 data-reveal>Join the conversation about disability in business.</h2>
       <div className="eq-cta-buttons">
         <Button to={MEMBERSHIP_FORM_URL}>Join UBLDA</Button>
         <Button to="/events">Come to an event</Button>
@@ -798,9 +796,8 @@ function Footer() {
       </div>
       <div className="eq-footer-info">
         <p>
-          Undergraduate Business Leaders for Diverse Abilities (UBLDA). A student
-          community at Michigan Ross, bringing disability inclusion into
-          business.
+          UBLDA is a student organization at Michigan Ross focused on disability
+          inclusion in business.
         </p>
         <a href="https://maps.google.com/?q=701+Tappan+Avenue+Ann+Arbor">
           Michigan Ross · University of Michigan
@@ -856,12 +853,12 @@ function EventsPage() {
         label="Events at UBLDA"
         title={
           <>
-            Good questions.
+            Events at
             <br />
-            New perspectives.
+            UBLDA
           </>
         }
-        description="Conversations with business leaders and experiences with the wider disability community at Michigan Ross."
+        description="Hear from business leaders working on disability and meet students who want to learn more."
       />
       <UpcomingEvents />
       <PastEvents />
@@ -880,15 +877,15 @@ function JoinPage() {
         label="Join UBLDA"
         title={
           <>
-            Your perspective
+            Join
             <br />
-            belongs here.
+            UBLDA
           </>
         }
-        description="All U-M students are welcome. You don’t need a business major, a disability, or experience in advocacy. Start with curiosity."
+        description="Membership is open to all U-M students. You do not need to study business or have prior experience in disability advocacy."
       />
       <section className="eq-section eq-join" data-tone="cream">
-        <h2 data-reveal>Find your way in.</h2>
+        <h2 data-reveal>Ways to take part</h2>
         <div className="eq-join-grid">
           <article>
             <h3>
@@ -935,7 +932,7 @@ function JoinPage() {
         </div>
       </section>
       <section className="eq-section eq-questions" data-tone="gold">
-        <h2>Come as you are.</h2>
+        <h2>Membership questions</h2>
         {[
           [
             "Do I need to be a Ross student?",
@@ -973,12 +970,12 @@ function BrandPage() {
         label="UBLDA Brand"
         title={
           <>
-            Different parts.
+            The UBLDA
             <br />
-            One identity.
+            brand
           </>
         }
-        description="Our mark brings people together. Our colors connect every piece of UBLDA’s public identity."
+        description="Use these colors and logo files when creating materials for the club."
       />
       <section className="eq-section" data-tone="cream">
         <h2>Our colors.</h2>
@@ -1025,12 +1022,12 @@ function LinksPage() {
         label="UBLDA · Michigan Ross"
         title={
           <>
-            One community.
+            UBLDA
             <br />
-            Many ways in.
+            links
           </>
         }
-        description="Find your next event, join the club, or explore UBLDA Consulting."
+        description="Find club events, the membership form and information about UBLDA Consulting."
       />
       <section className="eq-section eq-quick-links" data-tone="cream">
         {[

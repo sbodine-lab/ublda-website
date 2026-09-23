@@ -15,7 +15,7 @@ export function BusinessCase() {
     <section className="st-wrap st-business-case" aria-labelledby="business-case-heading">
       <div className="st-business-case-heading" data-enter>
         <div className="st-business-case-intro">
-          <p>Accessibility affects how people use products, contribute at work, and stay with an organization. These studies offer context for understanding those experiences and considering them in business decisions.</p>
+          <p>Accessibility affects whether people can use a product, do their work or stay in a job. These studies provide context for the business questions we ask. They do not describe results from UBLDA client projects.</p>
           <Button to="/consulting/insights">Read the research</Button>
         </div>
         <h2 id="business-case-heading">Accessibility<br />in business.</h2>
