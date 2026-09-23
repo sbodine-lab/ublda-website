@@ -240,7 +240,7 @@ export function StudioHome() {
       <section className="st-experience">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">The Arc<br />project</h2>
+            <h2 className="st-section-heading">The Arc<br />{' '}project</h2>
             <p>Four to six analysts will work with two project managers from October through December 2026.</p>
           </div>
           <div className="st-experience-grid">
@@ -284,7 +284,7 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
-        <h2 className="st-section-heading">Projects we<br />could take on</h2>
+        <h2 className="st-section-heading">Projects we<br />{' '}could take on</h2>
         <ServiceCards />
         <div className="st-service-inquiry">
           <Button to="/consulting/contact">Discuss a project</Button>
