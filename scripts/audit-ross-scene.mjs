@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { mkdir } from 'node:fs/promises'
 import { chromium } from 'playwright'
 
-const base = process.env.BASE_URL || 'http://127.0.0.1:5173'
-const output = process.env.OUTPUT_DIR || '/private/tmp/ross-scene-qa'
+const base = process.env.BASE_URL || process.argv[2] || 'http://127.0.0.1:5173'
+const output = process.env.OUTPUT_DIR || process.argv[3] || '/private/tmp/ross-scene-qa'
 await mkdir(output, { recursive: true })
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' })
 try {
@@ -19,10 +19,36 @@ try {
       window.sceneObserver = new MutationObserver(records => { window.sceneFrames += records.filter(record => record.attributeName === 'data-time').length })
       window.sceneObserver.observe(document.querySelector('.st-ross-scene'), { attributes: true })
     })
+    const capturePixels = () => canvas.evaluate(canvas => new Promise(resolve => {
+      const gl = canvas.getContext('webgl')
+      const original = gl.drawArrays.bind(gl)
+      gl.drawArrays = (...args) => {
+        original(...args)
+        gl.drawArrays = original
+        const regions = { roof: [750, 170, 200, 60], glass: [860, 350, 170, 180], trees: [500, 470, 95, 75], road: [1450, 220, 50, 580], plaza: [790, 852, 400, 26] }
+        resolve(Object.fromEntries(Object.entries(regions).map(([key, [x, y, w, h]]) => {
+          const px = Math.round(x / 1672 * canvas.width), py = Math.round((941 - y - h) / 941 * canvas.height)
+          const pw = Math.round(w / 1672 * canvas.width), ph = Math.round(h / 941 * canvas.height)
+          const data = new Uint8Array(pw * ph * 4)
+          gl.readPixels(px, py, pw, ph, gl.RGBA, gl.UNSIGNED_BYTE, data)
+          return [key, Array.from(data)]
+        })))
+      }
+    }))
+    const firstPixels = width === 1440 ? await capturePixels() : null
+    await page.evaluate(() => { window.sceneFrames = 0 })
     const start = Number(await canvas.getAttribute('data-time'))
     await page.waitForTimeout(3000)
     const elapsed = Number(await canvas.getAttribute('data-time')) - start
     const frames = await page.evaluate(() => { window.sceneObserver.disconnect(); return window.sceneFrames })
+    if (firstPixels) {
+      const secondPixels = await capturePixels()
+      const changed = Object.fromEntries(Object.entries(firstPixels).map(([key, pixels]) => [key, pixels.filter((value, i) => i % 4 !== 3 && Math.abs(value - secondPixels[key][i]) > 2).length]))
+      assert.equal(changed.roof, 0, 'roof pixels must remain stationary')
+      assert.equal(changed.glass, 0, 'glass pixels must remain stationary')
+      for (const key of ['trees', 'road', 'plaza']) assert.ok(changed[key] > 30, `${key} must visibly animate`)
+      console.log(JSON.stringify({ pixelMotion: changed }))
+    }
     assert.ok(elapsed > 2, 'scene time must advance naturally')
     assert.ok(frames > 45, `animation must paint smoothly: ${frames} frames in 3 seconds`)
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
