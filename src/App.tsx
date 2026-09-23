@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import AnnouncementBanner from './components/AnnouncementBanner'
-import { CONSULTING_FORM_URL, REMOVAL_FORM_URL } from './lib/forms'
+import { REMOVAL_FORM_URL } from './lib/forms'
 import Footer from './components/Footer'
 const Home = lazy(() => import('./pages/Home'))
 const EquatorSite = lazy(() => import('./features/equator/EquatorSite'))
@@ -13,6 +13,7 @@ const About = lazy(() => import('./pages/About'))
 const Events = lazy(() => import('./pages/Events'))
 const Team = lazy(() => import('./pages/Team'))
 const ShaderStudy = import.meta.env.DEV ? lazy(() => import('./pages/consulting/ShaderStudy')) : null
+const ConsultingApplications = lazy(() => import('./pages/consulting/Applications'))
 const Consulting = lazy(() => import('./pages/Consulting'))
 const ConsultingPractice = lazy(() => import('./pages/consulting/Practice'))
 const ConsultingLeadership = lazy(() => import('./pages/consulting/Leadership'))
@@ -37,7 +38,7 @@ const DecisionCenterEntry = lazy(() => (
 ))
 
 /** Pages that own their full-bleed chrome and skip the marketing nav and footer. */
-const STANDALONE_PREFIXES = ['/links', '/table', '/table.html', '/housing-intelligence', '/housing', '/consulting', '/advisory', '/craft-night', '/mtc']
+const STANDALONE_PREFIXES = ['/apply', '/links', '/table', '/table.html', '/housing-intelligence', '/housing', '/consulting', '/advisory', '/craft-night', '/mtc']
 const DECISION_PREFIXES = ['/auth/callback', '/workspace', '/decision', '/decisions', '/d', '/results', '/schedule', '/scheduling', '/s', '/calendar', '/projects', '/people', '/leadership/speakers', '/speaker-ops', '/operations', '/signin', '/dashboard', '/members']
 
 const matchesPrefix = (pathname: string, prefixes: string[]) => (
@@ -129,6 +130,7 @@ export default function App() {
           <Route path="/team" element={<Team />} />
           {ShaderStudy && <Route path="/consulting/shader-study" element={<ShaderStudy />} />}
           <Route path="/consulting" element={<Consulting />} />
+          <Route path="/consulting/apply" element={<ConsultingApplications />} />
           <Route path="/consulting/practice" element={<ConsultingPractice />} />
           <Route path="/consulting/leadership" element={<ConsultingLeadership />} />
           <Route path="/consulting/work" element={<ConsultingWork />} />
@@ -141,7 +143,7 @@ export default function App() {
           {/* The consulting arm used to live at /advisory; keep old links working. */}
           <Route path="/advisory" element={<Navigate to="/consulting" replace />} />
           <Route path="/join" element={<Join />} />
-          <Route path="/apply" element={<ExternalRedirect to={CONSULTING_FORM_URL} />} />
+          <Route path="/apply" element={<Navigate to="/consulting/apply" replace />} />
           <Route path="/housing-intelligence" element={<HousingIntelligence />} />
           <Route path="/housing" element={<HousingIntelligence />} />
           <Route path="/links" element={<Links />} />

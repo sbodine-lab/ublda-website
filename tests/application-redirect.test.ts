@@ -12,3 +12,14 @@ test('application links with email punctuation redirect to the canonical applica
     permanent: true,
   })
 })
+
+
+test('the shared application URL leads to the consulting recruiting page', () => {
+  const config = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'))
+  const redirect = config.redirects.find((entry: { source: string }) => entry.source === '/apply')
+  assert.deepEqual(redirect, {
+    source: '/apply',
+    destination: '/consulting/apply',
+    permanent: false,
+  })
+})

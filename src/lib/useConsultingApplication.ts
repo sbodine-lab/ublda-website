@@ -7,7 +7,7 @@ export function useConsultingApplication() {
   const state = applyWindow(useClock(APPLY_OPENS_AT_MS, APPLY_DEADLINE_AT_MS), APPLY_DEADLINE_AT_MS)
   return {
     state,
-    href: state === 'open' ? CONSULTING_FORM_URL : '/consulting/contact#join',
+    href: state === 'open' ? CONSULTING_FORM_URL : '/consulting/apply',
     label: state === 'open' ? 'Apply' : 'Recruiting',
   }
 }
