@@ -175,6 +175,7 @@ export function StudioHome() {
         <div className="st-wrap st-hero-content">
           <h1>
             <span data-enter>Student consulting on</span>
+            {' '}
             <span data-enter style={enterDelay(250)}>
               disability and business.
             </span>
