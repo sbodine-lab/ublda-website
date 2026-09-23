@@ -752,14 +752,14 @@ export function StudioContact() {
                     ? `Apply by ${APPLY_DEADLINE_LABEL}.`
                     : windowState === "before"
                       ? "Fall 2026 applications open September 2."
-                      : "The Fall 2026 application deadline has passed. Contact Alex Forstner about future opportunities."}
+                      : "Fall 2026 applications are closed. Keep an eye out for Winter 2027 recruiting information."}
                 </p>
                 {windowState === "open" ? (
                   <Button href={CONSULTING_FORM_URL} solid>
                     Apply
                   </Button>
                 ) : (
-                  <Button href={CONTACT_MAILTO}>Contact the team</Button>
+                  <Button to="/consulting/apply">Recruiting updates</Button>
                 )}
               </div>
               <Timeline />

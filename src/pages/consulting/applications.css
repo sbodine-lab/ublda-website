@@ -1,0 +1,21 @@
+/* BOI careers reference: oversized type, dark canvas and generous spacing. */
+.st-applications { padding-block: clamp(64px, 7vw, 104px) 100px; }
+.st-applications > .st-eyebrow { color: var(--st-muted-light); margin-bottom: 24px; }
+.st-applications h1 { max-width: 1150px; margin: 0; font-size: clamp(48px, 6.12vw, 88px); line-height: 1.08; letter-spacing: -.035em; text-wrap: balance; }
+.st-applications-thanks { max-width: 760px; margin: 36px 0 72px !important; font-size: clamp(22px, 2vw, 28px); line-height: 1.4; color: var(--st-muted-light); }
+.st-applications-next { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 72px; padding: 48px; background: var(--st-paper); color: var(--st-ink); border-radius: 4px; }
+.st-applications-next .st-eyebrow { margin-bottom: 24px; color: var(--st-muted); }
+.st-applications-next h2 { margin: 0; font-size: clamp(36px, 3.5vw, 50px); color: var(--st-accent); }
+.st-applications-details { align-self: center; }
+.st-applications-details p { max-width: 34ch; font-size: 24px; line-height: 1.4; margin-bottom: 32px; }
+.st .st-applications-next .st-button { color: var(--st-ink); border-color: var(--st-ink) !important; }
+.st .st-applications-next .st-button:hover { color: var(--st-paper); background: var(--st-dark); }
+@media (max-width: 767px) {
+  .st-applications { padding-block: 48px 64px; }
+  .st-applications h1 { font-size: clamp(40px, 9.5vw, 64px); }
+  .st-applications h1 br { display: none; }
+  .st-applications-thanks { margin-block: 28px 40px !important; }
+  .st-applications-next { grid-template-columns: 1fr; padding: 28px 24px; gap: 28px; }
+  .st-applications-next .st-eyebrow { margin-bottom: 14px; }
+  .st-applications-details p { font-size: 20px; }
+}
