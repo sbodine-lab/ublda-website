@@ -167,6 +167,9 @@
 .st-hero--photo { overflow: hidden; background: var(--st-dark); isolation: isolate; }
 .st-ross-hero { position: absolute; inset: 0; pointer-events: none; }
 .st-hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.st-ross-scene { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+.st-ross-scene[data-ready="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .st-ross-scene { display: none; } }
 .st-hero--photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, #0d1319b3, #0d131980 42%, #0d131959 85%); }
 .st-hero--photo .st-hero-content { z-index: 2; }
 .st-hero--photo h1 span, .st-hero--photo h1 span + span { color: #fff; }
