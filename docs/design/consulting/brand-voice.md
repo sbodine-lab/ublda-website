@@ -1,6 +1,6 @@
 # UBLDA Consulting copy direction
 
-Updated September 21, 2026 following Sam’s feedback on the consulting copy.
+Updated September 22, 2026 following Sam’s feedback on formulaic copy across the club and Consulting sites.
 
 State directly that UBLDA Consulting launched in Fall 2026 and that Arc Thrift Stores of Colorado is its first client. The launch is distinct from the October–December engagement, which has not been described as completed. Use connected sentences and descriptive headings instead of repeated two- or three-part slogans. The two-part scope is business consulting for disability-focused organizations and accessibility work for teams within companies. These statements are grounded in Sam’s current direction (Brain note 511) and Brain notes 177, 191, and 261. The December national-board presentation is a confirmed future plan.
 
@@ -10,9 +10,9 @@ Latest September 21 update (Brain notes 517–518): Sam requested a balanced hom
 
 The homepage serves both prospective members and businesses. Describe who UBLDA is, what its teams do, and the purpose of the client work in a calm organizational voice. Avoid audience-choice panels or an entry screen that asks visitors to identify themselves. Use normal navigation and contextual links: Apply in the header, program details with the project process, and project inquiries beside potential services. See [Michigan club homepage review](./michigan-club-homepages.md) for the current source review.
 
-The homepage leads with “Business with accessibility in mind.” Follow with the consulting division’s identity and two kinds of work: business consulting for disability-focused organizations and accessibility projects for companies across industries. Introduce the first client after the shared identity, followed by the project process, club community, potential project areas, and project managers. External research follows these sections.
+The homepage leads with “Student consulting on disability and business.” Follow with the program’s identity and two kinds of potential work: business questions for disability-focused organizations and accessibility questions for companies across industries. Introduce the first client after the shared identity, followed by the project process, club community, potential project areas, and project managers. External research follows these sections.
 
-Use fuller sentences with connected ideas and active verbs. Avoid strings of fragments, excessive commas and em dashes in marketing prose. Headlines can remain brief for readability. Encourage applications sparingly and use “Apply” linked directly to CONSULTING_FORM_URL. Distinguish selected consulting analyst roles from free general membership. The contact form sends through the existing website endpoint; preserve its status and error messages.
+Use fuller sentences with connected ideas and active verbs. Avoid strings of fragments, excessive commas and em dashes in marketing prose. Headlines can remain brief for readability, but do not turn adjacent short fragments into a slogan when a descriptive heading would serve the reader better. Use [plain-spoken-copy](../../../skills/plain-spoken-copy/SKILL.md) for the reusable editing checks and research notes. Encourage applications sparingly and use “Apply” linked directly to CONSULTING_FORM_URL. Distinguish selected consulting analyst roles from free general membership. The contact form sends through the existing website endpoint; preserve its status and error messages.
 
 ## Peer club review
 
