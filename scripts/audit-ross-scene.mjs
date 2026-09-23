@@ -1,64 +1,99 @@
-// Pixel-level regression for scenery occlusion and activity on both sides of Ross.
-import { chromium } from 'playwright';
-import { mkdir, writeFile } from 'node:fs/promises';
-const base = process.argv[2] || 'http://127.0.0.1:5184';
-const output = process.argv[3] || 'outputs/ross-paths/pixels';
-await mkdir(output, {recursive:true});
-const browser = await chromium.launch({headless:true,channel:'chrome'});
-const frames=[];
+import assert from 'node:assert/strict'
+import { mkdir } from 'node:fs/promises'
+import { chromium } from 'playwright'
+
+const base = process.env.BASE_URL || process.argv[2] || 'http://127.0.0.1:5173'
+const output = process.env.OUTPUT_DIR || process.argv[3] || '/private/tmp/ross-scene-qa'
+await mkdir(output, { recursive: true })
+const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' })
 try {
-  const pages=[];
-  for(const baseline of [true,false]) {
-    const page=await browser.newPage({viewport:{width:1672,height:1000},deviceScaleFactor:1});
-    await page.addInitScript(baseline=>{
-      localStorage.setItem('ublda-motion-paused','true');
-      const original=WebGL2RenderingContext.prototype.shaderSource;
-      WebGL2RenderingContext.prototype.shaderSource=function(shader,source){
-        const composite='fragColor = vec4(rossStreetLife(scene, sceneUV), 1.);';
-        if(baseline && source.includes(composite)) {
-          source=source.replace(composite,'fragColor = vec4(scene, 1.);');
-          window.__rossBaseline=true;
-        }
-        return original.call(this,shader,source);
-      };
-    },baseline);
-    await page.goto(base+'/consulting');
-    await page.waitForFunction(()=>document.querySelector('.st-ross-shader')?.dataset.ready==='true');
-    if(baseline && !await page.evaluate(()=>window.__rossBaseline)) throw new Error('Baseline shader was not installed');
-    await page.locator('.st-ross-hero').evaluate(el=>Object.assign(el.style,{position:'fixed',top:'0',left:'0',width:'1672px',height:'941px'}));
-    await page.waitForTimeout(250);
-    pages.push(page);
-  }
-  const capture=(page,time)=>page.locator('.st-ross-shader').evaluate((host,time)=>{
-    host.paperShaderMount.setUniforms({u_sceneTime:time,u_sceneBlend:0,u_cropShift:0,u_ubldaGridDrift:[0,0]});
-    const gl=host.querySelector('canvas').getContext('webgl2');
-    if(gl.drawingBufferWidth!==1672 || gl.drawingBufferHeight!==941) throw new Error('Unexpected scene scale');
-    const regions={east:[1440,0,232,941],west:[70,320,650,400],roof:[800,350,100,100]};
-    return Object.fromEntries(Object.entries(regions).map(([name,[x,y,w,h]])=>{
-      const pixels=new Uint8Array(w*h*4);gl.readPixels(x,941-y-h,w,h,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
-      return [name,Array.from(pixels)];
-    }));
-  },time);
-  // Sample the full vehicle loop, including turns and several canopy crossings.
-  for(const time of [0,12,24,36,48,60,72]) {
-    const [baseline,active]=await Promise.all(pages.map(page=>capture(page,time)));
-    const result={time,foliagePixels:0,foliageOverpaint:0,eastActivity:0,westActivity:0,roofChanges:0};
-    for(const [region,pixels] of Object.entries(baseline)) {
-      for(let i=0;i<pixels.length;i+=4) {
-        const [r,g,b]=pixels.slice(i,i+3);
-        const changed=Math.max(...[0,1,2].map(c=>Math.abs(pixels[i+c]-active[region][i+c])))>1;
-        if(region==='east') {
-          // Unambiguous leaf pixels in the source image, including gold leaves.
-          const leaf=g>b*1.25 && g>r*.9 && g-b>8;
-          if(leaf) {result.foliagePixels++; if(changed)result.foliageOverpaint++;}
-          if(changed)result.eastActivity++;
-        } else if(changed) result[region==='west'?'westActivity':'roofChanges']++;
+  for (const width of [1440, 390]) {
+    const page = await browser.newPage({ viewport: { width, height: 900 }, isMobile: width < 768, hasTouch: width < 768 })
+    const errors = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.goto(`${base}/consulting`, { waitUntil: 'networkidle' })
+    const canvas = page.locator('.st-ross-scene')
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'true')
+    await page.evaluate(() => {
+      window.sceneFrames = 0
+      window.sceneObserver = new MutationObserver(records => { window.sceneFrames += records.filter(record => record.attributeName === 'data-time').length })
+      window.sceneObserver.observe(document.querySelector('.st-ross-scene'), { attributes: true })
+    })
+    const capturePixels = () => canvas.evaluate(canvas => new Promise(resolve => {
+      const gl = canvas.getContext('webgl')
+      const original = gl.drawArrays.bind(gl)
+      gl.drawArrays = (...args) => {
+        original(...args)
+        gl.drawArrays = original
+        const regions = { roof: [750, 170, 200, 60], glass: [860, 350, 170, 180], trees: [500, 470, 95, 75], road: [1450, 220, 50, 580], plaza: [790, 852, 400, 26] }
+        resolve(Object.fromEntries(Object.entries(regions).map(([key, [x, y, w, h]]) => {
+          const px = Math.round(x / 1672 * canvas.width), py = Math.round((941 - y - h) / 941 * canvas.height)
+          const pw = Math.round(w / 1672 * canvas.width), ph = Math.round(h / 941 * canvas.height)
+          const data = new Uint8Array(pw * ph * 4)
+          gl.readPixels(px, py, pw, ph, gl.RGBA, gl.UNSIGNED_BYTE, data)
+          return [key, Array.from(data)]
+        })))
       }
+    }))
+    const firstPixels = width === 1440 ? await capturePixels() : null
+    await page.evaluate(() => { window.sceneFrames = 0 })
+    const start = Number(await canvas.getAttribute('data-time'))
+    await page.waitForTimeout(3000)
+    const elapsed = Number(await canvas.getAttribute('data-time')) - start
+    const frames = await page.evaluate(() => { window.sceneObserver.disconnect(); return window.sceneFrames })
+    if (firstPixels) {
+      const secondPixels = await capturePixels()
+      const changed = Object.fromEntries(Object.entries(firstPixels).map(([key, pixels]) => [key, pixels.filter((value, i) => i % 4 !== 3 && Math.abs(value - secondPixels[key][i]) > 2).length]))
+      assert.equal(changed.roof, 0, 'roof pixels must remain stationary')
+      assert.equal(changed.glass, 0, 'glass pixels must remain stationary')
+      for (const key of ['trees', 'road', 'plaza']) assert.ok(changed[key] > 30, `${key} must visibly animate`)
+      console.log(JSON.stringify({ pixelMotion: changed }))
     }
-    result.pass=result.foliagePixels>1000 && result.foliageOverpaint===0 && result.eastActivity>100 && result.westActivity>100 && result.roofChanges===0;
-    frames.push(result);console.log(JSON.stringify(result));
+    assert.ok(elapsed > 2, 'scene time must advance naturally')
+    assert.ok(frames > 45, `animation must paint smoothly: ${frames} frames in 3 seconds`)
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
+    await page.screenshot({ path: `${output}/hero-${width}.png` })
+    await page.getByRole('button', { name: 'Pause motion', exact: true }).first().click()
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'false')
+    const paused = await canvas.getAttribute('data-time')
+    await page.waitForTimeout(350)
+    assert.equal(await canvas.getAttribute('data-time'), paused, 'pause must freeze the scene')
+    await page.getByRole('button', { name: 'Resume motion', exact: true }).first().click()
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'true')
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'false')
+    const hidden = await canvas.getAttribute('data-time')
+    await page.waitForTimeout(350)
+    assert.equal(await canvas.getAttribute('data-time'), hidden, 'offscreen scene must stop')
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'true')
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.waitForFunction(() => { const canvas = document.querySelector('.st-ross-scene'); return getComputedStyle(canvas).display === 'none' && canvas.dataset.active === 'false' })
+    assert.equal(await canvas.getAttribute('data-active'), 'false')
+    assert.equal(await page.locator('.st-hero-photo').evaluate(image => image.complete && image.naturalWidth > 0), true)
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.active === 'true')
+    if (width === 390) {
+      await page.setViewportSize({ width: 844, height: 390 })
+      await page.waitForTimeout(500)
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
+      await page.screenshot({ path: `${output}/hero-landscape.png` })
+    }
+    await canvas.evaluate(canvas => canvas.getContext('webgl').getExtension('WEBGL_lose_context').loseContext())
+    await page.waitForFunction(() => document.querySelector('.st-ross-scene')?.dataset.ready === 'false')
+    assert.equal(await canvas.getAttribute('data-active'), 'false')
+    assert.deepEqual(errors, [])
+    console.log(JSON.stringify({ width, framesInThreeSeconds: frames, elapsed, pause: 'passed', offscreen: 'passed', reducedMotion: 'passed', webglFallback: 'passed', errors }))
+    await page.close()
   }
-  await pages[1].locator('.st-ross-shader canvas').screenshot({path:output+'/scene.png'});
-  await writeFile(output+'/pixels.json',JSON.stringify(frames,null,2));
-  if(frames.some(frame=>!frame.pass))process.exitCode=1;
-} finally {await browser.close();}
+  const reduced = await browser.newPage({ reducedMotion: 'reduce' })
+  const requests = []
+  reduced.on('request', request => requests.push(request.url()))
+  await reduced.goto(`${base}/consulting`, { waitUntil: 'networkidle' })
+  assert.equal(await reduced.locator('.st-hero-photo').evaluate(image => image.complete && image.naturalWidth > 0), true)
+  assert.equal(requests.some(url => /rossSceneRenderer/.test(url)), false, 'reduced motion must skip the renderer download')
+  console.log('Initial reduced-motion photo and renderer-download avoidance passed.')
+  await reduced.close()
+} finally {
+  await browser.close()
+}
