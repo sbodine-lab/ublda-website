@@ -385,20 +385,22 @@ function Story({ full = false }: { full?: boolean }) {
         {full && (
           <div className="eq-story-origin" data-reveal>
             <h2>
-              How UBLDA
+              The team
               <br />{' '}
-              began
+              behind UBLDA
             </h2>
             <p>
-              UBLDA began with a conversation. After being admitted to Michigan,
-              Sam Bodine connected with the former co-presidents of BLDA, the
-              MBA organization at Ross, about bringing its mission to
-              undergraduates.
+              Our team built UBLDA for students who want to explore where
+              disability and business meet, and how business can better serve
+              people with disabilities. Whether you bring personal experience,
+              years of involvement, or a new interest in the field, there’s a
+              place for you here. What matters is that you care about our mission
+              and want to learn and contribute.
             </p>
             <p>
-              Today, UBLDA holds speaker conversations and community events.
-              Our first pro bono consulting engagement is planned for Fall 2026.
-              Students from every school at U-M are welcome.
+              We bring students together through speaker conversations and
+              community events, with our first pro bono consulting engagement
+              planned for Fall 2026. Students from every school at U-M are welcome.
             </p>
           </div>
         )}
