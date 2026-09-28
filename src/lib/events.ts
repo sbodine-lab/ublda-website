@@ -22,25 +22,6 @@ export interface ClubEvent {
 
 export const events: ClubEvent[] = [
   {
-    id: 'alli-hirt-microsoft',
-    isoDate: '2026-10-01',
-    endsAt: '2026-10-01T20:00:00-04:00',
-    archiveDescription: 'The October 1 program was scheduled as a conversation with Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft, about her career and accessibility in everyday products. The announced format paired an in-person student gathering at Ross with Alli joining by video from Seattle.',
-    date: 'October 1, 2026',
-    month: 'Oct',
-    day: '1',
-    time: '7:00 PM - 8:00 PM',
-    timezone: 'America/Detroit',
-    title: 'A conversation with Alli Hirt, Microsoft',
-    host: 'UBLDA',
-    preview: 'Meet Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft, for a conversation about her career and accessibility in everyday products, followed by audience Q&A. Attendance is free.',
-    description:
-      'Join Michigan alum Alli Hirt, Director of Accessibility Engineering at Microsoft, for a conversation about her career and accessibility in the products people use every day. Two student moderators will lead the discussion, followed by audience Q&A. Attendance is free; RSVP to receive room details the week of the event and submit a question for Alli.',
-    formatNote: 'Students gather in person at Ross. Alli joins live by video from Seattle and will not be on campus.',
-    location: 'Ross School of Business, 701 Tappan Avenue. Room details emailed the week of the event.',
-    rsvpUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScB4BYm2kkqSO5Q9n6j5BrV8Xxtb1k3MZi00plC3HnvRXMeiw/viewform',
-  },
-  {
     id: 'lloyd-lewis-arc-thrift',
     isoDate: '2026-04-16',
     date: 'April 16, 2026',

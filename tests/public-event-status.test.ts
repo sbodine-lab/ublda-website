@@ -1,8 +1,22 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { events, isPastEvent } from '../src/lib/events.ts'
+import { events, isPastEvent, type ClubEvent } from '../src/lib/events.ts'
 
-const event = events.find(event => event.id === 'alli-hirt-microsoft')!
+const event: ClubEvent = {
+  id: 'test-event',
+  isoDate: '2026-10-01',
+  endsAt: '2026-10-01T20:00:00-04:00',
+  date: 'October 1, 2026',
+  month: 'Oct',
+  day: '1',
+  title: 'Test event',
+  description: 'Test event',
+  location: 'Ross School of Business',
+}
+
+test('October Microsoft event is absent from public listings', () => {
+  assert.equal(events.some(event => event.id === 'alli-hirt-microsoft'), false)
+})
 
 test('an event leaves upcoming listings at its advertised ending, across visitor timezones', () => {
   assert.equal(isPastEvent(event, Date.parse('2026-10-01T19:59:59-04:00')), false)
