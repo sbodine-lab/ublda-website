@@ -284,7 +284,7 @@ export function StudioHome() {
         </div>
       </section>
       <section className="st-wrap st-section" data-enter>
-        <h2 className="st-section-heading">Projects we<br />{' '}could take on</h2>
+        <h2 className="st-section-heading">Projects we<br />{' '}can take on</h2>
         <ServiceCards />
         <div className="st-service-inquiry">
           <Button to="/consulting/contact">Discuss a project</Button>

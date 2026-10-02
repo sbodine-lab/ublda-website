@@ -22,3 +22,13 @@ MEG was identified through its official club profile, but its current homepage c
 The recurring pattern is an integrated club story with ordinary navigation, not an audience gate. UBLDA’s homepage now follows: shared introduction → first client → project process → club community → potential project areas → project managers → external research. One hero link leads to the first client. Apply stays in the header and closing section, with a project-inquiry link beside the service areas.
 
 Copy connects student learning with the client’s business question in the same paragraph. Research remains neutral under “Accessibility in business.” Preserve the Fall 2026 launch, first-client status, future engagement dates, and actual two-part scope. Do not borrow peers’ track records, project counts, testimonials, professional-development programs, or claims of results.
+
+## Project offerings follow-up — October 2, 2026
+
+Sam asked whether APEX, BOND, and Nexecon describe the kinds of projects they can take on, and to retain UBLDA’s project explanations only if peers do so. Their official client pages all describe services or project areas:
+
+- [APEX Client Services](https://apexconsulting.org/services) lists marketing, process optimization, data analytics, market research, and growth strategy alongside case studies.
+- [BOND Client Services](https://www.bond-consulting.org/client-services) lists services under core business analysis, technology solutions, advanced analytics, and new business development.
+- [Nexecon Clients](https://www.nexeconconsulting.com/clients) introduces five service areas and illustrates each with a past project.
+
+Retained UBLDA’s project descriptions and changed the homepage heading to “Projects we can take on,” as requested. The descriptions remain prospective and subject to an agreed scope; they do not imply completed engagements in every area.
