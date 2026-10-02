@@ -663,7 +663,9 @@
   display: flex;
   width: max-content;
   animation: eq-marquee 24s linear infinite;
+  animation-play-state: paused;
 }
+.eq-marquee[data-active="true"] > div { animation-play-state: running; }
 .eq-logo-set {
   display: flex;
   gap: 48px;

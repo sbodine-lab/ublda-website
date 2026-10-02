@@ -64,7 +64,7 @@ export function RibbonJourney() {
       | undefined;
     const measure = () => {
       measurement = 0;
-      if (disposed) return;
+      if (disposed || !visible) return;
       compact = section.dataset.static === "true";
       const tops = zones.map((zone) => zone.getBoundingClientRect().top);
       const railRect = rail.getBoundingClientRect();
@@ -121,7 +121,7 @@ export function RibbonJourney() {
       start();
     };
     const scheduleMeasure = () => {
-      if (!measurement) measurement = requestAnimationFrame(measure);
+      if (visible && !measurement) measurement = requestAnimationFrame(measure);
     };
     const tick = (time: number) => {
       frame = 0;
