@@ -27,7 +27,19 @@ export function NetworkLogos() {
     observer.observe(frame);
     observer.observe(set);
     measure();
-    return () => observer.disconnect();
+    let visible = false;
+    const sync = () => { frame.dataset.active = String(visible && !document.hidden); };
+    const visibility = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      sync();
+    });
+    visibility.observe(frame);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      observer.disconnect();
+      visibility.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
   }, []);
 
   return (
@@ -42,7 +54,7 @@ export function NetworkLogos() {
           >
             {logos.map(([src, alt, relationship]) => (
               <figure key={src}>
-                <img src={src} alt={alt} decoding="async" />
+                <img src={src} alt={alt} loading="lazy" decoding="async" />
                 <figcaption>{relationship}</figcaption>
               </figure>
             ))}

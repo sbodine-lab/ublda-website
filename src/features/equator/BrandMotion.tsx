@@ -51,7 +51,7 @@ export function StoryArtwork({ kind }: { kind: string }) {
       {kind === "arc" && (
         <>
           <div className="eq-art-partner">
-            <img src="/consulting/logos/arc-thrift.svg" alt="" />
+            <img src="/consulting/logos/arc-thrift.svg" alt="" loading="lazy" decoding="async" />
           </div>
           <div className="eq-art-blocks">
             <i />
@@ -69,7 +69,7 @@ export function StoryArtwork({ kind }: { kind: string }) {
             </div>
             <span className="eq-art-plus">+</span>
             <div>
-              <img src="/partners-blda.webp" alt="" />
+              <img src="/partners-blda.webp" alt="" loading="lazy" decoding="async" />
               <span>BLDA</span>
             </div>
           </div>

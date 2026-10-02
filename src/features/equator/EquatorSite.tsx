@@ -442,8 +442,10 @@ function Values() {
       panels.forEach(panel => reflow.observe(panel.firstElementChild!));
     });
     let frame = 0;
+    let visible = false;
     const update = () => {
       frame = 0;
+      if (!visible) return;
       // Measure the entire stack before changing opacity: interleaving the two
       // forces a fresh layout for each sticky panel on every scroll frame.
       const tops = panels.map(panel => panel.getBoundingClientRect().top);
@@ -457,14 +459,20 @@ function Values() {
       });
     };
     const scroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+      if (visible && !frame) frame = requestAnimationFrame(update);
     };
+    const visibility = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) scroll();
+    });
+    visibility.observe(section);
     addEventListener("scroll", scroll, { passive: true });
     addEventListener("resize", scroll);
     update();
     return () => {
       disposed = true;
       reflow.disconnect();
+      visibility.disconnect();
       removeEventListener("scroll", scroll);
       removeEventListener("resize", scroll);
       cancelAnimationFrame(frame);

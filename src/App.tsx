@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import Nav from './components/Nav'
 import AnnouncementBanner from './components/AnnouncementBanner'
 import { REMOVAL_FORM_URL } from './lib/forms'
+import { canonicalPublicPath, isClubPath } from './lib/publicRoutes'
 import Footer from './components/Footer'
 const Home = lazy(() => import('./pages/Home'))
 const EquatorSite = lazy(() => import('./features/equator/EquatorSite'))
@@ -70,10 +71,11 @@ function PageFallback() {
 }
 
 export default function App() {
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const pathname = canonicalPublicPath(location.pathname)
   // Public club and Consulting pages use local fonts. Fetch the older Google
   // font families only for routes that actually use them (workspace, table, etc.).
-  const publicPage = ['/', '/about', '/events', '/team', '/join', '/brand', '/links'].includes(pathname)
+  const publicPage = isClubPath(pathname)
   const consultingPage = matchesPrefix(pathname, ['/consulting', '/advisory'])
   useTabEasterEgg(!publicPage && !consultingPage)
   useEffect(() => {
@@ -89,6 +91,9 @@ export default function App() {
   // `/links` has a <main> with no id; everywhere else the global link has a real
   // `#main-content` target, including `/housing-intelligence`.
   const hideGlobalSkipLink = pathname === '/links'
+  if (pathname !== location.pathname) {
+    return <Navigate to={{ pathname, search: location.search, hash: location.hash }} replace />
+  }
   // The club design is scoped to public pages; Consulting and operations retain their own UI.
   if (pathname === '/unsubscribe') return <ExternalRedirect to={REMOVAL_FORM_URL} />
   if (publicPage) {
