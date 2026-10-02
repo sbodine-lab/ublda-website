@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const base = process.argv[2] || 'http://127.0.0.1:5178';
 const output = process.argv[3] || 'outputs/accessibility';
-const routes = ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe', '/consulting', '/consulting/practice', '/consulting/leadership', '/consulting/contact'];
+const routes = ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/consulting/apply', '/consulting', '/consulting/practice', '/consulting/leadership', '/consulting/contact'];
 const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 // Instrumentation only: production CSP is kept unchanged.
 const page = await browser.newPage({ reducedMotion: 'reduce', bypassCSP: true });
@@ -25,6 +25,7 @@ try {
         return {
           title: document.title,
           h1Count: document.querySelectorAll('h1').length,
+          brokenImages: [...document.images].filter(image => image.complete && !image.naturalWidth).map(image => image.currentSrc || image.src),
           overflow: document.documentElement.scrollWidth > innerWidth,
           violations: axe.violations.map(v => ({ id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })),
           incomplete: axe.incomplete.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) })),
@@ -36,6 +37,7 @@ try {
   }
 } finally {
   await writeFile(path.join(output, 'automated.json'), JSON.stringify({ base, checkedAt: new Date().toISOString(), reports, errors }, null, 2));
-  await browser.close();
+  await Promise.race([browser.close(), new Promise(resolve => setTimeout(resolve, 5000))]);
 }
-if (errors.length || reports.some(r => r.overflow || r.violations.length)) process.exitCode = 1;
+const uniqueTitles = new Set(reports.filter(r => r.width === 320).map(r => r.title));
+process.exit(errors.length || uniqueTitles.size !== routes.length || reports.some(r => r.overflow || r.violations.length || r.brokenImages.length || r.h1Count !== 1) ? 1 : 0);

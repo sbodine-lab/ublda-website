@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 const logos = [
-  ["/partners-blda.webp", "BLDA"],
-  ["/consulting/logos/arc-thrift.svg", "Arc Thrift Stores"],
-  ["/partners-nestidd.png", "Nestidd"],
-  ["/partners-wso.png", "Wall Street Oasis"],
+  ["/partners-blda.webp", "BLDA", "MBA counterpart"],
+  ["/consulting/logos/arc-thrift.svg", "Arc Thrift Stores", "Fall 2026 consulting client"],
+  ["/partners-nestidd.png", "Nestidd", "Past speaker’s organization"],
+  ["/partners-wso.png", "Wall Street Oasis", "Club partner"],
 ];
 
 export function NetworkLogos() {
@@ -40,9 +40,10 @@ export function NetworkLogos() {
             ref={set === 0 ? firstSet : undefined}
             aria-hidden={set > 0}
           >
-            {logos.map(([src, alt]) => (
+            {logos.map(([src, alt, relationship]) => (
               <figure key={src}>
                 <img src={src} alt={alt} decoding="async" />
+                <figcaption>{relationship}</figcaption>
               </figure>
             ))}
           </div>

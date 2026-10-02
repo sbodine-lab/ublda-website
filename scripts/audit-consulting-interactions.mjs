@@ -21,7 +21,7 @@ try {
   const frozenA = await page.locator('.st-hero canvas').evaluate(el => el.toDataURL());
   await page.waitForTimeout(200);
   check('Paused canvas stays still', frozenA === await page.locator('.st-hero canvas').evaluate(el => el.toDataURL()));
-  await page.getByRole('navigation').getByRole('link', { name: 'Practice', exact: true }).click();
+  await page.getByRole('navigation').getByRole('link', { name: 'Program', exact: true }).click();
   await page.locator('.st h1').waitFor();
   await page.waitForFunction(() => document.activeElement?.id === 'main-content');
   check('Client navigation focuses main', true);
@@ -74,14 +74,28 @@ try {
   await page.screenshot({ path: output + '/services-desktop.png' });
   await ready('/consulting/insights');
   await page.getByRole('button', { name: 'Data', exact: true }).click();
-  check('Insight filtering announces result count', await page.getByRole('status').innerText() === '1 insights shown in Data.' && await page.locator('.st-insight-card').count() === 1);
+  check('Insight filtering announces result count', await page.getByRole('status').innerText() === '2 insights shown in Data.' && await page.locator('.st-insight-card').count() === 2);
   await ready('/consulting/contact');
   check('Required fields have visible labels', (await page.locator('input[required], textarea[required]').evaluateAll(fields => fields.every(el => el.labels?.[0]?.textContent.includes('required')))));
-  await page.getByRole('button', { name: 'Prepare email', exact: true }).click();
+  await page.getByRole('button', { name: 'Send message', exact: true }).click();
   check('Empty contact form focuses invalid field', await page.locator('input[name="name"]').evaluate(el => el === document.activeElement && !el.validity.valid));
   await page.locator('input[name="email"]').fill('invalid');
   check('Contact email validates format', await page.locator('input[name="email"]').evaluate(el => el.validity.typeMismatch));
-  // No valid submission: the form opens the user's external email application.
+  // Browser-local response simulation: the contact request never reaches the API.
+  await page.route('**/api/contact', route => route.fulfill({status:503, contentType:'application/json', body:JSON.stringify({error:'Test service unavailable'})}));
+  await page.locator('input[name="name"]').fill('Audit Test');
+  await page.locator('input[name="email"]').fill('audit@example.com');
+  await page.locator('textarea[name="message"]').fill('Local browser test; no message is sent.');
+  await page.getByRole('button', {name:'Send message', exact:true}).click();
+  await page.getByRole('alert').waitFor();
+  check('Contact failure is announced and preserves the inquiry', (await page.getByRole('alert').innerText()).includes('Test service unavailable') && await page.locator('textarea[name="message"]').inputValue() === 'Local browser test; no message is sent.');
+  check('Contact failure offers direct email fallback', await page.getByRole('alert').getByRole('link').getAttribute('href') === 'mailto:alexfors@umich.edu?subject=UBLDA%20Consulting%20inquiry');
+  await page.unroute('**/api/contact');
+  await page.route('**/api/contact', route => route.fulfill({status:200, contentType:'application/json', body:JSON.stringify({success:true})}));
+  await page.getByRole('button', {name:'Send message', exact:true}).click();
+  await page.getByRole('button', {name:'Message sent', exact:true}).waitFor();
+  check('Contact success is announced and prevents duplicate submission', (await page.getByRole('status').innerText()).includes('Your message has been sent') && await page.getByRole('button', {name:'Message sent', exact:true}).isDisabled());
+  await page.unroute('**/api/contact');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const layout = () => {
     const outside = [...document.querySelectorAll('.st h1, .st h2, .st h3, .st p, .st a, .st button, .st label')].filter(el => {
@@ -118,6 +132,6 @@ try {
   check('Club hero decorative dot is removed', await page.locator('.eq-hero-sub > span').count() === 0);
 } finally {
   await writeFile(output + '/interactions.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks}, null, 2));
-  await browser.close();
+  await Promise.race([browser.close(), new Promise(resolve => setTimeout(resolve, 5000))]);
 }
 process.exit(checks.some(c => !c.pass) ? 1 : 0);

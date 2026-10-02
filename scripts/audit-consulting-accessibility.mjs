@@ -59,6 +59,6 @@ try {
   }
 } finally {
   await writeFile(output + '/automated.json', JSON.stringify({ base, checkedAt: new Date().toISOString(), reports, errors }, null, 2));
-  await browser.close();
+  await Promise.race([browser.close(), new Promise(resolve => setTimeout(resolve, 5000))]);
 }
 process.exit(errors.length || reports.some(r => r.overflow || r.outsideViewport.length || r.splitHeadingWords.length || !r.consistentPalette || r.violations.length) ? 1 : 0);

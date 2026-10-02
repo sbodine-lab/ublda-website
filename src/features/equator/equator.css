@@ -684,6 +684,11 @@
   object-fit: contain;
   mix-blend-mode: multiply;
 }
+.eq-logo-set figcaption {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
 @keyframes eq-marquee {
   to {
     transform: translateX(calc(-100% / var(--logo-set-count, 2)));

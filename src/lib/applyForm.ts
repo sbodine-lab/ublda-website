@@ -30,7 +30,8 @@ export const APPLY_CLOSE_TIME_SHORT = 'closes 11:30 PM ET'
 export const INTERVIEW_WINDOW_SHORT = 'Late September'
 export const INTERVIEW_FORMAT = 'One interview round, split between behavioral questions and a simple case.'
 export const OFFERS_SHORT = 'After interviews'
-export const KICKOFF_SHORT = 'Early October'
+// September 25 planning: onboarding precedes client work; no date is confirmed.
+export const KICKOFF_SHORT = 'October (planned)'
 
 export type ApplyWindow = 'before' | 'open' | 'closed'
 

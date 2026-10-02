@@ -120,7 +120,7 @@ const programs = [
   ],
   [
     "Student consulting",
-    "Our first client engagement is planned for Fall 2026. Apply to UBLDA Consulting through a separate application and interview to join the student team.",
+    "Our first client engagement is planned for Fall 2026. Consulting has a separate application and interview process. Explore the program and current recruiting information.",
     "/consulting",
   ],
   [
@@ -1104,7 +1104,16 @@ export default function EquatorSite() {
     return () => context.revert();
   }, [motionPaused, pathname]);
   useEffect(() => {
-    document.title = "UBLDA";
+    const pageTitles: Record<string, string> = {
+      "/": "UBLDA | Disability Inclusion at Michigan Ross",
+      "/about": "Our story | UBLDA",
+      "/events": "Events | UBLDA",
+      "/team": "Our team | UBLDA",
+      "/join": "Join UBLDA",
+      "/brand": "Brand resources | UBLDA",
+      "/links": "Club links | UBLDA",
+    };
+    document.title = pageTitles[pathname] || "UBLDA";
     let disposed = false;
     let frame = 0;
     const el = root.current;
