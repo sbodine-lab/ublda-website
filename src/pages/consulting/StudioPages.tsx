@@ -131,7 +131,7 @@ function ClientLogos() {
       </figure>
       <figure>
         <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
-        <figcaption>Planned national board presentation</figcaption>
+        <figcaption>National disability advocacy network</figcaption>
       </figure>
     </div>
   );
@@ -149,7 +149,7 @@ function Timeline() {
       `${INTERVIEW_FORMAT} Invited applicants will receive confirmed dates and times.`,
     ],
     ["Decisions", OFFERS_SHORT, ""],
-    ["Kickoff", KICKOFF_SHORT, "Begin weekly project work with your team."],
+    ["Kickoff", KICKOFF_SHORT, "Project work begins after onboarding. The date will be confirmed with the team and client."],
   ];
   return (
     <div className="st-timeline">
@@ -227,11 +227,11 @@ export function StudioHome() {
           <div className="st-client-detail">
             <BrandLogo src="/client-the-arc.svg" alt="The Arc" />
             <div>
-              <h3>National board presentation</h3>
+              <h3>The wider Arc network</h3>
               <p>
-                Our October–December engagement will conclude with the student
-                team presenting its recommendations to The Arc’s national board
-                in December 2026.
+                Arc Thrift funds local chapters of The Arc in Colorado and New
+                Mexico. The Arc of the United States is the national advocacy
+                organization; Arc Thrift Stores is our consulting client.
               </p>
             </div>
           </div>
@@ -241,7 +241,7 @@ export function StudioHome() {
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
             <h2 className="st-section-heading">The Arc<br />{' '}project</h2>
-            <p>Four to six analysts will work with two project managers from October through December 2026.</p>
+            <p>Four to six analysts and two project managers are preparing for an October–December 2026 engagement. The scope and schedule are being finalized with the client.</p>
           </div>
           <div className="st-experience-grid">
             <article data-enter>
@@ -257,7 +257,7 @@ export function StudioHome() {
             <article data-enter>
               <span aria-hidden="true">03</span>
               <h3>Present the findings</h3>
-              <p>The team will review its work at the midpoint and present its recommendations to The Arc’s national board in December.</p>
+              <p>The team plans to review its work at the midpoint and present its final recommendations to the client. The presentation date and audience are being confirmed.</p>
             </article>
           </div>
           <Button to="/consulting/practice">Inside the program</Button>
@@ -393,9 +393,9 @@ export function StudioWork() {
         <ClientLogos />
         <p>
           Arc Thrift Stores of Colorado is UBLDA Consulting’s first client. The
-          student team will work with the nonprofit retailer from October
-          through December 2026 and then present its recommendations to The
-          Arc’s national board.
+          student team is preparing for an October–December 2026 engagement
+          on Arc University. The project scope, schedule, and final presentation
+          arrangements are being confirmed with the client.
         </p>
       </Intro>
       <section className="st-wrap st-work-row" data-enter>
@@ -412,8 +412,8 @@ export function StudioWork() {
           </p>
           <p>
             Arc Thrift’s CEO sponsors the engagement. Four to six analysts and
-            two project managers will meet each week as they prepare for the
-            December presentation.
+            two project managers plan to meet each week to research the
+            client’s question and develop recommendations.
           </p>
           <Button href="https://arcthrift.com">Visit Arc Thrift Stores</Button>
         </div>
@@ -456,7 +456,7 @@ export function StudioPractice() {
         </p>
         <p>
           Our first client is Arc Thrift Stores of Colorado. During the
-          October–December engagement, analysts will research a business
+          planned October–December engagement, analysts will research a business
           question and develop recommendations with guidance from two project
           managers.
         </p>
@@ -744,8 +744,8 @@ export function StudioContact() {
               <div>
                 <p>
                   Our Fall 2026 team will include four to six analysts working
-                  with two project managers on weekly client work from October
-                  through December.
+                  with two project managers. Project work is planned for October
+                  through December, with the schedule being finalized.
                 </p>
                 <p>
                   {windowState === "open"

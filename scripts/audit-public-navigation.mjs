@@ -33,6 +33,7 @@ const routeClick = async (link, name) => {
 };
 await mkdir(output,{recursive:true});
 try {
+  if (!process.argv.includes('--inventory-only')) {
   for (const width of [1440,390]) {
     await page.setViewportSize({width,height:900});
     await ready();
@@ -61,7 +62,9 @@ try {
       const label=await program.locator('h3').innerText();
       await routeClick(program.getByRole('link',{name:'Explore',exact:true}),`Program Explore: ${label} ${width}`);
     }
-    for(let i=0;i<4;i++) {
+    await ready();
+    const storyCount = await page.locator('.eq-story-card').count();
+    for(let i=0;i<storyCount;i++) {
       await ready();
       const card=page.locator('.eq-story-card').nth(i);
       await card.locator('button').click();
@@ -74,12 +77,17 @@ try {
     await ready();
     await routeClick(page.locator('.eq-cta').getByRole('link',{name:'Come to an event',exact:true}),`Events CTA ${width}`);
     await ready();
-    await routeClick(page.getByRole('link',{name:'Event details',exact:true}),`Upcoming event details ${width}`);
-    check(`Event detail anchor visible ${width}`, await page.locator('.eq-event-feature').evaluate(el=>Math.abs(el.getBoundingClientRect().top)<130));
+    if (await page.getByRole('link',{name:'Event details',exact:true}).count()) {
+      await routeClick(page.getByRole('link',{name:'Event details',exact:true}).first(),`Upcoming event details ${width}`);
+      check(`Event detail anchor visible ${width}`, await page.locator('.eq-event-feature').first().evaluate(el=>Math.abs(el.getBoundingClientRect().top)<130));
+    } else {
+      check(`No upcoming event has an expired RSVP ${width}`, await page.locator('.eq-events-empty').count() === 1 && await page.locator('.eq-upcoming-events a').filter({hasText:'RSVP'}).count() === 0);
+      await ready('/events');
+    }
     await routeClick(page.getByRole('link',{name:'Explore past events',exact:true}),`Past events anchor ${width}`);
     await page.locator('.eq-event-recap summary').first().click();
     check(`Event recap expands ${width}`, await page.locator('.eq-event-recap').first().evaluate(el=>el.open));
-    for(const href of ['/about','/events','/team','/consulting','/brand','/links','/unsubscribe']) {
+    for(const href of ['/about','/events','/team','/consulting','/brand','/links']) {
       await ready();
       await routeClick(page.locator(`.eq-footer-nav a[href="${href}"]`),`Footer ${href} ${width}`);
     }
@@ -110,9 +118,10 @@ try {
     await page.locator('.eq-footer-wordmark').scrollIntoViewIfNeeded(); await page.locator('.eq-footer-wordmark').click(); await pause();
     check(`Full motion home link ${width}`,await page.evaluate(()=>scrollY<5));
   }
+  }
   await page.emulateMedia({reducedMotion:'reduce'});
   // Inventory every public route, including references that only appear in disclosures.
-  const routes=['/','/about','/events','/team','/join','/brand','/links','/unsubscribe','/consulting','/consulting/work','/consulting/practice','/consulting/leadership','/consulting/partners','/consulting/contact','/consulting/services','/consulting/services/strategy','/consulting/services/accessibility','/consulting/services/workplace','/consulting/insights','/consulting/insights/disability-is-not-a-niche','/consulting/insights/the-business-case','/consulting/insights/employment-and-access'];
+  const routes=['/','/about','/events','/team','/join','/brand','/links','/consulting','/consulting/work','/consulting/practice','/consulting/leadership','/consulting/partners','/consulting/contact','/consulting/services','/consulting/services/strategy','/consulting/services/accessibility','/consulting/services/workplace','/consulting/insights','/consulting/insights/disability-is-not-a-niche','/consulting/insights/the-business-case','/consulting/insights/employment-and-access','/consulting/insights/disability-in-the-workforce','/consulting/insights/accommodations-and-retention','/consulting/apply'];
   for(const route of routes) {
     await ready(route);
     for(const link of await page.locator('a').evaluateAll(anchors=>anchors.map(a=>({href:a.getAttribute('href'),label:a.getAttribute('aria-label')||a.textContent.trim(),download:a.hasAttribute('download')})))) {

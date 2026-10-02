@@ -52,14 +52,14 @@ try {
   const program = page.getByRole('button', { name: 'Speaker conversations', exact: true });
   await program.click();
   check('Program accordion exposes its details', await program.getAttribute('aria-expanded') === 'true' && !(await page.locator('#program-0').evaluate(el => el.inert)));
-  await page.getByRole('button', { name: 'A conversation with Microsoft', exact: true }).click();
+  await page.getByRole('button', { name: 'Our first consulting client', exact: true }).click();
   check('Community card details remain inside their card', await page.locator('.eq-story-card.is-open').evaluate(el => { const card = el.getBoundingClientRect(); const text = el.querySelector('.eq-card-detail').getBoundingClientRect(); return text.bottom <= card.bottom + 1; }));
-  for (let i = 0; i < 3; i++) { await page.getByRole('button', { name: 'Next story', exact: true }).click(); await page.waitForTimeout(100); }
+  for (let i = 1; i < await page.locator('.eq-story-card').count(); i++) { await page.getByRole('button', { name: 'Next story', exact: true }).click(); await page.waitForTimeout(100); }
   check('Carousel works without dragging', await page.getByRole('button', { name: 'Next story', exact: true }).isDisabled());
 
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe']) {
+    for (const route of ['/', '/about', '/events', '/team', '/join', '/brand', '/links']) {
       await page.goto(base + route);
       await page.locator('.eq-site h1').waitFor();
       await page.addStyleTag({ content: '.eq-site * { line-height: 1.5 !important; letter-spacing: .12em !important; word-spacing: .16em !important; } .eq-site p { margin-bottom: 2em !important; }' });
@@ -75,7 +75,7 @@ try {
   }
   for (const viewport of [{ width: 640, height: 450 }, { width: 320, height: 225 }]) {
     await page.setViewportSize(viewport);
-    for (const route of ['/', '/about', '/events', '/team', '/join', '/brand', '/links', '/unsubscribe']) {
+    for (const route of ['/', '/about', '/events', '/team', '/join', '/brand', '/links']) {
       await page.goto(base + route);
       await page.locator('.eq-site h1').waitFor();
       check(`Zoom reflow ${viewport.width}x${viewport.height} ${route}`, await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -89,6 +89,6 @@ try {
   await page.screenshot({ path: output + '/mobile-event-recap.png' });
 } finally {
   await writeFile(output + '/interactions.json', JSON.stringify({ base, checkedAt: new Date().toISOString(), checks }, null, 2));
-  await browser.close();
+  await Promise.race([browser.close(), new Promise(resolve => setTimeout(resolve, 5000))]);
 }
-if (checks.some(result => !result.pass)) process.exitCode = 1;
+process.exit(checks.some(result => !result.pass) ? 1 : 0);
