@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable"], "resolveJsonModule": true },
+  "include": ["cloudflare/**/*.ts"]
+}

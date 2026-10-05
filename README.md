@@ -1,5 +1,9 @@
 # UBLDA Website
 
+## Cloudflare hosting migration
+
+Preview deployment, configuration requirements, verification gates, and rollback records are in [Cloudflare migration](docs/cloudflare-migration.md).
+
 ## Decision Center
 
 Local preview, Logto/Convex configuration, governance rules, and agent API/MCP setup are documented in [Decision Center setup and operations](docs/decision-center.md).

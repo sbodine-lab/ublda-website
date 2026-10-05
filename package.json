@@ -13,7 +13,11 @@
     "check:decisions": "npm run typecheck:convex && node --experimental-strip-types --test tests/decision-*.test.ts",
     "pretest": "npm run build:store",
     "test": "node --experimental-strip-types --test tests/**/*.test.ts",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:cloudflare": "npm run build && node scripts/cloudflare-assets.mjs",
+    "check:cloudflare": "tsc -p tsconfig.cloudflare.json",
+    "preview:cloudflare": "wrangler dev --port 8787",
+    "deploy:cloudflare:preview": "npm run build:cloudflare && wrangler deploy"
   },
   "dependencies": {
     "@logto/react": "^4.0.14",
@@ -56,6 +60,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "wrangler": "4.147.0"
   }
 }
