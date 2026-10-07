@@ -132,6 +132,16 @@ export const PARTNERS = [
   { src: '/partners-wso.png', alt: 'Wall Street Oasis — club partner', role: 'Club partner' },
 ]
 
+export const CONSULTANTS = [
+  { name: 'Abram Freilich', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/abram-freilich-270a0535b/' },
+  { name: 'Alex Cohen', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/alex-cohen-2b031b382/' },
+  { name: 'Anthony Cavallario', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/anthony-cavallario/' },
+  { name: 'Colin Park', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/colinnampark/' },
+  { name: 'Laith Kasim', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/laithkasim/' },
+  { name: 'Lena Sbaschnig', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/lena-sbaschnig-2a6663285/' },
+  { name: "Paige O'Neill", role: 'Consultant', linkedin: 'https://www.linkedin.com/in/paigewoneill/' },
+]
+
 export const LEADERS = [
   { name: 'Alex Forstner', role: 'VP of Education, project manager', email: 'alexfors@umich.edu', linkedin: 'https://www.linkedin.com/in/alex-forstner/' },
   { name: 'Solomon DeYoung', role: 'VP Outreach and Partnerships, project manager', email: 'sdeyoun@umich.edu', linkedin: 'https://www.linkedin.com/in/solomon-deyoung/' },

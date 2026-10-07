@@ -2372,3 +2372,35 @@ html.st-menu-open {
 @media (min-width: 901px) {
   .st-insight-card :is(h2, h3) { min-height: 2.24em; }
 }
+
+.st-consultants {
+  margin-top: 80px;
+}
+.st-consultant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 40px;
+}
+.st-consultant {
+  border-top: 1px solid #11262b33;
+  padding-top: 24px;
+}
+.st-consultant h3 {
+  font-size: clamp(24px, 2.4vw, 33.6px);
+  margin-bottom: 12px;
+}
+.st-consultant > p {
+  font-size: 17px;
+  color: var(--st-muted);
+  margin-bottom: 14px;
+}
+@media (max-width: 900px) {
+  .st-consultant-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .st-consultant-grid {
+    grid-template-columns: 1fr;
+  }
+}
