@@ -6,7 +6,7 @@ import { GenerativeArt } from "./GenerativeArt";
 import { BusinessCase } from "./BusinessCase";
 import { RossHero } from "./RossHero";
 import { AREAS, RESEARCH } from "./research";
-import { LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
+import { CONSULTANTS, LEADERS, PARTNERS, PARTNER_STATEMENT, ROSS_ADDRESS, CONTACT_MAILTO } from "./content";
 import { CONSULTING_FORM_URL, MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { useConsultingApplication } from "../../lib/useConsultingApplication";
 import {
@@ -119,6 +119,30 @@ function People({ full = false }: { full?: boolean }) {
           )}
         </article>
       ))}
+    </div>
+  );
+}
+function Consultants() {
+  return (
+    <div className="st-consultants">
+      <h2 className="st-section-heading" data-enter>Consultants</h2>
+      <div className="st-consultant-grid">
+        {CONSULTANTS.map((person) => (
+          <article key={person.linkedin} className="st-consultant" data-enter>
+            <h3>{person.name}</h3>
+            <p>{person.role}</p>
+            <a
+              className="st-text-link"
+              href={person.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${person.name} on LinkedIn`}
+            >
+              LinkedIn <ArrowUpRight size={16} />
+            </a>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
@@ -293,10 +317,11 @@ export function StudioHome() {
       <section className="st-team-section">
         <div className="st-wrap">
           <div className="st-section-top" data-enter>
-            <h2 className="st-section-heading">Meet our<br />project managers.</h2>
+            <h2 className="st-section-heading">Meet our<br />team.</h2>
             <Button to="/consulting/leadership">Meet the team</Button>
           </div>
           <People />
+          <Consultants />
         </div>
       </section>
       <BusinessCase />
@@ -494,20 +519,22 @@ export function StudioPractice() {
 }
 export function StudioLeadership() {
   return (
-    <Studio title="Leadership">
+    <Studio title="Our team">
       <Intro
         title={
           <>
             Meet our
             <br />
-            <em>project managers.</em>
+            <em>team.</em>
           </>
         }
       >
         <Button to="/team">View the full E-board</Button>
       </Intro>
       <section className="st-wrap st-leadership">
+        <h2 className="st-section-heading" data-enter>Project managers</h2>
         <People full />
+        <Consultants />
       </section>
       <Callout join />
     </Studio>
