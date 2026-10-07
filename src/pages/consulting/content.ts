@@ -133,13 +133,13 @@ export const PARTNERS = [
 ]
 
 export const CONSULTANTS = [
-  { name: 'Abram Freilich', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/abram-freilich-270a0535b/' },
-  { name: 'Alex Cohen', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/alex-cohen-2b031b382/' },
-  { name: 'Anthony Cavallario', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/anthony-cavallario/' },
-  { name: 'Colin Park', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/colinnampark/' },
-  { name: 'Laith Kasim', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/laithkasim/' },
-  { name: 'Lena Sbaschnig', role: 'Consultant', linkedin: 'https://www.linkedin.com/in/lena-sbaschnig-2a6663285/' },
-  { name: "Paige O'Neill", role: 'Consultant', linkedin: 'https://www.linkedin.com/in/paigewoneill/' },
+  { name: 'Abram Freilich', role: 'Consultant' },
+  { name: 'Alex Cohen', role: 'Consultant' },
+  { name: 'Anthony Cavallario', role: 'Consultant' },
+  { name: 'Colin Park', role: 'Consultant' },
+  { name: 'Laith Kasim', role: 'Consultant' },
+  { name: 'Lena Sbaschnig', role: 'Consultant' },
+  { name: "Paige O'Neill", role: 'Consultant' },
 ]
 
 export const LEADERS = [
