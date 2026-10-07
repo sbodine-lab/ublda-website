@@ -128,18 +128,9 @@ function Consultants() {
       <h2 className="st-section-heading" data-enter>Consultants</h2>
       <div className="st-consultant-grid">
         {CONSULTANTS.map((person) => (
-          <article key={person.linkedin} className="st-consultant" data-enter>
+          <article key={person.name} className="st-consultant" data-enter>
             <h3>{person.name}</h3>
             <p>{person.role}</p>
-            <a
-              className="st-text-link"
-              href={person.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${person.name} on LinkedIn`}
-            >
-              LinkedIn <ArrowUpRight size={16} />
-            </a>
           </article>
         ))}
       </div>
