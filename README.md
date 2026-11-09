@@ -8,6 +8,12 @@ Local preview, Logto/Convex configuration, governance rules, and agent API/MCP s
 
 Leadership administration uses the Logto + Convex member roster described in the Decision Center operations guide. The retired E-board recruiting portal, applicant accounts, interview scheduler, resume storage, exports, health checks, and shared-password admin backend have been removed. General membership sign-up remains available at `/join`.
 
+## Hosting (GitHub Pages)
+
+The public site is built by `.github/workflows/deploy-pages.yml` on every push to `main` and served by GitHub Pages at https://ublda.org. `scripts/prepare-github-pages.mjs` runs after `npm run build` to add `404.html`, one HTML copy per route, and the security meta tags that Vercel used to send as headers. `public/CNAME` keeps the custom domain.
+
+GitHub Pages only serves static files, so the serverless functions in `api/` do not run there. The consulting contact form falls back to its "Email Alex directly" link, and the pages that call `/api/*` (craft night, MTC shifts, speaker ops, operations, Decision Center sign-in bridge, workspace weather) need a separate backend before they work again.
+
 ## Local development
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
