@@ -88,6 +88,11 @@ let html = readFileSync(indexPath, 'utf8')
 if (metaTags.length && !html.includes('http-equiv="Content-Security-Policy"')) {
   html = html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    ${metaTags.join('\n    ')}`)
 }
+// Fail the build rather than ship pages without the security policy.
+if (csp && !html.includes('http-equiv="Content-Security-Policy"')) {
+  console.error('Could not add the Content-Security-Policy meta tag: <meta charset="UTF-8" /> not found in dist/index.html.')
+  process.exit(1)
+}
 writeFileSync(indexPath, html)
 writeFileSync(path.join(dist, '404.html'), html)
 
