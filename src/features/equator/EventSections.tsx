@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowDown, ArrowUpRight, Plus } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Check, Plus } from "lucide-react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MEMBERSHIP_FORM_URL } from "../../lib/forms";
 import { useClock } from "../../lib/useClock";
 import { buildGCalUrl } from "../../lib/calendarLinks";
 import { events, EVENT_BOUNDARIES, isPastEvent, type ClubEvent } from "../../lib/events";
+import { markFormOpened, useRsvpRecord } from "../../lib/rsvpStatus";
 
 function EventDate({ event }: { event: ClubEvent }) {
   return (
@@ -25,6 +26,7 @@ function EventDate({ event }: { event: ClubEvent }) {
 }
 
 function UpcomingEvent({ event, preview }: { event: ClubEvent; preview: boolean }) {
+  const { going } = useRsvpRecord(event.id);
   return (
     <article className="eq-event-feature" id={preview ? undefined : event.id} aria-labelledby={`${preview ? "preview-" : ""}${event.id}-title`}>
       <EventDate event={event} />
@@ -35,7 +37,13 @@ function UpcomingEvent({ event, preview }: { event: ClubEvent; preview: boolean 
         {event.formatNote && <p className="eq-event-format-note">{event.formatNote}</p>}
         {!preview && <p className="eq-event-location">{event.location}</p>}
         <div className="eq-event-actions">
-          {event.rsvpUrl && <a className="eq-button" href={event.rsvpUrl}>RSVP<ArrowUpRight size={18} aria-hidden="true" /></a>}
+          {event.rsvpUrl && (going ? (
+            <span className="eq-event-going"><Check size={20} aria-hidden="true" />You’re on the list</span>
+          ) : (
+            <a className="eq-button" href={event.rsvpUrl} target="_blank" rel="noreferrer" onClick={() => markFormOpened(event.id)}>
+              RSVP<ArrowUpRight size={18} aria-hidden="true" /><span className="eq-sr-only"> (form opens in a new tab)</span>
+            </a>
+          ))}
           {preview ? (
             <Link className="eq-text-link" to={`/events#${event.id}`}>Event details<ArrowUpRight size={18} aria-hidden="true" /></Link>
           ) : (
