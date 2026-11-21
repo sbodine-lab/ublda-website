@@ -1,0 +1,117 @@
+/* Countdown bar and RSVP popup for the featured event. */
+
+.eq-site { padding-bottom: var(--eq-promo-h, 0px); }
+
+.eq-promo-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 18px 28px;
+  padding: 12px var(--eq-margin) calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--eq-navy);
+  color: var(--eq-cream);
+  font-size: 17px;
+  line-height: 1.25;
+  box-shadow: 0 -1px 0 #faf9f622;
+}
+.eq-promo-bar-info { display: flex; align-items: baseline; gap: 6px 16px; flex-wrap: wrap; min-width: 0; margin-right: auto; }
+.eq-site .eq-promo-bar-title { color: inherit; font-weight: 500; text-decoration: underline; text-decoration-color: #faf9f655; text-underline-offset: 4px; }
+.eq-site .eq-promo-bar-title:hover { text-decoration-color: currentColor; }
+.eq-promo-bar-meta { color: #faf9f6cc; display: inline-flex; align-items: center; flex-wrap: wrap; white-space: pre; }
+.eq-promo-live {
+  width: 9px; height: 9px; margin-right: 8px; border-radius: 50%;
+  background: var(--eq-teal); box-shadow: 0 0 0 0 #67b8b3aa;
+  animation: eq-promo-pulse 1.8s ease-out infinite;
+}
+@keyframes eq-promo-pulse { to { box-shadow: 0 0 0 10px #67b8b300; } }
+
+.eq-promo-countdown { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.eq-promo-unit { color: #faf9f6aa; font-size: 15px; }
+.eq-promo-unit + .eq-promo-unit { margin-left: 10px; }
+.eq-promo-unit strong { color: var(--eq-gold); font-size: 22px; font-weight: 500; letter-spacing: -0.02em; margin-right: 2px; }
+
+.eq-promo-bar-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.eq-promo-going { display: inline-flex; align-items: center; gap: 6px; color: var(--eq-gold); }
+
+.eq-site .eq-promo-rsvp {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 44px; padding: 10px 16px;
+  border: 0; border-radius: 0;
+  background: var(--eq-gold); color: var(--eq-navy);
+  font: inherit; font-size: 17px; font-weight: 500; cursor: pointer;
+  transition: gap 0.12s, background 0.15s;
+}
+.eq-site .eq-promo-rsvp:hover { gap: 16px; background: var(--eq-cream); }
+.eq-site .eq-promo-link,
+.eq-site .eq-promo-text,
+.eq-site .eq-promo-again {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px;
+  border: 0; background: none; color: inherit; font: inherit; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+.eq-site :is(.eq-promo-link, .eq-promo-text, .eq-promo-again):hover { text-decoration-color: currentColor; }
+.eq-promo-icon {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0;
+  border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer;
+}
+.eq-promo-icon:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+
+/* Popup: a card in the corner, never a blocking modal. */
+.eq-promo-popup {
+  position: fixed;
+  right: var(--eq-margin);
+  bottom: calc(var(--eq-promo-h, 0px) + 20px);
+  z-index: 21;
+  width: min(400px, calc(100vw - 32px));
+  padding: 28px 28px 22px;
+  background: var(--eq-cream);
+  color: var(--eq-navy);
+  border-top: 6px solid var(--eq-teal);
+  box-shadow: 0 24px 60px -18px #0a365866, 0 2px 8px #0a36581f;
+}
+.eq-promo-close { position: absolute; top: 8px; right: 8px; }
+.eq-promo-kicker { display: flex; align-items: center; gap: 6px; padding-right: 40px; color: var(--eq-muted); font-size: 16px; line-height: 1.3; }
+.eq-site .eq-promo-title { margin-top: 10px; font-size: 32px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 500; text-wrap: balance; }
+.eq-promo-body { margin-top: 12px; font-size: 17px; line-height: 1.4; }
+.eq-promo-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 20px; }
+.eq-site .eq-promo-popup .eq-promo-rsvp { background: var(--eq-navy); color: var(--eq-cream); }
+.eq-site .eq-promo-popup .eq-promo-rsvp:hover { background: var(--eq-teal); color: var(--eq-navy); }
+.eq-site .eq-promo-again { margin-top: 4px; font-size: 15px; color: var(--eq-muted); }
+
+/* Events page: confirmed visitors see their status beside the RSVP. */
+.eq-event-going { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 18px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .eq-site:not([data-motion-paused="true"]) .eq-promo-popup { animation: eq-promo-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .eq-site:not([data-motion-paused="true"]) .eq-promo-bar { animation: eq-promo-rise 0.5s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+}
+.eq-site[data-motion-paused="true"] .eq-promo-live { animation: none; }
+@media (prefers-reduced-motion: reduce) { .eq-promo-live { animation: none; } }
+@keyframes eq-promo-in { from { opacity: 0; transform: translateY(18px); } }
+@keyframes eq-promo-rise { from { transform: translateY(100%); } }
+
+@media (max-width: 900px) {
+  .eq-promo-bar-room { display: none; }
+}
+@media (max-width: 768px) {
+  .eq-promo-bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 10px 8px calc(10px + env(safe-area-inset-bottom, 0px)) 20px;
+    font-size: 15px;
+  }
+  .eq-promo-bar-info { grid-column: 1; flex-direction: column; gap: 2px; }
+  .eq-promo-countdown { grid-column: 1; grid-row: 2; }
+  .eq-promo-unit strong { font-size: 18px; }
+  .eq-promo-unit { font-size: 13px; }
+  .eq-promo-bar-actions { grid-column: 2; grid-row: 1 / span 2; gap: 4px; }
+  .eq-site .eq-promo-bar .eq-promo-rsvp { padding: 10px 14px; font-size: 16px; }
+  .eq-promo-going { font-size: 15px; }
+  .eq-promo-bar .eq-promo-going + .eq-promo-link { display: none; }
+  .eq-promo-popup { right: 16px; left: 16px; width: auto; bottom: calc(var(--eq-promo-h, 0px) + 12px); padding: 24px 20px 18px; }
+  .eq-site .eq-promo-title { font-size: 27px; }
+  .eq-promo-body { font-size: 16px; }
+}

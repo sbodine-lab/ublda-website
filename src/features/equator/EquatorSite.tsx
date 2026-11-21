@@ -36,6 +36,7 @@ import {
 import { useClock } from "../../lib/useClock";
 import { board } from "./content";
 import { UpcomingEvents, PastEvents } from "./EventSections";
+import { EventPromo } from "./EventPromo";
 import {
   MotionPreference,
   useCompactMotion,
@@ -1281,6 +1282,7 @@ export default function EquatorSite() {
       <Header key={pathname} home={home} paused={motionPaused} systemMotion={systemMotion} onToggleMotion={toggleMotion} />
       <main id="main-content" tabIndex={-1}>{content}</main>
       <Footer />
+      <EventPromo />
     </div>
     </MotionPreference>
   );
